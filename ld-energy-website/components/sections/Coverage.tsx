@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Section } from '@/components/ui/Section'
-import { ArrowRight, ArrowUpRight, MapPin } from 'lucide-react'
+import { ArrowRight, ArrowUpRight } from 'lucide-react'
 import { boroughMeta } from '@/lib/boroughs'
 
 const groups: { region: string; slugs: string[] }[] = [
@@ -84,7 +84,7 @@ export function Coverage() {
           <ArrowRight className="w-4 h-4" aria-hidden="true" />
         </Link>
         <p className="text-sm text-secondary-600">
-          Don't see your area? We cover all 32 boroughs,{' '}
+          Don&apos;t see your area? We cover all 32 boroughs,{' '}
           <Link href="#contact" className="font-semibold text-primary-700 hover:text-primary-800">
             get in touch
           </Link>

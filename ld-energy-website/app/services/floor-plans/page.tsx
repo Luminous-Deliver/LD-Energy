@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { CheckCircle2, Sparkles } from 'lucide-react'
 import { Section } from '@/components/ui/Section'
-import { Card } from '@/components/ui/Card'
 import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { StepList } from '@/components/ui/StepList'
 import { PageHero } from '@/components/sections/PageHero'

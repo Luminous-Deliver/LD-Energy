@@ -10,7 +10,6 @@ import {
   ChevronRight, 
   ChevronLeft, 
   BadgePoundSterling,
-  Calendar,
   Sparkles,
   ClipboardCheck,
   Phone,
@@ -25,9 +24,6 @@ import { useTurnstile } from '@/lib/useTurnstile'
 import {
   contactSchema,
   propertyTypes,
-  customerTypes,
-  services as serviceOptions,
-  speeds,
   EXPRESS_SPEED,
   type ContactInput,
 } from '@/lib/validators'
@@ -77,9 +73,14 @@ export function ContactForm() {
   const {
     containerRef: turnstileRef,
     token: turnstileToken,
+    isLoading: turnstileLoading,
+    error: turnstileError,
+    reset: resetTurnstile,
   } = useTurnstile({
+    enabled: step === 3 && status !== 'success',
     onVerify: (token) => setValue('turnstileToken', token, { shouldValidate: true }),
     onExpire: () => setValue('turnstileToken', '', { shouldValidate: true }),
+    onError: () => setValue('turnstileToken', '', { shouldValidate: true }),
   })
 
   // Watch form fields for the live pricing calculator
@@ -142,7 +143,6 @@ export function ContactForm() {
     epcPrice,
     floorPlanPrice,
     discount,
-    speedPrice,
     retrofitPrice,
     total,
     wantsEpc,
@@ -167,6 +167,9 @@ export function ContactForm() {
       setStatus('success')
       reset()
     } catch (err) {
+      // Turnstile tokens are single-use. A failed request needs a fresh token
+      // before the visitor can retry, regardless of where the request failed.
+      resetTurnstile()
       setStatus('error')
       setServerError(err instanceof Error ? err.message : 'Unknown error')
     }
@@ -273,28 +276,28 @@ export function ContactForm() {
                   const value = field.value ?? []
                   const isBundleSelected = value.includes('Both (Bundle)')
                   // The bundle tile also lights up when EPC + Floor Plan are both picked
-                  const isSelected = (v: string) =>
+                  const isSelected = (v: ContactInput['services'][number]) =>
                     v === 'Both (Bundle)'
                       ? isBundleSelected
                       : isBundleSelected
                         ? false
-                        : value.includes(v as any)
+                        : value.includes(v)
 
                   return (
                     <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                      {[
-                        { value: 'EPC Certificate', label: 'EPC only', desc: 'Official 10-year energy rating, lodged on the government register.' },
+                      {([
+                        { value: 'EPC Certificate', label: 'EPC only', desc: 'Official 10-year energy rating, lodged on the government register.', badge: undefined },
                         { value: 'Both (Bundle)', label: 'EPC + Floor Plan', desc: 'Both for the same property in one visit — better value than booking separately.', badge: 'Better value' },
-                        { value: 'Floor Plan', label: 'Floor plan only', desc: 'Laser-measured scale drawing showing layout and room sizes.' },
+                        { value: 'Floor Plan', label: 'Floor plan only', desc: 'Laser-measured scale drawing showing layout and room sizes.', badge: undefined },
                         { value: 'Bulk / Agency Enquiry', label: 'Bulk / agency enquiry', desc: 'Multiple properties or ongoing instructions — we’ll quote volume rates.', badge: 'Agents' },
-                      ].map((s) => {
+                      ] as const).map((s) => {
                         const checked = isSelected(s.value)
                         return (
                           <button
                             key={s.value}
                             type="button"
                             aria-pressed={checked}
-                            onClick={() => field.onChange([s.value as any])}
+                            onClick={() => field.onChange([s.value])}
                             className={cn(
                               'flex flex-col text-left p-2.5 rounded-lg border transition-all duration-200 hover:-translate-y-0.5 shadow-sm min-h-[60px]',
                               checked
@@ -487,16 +490,16 @@ export function ContactForm() {
               <p className="text-xs text-secondary-500 mt-0.5">Need your certificate quickly? Next-day service is available.</p>
 
               <div className="mt-2.5 grid gap-2 sm:grid-cols-2">
-                {[
+                {([
                   { value: 'Standard (72 hours)', label: 'Standard Delivery', desc: 'Lodged on the GOV.UK register within 72 hours of the visit', priceBadge: 'Included' },
                   { value: EXPRESS_SPEED, label: `Express Delivery (+£${EXPRESS_SURCHARGE})`, desc: 'Lodged within 24 hours of the visit', priceBadge: `£${EXPRESS_SURCHARGE} extra` },
-                ].map((s) => {
+                ] as const).map((s) => {
                   const active = watchSpeed === s.value
                   return (
                     <button
                       key={s.value}
                       type="button"
-                      onClick={() => setValue('speed', s.value as any, { shouldValidate: true })}
+                      onClick={() => setValue('speed', s.value, { shouldValidate: true })}
                       className={cn(
                         'flex flex-col text-left p-3 rounded-lg border transition-all duration-200 hover:-translate-y-0.5 shadow-sm min-h-[74px]',
                         active
@@ -644,6 +647,25 @@ export function ContactForm() {
                   under 300px, which caused the widget to overflow its own
                   border. w-full lets it size itself against the step column. */}
               <div className="w-full flex justify-center" ref={turnstileRef} />
+              {turnstileLoading && (
+                <p className="text-xs text-secondary-500" role="status">
+                  Loading security check...
+                </p>
+              )}
+              {turnstileError && (
+                <div className="text-center" role="alert">
+                  <p className="text-xs text-danger">
+                    The security check could not complete. Check your connection and try again.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={resetTurnstile}
+                    className="mt-1 min-h-[44px] px-3 text-xs font-bold text-primary-700 hover:text-primary-800 hover:underline"
+                  >
+                    Retry security check
+                  </button>
+                </div>
+              )}
               {errors.turnstileToken && (
                 <p className="text-xs text-danger" role="alert">
                   {errors.turnstileToken.message}

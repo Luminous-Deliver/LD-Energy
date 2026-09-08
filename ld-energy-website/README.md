@@ -35,6 +35,8 @@ Set these in the Cloudflare Pages dashboard (Settings → Environment variables)
 | `RESEND_API_KEY` | Resend REST API key for transactional email |
 | `RESEND_FROM` | `"L&D Energy <bookings@epc.luminousanddeliver.co.uk>"` |
 | `RESEND_TO` | Email address that receives contact-form submissions |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Public Turnstile widget key, embedded at build time |
+| `TURNSTILE_SECRET_KEY` | Secret used by `/api/contact` to validate Turnstile tokens |
 | `NEXT_PUBLIC_CF_BEACON_TOKEN` | Optional. Cloudflare Web Analytics site token. If unset, the beacon is omitted. |
 
 ## Project structure

@@ -13,7 +13,6 @@ const LOGO_URL = `${SITE_URL}/logo-email.png`
 const PHONE = '07492 575 396'
 const PHONE_HREF = 'tel:+447492575396'
 const WHATSAPP_HREF = 'https://wa.me/447492575396'
-const CONTACT_EMAIL = 'contact@luminousanddeliver.co.uk'
 
 // Brand palette (inline hex — email clients don't support CSS variables)
 const NAVY = '#182848'

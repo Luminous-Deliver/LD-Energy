@@ -1,4 +1,4 @@
-import { site, pricing, priceFrom, formatPrice, bundleSaving, maxBundleSaving, EXPRESS_SURCHARGE } from '@/lib/site'
+import { site, pricing, formatPrice, bundleSaving, maxBundleSaving, EXPRESS_SURCHARGE } from '@/lib/site'
 import { boroughMeta } from '@/lib/boroughs'
 
 export const runtime = 'edge'

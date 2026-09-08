@@ -11,7 +11,9 @@ declare global {
           sitekey: string
           callback?: (token: string) => void
           'expired-callback'?: () => void
-          'error-callback'?: () => void
+          'error-callback'?: (errorCode: string) => boolean | void
+          'timeout-callback'?: () => void
+          'unsupported-callback'?: () => void
           theme?: 'light' | 'dark' | 'auto'
           size?: 'normal' | 'compact' | 'flexible'
         }
@@ -24,114 +26,206 @@ declare global {
 }
 
 const TURNSTILE_SCRIPT_ID = 'cf-turnstile-script'
-const TURNSTILE_SCRIPT_URL = 'https://challenges.cloudflare.com/turnstile/v0/api.js'
+const TURNSTILE_SCRIPT_URL = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'
+const TURNSTILE_LOAD_TIMEOUT_MS = 10_000
 
 const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ''
 
-if (!TURNSTILE_SITE_KEY && typeof window !== 'undefined') {
-  console.warn('Missing NEXT_PUBLIC_TURNSTILE_SITE_KEY environment variable')
-}
+let turnstileScriptPromise: Promise<void> | null = null
 
-interface UseTurnstileOptions {
-  onVerify?: (token: string) => void
-  onExpire?: () => void
-  onError?: () => void
-}
+function loadTurnstileScript(): Promise<void> {
+  if (window.turnstile) return Promise.resolve()
+  if (turnstileScriptPromise) return turnstileScriptPromise
 
-export function useTurnstile({ onVerify, onExpire, onError }: UseTurnstileOptions = {}) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const widgetIdRef = useRef<string | null>(null)
-  const [token, setToken] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  turnstileScriptPromise = new Promise<void>((resolve, reject) => {
+    let script = document.getElementById(TURNSTILE_SCRIPT_ID) as HTMLScriptElement | null
+    let checkReady: number | null = null
 
-  const loadScript = useCallback(() => {
-    return new Promise<void>((resolve) => {
-      if (document.getElementById(TURNSTILE_SCRIPT_ID)) {
-        if (window.turnstile) {
-          resolve()
-        } else {
-          const checkReady = setInterval(() => {
-            if (window.turnstile) {
-              clearInterval(checkReady)
-              resolve()
-            }
-          }, 100)
-        }
-        return
-      }
+    const cleanup = () => {
+      if (checkReady !== null) window.clearInterval(checkReady)
+      window.clearTimeout(loadTimeout)
+      script?.removeEventListener('error', handleError)
+    }
 
-      const script = document.createElement('script')
+    const handleError = () => {
+      cleanup()
+      script?.remove()
+      reject(new Error('Cloudflare Turnstile script failed to load'))
+    }
+
+    const loadTimeout = window.setTimeout(() => {
+      cleanup()
+      script?.remove()
+      reject(new Error('Cloudflare Turnstile script timed out'))
+    }, TURNSTILE_LOAD_TIMEOUT_MS)
+
+    checkReady = window.setInterval(() => {
+      if (!window.turnstile) return
+      cleanup()
+      resolve()
+    }, 100)
+
+    if (!script) {
+      script = document.createElement('script')
       script.id = TURNSTILE_SCRIPT_ID
       script.src = TURNSTILE_SCRIPT_URL
       script.async = true
       script.defer = true
-      script.onload = () => {
-        const checkReady = setInterval(() => {
-          if (window.turnstile) {
-            clearInterval(checkReady)
-            resolve()
-          }
-        }, 100)
-      }
+      script.addEventListener('error', handleError, { once: true })
       document.head.appendChild(script)
-    })
+    } else {
+      script.addEventListener('error', handleError, { once: true })
+    }
+  }).catch((error) => {
+    turnstileScriptPromise = null
+    throw error
+  })
+
+  return turnstileScriptPromise
+}
+
+interface UseTurnstileOptions {
+  enabled?: boolean
+  onVerify?: (token: string) => void
+  onExpire?: () => void
+  onError?: (errorCode?: string) => void
+}
+
+export function useTurnstile({
+  enabled = true,
+  onVerify,
+  onExpire,
+  onError,
+}: UseTurnstileOptions = {}) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const widgetIdRef = useRef<string | null>(null)
+  const tokenRef = useRef<string | null>(null)
+  const callbacksRef = useRef({ onVerify, onExpire, onError })
+  const [token, setToken] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [renderAttempt, setRenderAttempt] = useState(0)
+
+  // Callers commonly pass inline handlers. Keep the latest versions available
+  // without making the widget effect depend on their changing identities.
+  callbacksRef.current = { onVerify, onExpire, onError }
+
+  const clearToken = useCallback((notify = true) => {
+    const hadToken = tokenRef.current !== null
+    tokenRef.current = null
+    setToken(null)
+    if (hadToken && notify) callbacksRef.current.onExpire?.()
   }, [])
 
-  const renderWidget = useCallback(async () => {
-    if (!containerRef.current || widgetIdRef.current) return
-
-    await loadScript()
-
-    if (!window.turnstile || !containerRef.current) return
-
-    containerRef.current.innerHTML = ''
-
-    try {
-      widgetIdRef.current = window.turnstile.render(containerRef.current, {
-        sitekey: TURNSTILE_SITE_KEY,
-        callback: (newToken: string) => {
-          setToken(newToken)
-          onVerify?.(newToken)
-        },
-        'expired-callback': () => {
-          setToken(null)
-          onExpire?.()
-        },
-        'error-callback': () => {
-          setToken(null)
-          onError?.()
-        },
-        theme: 'light',
-        size: 'flexible',
-      })
-      setIsLoading(false)
-    } catch (error) {
-      console.error('Failed to render Turnstile widget:', error)
-      setIsLoading(false)
+  const removeWidget = useCallback(() => {
+    if (widgetIdRef.current !== null && window.turnstile) {
+      try {
+        window.turnstile.remove(widgetIdRef.current)
+      } catch {
+        // The widget may already have removed itself after a failed challenge.
+      }
     }
-  }, [loadScript, onVerify, onExpire, onError])
+    widgetIdRef.current = null
+  }, [])
 
   const reset = useCallback(() => {
-    if (widgetIdRef.current && window.turnstile) {
+    clearToken()
+    setError(null)
+
+    if (widgetIdRef.current !== null && window.turnstile) {
       window.turnstile.reset(widgetIdRef.current)
-      setToken(null)
+      return
     }
-  }, [])
+
+    // If the script or initial render failed, create a fresh widget attempt.
+    removeWidget()
+    setIsLoading(true)
+    setRenderAttempt((attempt) => attempt + 1)
+  }, [clearToken, removeWidget])
 
   useEffect(() => {
-    renderWidget()
+    if (!enabled) {
+      clearToken()
+      setError(null)
+      setIsLoading(false)
+      return
+    }
 
-    return () => {
-      if (widgetIdRef.current && window.turnstile) {
-        try {
-          window.turnstile.remove(widgetIdRef.current)
-        } catch {
-          // Widget might already be removed
-        }
-        widgetIdRef.current = null
+    let cancelled = false
+
+    const renderWidget = async () => {
+      if (!containerRef.current || widgetIdRef.current !== null) return
+
+      setIsLoading(true)
+      setError(null)
+
+      if (!TURNSTILE_SITE_KEY) {
+        const message = 'Missing NEXT_PUBLIC_TURNSTILE_SITE_KEY environment variable'
+        console.error(message)
+        setError('configuration-error')
+        setIsLoading(false)
+        callbacksRef.current.onError?.('configuration-error')
+        return
+      }
+
+      try {
+        await loadTurnstileScript()
+
+        if (cancelled || !window.turnstile || !containerRef.current) return
+
+        containerRef.current.innerHTML = ''
+        widgetIdRef.current = window.turnstile.render(containerRef.current, {
+          sitekey: TURNSTILE_SITE_KEY,
+          callback: (newToken: string) => {
+            if (cancelled) return
+            tokenRef.current = newToken
+            setToken(newToken)
+            setError(null)
+            callbacksRef.current.onVerify?.(newToken)
+          },
+          'expired-callback': () => {
+            if (cancelled) return
+            clearToken()
+          },
+          'error-callback': (errorCode: string) => {
+            if (cancelled) return true
+            clearToken()
+            setError(errorCode || 'unknown-error')
+            callbacksRef.current.onError?.(errorCode)
+            return true
+          },
+          'timeout-callback': () => {
+            if (cancelled) return
+            clearToken()
+            setError('interaction-timeout')
+            callbacksRef.current.onError?.('interaction-timeout')
+          },
+          'unsupported-callback': () => {
+            if (cancelled) return
+            clearToken()
+            setError('unsupported-browser')
+            callbacksRef.current.onError?.('unsupported-browser')
+          },
+          theme: 'light',
+          size: 'flexible',
+        })
+        setIsLoading(false)
+      } catch (renderError) {
+        if (cancelled) return
+        console.error('Failed to render Turnstile widget:', renderError)
+        setError('load-error')
+        setIsLoading(false)
+        callbacksRef.current.onError?.('load-error')
       }
     }
-  }, [renderWidget])
 
-  return { containerRef, token, isLoading, reset }
+    void renderWidget()
+
+    return () => {
+      cancelled = true
+      removeWidget()
+    }
+  }, [clearToken, enabled, removeWidget, renderAttempt])
+
+  return { containerRef, token, isLoading, error, reset }
 }
