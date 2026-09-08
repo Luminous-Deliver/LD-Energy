@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { Section } from '@/components/ui/Section'
 import { Card } from '@/components/ui/Card'
 import { ArrowRight, FileText, Ruler, PackageCheck, Leaf, CheckCircle2, Sparkles, Camera } from 'lucide-react'
-import { priceFrom, formatPrice } from '@/lib/site'
+import { priceFrom, formatPrice, site } from '@/lib/site'
 
 // Three core services today; the grid flexes to fit future additions
 // (property photography, gas & electric boiler work, …) without redesign.
@@ -48,10 +48,10 @@ const services = [
     title: 'Retrofit Consultation',
     href: '/services/retrofit-consultation',
     description:
-      'A 15-minute walk-through on the day: what would realistically lift this property to band C, roughly what it costs, and in what order.',
+      'A 10-minute walk-through on the day: what would realistically lift this property’s rating — often the next band up, sometimes further — roughly what it costs, and in what order.',
     bullets: [
-      'Just £25 added to your EPC',
-      'Plain-English route to band C',
+      `Just £${site.addOns.retrofitConsult} added to your EPC`,
+      'Plain-English route to a better rating',
     ],
     highlighted: false,
   },

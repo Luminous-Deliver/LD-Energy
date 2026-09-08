@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { getRequestContext } from '@cloudflare/next-on-pages'
 import { contactSchema } from '@/lib/validators'
+import { site } from '@/lib/site'
+import { guideEstimate, guideEstimateLine } from '@/lib/pricing-estimate'
 
 export const runtime = 'edge'
 
@@ -63,6 +65,13 @@ async function verifyTurnstile(token: string, secret: string, remoteip: string):
 }
 
 function buildEmail(data: ParsedInput) {
+  const estimate = guideEstimate({
+    propertyType: data.propertyType,
+    services: data.services,
+    speed: data.speed,
+    retrofitConsult: data.retrofitConsult,
+  })
+
   const rows: Array<[string, string]> = [
     ['Name', data.name],
     ['Phone', data.phone],
@@ -72,8 +81,9 @@ function buildEmail(data: ParsedInput) {
     ['Property Type', data.propertyType],
     ['Booking as', data.customerType],
     ['Service(s)', data.services.join(', ')],
-    ['Retrofit consult', data.retrofitConsult ? 'Yes (+£25)' : 'No'],
+    ['Retrofit consult', data.retrofitConsult ? `Yes (+£${site.addOns.retrofitConsult})` : 'No'],
     ['Speed', data.speed],
+    ['Guide shown to customer', guideEstimateLine(estimate)],
     ['Preferred Date', data.preferredDate || '—'],
     ['Notes', data.notes || '—'],
   ]
@@ -108,7 +118,7 @@ function buildConfirmation(data: ParsedInput) {
     ['Property', `${data.propertyType} — ${data.address}, ${data.postcode}`],
     ['Turnaround', data.speed],
   ]
-  if (data.retrofitConsult) summary.push(['Add-on', 'Retrofit consultation (+£25)'])
+  if (data.retrofitConsult) summary.push(['Add-on', `Retrofit consultation (+£${site.addOns.retrofitConsult})`])
   if (data.preferredDate) summary.push(['Preferred date', data.preferredDate])
 
   const text =

@@ -82,7 +82,7 @@ export function WhatIsEpc() {
             href="/services/retrofit-consultation"
             className="mt-3 inline-flex min-h-[44px] items-center gap-1.5 text-sm font-semibold text-primary-700 hover:text-primary-800"
           >
-            How we help you reach band C
+            How we help lift your rating
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
         </div>

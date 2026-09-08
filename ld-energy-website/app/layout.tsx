@@ -151,7 +151,7 @@ const localBusinessSchema = {
           '@type': 'Service',
           name: 'Retrofit and Energy Efficiency Consultation',
           description:
-            '15-minute verbal consultation on the practical route to EPC band C, delivered alongside an EPC assessment',
+            '10-minute verbal consultation on the practical route to a better EPC rating, delivered alongside an EPC assessment',
         },
         price: site.addOns.retrofitConsult,
         priceCurrency: 'GBP',

@@ -57,7 +57,7 @@ ${priceTable()}
 - Next-day (express) service: add £${EXPRESS_SURCHARGE} to the EPC price above.
 - Booking an EPC and floor plan together saves up to £${formatPrice(maxBundleSaving)} against booking them separately, because both are completed in a single property visit.
 - Properties over 121 m² vary considerably; that band is a starting point and an exact quote is always required.
-- Retrofit consultation add-on: £${site.addOns.retrofitConsult} (15-minute verbal walk-through of the practical route to band C).
+- Retrofit consultation add-on: £${site.addOns.retrofitConsult} (10-minute verbal walk-through of what would realistically lift the rating — often the next band up, sometimes further).
 - There is no call-out or mileage charge within the normal service area.
 
 Estate and letting agents: we act as an EPC and floor plan supplier for London agencies, with volume

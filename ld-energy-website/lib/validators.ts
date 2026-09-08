@@ -67,7 +67,8 @@ export const contactSchema = z.object({
   services: z
     .array(z.enum(services))
     .min(1, 'Please choose at least one service'),
-  /** Optional £25 add-on: 15-minute verbal route-to-band-C consultation */
+  /** Optional add-on (£ from site.addOns.retrofitConsult): 10-minute verbal
+   *  walk-through of what would realistically lift the property's rating. */
   retrofitConsult: z.boolean().optional().default(false),
   speed: z.enum(speeds, { required_error: 'Please choose a service speed' }),
   preferredDate: z.string().trim().max(40).optional().or(z.literal('')),

@@ -20,6 +20,7 @@ import { Field, Input, Textarea } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/cn'
 import { pricing, site, EXPRESS_SURCHARGE } from '@/lib/site'
+import { guideEstimate } from '@/lib/pricing-estimate'
 import { useTurnstile } from '@/lib/useTurnstile'
 import {
   contactSchema,
@@ -90,52 +91,32 @@ export function ContactForm() {
   const watchCustomerType = watch('customerType')
   const watchRetrofit = watch('retrofitConsult')
 
-  // Calculate live pricing
+  // Calculate live pricing. The arithmetic lives in one place — lib/pricing-estimate
+  // — so the number here and the "Guide shown to customer" line in the booking
+  // email can never disagree.
   const calculatePrice = () => {
-    // propertyTypes is ordered to match the canonical pricing bands, so the
-    // band is found by index. A hand-maintained label->band map here was a
-    // second copy of the pricing model and could silently drift from it.
-    const bandIndex = propertyTypes.indexOf(watchPropertyType)
-    const pricingRow = pricing[bandIndex >= 0 ? bandIndex : 0]
-    if (!pricingRow) {
-      return { epcPrice: 0, floorPlanPrice: 0, discount: 0, speedPrice: 0, retrofitPrice: 0, total: 0 }
-    }
-
-    // Bulk enquiries are quoted individually — no live estimate applies.
-    const isBulk = watchServices.includes('Bulk / Agency Enquiry')
-    const wantsEpc = watchServices.includes('EPC Certificate') || watchServices.includes('Both (Bundle)')
-    const wantsFloorPlan = watchServices.includes('Floor Plan') || watchServices.includes('Both (Bundle)')
-
-    const epcPrice = wantsEpc ? pricingRow.epc : 0
-    const floorPlanPrice = wantsFloorPlan ? pricingRow.floorPlan : 0
-    let discount = 0
-    let total = 0
-
-    if (wantsEpc && wantsFloorPlan) {
-      total = pricingRow.bundle
-      discount = pricingRow.epc + pricingRow.floorPlan - pricingRow.bundle
-    } else {
-      total = epcPrice + floorPlanPrice
-    }
-
-    const isExpress = watchSpeed?.includes('Express')
-    const speedPrice = isExpress ? EXPRESS_SURCHARGE : 0
-    total += speedPrice
-
-    const retrofitPrice = watchRetrofit ? site.addOns.retrofitConsult : 0
-    total += retrofitPrice
+    const e = guideEstimate({
+      propertyType: watchPropertyType,
+      services: watchServices,
+      speed: watchSpeed,
+      retrofitConsult: watchRetrofit,
+    })
+    const wantsEpc =
+      watchServices.includes('EPC Certificate') || watchServices.includes('Both (Bundle)')
+    const wantsFloorPlan =
+      watchServices.includes('Floor Plan') || watchServices.includes('Both (Bundle)')
 
     return {
-      epcPrice,
-      floorPlanPrice,
-      discount,
-      speedPrice,
-      retrofitPrice,
-      total,
+      epcPrice: e.epc,
+      floorPlanPrice: e.floorPlan,
+      discount: e.bundleDiscount,
+      speedPrice: e.express,
+      retrofitPrice: e.retrofit,
+      total: e.total,
       wantsEpc,
       wantsFloorPlan,
-      isExpress,
-      isBulk,
+      isExpress: e.express > 0,
+      isBulk: e.isBulk,
     }
   }
 
@@ -466,13 +447,13 @@ export function ContactForm() {
                     <span className="flex flex-wrap items-center gap-1.5 font-bold text-sm text-secondary-900">
                       Add a retrofit consultation
                       <span className="text-xs uppercase tracking-wider bg-accent-600 text-white font-black px-1.5 py-0.5 rounded">
-                        +£25
+                        +£{site.addOns.retrofitConsult}
                       </span>
                     </span>
                     <span className="block text-xs text-secondary-500 mt-1 leading-snug">
-                      A 15-minute verbal walk-through on the day: what would realistically lift this
-                      property to band C, roughly what each step costs, and the order to do them in.
-                      Useful for MEES compliance planning.
+                      A 10-minute verbal walk-through on the day: what would realistically lift this
+                      property&rsquo;s rating — often the next band up, sometimes further — roughly what
+                      each step costs, and the order to do them in. Useful for MEES compliance planning.
                     </span>
                   </span>
                 </button>

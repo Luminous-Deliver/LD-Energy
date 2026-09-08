@@ -66,7 +66,7 @@ export const site = {
   },
   /** Add-on services quoted alongside an EPC */
   addOns: {
-    retrofitConsult: 25,
+    retrofitConsult: 15,
   },
   /**
    * Google Business Profile. Keep in sync with the live profile.
