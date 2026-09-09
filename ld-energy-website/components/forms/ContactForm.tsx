@@ -26,6 +26,7 @@ import {
   contactSchema,
   propertyTypes,
   EXPRESS_SPEED,
+  PRE_ASSESSMENT,
   type ContactInput,
 } from '@/lib/validators'
 
@@ -112,6 +113,8 @@ export function ContactForm() {
       discount: e.bundleDiscount,
       speedPrice: e.express,
       improvementPlanPrice: e.improvementPlan,
+      preAssessmentPrice: e.preAssessment,
+      planIncluded: e.planIncluded,
       total: e.total,
       wantsEpc,
       wantsFloorPlan,
@@ -125,6 +128,8 @@ export function ContactForm() {
     floorPlanPrice,
     discount,
     improvementPlanPrice,
+    preAssessmentPrice,
+    planIncluded,
     total,
     wantsEpc,
     wantsFloorPlan,
@@ -270,6 +275,7 @@ export function ContactForm() {
                         { value: 'EPC Certificate', label: 'EPC only', desc: 'Official 10-year energy rating, lodged on the government register.', badge: undefined },
                         { value: 'Both (Bundle)', label: 'EPC + Floor Plan', desc: 'Both for the same property in one visit — better value than booking separately.', badge: 'Better value' },
                         { value: 'Floor Plan', label: 'Floor plan only', desc: 'Laser-measured scale drawing showing layout and room sizes.', badge: undefined },
+                        { value: PRE_ASSESSMENT, label: 'EPC Pre-Assessment', desc: 'Find out your score without it going on the public register. Nothing is lodged.', badge: 'Private' },
                         { value: 'Bulk / Agency Enquiry', label: 'Bulk / agency enquiry', desc: 'Multiple properties or ongoing instructions — we’ll quote volume rates.', badge: 'Agents' },
                       ] as const).map((s) => {
                         const checked = isSelected(s.value)
@@ -417,8 +423,30 @@ export function ContactForm() {
               )}
             </div>
 
+            {/* Already inside a Pre-Assessment: without a certificate the customer
+                would otherwise get nothing actionable, so it is never sold again. */}
+            {planIncluded && (
+              <div className="flex items-start gap-3 rounded-lg border border-accent-500 bg-accent-50/60 p-2.5 shadow-sm">
+                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 border-accent-600 bg-accent-600">
+                  <CheckCircle2 className="h-4 w-4 text-white" />
+                </span>
+                <span>
+                  <span className="flex flex-wrap items-center gap-1.5 font-bold text-sm text-secondary-900">
+                    Improvement Plan
+                    <span className="text-xs uppercase tracking-wider bg-accent-600 text-white font-black px-1.5 py-0.5 rounded">
+                      Included
+                    </span>
+                  </span>
+                  <span className="block text-xs text-secondary-500 mt-1 leading-snug">
+                    Nothing is lodged, so there is no certificate to read your recommendations
+                    from. The Energy Report and your written plan are part of the price.
+                  </span>
+                </span>
+              </div>
+            )}
+
             {/* Improvement Plan add-on — per-property, so not shown for bulk */}
-            {!isBulk && (
+            {!isBulk && !planIncluded && (
             <Controller
               control={control}
               name="improvementPlan"
@@ -467,6 +495,16 @@ export function ContactForm() {
         {/* Step 2: Speed & Date */}
         {step === 2 && (
           <div className="space-y-4 animate-fade-in">
+            {planIncluded ? (
+              <div className="rounded-lg border border-primary-200 bg-primary-50/60 p-3">
+                <h4 className="text-sm font-bold text-secondary-900">Turnaround</h4>
+                <p className="mt-1 text-sm text-secondary-700 leading-relaxed">
+                  Nothing is lodged on the government register, so there is no certificate to
+                  expedite and no next-day option. Your Energy Report and written plan are sent
+                  within 72 hours of the visit.
+                </p>
+              </div>
+            ) : (
             <div>
               <h4 className="text-base font-bold text-secondary-900">Select Delivery Speed</h4>
               <p className="text-xs text-secondary-500 mt-0.5">Need your certificate quickly? Next-day service is available.</p>
@@ -509,6 +547,7 @@ export function ContactForm() {
                 </p>
               )}
             </div>
+            )}
 
             <div className="grid gap-3 sm:grid-cols-2">
               <Field label="Preferred Visit Date" htmlFor="preferredDate" hint="Select a date for the assessor's visit. Optional.">
@@ -723,17 +762,21 @@ export function ContactForm() {
               <span className="text-xs text-secondary-500 mt-0.5 block leading-relaxed">
                 {isBulk
                   ? 'Bulk / agency enquiry'
-                  : wantsEpc && wantsFloorPlan
-                    ? 'EPC + Floor Plan Bundle (same property)'
-                    : wantsEpc
-                      ? 'Domestic EPC Only'
-                      : wantsFloorPlan
-                        ? 'Floor Plan Only'
-                        : 'No service selected'}
+                  : planIncluded
+                    ? 'EPC Pre-Assessment — not lodged'
+                    : wantsEpc && wantsFloorPlan
+                      ? 'EPC + Floor Plan Bundle (same property)'
+                      : wantsEpc
+                        ? 'Domestic EPC Only'
+                        : wantsFloorPlan
+                          ? 'Floor Plan Only'
+                          : 'No service selected'}
               </span>
             </div>
             {!isBulk &&
-              (wantsEpc && wantsFloorPlan ? (
+              (planIncluded ? (
+                <span className="font-bold text-secondary-900">{`£${preAssessmentPrice}`}</span>
+              ) : wantsEpc && wantsFloorPlan ? (
                 <div className="text-right">
                   <span className="text-secondary-600 line-through">{`£${epcPrice + floorPlanPrice}`}</span>
                   <span className="font-bold text-secondary-900 block">{`£${epcPrice + floorPlanPrice - discount}`}</span>
@@ -756,8 +799,10 @@ export function ContactForm() {
           )}
 
           <div className="flex justify-between">
-            <span className="font-semibold">Delivery Speed:</span>
-            <span className="font-bold text-secondary-900">{watchSpeed?.split(' (')[0]}</span>
+            <span className="font-semibold">{planIncluded ? 'Report sent:' : 'Delivery Speed:'}</span>
+            <span className="font-bold text-secondary-900">
+              {planIncluded ? 'Within 72 hours' : watchSpeed?.split(' (')[0]}
+            </span>
           </div>
 
           {isExpress && !isBulk && (
@@ -771,6 +816,13 @@ export function ContactForm() {
             <div className="flex justify-between text-xs text-secondary-900">
               <span>Improvement Plan:</span>
               <span className="font-bold">+{`£${improvementPlanPrice}`}</span>
+            </div>
+          )}
+
+          {planIncluded && (
+            <div className="flex justify-between text-xs text-secondary-900">
+              <span>Improvement Plan:</span>
+              <span className="font-bold text-accent-700">Included</span>
             </div>
           )}
 
@@ -804,22 +856,27 @@ export function ContactForm() {
         <div className="mt-4 border-t border-secondary-100 pt-3 space-y-2">
           <h5 className="text-xs font-bold uppercase tracking-wider text-secondary-500">What&apos;s Included:</h5>
           <ul className="space-y-1.5 text-xs text-secondary-600">
-            <li className="flex items-center gap-1.5">
-              <ClipboardCheck className="w-3.5 h-3.5 text-primary-600 shrink-0" />
-              Elmhurst Lodgement Fee
-            </li>
-            <li className="flex items-center gap-1.5">
-              <ClipboardCheck className="w-3.5 h-3.5 text-primary-600 shrink-0" />
-              Official Government Register Listing
-            </li>
-            <li className="flex items-center gap-1.5">
-              <ClipboardCheck className="w-3.5 h-3.5 text-primary-600 shrink-0" />
-              No Travel/Call-out Surcharges
-            </li>
-            <li className="flex items-center gap-1.5">
-              <ClipboardCheck className="w-3.5 h-3.5 text-primary-600 shrink-0" />
-              Certificate link sent once lodged
-            </li>
+            {/* A Pre-Assessment is never lodged, so the lodgement and register
+                lines would be straightforwardly untrue for it. */}
+            {(planIncluded
+              ? [
+                  'Full survey by an accredited assessor',
+                  'Nothing lodged — no entry on the public register',
+                  'Energy Report + written Improvement Plan',
+                  'No Travel/Call-out Surcharges',
+                ]
+              : [
+                  'Elmhurst Lodgement Fee',
+                  'Official Government Register Listing',
+                  'No Travel/Call-out Surcharges',
+                  'Certificate link sent once lodged',
+                ]
+            ).map((item) => (
+              <li key={item} className="flex items-center gap-1.5">
+                <ClipboardCheck className="w-3.5 h-3.5 text-primary-600 shrink-0" />
+                {item}
+              </li>
+            ))}
           </ul>
         </div>
 

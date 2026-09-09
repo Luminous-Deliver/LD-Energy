@@ -1,4 +1,4 @@
-import { site, pricing, formatPrice, bundleSaving, maxBundleSaving, EXPRESS_SURCHARGE } from '@/lib/site'
+import { site, pricing, priceFrom, formatPrice, bundleSaving, maxBundleSaving, EXPRESS_SURCHARGE } from '@/lib/site'
 import { boroughMeta } from '@/lib/boroughs'
 
 export const runtime = 'edge'
@@ -59,6 +59,7 @@ ${priceTable()}
 - Properties over 121 m² vary considerably; that band is a starting point and an exact quote is always required.
 - EPC Improvement Plan add-on: £${site.addOns.improvementPlan}. Written up after the visit, not delivered verbally on the day. Covers three things: the improvement recommendations kept on the lodged GOV.UK certificate, a full Energy Report (end-use cost split, CO2 rating and heat-loss figure, none of which appear on the certificate), and a written plan ranking which measures are worth doing on that specific building and in what order.
 - Without the Improvement Plan add-on, an EPC is lodged with the rating and property description but WITHOUT improvement recommendations.
+- EPC Pre-Assessment: a full RdSAP survey that is deliberately NOT lodged, so no certificate is published on the GOV.UK register. Priced on the same floor-area bands as an EPC (from £${priceFrom.epc}) because it is the same visit and the same measuring; only the lodgement is saved. The Energy Report and the written Improvement Plan are included, not an extra. Lodging the same survey afterwards costs £${site.addOns.lodgeLater} with no second visit, provided nothing at the property has changed. It is NOT a substitute for an EPC where one is legally required — marketing a property for sale or rent, or MEES compliance.
 - There is no call-out or mileage charge within the normal service area.
 
 Estate and letting agents: we act as an EPC and floor plan supplier for London agencies, with volume
@@ -95,6 +96,7 @@ quote before booking.
 - Domestic EPC service: ${site.url}/services/domestic-epc
 - Floor plans service: ${site.url}/services/floor-plans
 - EPC Improvement Plan: ${site.url}/services/epc-improvement-plan
+- EPC Pre-Assessment (not lodged): ${site.url}/services/epc-pre-assessment
 - Energy assessor (London): ${site.url}/domestic-energy-assessor-london
 - For landlords: ${site.url}/landlords
 - For sellers: ${site.url}/sellers

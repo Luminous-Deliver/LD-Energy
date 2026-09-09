@@ -80,6 +80,18 @@ export const site = {
    */
   addOns: {
     improvementPlan: 35,
+    /**
+     * Lodging a held Pre-Assessment survey as a real EPC afterwards, with no
+     * second visit. Set equal to `improvementPlan` deliberately: it makes the
+     * two routes to a lodged EPC-plus-advice cost the same (EPC + plan, or
+     * Pre-Assessment then lodge), so the Pre-Assessment cannot become a
+     * cheaper back door to an ordinary EPC.
+     *
+     * Conditional on nothing having changed at the property since the survey.
+     * Any works since — extension, glazing, heating, insulation — need a fresh
+     * visit with new photographs and measurements, priced as a new EPC.
+     */
+    lodgeLater: 35,
   },
   /**
    * Google Business Profile. Keep in sync with the live profile.
@@ -136,6 +148,7 @@ export const servicesMenu = [
     links: [
       { href: '/services/domestic-epc', label: 'Domestic EPC', desc: 'Lodged on the GOV.UK register' },
       { href: '/services/floor-plans', label: 'Floor Plans', desc: 'Laser-measured, portal-ready' },
+      { href: '/services/epc-pre-assessment', label: 'EPC Pre-Assessment', desc: 'Your score, without lodging it' },
       { href: '/domestic-energy-assessor-london', label: 'Energy Assessor', desc: 'Your accredited London DEA' },
     ],
   },

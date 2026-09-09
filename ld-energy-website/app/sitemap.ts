@@ -9,6 +9,7 @@ const staticRoutes: Array<{ path: string; priority: number; changeFreq: Metadata
   { path: '/domestic-energy-assessor-london', priority: 0.9, changeFreq: 'monthly' },
   { path: '/services/floor-plans',    priority: 0.9, changeFreq: 'monthly' },
   { path: '/services/epc-improvement-plan', priority: 0.8, changeFreq: 'monthly' },
+  { path: '/services/epc-pre-assessment', priority: 0.8, changeFreq: 'monthly' },
   { path: '/landlords',               priority: 0.8, changeFreq: 'monthly' },
   { path: '/sellers',                 priority: 0.8, changeFreq: 'monthly' },
   { path: '/estate-agents',           priority: 0.8, changeFreq: 'monthly' },

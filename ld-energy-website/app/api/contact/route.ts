@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getRequestContext } from '@cloudflare/next-on-pages'
-import { contactSchema } from '@/lib/validators'
+import { contactSchema, PRE_ASSESSMENT } from '@/lib/validators'
 import { site } from '@/lib/site'
 import { guideEstimate, guideEstimateLine } from '@/lib/pricing-estimate'
 
@@ -81,8 +81,15 @@ function buildEmail(data: ParsedInput) {
     ['Property Type', data.propertyType],
     ['Booking as', data.customerType],
     ['Service(s)', data.services.join(', ')],
-    ['Improvement Plan', data.improvementPlan ? `Yes (+£${site.addOns.improvementPlan})` : 'No'],
-    ['Speed', data.speed],
+    [
+      'Improvement Plan',
+      estimate.planIncluded
+        ? 'Included in Pre-Assessment'
+        : data.improvementPlan
+          ? `Yes (+£${site.addOns.improvementPlan})`
+          : 'No',
+    ],
+    ['Speed', estimate.planIncluded ? 'Report within 72 hours — nothing lodged' : data.speed],
     ['Guide shown to customer', guideEstimateLine(estimate)],
     ['Preferred Date', data.preferredDate || '—'],
     ['Notes', data.notes || '—'],
@@ -113,12 +120,17 @@ ${rows
  */
 function buildConfirmation(data: ParsedInput) {
   const firstName = data.name.trim().split(/\s+/)[0] || 'there'
+  const isPreAssessment = data.services.includes(PRE_ASSESSMENT)
   const summary: Array<[string, string]> = [
     ['Service', data.services.join(' + ')],
     ['Property', `${data.propertyType} — ${data.address}, ${data.postcode}`],
-    ['Turnaround', data.speed],
+    ['Turnaround', isPreAssessment ? 'Report within 72 hours' : data.speed],
   ]
-  if (data.improvementPlan) summary.push(['Add-on', `Improvement Plan (+£${site.addOns.improvementPlan})`])
+  if (isPreAssessment) {
+    summary.push(['Included', 'Energy Report + written Improvement Plan'])
+  } else if (data.improvementPlan) {
+    summary.push(['Add-on', `Improvement Plan (+£${site.addOns.improvementPlan})`])
+  }
   if (data.preferredDate) summary.push(['Preferred date', data.preferredDate])
 
   const text =

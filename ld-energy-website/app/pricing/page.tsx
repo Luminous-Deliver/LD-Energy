@@ -59,6 +59,8 @@ const notIncluded = [
 const additionalCharges: Array<{ label: string; guide: string }> = [
   { label: 'Next-day service', guide: `+£${EXPRESS_SURCHARGE}` },
   { label: 'EPC Improvement Plan', guide: `+£${site.addOns.improvementPlan}` },
+  { label: 'EPC Pre-Assessment (not lodged)', guide: 'Same as the EPC band' },
+  { label: 'Lodging a held Pre-Assessment later', guide: `+£${site.addOns.lodgeLater}` },
   { label: 'Extensions, loft conversions or unusual layouts', guide: 'Exact quote' },
   { label: 'Multiple floors or additional measurement complexity', guide: 'Exact quote' },
   { label: 'Travel outside the normal service area', guide: 'Exact quote' },
@@ -77,6 +79,10 @@ const pricingFaq: FaqItem[] = [
   {
     q: 'Does my EPC include improvement recommendations?',
     a: `Not as standard. Your certificate shows the energy rating and a full description of the property — walls, windows, heating, hot water and lighting. Improvement recommendations come with the £${site.addOns.improvementPlan} EPC Improvement Plan, which also includes a full Energy Report and a written plan ranking which measures are worth doing on your building and in what order. You can add it when you book, or decide on the day before we lodge.`,
+  },
+  {
+    q: 'How much is an EPC Pre-Assessment?',
+    a: `The same as the EPC for that floor-area band — from £${pricing[0].epc} — because it is the same visit, the same measuring and the same evidence gathering; only the lodgement is skipped. The Energy Report and the written Improvement Plan are included rather than charged on top. If you later decide you want the certificate after all, we can usually lodge the same survey for £${site.addOns.lodgeLater} with no second visit, provided nothing at the property has changed. It is not a substitute for an EPC where one is legally required.`,
   },
   {
     q: 'Do you charge for travel?',

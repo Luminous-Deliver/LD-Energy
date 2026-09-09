@@ -1,5 +1,5 @@
 import { pricing, site, EXPRESS_SURCHARGE, type PricingBand } from '@/lib/site'
-import { propertyTypes } from '@/lib/validators'
+import { propertyTypes, PRE_ASSESSMENT } from '@/lib/validators'
 
 /**
  * ONE definition of the live guide estimate.
@@ -22,9 +22,17 @@ export interface GuideEstimate {
   /** Positive when EPC + Floor Plan are bundled. */
   bundleDiscount: number
   express: number
+  /** Not-lodged full survey. Same visit and measuring as an EPC, so the same
+   *  band price; only the ~£9 lodgement is saved. */
+  preAssessment: number
   /** Improvement Plan add-on: recommendations kept on the certificate, plus
-   *  the Energy Report and our written plan. Produced after the visit. */
+   *  the Energy Report and our written plan. Produced after the visit.
+   *  Zero when it is bundled into a Pre-Assessment — see `planIncluded`. */
   improvementPlan: number
+  /** True when the plan comes free inside a Pre-Assessment. Without a
+   *  certificate the customer would otherwise receive nothing actionable, so
+   *  it is always included rather than sold again. */
+  planIncluded: boolean
   /** Guide total the customer sees. 0 when nothing priceable is selected. */
   total: number
 }
@@ -40,6 +48,7 @@ export function guideEstimate(opts: {
   const band = pricing[i >= 0 ? i : 0]
 
   const isBulk = opts.services.includes('Bulk / Agency Enquiry')
+  const wantsPreAssessment = opts.services.includes(PRE_ASSESSMENT)
   const wantsEpc =
     opts.services.includes('EPC Certificate') || opts.services.includes('Both (Bundle)')
   const wantsFloorPlan =
@@ -57,13 +66,32 @@ export function guideEstimate(opts: {
     total = epc + floorPlan
   }
 
-  const express = opts.speed?.includes('Express') ? EXPRESS_SURCHARGE : 0
+  // A Pre-Assessment is the same survey at the same band price. It is
+  // single-select in the form, so it never combines with the EPC or the bundle.
+  const preAssessment = wantsPreAssessment ? band.epc : 0
+  total += preAssessment
+
+  // Nothing is lodged, so there is no lodgement to expedite.
+  const express = !wantsPreAssessment && opts.speed?.includes('Express') ? EXPRESS_SURCHARGE : 0
   total += express
 
-  const improvementPlan = opts.improvementPlan ? site.addOns.improvementPlan : 0
+  const planIncluded = wantsPreAssessment
+  const improvementPlan =
+    opts.improvementPlan && !planIncluded ? site.addOns.improvementPlan : 0
   total += improvementPlan
 
-  return { band, isBulk, epc, floorPlan, bundleDiscount, express, improvementPlan, total }
+  return {
+    band,
+    isBulk,
+    epc,
+    floorPlan,
+    bundleDiscount,
+    express,
+    preAssessment,
+    improvementPlan,
+    planIncluded,
+    total,
+  }
 }
 
 /** One-line summary of a guide estimate for the internal booking email. */
@@ -78,6 +106,7 @@ export function guideEstimateLine(e: GuideEstimate): string {
   } else if (e.floorPlan) {
     parts.push(`Floor Plan £${e.floorPlan}`)
   }
+  if (e.preAssessment) parts.push(`Pre-Assessment (not lodged) £${e.preAssessment}, plan included`)
   if (e.express) parts.push(`express +£${e.express}`)
   if (e.improvementPlan) parts.push(`improvement plan +£${e.improvementPlan}`)
   return `£${e.total} guide (${parts.join(', ')}) — confirm the real quote`

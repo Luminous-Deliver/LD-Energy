@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Section } from '@/components/ui/Section'
 import { Card } from '@/components/ui/Card'
-import { ArrowRight, FileText, Ruler, PackageCheck, Leaf, CheckCircle2, Sparkles, Camera } from 'lucide-react'
+import { ArrowRight, FileText, Ruler, PackageCheck, Leaf, EyeOff, CheckCircle2, Sparkles, Camera } from 'lucide-react'
 import { priceFrom, formatPrice, site } from '@/lib/site'
 
 // Three core services today; the grid flexes to fit future additions
@@ -42,6 +42,18 @@ const services = [
       'Lower combined price than booking separately',
     ],
     highlighted: true,
+  },
+  {
+    Icon: EyeOff,
+    title: 'EPC Pre-Assessment',
+    href: '/services/epc-pre-assessment',
+    description:
+      'The full survey, deliberately not lodged — find out what the property would score before anything goes on the public register, and what it would take to improve it.',
+    bullets: [
+      'Nothing published on the GOV.UK register',
+      'Improvement Plan included, not an extra',
+    ],
+    highlighted: false,
   },
   {
     Icon: Leaf,

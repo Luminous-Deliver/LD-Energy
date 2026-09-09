@@ -65,6 +65,10 @@ export const homepageFaq: FaqItem[] = [
     a: `It depends on the building — for most London homes it’s a combination of insulation, heating controls, and lighting, done in the right order. Our £${site.addOns.improvementPlan} EPC Improvement Plan is written up after your assessment and covers exactly that: what would realistically lift your rating, what each measure costs to install, where your energy money currently goes, and what to do first.`,
   },
   {
+    q: 'Can I find out my rating without it going on the public register?',
+    a: `Yes — that is an EPC Pre-Assessment. We carry out the full survey exactly as we would for a real EPC, but we do not lodge it, so no certificate is published and nothing appears on the GOV.UK register. You get the score, a breakdown of what is holding it back, and a written improvement plan. It is priced on the same floor-area bands as an EPC because it is the same visit and the same measuring. If you decide you want the certificate afterwards, we can usually lodge the same survey for £${site.addOns.lodgeLater} without a second visit, as long as nothing at the property has changed. It is not a substitute for an EPC where one is legally required, such as marketing a property for sale or rent.`,
+  },
+  {
     q: 'How do I check my assessor is genuinely accredited?',
     a: 'Every UK domestic energy assessor appears on the official government register. Our assessor is Abdul Motaleb Taher, accreditation number EES/036265, accredited through Elmhurst Energy — you can look this up yourself on the government’s find-an-assessor service before you book.',
   },

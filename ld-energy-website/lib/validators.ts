@@ -18,6 +18,13 @@ export const propertyTypes = [
 ] as const
 
 /**
+ * A full survey that is deliberately NOT lodged, so no certificate is ever
+ * published. Named once here because the form, the Zod schema, the estimator
+ * and the booking email all have to agree on the exact string.
+ */
+export const PRE_ASSESSMENT = 'EPC Pre-Assessment (not lodged)' as const
+
+/**
  * Service options. "Both (Bundle)" is the better-value pairing and only applies
  * when the EPC and floor plan are for the SAME property — selecting EPC and
  * Floor Plan together in the form resolves to this automatically.
@@ -26,6 +33,7 @@ export const services = [
   'EPC Certificate',
   'Floor Plan',
   'Both (Bundle)',
+  PRE_ASSESSMENT,
   'Bulk / Agency Enquiry',
 ] as const
 
