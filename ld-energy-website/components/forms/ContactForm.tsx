@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { 
@@ -40,6 +41,22 @@ const STEP_TITLES = [
 ]
 
 export function ContactForm() {
+  const pathname = usePathname()
+  /**
+   * The pinned mobile price bar belongs to the dedicated booking page only.
+   *
+   * This form is also embedded on the homepage and every borough page via
+   * ContactSection, where it is a secondary conversion path a long way down
+   * the page — a bar pinned from the top of the homepage would advertise a
+   * price for a form nobody has reached, and would sit on top of MobileCallBar
+   * at the same z-index.
+   *
+   * This condition is the exact complement of the one in MobileCallBar: the
+   * price bar shows precisely where the call bar stands down. Change one and
+   * you must change the other.
+   */
+  const showMobilePriceBar = pathname === '/contact'
+
   const [step, setStep] = useState(1)
   const [status, setStatus] = useState<Status>('idle')
   const [serverError, setServerError] = useState<string | null>(null)
@@ -226,8 +243,14 @@ export function ContactForm() {
 
   return (
     // pb-24 keeps the Next / Back / Submit controls clear of the fixed mobile
-    // price bar; lg:pb-0 because the bar is lg:hidden.
-    <div className="max-w-5xl mx-auto grid gap-5 lg:grid-cols-12 items-start pb-24 lg:pb-0">
+    // price bar; lg:pb-0 because the bar is lg:hidden, and no padding at all
+    // where the bar is not rendered.
+    <div
+      className={cn(
+        'max-w-5xl mx-auto grid gap-5 lg:grid-cols-12 items-start',
+        showMobilePriceBar && 'pb-24 lg:pb-0',
+      )}
+    >
       {/* Form Steps Column */}
       <form
         onSubmit={handleSubmit(onSubmit)}
@@ -993,7 +1016,7 @@ export function ContactForm() {
 
       {/* Mobile only: the sidebar above sits below the whole form on a phone,
           so the running total needs its own pinned home. */}
-      <MobilePriceBar estimate={estimate} />
+      {showMobilePriceBar && <MobilePriceBar estimate={estimate} />}
     </div>
   )
 }
