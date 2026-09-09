@@ -67,9 +67,10 @@ export const contactSchema = z.object({
   services: z
     .array(z.enum(services))
     .min(1, 'Please choose at least one service'),
-  /** Optional add-on (£ from site.addOns.retrofitConsult): 10-minute verbal
-   *  walk-through of what would realistically lift the property's rating. */
-  retrofitConsult: z.boolean().optional().default(false),
+  /** Optional add-on (£ from site.addOns.improvementPlan): recommendations kept
+   *  on the lodged certificate, plus an Energy Report and a written plan
+   *  ranking the measures. Produced after the visit, never on the doorstep. */
+  improvementPlan: z.boolean().optional().default(false),
   speed: z.enum(speeds, { required_error: 'Please choose a service speed' }),
   preferredDate: z.string().trim().max(40).optional().or(z.literal('')),
   notes: z.string().trim().max(2000).optional().or(z.literal('')),

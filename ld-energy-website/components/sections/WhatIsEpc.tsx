@@ -79,7 +79,7 @@ export function WhatIsEpc() {
           </p>
 
           <Link
-            href="/services/retrofit-consultation"
+            href="/services/epc-improvement-plan"
             className="mt-3 inline-flex min-h-[44px] items-center gap-1.5 text-sm font-semibold text-primary-700 hover:text-primary-800"
           >
             How we help lift your rating

@@ -149,11 +149,11 @@ const localBusinessSchema = {
         '@type': 'Offer',
         itemOffered: {
           '@type': 'Service',
-          name: 'Retrofit and Energy Efficiency Consultation',
+          name: 'EPC Improvement Plan',
           description:
-            '10-minute verbal consultation on the practical route to a better EPC rating, delivered alongside an EPC assessment',
+            'Written improvement plan delivered alongside an EPC assessment: the improvement recommendations on the lodged certificate, a full Energy Report, and a prioritised plan of which measures are worth doing on the property',
         },
-        price: site.addOns.retrofitConsult,
+        price: site.addOns.improvementPlan,
         priceCurrency: 'GBP',
       },
     ],

@@ -43,7 +43,7 @@ interface ParsedInput {
   propertyType: string
   customerType: string
   services: string[]
-  retrofitConsult?: boolean
+  improvementPlan?: boolean
   speed: string
   preferredDate?: string
   notes?: string
@@ -69,7 +69,7 @@ function buildEmail(data: ParsedInput) {
     propertyType: data.propertyType,
     services: data.services,
     speed: data.speed,
-    retrofitConsult: data.retrofitConsult,
+    improvementPlan: data.improvementPlan,
   })
 
   const rows: Array<[string, string]> = [
@@ -81,7 +81,7 @@ function buildEmail(data: ParsedInput) {
     ['Property Type', data.propertyType],
     ['Booking as', data.customerType],
     ['Service(s)', data.services.join(', ')],
-    ['Retrofit consult', data.retrofitConsult ? `Yes (+£${site.addOns.retrofitConsult})` : 'No'],
+    ['Improvement Plan', data.improvementPlan ? `Yes (+£${site.addOns.improvementPlan})` : 'No'],
     ['Speed', data.speed],
     ['Guide shown to customer', guideEstimateLine(estimate)],
     ['Preferred Date', data.preferredDate || '—'],
@@ -118,7 +118,7 @@ function buildConfirmation(data: ParsedInput) {
     ['Property', `${data.propertyType} — ${data.address}, ${data.postcode}`],
     ['Turnaround', data.speed],
   ]
-  if (data.retrofitConsult) summary.push(['Add-on', `Retrofit consultation (+£${site.addOns.retrofitConsult})`])
+  if (data.improvementPlan) summary.push(['Add-on', `Improvement Plan (+£${site.addOns.improvementPlan})`])
   if (data.preferredDate) summary.push(['Preferred date', data.preferredDate])
 
   const text =
@@ -276,6 +276,17 @@ export async function POST(req: Request) {
   }
 
   const turnstileSecret = cfEnv.TURNSTILE_SECRET_KEY || process.env.TURNSTILE_SECRET_KEY
+  if (!turnstileSecret && process.env.NODE_ENV === 'production') {
+    // A missing production secret must never turn bot protection into a no-op.
+    // Return a temporary failure so the visitor can use the phone/WhatsApp
+    // fallback while the deployment configuration is repaired.
+    console.error('[contact] TURNSTILE_SECRET_KEY is not configured in production.')
+    return NextResponse.json(
+      { error: 'Booking requests are temporarily unavailable. Please call or WhatsApp us instead.' },
+      { status: 503 },
+    )
+  }
+
   if (turnstileSecret) {
     const clientIP = req.headers.get('CF-Connecting-IP') || req.headers.get('X-Forwarded-For')?.split(',')[0]?.trim() || ''
     const verified = await verifyTurnstile(parsed.data.turnstileToken, turnstileSecret, clientIP)
@@ -286,7 +297,7 @@ export async function POST(req: Request) {
       )
     }
   } else {
-    console.warn('[contact] TURNSTILE_SECRET_KEY not set — skipping verification.')
+    console.warn('[contact] TURNSTILE_SECRET_KEY not set — verification skipped in local development only.')
   }
 
   const data: ParsedInput = {
@@ -298,7 +309,7 @@ export async function POST(req: Request) {
     propertyType: parsed.data.propertyType,
     customerType: parsed.data.customerType,
     services: parsed.data.services,
-    retrofitConsult: parsed.data.retrofitConsult,
+    improvementPlan: parsed.data.improvementPlan,
     speed: parsed.data.speed,
     preferredDate: parsed.data.preferredDate || undefined,
     notes: parsed.data.notes || undefined,

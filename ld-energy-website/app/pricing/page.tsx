@@ -41,12 +41,12 @@ const included = [
   'On-site assessment by an Elmhurst-accredited DEA',
   'Official lodgement on the UK Government EPC Register',
   'Certificate link sent once lodged on the government register',
-  'Energy improvement recommendations',
   'Full data report',
   'No call-out or mileage charge within our normal service area',
 ]
 
 const notIncluded = [
+  `Energy improvement recommendations — available with the £${site.addOns.improvementPlan} EPC Improvement Plan`,
   'Re-visits due to access issues, charged at £25 per visit',
   'Properties outside our normal service area (contact for a quote)',
 ]
@@ -58,6 +58,7 @@ const notIncluded = [
  */
 const additionalCharges: Array<{ label: string; guide: string }> = [
   { label: 'Next-day service', guide: `+£${EXPRESS_SURCHARGE}` },
+  { label: 'EPC Improvement Plan', guide: `+£${site.addOns.improvementPlan}` },
   { label: 'Extensions, loft conversions or unusual layouts', guide: 'Exact quote' },
   { label: 'Multiple floors or additional measurement complexity', guide: 'Exact quote' },
   { label: 'Travel outside the normal service area', guide: 'Exact quote' },
@@ -72,6 +73,10 @@ const pricingFaq: FaqItem[] = [
   {
     q: 'Are there any hidden fees?',
     a: 'No. The price we confirm before booking is the price you pay. Quotes are worked out from your property size and condition, so there are no surprise add-ons or call-out charges. Anything that could change the figure — extensions, unusual layouts, or travel outside our normal service area — is priced into the quote up front.',
+  },
+  {
+    q: 'Does my EPC include improvement recommendations?',
+    a: `Not as standard. Your certificate shows the energy rating and a full description of the property — walls, windows, heating, hot water and lighting. Improvement recommendations come with the £${site.addOns.improvementPlan} EPC Improvement Plan, which also includes a full Energy Report and a written plan ranking which measures are worth doing on your building and in what order. You can add it when you book, or decide on the day before we lodge.`,
   },
   {
     q: 'Do you charge for travel?',

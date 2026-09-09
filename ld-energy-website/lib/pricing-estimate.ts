@@ -22,7 +22,9 @@ export interface GuideEstimate {
   /** Positive when EPC + Floor Plan are bundled. */
   bundleDiscount: number
   express: number
-  retrofit: number
+  /** Improvement Plan add-on: recommendations kept on the certificate, plus
+   *  the Energy Report and our written plan. Produced after the visit. */
+  improvementPlan: number
   /** Guide total the customer sees. 0 when nothing priceable is selected. */
   total: number
 }
@@ -31,7 +33,7 @@ export function guideEstimate(opts: {
   propertyType: string | undefined
   services: readonly string[]
   speed?: string
-  retrofitConsult?: boolean
+  improvementPlan?: boolean
 }): GuideEstimate {
   // propertyTypes is index-aligned with the pricing bands by design.
   const i = propertyTypes.indexOf(opts.propertyType as (typeof propertyTypes)[number])
@@ -58,10 +60,10 @@ export function guideEstimate(opts: {
   const express = opts.speed?.includes('Express') ? EXPRESS_SURCHARGE : 0
   total += express
 
-  const retrofit = opts.retrofitConsult ? site.addOns.retrofitConsult : 0
-  total += retrofit
+  const improvementPlan = opts.improvementPlan ? site.addOns.improvementPlan : 0
+  total += improvementPlan
 
-  return { band, isBulk, epc, floorPlan, bundleDiscount, express, retrofit, total }
+  return { band, isBulk, epc, floorPlan, bundleDiscount, express, improvementPlan, total }
 }
 
 /** One-line summary of a guide estimate for the internal booking email. */
@@ -77,6 +79,6 @@ export function guideEstimateLine(e: GuideEstimate): string {
     parts.push(`Floor Plan £${e.floorPlan}`)
   }
   if (e.express) parts.push(`express +£${e.express}`)
-  if (e.retrofit) parts.push(`retrofit +£${e.retrofit}`)
+  if (e.improvementPlan) parts.push(`improvement plan +£${e.improvementPlan}`)
   return `£${e.total} guide (${parts.join(', ')}) — confirm the real quote`
 }

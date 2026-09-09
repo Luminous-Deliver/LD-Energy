@@ -64,9 +64,22 @@ export const site = {
     verifyUrl:
       'https://getting-new-energy-certificate.service.gov.uk/find-an-assessor/search-by-name?name=Abdul+Motaleb+Taher',
   },
-  /** Add-on services quoted alongside an EPC */
+  /**
+   * Add-on services quoted alongside an EPC.
+   *
+   * `improvementPlan` covers three deliverables, not one: the improvement
+   * recommendations left on the lodged certificate, the Elmhurst Energy Report
+   * (which costs ~£9 to output and is the only source of the end-use cost
+   * split, the CO2 graph and the HTC figure), and our own written plan ranking
+   * the measures for that specific building.
+   *
+   * Priced at £35 rather than £25 as a packaging decision, not a margin one:
+   * £25 without the Energy Report nets £25, £35 with it nets £26. For the same
+   * income the customer receives materially more, so the Energy Report is
+   * always bought. It is a cost of goods, never a separate quote line.
+   */
   addOns: {
-    retrofitConsult: 15,
+    improvementPlan: 35,
   },
   /**
    * Google Business Profile. Keep in sync with the live profile.

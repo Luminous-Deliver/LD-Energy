@@ -57,7 +57,8 @@ ${priceTable()}
 - Next-day (express) service: add £${EXPRESS_SURCHARGE} to the EPC price above.
 - Booking an EPC and floor plan together saves up to £${formatPrice(maxBundleSaving)} against booking them separately, because both are completed in a single property visit.
 - Properties over 121 m² vary considerably; that band is a starting point and an exact quote is always required.
-- Retrofit consultation add-on: £${site.addOns.retrofitConsult} (10-minute verbal walk-through of what would realistically lift the rating — often the next band up, sometimes further).
+- EPC Improvement Plan add-on: £${site.addOns.improvementPlan}. Written up after the visit, not delivered verbally on the day. Covers three things: the improvement recommendations kept on the lodged GOV.UK certificate, a full Energy Report (end-use cost split, CO2 rating and heat-loss figure, none of which appear on the certificate), and a written plan ranking which measures are worth doing on that specific building and in what order.
+- Without the Improvement Plan add-on, an EPC is lodged with the rating and property description but WITHOUT improvement recommendations.
 - There is no call-out or mileage charge within the normal service area.
 
 Estate and letting agents: we act as an EPC and floor plan supplier for London agencies, with volume
@@ -93,7 +94,7 @@ quote before booking.
 - Homepage: ${site.url}/
 - Domestic EPC service: ${site.url}/services/domestic-epc
 - Floor plans service: ${site.url}/services/floor-plans
-- Retrofit consultation: ${site.url}/services/retrofit-consultation
+- EPC Improvement Plan: ${site.url}/services/epc-improvement-plan
 - Energy assessor (London): ${site.url}/domestic-energy-assessor-london
 - For landlords: ${site.url}/landlords
 - For sellers: ${site.url}/sellers

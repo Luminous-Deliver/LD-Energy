@@ -45,12 +45,12 @@ const services = [
   },
   {
     Icon: Leaf,
-    title: 'Retrofit Consultation',
-    href: '/services/retrofit-consultation',
+    title: 'EPC Improvement Plan',
+    href: '/services/epc-improvement-plan',
     description:
-      'A 10-minute walk-through on the day: what would realistically lift this property’s rating — often the next band up, sometimes further — roughly what it costs, and in what order.',
+      'Written up after the visit: your improvement recommendations, a full Energy Report showing where the money actually goes, and a plan ranking what is worth doing on this building — and in what order.',
     bullets: [
-      `Just £${site.addOns.retrofitConsult} added to your EPC`,
+      `£${site.addOns.improvementPlan} added to your EPC`,
       'Plain-English route to a better rating',
     ],
     highlighted: false,

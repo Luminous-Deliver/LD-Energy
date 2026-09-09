@@ -62,7 +62,7 @@ export const homepageFaq: FaqItem[] = [
   },
   {
     q: 'How do I get my property to EPC band C?',
-    a: `It depends on the building — for most London homes it’s a combination of insulation, heating controls, and lighting, done in the right order. We offer a £${site.addOns.retrofitConsult} retrofit consultation: a 10-minute verbal walk-through at the end of your assessment covering what would realistically lift your rating — often the next band up, sometimes further — roughly what each step costs, and what to do first.`,
+    a: `It depends on the building — for most London homes it’s a combination of insulation, heating controls, and lighting, done in the right order. Our £${site.addOns.improvementPlan} EPC Improvement Plan is written up after your assessment and covers exactly that: what would realistically lift your rating, what each measure costs to install, where your energy money currently goes, and what to do first.`,
   },
   {
     q: 'How do I check my assessor is genuinely accredited?',

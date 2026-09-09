@@ -62,7 +62,7 @@ export function ContactForm() {
       services: ['EPC Certificate'], // default select
       propertyType: '2 Bedroom', // default select
       customerType: 'Homeowner', // default select
-      retrofitConsult: false,
+      improvementPlan: false,
       speed: 'Standard (72 hours)', // default select
       preferredDate: '',
       notes: '',
@@ -89,7 +89,7 @@ export function ContactForm() {
   const watchServices = watch('services') || []
   const watchSpeed = watch('speed')
   const watchCustomerType = watch('customerType')
-  const watchRetrofit = watch('retrofitConsult')
+  const watchImprovementPlan = watch('improvementPlan')
 
   // Calculate live pricing. The arithmetic lives in one place — lib/pricing-estimate
   // — so the number here and the "Guide shown to customer" line in the booking
@@ -99,7 +99,7 @@ export function ContactForm() {
       propertyType: watchPropertyType,
       services: watchServices,
       speed: watchSpeed,
-      retrofitConsult: watchRetrofit,
+      improvementPlan: watchImprovementPlan,
     })
     const wantsEpc =
       watchServices.includes('EPC Certificate') || watchServices.includes('Both (Bundle)')
@@ -111,7 +111,7 @@ export function ContactForm() {
       floorPlanPrice: e.floorPlan,
       discount: e.bundleDiscount,
       speedPrice: e.express,
-      retrofitPrice: e.retrofit,
+      improvementPlanPrice: e.improvementPlan,
       total: e.total,
       wantsEpc,
       wantsFloorPlan,
@@ -124,7 +124,7 @@ export function ContactForm() {
     epcPrice,
     floorPlanPrice,
     discount,
-    retrofitPrice,
+    improvementPlanPrice,
     total,
     wantsEpc,
     wantsFloorPlan,
@@ -417,11 +417,11 @@ export function ContactForm() {
               )}
             </div>
 
-            {/* Retrofit consultation add-on — per-property, so not shown for bulk */}
+            {/* Improvement Plan add-on — per-property, so not shown for bulk */}
             {!isBulk && (
             <Controller
               control={control}
-              name="retrofitConsult"
+              name="improvementPlan"
               render={({ field }) => (
                 <button
                   type="button"
@@ -445,15 +445,16 @@ export function ContactForm() {
                   </span>
                   <span>
                     <span className="flex flex-wrap items-center gap-1.5 font-bold text-sm text-secondary-900">
-                      Add a retrofit consultation
+                      Add the Improvement Plan
                       <span className="text-xs uppercase tracking-wider bg-accent-600 text-white font-black px-1.5 py-0.5 rounded">
-                        +£{site.addOns.retrofitConsult}
+                        +£{site.addOns.improvementPlan}
                       </span>
                     </span>
                     <span className="block text-xs text-secondary-500 mt-1 leading-snug">
-                      A 10-minute verbal walk-through on the day: what would realistically lift this
-                      property&rsquo;s rating — often the next band up, sometimes further — roughly what
-                      each step costs, and the order to do them in. Useful for MEES compliance planning.
+                      Keeps the improvement recommendations on your certificate, and adds two things
+                      sent after the visit: a full Energy Report showing where your money actually goes
+                      and what each measure costs to install, plus a written plan ranking which ones are
+                      worth doing on your building and in what order. Useful for MEES planning.
                     </span>
                   </span>
                 </button>
@@ -766,10 +767,10 @@ export function ContactForm() {
             </div>
           )}
 
-          {retrofitPrice > 0 && !isBulk && (
+          {improvementPlanPrice > 0 && !isBulk && (
             <div className="flex justify-between text-xs text-secondary-900">
-              <span>Retrofit consultation:</span>
-              <span className="font-bold">+{`£${retrofitPrice}`}</span>
+              <span>Improvement Plan:</span>
+              <span className="font-bold">+{`£${improvementPlanPrice}`}</span>
             </div>
           )}
 
