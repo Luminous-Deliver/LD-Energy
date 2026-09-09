@@ -40,7 +40,7 @@ export function Pricing() {
             `Improvement recommendations and a written plan available for £${site.addOns.improvementPlan}`,
           ]}
           href="/contact"
-          footnote={{
+          alternative={{
             text: 'Don’t want it on the public register? The EPC Pre-Assessment is the same survey at the same price, not lodged.',
             linkLabel: 'See how it works',
             href: '/services/epc-pre-assessment',

@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowRight, Check } from 'lucide-react'
+import { ArrowRight, Check, EyeOff } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { formatPrice } from '@/lib/site'
 
@@ -31,11 +31,16 @@ export interface PricingServiceCardProps {
   emphasis?: boolean
   emphasisLabel?: string
   /**
-   * Quiet line under the CTA for a genuine alternative to this service — a
-   * variant someone comparing cards would want to know exists, without giving
-   * it a card of its own and diluting the three-way choice.
+   * A genuine alternative to this service — a variant someone comparing cards
+   * would want to know exists, without giving it a card of its own and diluting
+   * the three-way choice.
+   *
+   * Rendered as a tinted callout INSIDE the card, above the price. It began as
+   * small grey text below the CTA and was invisible there: nothing after the
+   * button gets read, which is the whole problem with footnote-shaped links to
+   * things you actually want people to find.
    */
-  footnote?: {
+  alternative?: {
     text: string
     linkLabel: string
     href: string
@@ -52,7 +57,7 @@ export function PricingServiceCard({
   saving,
   emphasis = false,
   emphasisLabel,
-  footnote,
+  alternative,
 }: PricingServiceCardProps) {
   return (
     <div
@@ -87,6 +92,25 @@ export function PricingServiceCard({
         ))}
       </ul>
 
+      {alternative && (
+        <div className="mt-5 rounded-xl border border-primary-200 bg-primary-50/70 p-3">
+          <div className="flex items-start gap-2.5">
+            <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-primary-600 text-white">
+              <EyeOff className="h-3.5 w-3.5" aria-hidden="true" />
+            </span>
+            <p className="text-xs leading-relaxed text-secondary-700">
+              {alternative.text}{' '}
+              <Link
+                href={alternative.href}
+                className="font-semibold text-primary-700 underline underline-offset-2 hover:text-primary-800"
+              >
+                {alternative.linkLabel}
+              </Link>
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Price supports the decision, it does not lead it — hence below the
           inclusions, and set in a sentence so "from" cannot be skipped. */}
       <div className="mt-5 border-t border-secondary-100 pt-4">
@@ -116,18 +140,6 @@ export function PricingServiceCard({
         {ctaLabel}
         <ArrowRight className="h-4 w-4" aria-hidden="true" />
       </Link>
-
-      {footnote && (
-        <p className="mt-3 text-xs leading-relaxed text-secondary-600">
-          {footnote.text}{' '}
-          <Link
-            href={footnote.href}
-            className="font-semibold text-primary-700 underline underline-offset-2 hover:text-primary-800"
-          >
-            {footnote.linkLabel}
-          </Link>
-        </p>
-      )}
     </div>
   )
 }

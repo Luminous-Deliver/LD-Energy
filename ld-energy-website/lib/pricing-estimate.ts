@@ -2,6 +2,15 @@ import { pricing, site, EXPRESS_SURCHARGE, type PricingBand } from '@/lib/site'
 import { propertyTypes, PRE_ASSESSMENT } from '@/lib/validators'
 
 /**
+ * The product a booking resolves to. Exhaustive by design — see `productKind`.
+ *
+ * 'bundle' is kept distinct from 'epc' even though both are lodged: the
+ * deliverables differ (a bundle also produces floor plans), and copy that
+ * lists what arrives has to say so.
+ */
+export type ProductKind = 'epc' | 'bundle' | 'floorPlan' | 'preAssessment' | 'bulk' | 'none'
+
+/**
  * ONE definition of the live guide estimate.
  *
  * The contact form (client) shows this number in "Live Price Estimate"; the
@@ -50,6 +59,26 @@ export interface GuideEstimate {
    * are both unlodged; only the reasons differ.
    */
   isLodged: boolean
+  /**
+   * WHICH PRODUCT this booking is, as one exhaustive value.
+   *
+   * Any copy that describes what the customer ends up with must switch on this
+   * rather than nesting `isLodged` / `planIncluded` / `isBulk` ternaries in each
+   * component. Four separate defects came from that pattern — the delivery-speed
+   * step, the form's "What's included" panel, the homepage pricing card, and
+   * bulk being told about floor plans — because two booleans describe four
+   * states and a two-branch ternary can only serve two of them, so a third case
+   * silently falls through to whichever branch is nearest.
+   *
+   * With a union, a missing case is a compile error at every `switch` instead of
+   * a plausible-looking sentence shown to the wrong customer. Add a product here
+   * and TypeScript will point at each place that has to say something about it.
+   *
+   * `canHavePlan` and `isLodged` stay: they answer narrower questions (what is
+   * purchasable, what gets lodged) and remain the right gates for PRICING.
+   * This one is for WORDING.
+   */
+  productKind: ProductKind
   /** Guide total the customer sees. 0 when nothing priceable is selected. */
   total: number
 }
@@ -97,6 +126,21 @@ export function guideEstimate(opts: {
   const express = isLodged && opts.speed?.includes('Express') ? EXPRESS_SURCHARGE : 0
   total += express
 
+  // Order matters: bulk wins over everything (it is quoted individually and
+  // has no single product), and the bundle must be tested before plain EPC
+  // because a bundle satisfies `wantsEpc` too.
+  const productKind: ProductKind = isBulk
+    ? 'bulk'
+    : wantsPreAssessment
+      ? 'preAssessment'
+      : wantsEpc && wantsFloorPlan
+        ? 'bundle'
+        : wantsEpc
+          ? 'epc'
+          : wantsFloorPlan
+            ? 'floorPlan'
+            : 'none'
+
   // The plan is written FROM an assessment. Without one there is nothing to
   // write it from, so it is not merely unpriced — it is not purchasable.
   const canHavePlan = !isBulk && (wantsEpc || wantsPreAssessment)
@@ -117,6 +161,7 @@ export function guideEstimate(opts: {
     planIncluded,
     canHavePlan,
     isLodged,
+    productKind,
     total,
   }
 }

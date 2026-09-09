@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getRequestContext } from '@cloudflare/next-on-pages'
-import { contactSchema, PRE_ASSESSMENT } from '@/lib/validators'
+import { contactSchema } from '@/lib/validators'
 import { site } from '@/lib/site'
 import { guideEstimate, guideEstimateLine } from '@/lib/pricing-estimate'
 
@@ -43,6 +43,8 @@ interface ParsedInput {
   propertyType: string
   customerType: string
   services: string[]
+  /** Bulk enquiries only — roughly how many properties. */
+  propertyCount?: string
   improvementPlan?: boolean
   speed: string
   preferredDate?: string
@@ -76,8 +78,10 @@ function buildEmail(data: ParsedInput) {
     ['Name', data.name],
     ['Phone', data.phone],
     ['Email', data.email],
-    ['Property Address', data.address],
-    ['Postcode', data.postcode],
+    [estimate.isBulk ? 'Properties & postcodes' : 'Property Address', data.address || '—'],
+    ...(estimate.isBulk
+      ? ([['Property count', data.propertyCount || '—']] as Array<[string, string]>)
+      : ([['Postcode', data.postcode]] as Array<[string, string]>)),
     // The form hides property size on a bulk enquiry, so the schema default
     // ('2 Bedroom') would otherwise be reported as if the customer picked it.
     ['Property Type', estimate.isBulk ? 'Not applicable — bulk enquiry' : data.propertyType],
@@ -91,7 +95,14 @@ function buildEmail(data: ParsedInput) {
           ? `Yes (+£${site.addOns.improvementPlan})`
           : 'No',
     ],
-    ['Speed', estimate.planIncluded ? 'Report within 72 hours — nothing lodged' : data.speed],
+    [
+      'Speed',
+      estimate.isBulk
+        ? 'Agreed per property once quoted'
+        : estimate.isLodged
+          ? data.speed
+          : 'Within 72 hours — nothing lodged',
+    ],
     ['Guide shown to customer', guideEstimateLine(estimate)],
     ['Preferred Date', data.preferredDate || '—'],
     ['Notes', data.notes || '—'],
@@ -123,19 +134,26 @@ ${rows
 function buildConfirmation(data: ParsedInput) {
   const firstName = data.name.trim().split(/\s+/)[0] || 'there'
   const estimate = guideEstimate(data)
-  const isPreAssessment = data.services.includes(PRE_ASSESSMENT)
-  const isBulkEnquiry = data.services.includes('Bulk / Agency Enquiry')
-  const summary: Array<[string, string]> = [
-    ['Service', data.services.join(' + ')],
-    [
+  const isBulkEnquiry = estimate.productKind === 'bulk'
+
+  // Bulk has no single property and no agreed turnaround yet; an unlodged
+  // product has no lodgement to expedite. Both read off productKind so a new
+  // product cannot silently inherit the wrong line.
+  const summary: Array<[string, string]> = [['Service', data.services.join(' + ')]]
+
+  if (isBulkEnquiry) {
+    summary.push(['Properties', data.propertyCount || 'To be confirmed'])
+    if (data.address) summary.push(['Addresses supplied', data.address])
+    summary.push(['Turnaround', 'Agreed per property once quoted'])
+  } else {
+    summary.push([
       'Property',
-      isBulkEnquiry
-        ? `${data.address}, ${data.postcode}`
-        : `${data.propertyType} — ${data.address}, ${data.postcode}`,
-    ],
-    ['Turnaround', isPreAssessment ? 'Report within 72 hours' : data.speed],
-  ]
-  if (isPreAssessment) {
+      `${data.propertyType} — ${data.address}, ${data.postcode}`,
+    ])
+    summary.push(['Turnaround', estimate.isLodged ? data.speed : 'Within 72 hours of the visit'])
+  }
+
+  if (estimate.planIncluded) {
     summary.push(['Included', 'Energy Report + written Improvement Plan'])
   } else if (estimate.improvementPlan > 0) {
     summary.push(['Add-on', `Improvement Plan (+£${site.addOns.improvementPlan})`])
@@ -328,6 +346,7 @@ export async function POST(req: Request) {
     address: parsed.data.address,
     postcode: parsed.data.postcode,
     propertyType: parsed.data.propertyType,
+    propertyCount: parsed.data.propertyCount || undefined,
     customerType: parsed.data.customerType,
     services: parsed.data.services,
     improvementPlan: parsed.data.improvementPlan,

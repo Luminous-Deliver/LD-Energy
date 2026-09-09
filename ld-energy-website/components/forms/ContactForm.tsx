@@ -22,7 +22,7 @@ import { Button } from '@/components/ui/Button'
 import { MobilePriceBar } from '@/components/forms/MobilePriceBar'
 import { cn } from '@/lib/cn'
 import { pricing, site, EXPRESS_SURCHARGE } from '@/lib/site'
-import { guideEstimate } from '@/lib/pricing-estimate'
+import { guideEstimate, type ProductKind } from '@/lib/pricing-estimate'
 import { useTurnstile } from '@/lib/useTurnstile'
 import {
   contactSchema,
@@ -39,6 +39,98 @@ const STEP_TITLES = [
   'Speed & Date',
   'Contact Details'
 ]
+
+/**
+ * Copy that describes what a booking produces, keyed on ONE exhaustive value.
+ *
+ * These switches are the whole point of `ProductKind`. Every previous version
+ * of this copy was a two-branch ternary over `isLodged` / `planIncluded`, and
+ * each time a product was added a third case fell silently through to the
+ * nearest branch — floor-plan bookings promised a certificate, bulk enquiries
+ * were told about JPG floor plans. A `switch` with a `never` fallthrough turns
+ * the next such omission into a build failure.
+ */
+function assertNever(kind: never): never {
+  throw new Error(`Unhandled product kind: ${String(kind)}`)
+}
+
+/** Shown in place of the speed choice when nothing is lodged. */
+function turnaroundCopy(kind: ProductKind): string {
+  switch (kind) {
+    case 'bulk':
+      return 'Turnaround and visit dates are agreed per property once we have quoted your volume rate, so there is nothing to choose here yet.'
+    case 'preAssessment':
+      return 'Nothing is lodged on the government register, so there is no certificate to expedite and no next-day option. Your Energy Report and written plan are sent within 72 hours of the visit.'
+    case 'floorPlan':
+      return 'Floor plans are not lodged on the government register, so there is no next-day lodgement option. Your plans are supplied as JPG and PDF within 72 hours of the visit.'
+    case 'none':
+      return 'Choose a service on the previous step and we will show the turnaround options that apply to it.'
+    case 'epc':
+    case 'bundle':
+      // Lodged, so the speed cards are shown instead and this is unreachable.
+      return 'Standard lodgement is within 72 hours of the visit.'
+    default:
+      return assertNever(kind)
+  }
+}
+
+/** The sidebar's "What's included" list — must describe THIS product, not another. */
+function includedList(kind: ProductKind): string[] {
+  switch (kind) {
+    case 'epc':
+    case 'bundle':
+      return [
+        'Elmhurst Lodgement Fee',
+        'Official Government Register Listing',
+        'No Travel/Call-out Surcharges',
+        'Certificate link sent once lodged',
+      ]
+    case 'preAssessment':
+      return [
+        'Full survey by an accredited assessor',
+        'Nothing lodged — no entry on the public register',
+        'Energy Report + written Improvement Plan',
+        'No Travel/Call-out Surcharges',
+      ]
+    case 'floorPlan':
+      return [
+        'Laser-measured on site by your assessor',
+        'Drawn to Rightmove and Zoopla specification',
+        'High-resolution JPG and PDF supplied',
+        'No Travel/Call-out Surcharges',
+      ]
+    case 'bulk':
+      return [
+        'Volume rates across the whole portfolio',
+        'One point of contact for every property',
+        'Scheduling arranged around your tenants',
+        'No Travel/Call-out Surcharges',
+      ]
+    case 'none':
+      return ['No Travel/Call-out Surcharges']
+    default:
+      return assertNever(kind)
+  }
+}
+
+/** Sub-heading on step 3, which must not promise a certificate that isn't coming. */
+function contactStepIntro(kind: ProductKind): string {
+  switch (kind) {
+    case 'bulk':
+      return 'Tell us where to send the quote, and list the properties you need covered.'
+    case 'preAssessment':
+      return 'Provide the property details and where we should send your report. Nothing is lodged on the public register.'
+    case 'floorPlan':
+      return 'Provide the property details and where we should send the invoice and your floor plans.'
+    case 'epc':
+    case 'bundle':
+      return 'Provide the property details and where we should send the invoice and certificate.'
+    case 'none':
+      return 'Provide the property details and where we should send the invoice.'
+    default:
+      return assertNever(kind)
+  }
+}
 
 export function ContactForm() {
   const pathname = usePathname()
@@ -83,6 +175,7 @@ export function ContactForm() {
       customerType: 'Homeowner', // default select
       improvementPlan: false,
       speed: 'Standard (72 hours)', // default select
+      propertyCount: '', // bulk only; required for bulk in the schema
       preferredDate: '',
       notes: '',
       website: '',
@@ -138,6 +231,7 @@ export function ContactForm() {
       planIncluded: e.planIncluded,
       canHavePlan: e.canHavePlan,
       isLodged: e.isLodged,
+      productKind: e.productKind,
       total: e.total,
       wantsEpc,
       wantsFloorPlan,
@@ -156,6 +250,7 @@ export function ContactForm() {
     planIncluded,
     canHavePlan,
     isLodged,
+    productKind,
     total,
     wantsEpc,
     wantsFloorPlan,
@@ -321,20 +416,12 @@ export function ContactForm() {
                             key={s.value}
                             type="button"
                             aria-pressed={checked}
-                            onClick={() => {
-                              field.onChange([s.value])
-                              // "Homeowner" is the default and is not an option
-                              // on a bulk enquiry, so it would otherwise submit
-                              // invisibly with no card looking selected.
-                              if (s.value === 'Bulk / Agency Enquiry') {
-                                setValue('customerType', 'Estate agent', { shouldValidate: true })
-                              } else if (isBulk) {
-                                // Leaving bulk — `isBulk` is the pre-click
-                                // state, so this only fires on the way out and
-                                // never overrides a genuine agent's own choice.
-                                setValue('customerType', 'Homeowner', { shouldValidate: true })
-                              }
-                            }}
+                            // Choosing a service must never overwrite who the
+                            // customer already said they are, in either
+                            // direction. An earlier version force-set this to
+                            // 'Estate agent' on bulk, silently switching a
+                            // landlord who had answered correctly.
+                            onClick={() => field.onChange([s.value])}
                             className={cn(
                               'flex flex-col text-left p-2.5 rounded-lg border transition-all duration-200 hover:-translate-y-0.5 shadow-sm min-h-[60px]',
                               s.wide && 'sm:col-span-2',
@@ -376,8 +463,8 @@ export function ContactForm() {
               <div className="rounded-lg border border-primary-200 bg-primary-50/60 p-3">
                 <h4 className="text-sm font-bold text-secondary-900">Property size</h4>
                 <p className="mt-1 text-sm text-secondary-700 leading-relaxed">
-                  Not needed for a bulk enquiry — tell us roughly how many properties and the postcodes
-                  in the notes on the next step, and we’ll come back with volume rates.
+                  Not needed for a bulk enquiry — we’ll ask how many properties you have on the last
+                  step, and come back to you with volume rates.
                 </p>
               </div>
             ) : (
@@ -403,10 +490,15 @@ export function ContactForm() {
                           : 'border-secondary-200 bg-white hover:border-secondary-300'
                       )}
                     >
-                      <span className="font-bold text-sm text-secondary-900">{p}</span>
-                      <span className="mt-0.5 text-[10px] leading-tight text-secondary-500">
+                      {/* Floor area leads; bedrooms caption it. lib/site.ts:
+                          areaLabel is the "Primary pricing driver", the bedroom
+                          label is "Secondary to floor area — never lead with
+                          this". FloorAreaGuide on the pricing page already does
+                          it this way; the form had the two inverted. */}
+                      <span className="font-bold text-sm text-secondary-900">
                         {pricing[propertyTypes.indexOf(p)]?.areaLabel}
                       </span>
+                      <span className="mt-0.5 text-[10px] leading-tight text-secondary-500">{p}</span>
                     </button>
                   )
                 })}
@@ -422,30 +514,29 @@ export function ContactForm() {
             <div>
               <h4 className="text-base font-bold text-secondary-900">Who are you booking as?</h4>
               <p className="text-xs text-secondary-500 mt-0.5">
-                {isBulk
-                  ? 'Bulk instructions come from agencies, so we only ask which kind.'
-                  : 'This tells us how to arrange access to the property.'}
+                This tells us how to arrange access to the property.
               </p>
 
               <Controller
                 control={control}
                 name="customerType"
                 render={({ field }) => (
-                  <div className={cn('mt-2 grid gap-2', isBulk ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-2')}>
-                    {/* Nobody books a multi-property bulk enquiry as a
-                        homeowner, and "Homeowner" is the default — so on a bulk
-                        enquiry the two private options are dropped rather than
-                        left as reachable nonsense. */}
+                  <div className="mt-2 grid grid-cols-2 gap-2">
+                    {/* Only "Homeowner" is genuinely singular — its own
+                        description reads "I live in or own the property". A
+                        portfolio landlord with several tenanted properties is a
+                        textbook bulk enquiry, so Landlord stays on the list. */}
                     {(isBulk
                       ? [
-                          { value: 'Estate agent', desc: 'Instructing on behalf of sellers' },
-                          { value: 'Letting agent / firm', desc: 'Managing lettings or a portfolio' },
+                          { value: 'Landlord (tenanted)', desc: 'I own several rented properties', wide: false },
+                          { value: 'Estate agent', desc: 'Instructing on behalf of sellers', wide: false },
+                          { value: 'Letting agent / firm', desc: 'Managing lettings or a portfolio', wide: true },
                         ]
                       : [
-                          { value: 'Homeowner', desc: 'I live in or own the property' },
-                          { value: 'Landlord (tenanted)', desc: 'It’s rented out — tenants live there' },
-                          { value: 'Estate agent', desc: 'Instructing on behalf of a seller' },
-                          { value: 'Letting agent / firm', desc: 'Managing lettings or a portfolio' },
+                          { value: 'Homeowner', desc: 'I live in or own the property', wide: false },
+                          { value: 'Landlord (tenanted)', desc: 'It’s rented out — tenants live there', wide: false },
+                          { value: 'Estate agent', desc: 'Instructing on behalf of a seller', wide: false },
+                          { value: 'Letting agent / firm', desc: 'Managing lettings or a portfolio', wide: false },
                         ]
                     ).map((c) => {
                       const active = field.value === c.value
@@ -457,6 +548,8 @@ export function ContactForm() {
                           onClick={() => field.onChange(c.value)}
                           className={cn(
                             'flex flex-col text-left p-2 rounded-lg border transition-all duration-200 hover:-translate-y-0.5 shadow-sm',
+                            // Three options would otherwise orphan the last one.
+                            c.wide && 'col-span-2',
                             active
                               ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-500'
                               : 'border-secondary-200 bg-white hover:border-secondary-300'
@@ -560,17 +653,16 @@ export function ContactForm() {
         {/* Step 2: Speed & Date */}
         {step === 2 && (
           <div className="space-y-4 animate-fade-in">
-            {/* Express is a lodgement surcharge. Nothing here is lodged for a
-                Pre-Assessment (by design) or a floor plan (never was), so the
-                choice is withheld in both cases rather than promising a
-                next-day lodgement that cannot happen. */}
+            {/* Express is a lodgement surcharge, so it only applies to a lodged
+                product. Everything else states what it actually gets instead.
+                Switched on productKind rather than nested booleans: an earlier
+                two-way version sent bulk enquiries down the floor-plan branch
+                and told agencies about JPGs. */}
             {!isLodged ? (
               <div className="rounded-lg border border-primary-200 bg-primary-50/60 p-3">
                 <h4 className="text-sm font-bold text-secondary-900">Turnaround</h4>
                 <p className="mt-1 text-sm text-secondary-700 leading-relaxed">
-                  {planIncluded
-                    ? 'Nothing is lodged on the government register, so there is no certificate to expedite and no next-day option. Your Energy Report and written plan are sent within 72 hours of the visit.'
-                    : 'Floor plans are not lodged on the government register, so there is no next-day lodgement option. Your plans are supplied as JPG and PDF within 72 hours of the visit.'}
+                  {turnaroundCopy(productKind)}
                 </p>
               </div>
             ) : (
@@ -619,12 +711,25 @@ export function ContactForm() {
             )}
 
             <div className="grid gap-3 sm:grid-cols-2">
-              <Field label="Preferred Visit Date" htmlFor="preferredDate" hint="Select a date for the assessor's visit. Optional.">
-                <div className="relative">
-                  <Input id="preferredDate" type="date" {...register('preferredDate')} />
-                </div>
-              </Field>
-              <Field label="Additional Instructions" htmlFor="notes" hint="e.g. key codes, parking info, property details. Optional.">
+              {/* A single visit date is meaningless across many properties —
+                  those are scheduled per property after the quote. */}
+              {!isBulk && (
+                <Field label="Preferred Visit Date" htmlFor="preferredDate" hint="Select a date for the assessor's visit. Optional.">
+                  <div className="relative">
+                    <Input id="preferredDate" type="date" {...register('preferredDate')} />
+                  </div>
+                </Field>
+              )}
+              <Field
+                label="Additional Instructions"
+                htmlFor="notes"
+                hint={
+                  isBulk
+                    ? 'Access arrangements, timescales, or anything else about the portfolio. Optional.'
+                    : 'e.g. key codes, parking info, property details. Optional.'
+                }
+                className={isBulk ? 'sm:col-span-2' : undefined}
+              >
                 <Input id="notes" placeholder="Notes for the assessor..." {...register('notes')} />
               </Field>
             </div>
@@ -635,8 +740,10 @@ export function ContactForm() {
         {step === 3 && (
           <div className="space-y-3 animate-fade-in">
             <div>
-              <h4 className="text-base font-bold text-secondary-900">Enter Contact & Property Address</h4>
-              <p className="text-xs text-secondary-500 mt-0.5">Provide the property details and where we should send the invoice and certificate.</p>
+              <h4 className="text-base font-bold text-secondary-900">
+                {isBulk ? 'Enter Contact & Portfolio Details' : 'Enter Contact & Property Address'}
+              </h4>
+              <p className="text-xs text-secondary-500 mt-0.5">{contactStepIntro(productKind)}</p>
             </div>
 
             <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
@@ -677,33 +784,66 @@ export function ContactForm() {
                   {...register('email')}
                 />
               </Field>
+              {/* A bulk enquiry has many properties and no single address, so
+                  the same textarea becomes the property list and the separate
+                  postcode field drops away. The schema applies the address and
+                  postcode requirements conditionally to match. */}
+              {isBulk && (
+                <Field
+                  label="How many properties?"
+                  htmlFor="propertyCount"
+                  required
+                  error={errors.propertyCount?.message}
+                  hint="A rough number is fine — it just sizes the quote."
+                  className="col-span-2"
+                >
+                  <Input
+                    id="propertyCount"
+                    placeholder="e.g. 12, or 20+"
+                    hasError={!!errors.propertyCount}
+                    aria-invalid={!!errors.propertyCount}
+                    {...register('propertyCount')}
+                  />
+                </Field>
+              )}
               <Field
-                label="Full Property Address"
+                label={isBulk ? 'Properties & postcodes' : 'Full Property Address'}
                 htmlFor="address"
-                required
+                required={!isBulk}
                 error={errors.address?.message}
+                hint={
+                  isBulk
+                    ? 'Paste the addresses or postcodes if you have them to hand. Optional — we can take them later.'
+                    : undefined
+                }
                 className="col-span-2"
               >
                 <Textarea
                   id="address"
-                  rows={2}
-                  placeholder="Include street number, block name, and flat number..."
-                  autoComplete="street-address"
+                  rows={isBulk ? 5 : 2}
+                  placeholder={
+                    isBulk
+                      ? 'One property per line, or just the postcodes...'
+                      : 'Include street number, block name, and flat number...'
+                  }
+                  autoComplete={isBulk ? 'off' : 'street-address'}
                   hasError={!!errors.address}
                   aria-invalid={!!errors.address}
                   {...register('address')}
                 />
               </Field>
-              <Field label="Postcode" htmlFor="postcode" required error={errors.postcode?.message}>
-                <Input
-                  id="postcode"
-                  autoComplete="postal-code"
-                  placeholder="e.g. E15 3JZ"
-                  hasError={!!errors.postcode}
-                  aria-invalid={!!errors.postcode}
-                  {...register('postcode')}
-                />
-              </Field>
+              {!isBulk && (
+                <Field label="Postcode" htmlFor="postcode" required error={errors.postcode?.message}>
+                  <Input
+                    id="postcode"
+                    autoComplete="postal-code"
+                    placeholder="e.g. E15 3JZ"
+                    hasError={!!errors.postcode}
+                    aria-invalid={!!errors.postcode}
+                    {...register('postcode')}
+                  />
+                </Field>
+              )}
             </div>
 
             <div className="pt-1">
@@ -925,31 +1065,10 @@ export function ContactForm() {
         <div className="mt-4 border-t border-secondary-100 pt-3 space-y-2">
           <h5 className="text-xs font-bold uppercase tracking-wider text-secondary-500">What&apos;s Included:</h5>
           <ul className="space-y-1.5 text-xs text-secondary-600">
-            {/* Only an EPC is lodged. Asserting a lodgement fee, a register
-                listing or a certificate link against a Pre-Assessment or a
-                floor plan is simply untrue, so each unlodged case states what
-                it actually gets. */}
-            {(isLodged
-              ? [
-                  'Elmhurst Lodgement Fee',
-                  'Official Government Register Listing',
-                  'No Travel/Call-out Surcharges',
-                  'Certificate link sent once lodged',
-                ]
-              : planIncluded
-                ? [
-                    'Full survey by an accredited assessor',
-                    'Nothing lodged — no entry on the public register',
-                    'Energy Report + written Improvement Plan',
-                    'No Travel/Call-out Surcharges',
-                  ]
-                : [
-                    'Laser-measured on site by your assessor',
-                    'Drawn to Rightmove and Zoopla specification',
-                    'High-resolution JPG and PDF supplied',
-                    'No Travel/Call-out Surcharges',
-                  ]
-            ).map((item) => (
+            {/* Every product states what IT includes. The nested-boolean version
+                of this sent bulk enquiries down the floor-plan branch and told
+                agencies their portfolio would arrive as JPGs. */}
+            {includedList(productKind).map((item) => (
               <li key={item} className="flex items-center gap-1.5">
                 <ClipboardCheck className="w-3.5 h-3.5 text-primary-600 shrink-0" />
                 {item}

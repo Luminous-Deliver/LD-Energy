@@ -55,7 +55,11 @@ export const speeds = ['Standard (72 hours)', EXPRESS_SPEED] as const
 
 export const ukPostcodeRegex = /^[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}$/i
 
-export const contactSchema = z.object({
+/** The one service value that means "many properties, quoted individually". */
+export const BULK = 'Bulk / Agency Enquiry' as const
+
+export const contactSchema = z
+  .object({
   name: z.string().trim().min(2, 'Please enter your full name').max(120),
   phone: z
     .string()
@@ -64,12 +68,14 @@ export const contactSchema = z.object({
     .max(30)
     .regex(/^[\d\s+()-]+$/, 'Phone number contains invalid characters'),
   email: z.string().trim().toLowerCase().email('Please enter a valid email address').max(200),
-  address: z.string().trim().min(5, 'Please enter the property address').max(500),
-  postcode: z
-    .string()
-    .trim()
-    .toUpperCase()
-    .regex(ukPostcodeRegex, 'Please enter a valid UK postcode'),
+  /**
+   * Doubles as the properties-and-postcodes list on a bulk enquiry, which is
+   * why there is no `min` here — the requirement is applied conditionally in
+   * the `superRefine` below, where `services` is visible.
+   */
+  address: z.string().trim().max(2000),
+  /** Not asked for on a bulk enquiry — see the `superRefine` below. */
+  postcode: z.string().trim().toUpperCase().max(12),
   propertyType: z.enum(propertyTypes, { required_error: 'Please select a property type' }),
   customerType: z.enum(customerTypes, { required_error: 'Please tell us who you are' }),
   services: z
@@ -82,12 +88,53 @@ export const contactSchema = z.object({
   speed: z.enum(speeds, { required_error: 'Please choose a service speed' }),
   preferredDate: z.string().trim().max(40).optional().or(z.literal('')),
   notes: z.string().trim().max(2000).optional().or(z.literal('')),
+  /**
+   * Roughly how many properties a bulk enquiry covers. A string, not a number:
+   * the real answers are "about 12" and "20+", and forcing an exact integer
+   * would make people guess precisely rather than usefully.
+   */
+  propertyCount: z.string().trim().max(60).optional().or(z.literal('')),
   consent: z.literal(true, {
     errorMap: () => ({ message: 'Please confirm you agree to be contacted' }),
   }),
   /** Honeypot, must remain empty */
   website: z.string().max(0).optional().or(z.literal('')),
   turnstileToken: z.string().min(1, 'Please complete the security check'),
-})
+  })
+  /**
+   * Requirements that depend on WHICH service was chosen, so they cannot be
+   * expressed per-field: a bulk enquiry covers many properties and has no
+   * single address or postcode, while every other booking has exactly one and
+   * needs both.
+   */
+  .superRefine((data, ctx) => {
+    const isBulk = data.services.includes(BULK)
+
+    if (isBulk) {
+      if (!data.propertyCount) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['propertyCount'],
+          message: 'Please tell us roughly how many properties',
+        })
+      }
+      return
+    }
+
+    if (data.address.length < 5) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['address'],
+        message: 'Please enter the property address',
+      })
+    }
+    if (!ukPostcodeRegex.test(data.postcode)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['postcode'],
+        message: 'Please enter a valid UK postcode',
+      })
+    }
+  })
 
 export type ContactInput = z.infer<typeof contactSchema>
