@@ -33,6 +33,23 @@ export interface GuideEstimate {
    *  certificate the customer would otherwise receive nothing actionable, so
    *  it is always included rather than sold again. */
   planIncluded: boolean
+  /**
+   * Whether an Improvement Plan is possible at all for this selection.
+   *
+   * It is written FROM an assessment, so a floor-plan-only or bulk booking
+   * cannot have one — there is nothing to write it from. The form gates its
+   * checkbox on this rather than re-deriving the rule, so the UI and the
+   * arithmetic cannot disagree about what is purchasable.
+   */
+  canHavePlan: boolean
+  /**
+   * Whether anything in this selection is lodged on the GOV.UK register.
+   *
+   * Drives the express surcharge (a lodgement surcharge, so it needs a lodged
+   * product) and the delivery-speed copy. Floor-plan-only and Pre-Assessment
+   * are both unlodged; only the reasons differ.
+   */
+  isLodged: boolean
   /** Guide total the customer sees. 0 when nothing priceable is selected. */
   total: number
 }
@@ -71,13 +88,21 @@ export function guideEstimate(opts: {
   const preAssessment = wantsPreAssessment ? band.epc : 0
   total += preAssessment
 
-  // Nothing is lodged, so there is no lodgement to expedite.
-  const express = !wantsPreAssessment && opts.speed?.includes('Express') ? EXPRESS_SURCHARGE : 0
+  // Express is a LODGEMENT surcharge, not a general turnaround fee. Only an
+  // EPC is lodged: a Pre-Assessment deliberately is not, and a floor plan
+  // never was. Gating on `isLodged` rather than "not a Pre-Assessment" fixes
+  // floor-plan-only too, which had the same defect before Pre-Assessment
+  // existed and was missed when that case was handled.
+  const isLodged = wantsEpc
+  const express = isLodged && opts.speed?.includes('Express') ? EXPRESS_SURCHARGE : 0
   total += express
 
+  // The plan is written FROM an assessment. Without one there is nothing to
+  // write it from, so it is not merely unpriced — it is not purchasable.
+  const canHavePlan = !isBulk && (wantsEpc || wantsPreAssessment)
   const planIncluded = wantsPreAssessment
   const improvementPlan =
-    opts.improvementPlan && !planIncluded ? site.addOns.improvementPlan : 0
+    opts.improvementPlan && canHavePlan && !planIncluded ? site.addOns.improvementPlan : 0
   total += improvementPlan
 
   return {
@@ -90,8 +115,41 @@ export function guideEstimate(opts: {
     preAssessment,
     improvementPlan,
     planIncluded,
+    canHavePlan,
+    isLodged,
     total,
   }
+}
+
+/**
+ * The priced lines of an estimate, as label/value pairs.
+ *
+ * Derived here rather than assembled in a component so the mobile price bar
+ * and any other summary read the same breakdown the arithmetic produced. The
+ * desktop sidebar keeps its own richer layout (it also shows non-priced
+ * context like who is booking), but every FIGURE in both comes from
+ * `guideEstimate`.
+ */
+export function guideEstimateRows(e: GuideEstimate): Array<[string, string]> {
+  if (e.isBulk || e.total <= 0) return []
+  const rows: Array<[string, string]> = []
+
+  if (e.preAssessment) {
+    rows.push(['EPC Pre-Assessment (not lodged)', `£${e.preAssessment}`])
+  } else if (e.epc && e.floorPlan) {
+    rows.push(['EPC + Floor Plan bundle', `£${e.epc + e.floorPlan - e.bundleDiscount}`])
+  } else if (e.epc) {
+    rows.push(['Domestic EPC', `£${e.epc}`])
+  } else if (e.floorPlan) {
+    rows.push(['Floor plan', `£${e.floorPlan}`])
+  }
+
+  if (e.bundleDiscount) rows.push(['Bundle saving', `−£${e.bundleDiscount}`])
+  if (e.express) rows.push(['Next-day lodgement', `+£${e.express}`])
+  if (e.improvementPlan) rows.push(['Improvement Plan', `+£${e.improvementPlan}`])
+  if (e.planIncluded) rows.push(['Improvement Plan', 'Included'])
+
+  return rows
 }
 
 /** One-line summary of a guide estimate for the internal booking email. */

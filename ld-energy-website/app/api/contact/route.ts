@@ -78,14 +78,16 @@ function buildEmail(data: ParsedInput) {
     ['Email', data.email],
     ['Property Address', data.address],
     ['Postcode', data.postcode],
-    ['Property Type', data.propertyType],
+    // The form hides property size on a bulk enquiry, so the schema default
+    // ('2 Bedroom') would otherwise be reported as if the customer picked it.
+    ['Property Type', estimate.isBulk ? 'Not applicable — bulk enquiry' : data.propertyType],
     ['Booking as', data.customerType],
     ['Service(s)', data.services.join(', ')],
     [
       'Improvement Plan',
       estimate.planIncluded
         ? 'Included in Pre-Assessment'
-        : data.improvementPlan
+        : estimate.improvementPlan > 0
           ? `Yes (+£${site.addOns.improvementPlan})`
           : 'No',
     ],
@@ -120,15 +122,22 @@ ${rows
  */
 function buildConfirmation(data: ParsedInput) {
   const firstName = data.name.trim().split(/\s+/)[0] || 'there'
+  const estimate = guideEstimate(data)
   const isPreAssessment = data.services.includes(PRE_ASSESSMENT)
+  const isBulkEnquiry = data.services.includes('Bulk / Agency Enquiry')
   const summary: Array<[string, string]> = [
     ['Service', data.services.join(' + ')],
-    ['Property', `${data.propertyType} — ${data.address}, ${data.postcode}`],
+    [
+      'Property',
+      isBulkEnquiry
+        ? `${data.address}, ${data.postcode}`
+        : `${data.propertyType} — ${data.address}, ${data.postcode}`,
+    ],
     ['Turnaround', isPreAssessment ? 'Report within 72 hours' : data.speed],
   ]
   if (isPreAssessment) {
     summary.push(['Included', 'Energy Report + written Improvement Plan'])
-  } else if (data.improvementPlan) {
+  } else if (estimate.improvementPlan > 0) {
     summary.push(['Add-on', `Improvement Plan (+£${site.addOns.improvementPlan})`])
   }
   if (data.preferredDate) summary.push(['Preferred date', data.preferredDate])
@@ -339,9 +348,13 @@ export async function POST(req: Request) {
   const to = cfEnv.RESEND_TO || process.env.RESEND_TO || NOTIFY_TO
 
   if (!apiKey) {
-    console.warn('[contact] RESEND_API_KEY not set — submission accepted but not delivered.')
-    console.log('[contact] payload:', text)
-    return NextResponse.json({ ok: true, delivered: false })
+    // No email means the enquiry has not been captured. Never show success
+    // or put the customer's personal details into application logs.
+    console.error('[contact] RESEND_API_KEY is not configured.')
+    return NextResponse.json(
+      { error: 'Booking requests are temporarily unavailable. Please call or WhatsApp us instead.' },
+      { status: 503 },
+    )
   }
 
   const sendEmail = (body: Record<string, unknown>) =>

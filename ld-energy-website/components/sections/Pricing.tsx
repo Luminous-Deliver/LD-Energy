@@ -3,7 +3,7 @@ import { SectionHeader } from '@/components/ui/SectionHeader'
 import { PricingServiceCard } from '@/components/ui/PricingServiceCard'
 import { ExactQuoteStrip } from '@/components/ui/ExactQuoteStrip'
 import { FloorAreaGuide } from '@/components/sections/FloorAreaGuide'
-import { priceFrom, maxBundleSaving } from '@/lib/site'
+import { priceFrom, maxBundleSaving, site } from '@/lib/site'
 
 /**
  * Pricing — a primary-tier section built in three layers:
@@ -32,14 +32,19 @@ export function Pricing() {
         <PricingServiceCard
           title="Domestic EPC"
           from={priceFrom.epc}
-          positioning="A full on-site assessment, lodged on the official GOV.UK EPC Register."
+          positioning="A full on-site assessment, lodged on the official GOV.UK EPC Register and valid for ten years."
           inclusions={[
             'Carried out by an accredited Domestic Energy Assessor',
             'Standard lodgement within 72 hours, next day available',
             'Certificate link sent as soon as it is live on the register',
-            'Improvement recommendations included, valid 10 years',
+            `Improvement recommendations and a written plan available for £${site.addOns.improvementPlan}`,
           ]}
           href="/contact"
+          footnote={{
+            text: 'Don’t want it on the public register? The EPC Pre-Assessment is the same survey at the same price, not lodged.',
+            linkLabel: 'See how it works',
+            href: '/services/epc-pre-assessment',
+          }}
         />
         <PricingServiceCard
           title="EPC + Floor Plan"

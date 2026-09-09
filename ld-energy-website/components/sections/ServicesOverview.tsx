@@ -4,8 +4,15 @@ import { Card } from '@/components/ui/Card'
 import { ArrowRight, FileText, Ruler, PackageCheck, Leaf, EyeOff, CheckCircle2, Sparkles, Camera } from 'lucide-react'
 import { priceFrom, formatPrice, site } from '@/lib/site'
 
-// Three core services today; the grid flexes to fit future additions
-// (property photography, gas & electric boiler work, …) without redesign.
+/**
+ * The four services that can be bought on their own — they fill the
+ * four-column row exactly. The Improvement Plan is deliberately NOT in here:
+ * it cannot be bought alone, so it sits in its own band below rather than
+ * posing as a fifth peer and orphaning a card.
+ *
+ * Keep this list at four. A fifth buyable service means changing the grid, not
+ * appending and living with the gap.
+ */
 const services = [
   {
     Icon: FileText,
@@ -52,18 +59,6 @@ const services = [
     bullets: [
       'Nothing published on the GOV.UK register',
       'Improvement Plan included, not an extra',
-    ],
-    highlighted: false,
-  },
-  {
-    Icon: Leaf,
-    title: 'EPC Improvement Plan',
-    href: '/services/epc-improvement-plan',
-    description:
-      'Written up after the visit: your improvement recommendations, a full Energy Report showing where the money actually goes, and a plan ranking what is worth doing on this building — and in what order.',
-    bullets: [
-      `£${site.addOns.improvementPlan} added to your EPC`,
-      'Plain-English route to a better rating',
     ],
     highlighted: false,
   },
@@ -144,6 +139,37 @@ export function ServicesOverview() {
             </Link>
           </Card>
         ))}
+      </div>
+
+      {/*
+        Add-on band. Outside the grid because the Improvement Plan cannot be
+        bought on its own — it attaches to an assessment. Solid rather than
+        dashed: unlike photography below, this IS bookable today.
+      */}
+      <div className="mt-5 flex flex-col gap-4 rounded-2xl border border-accent-200 bg-accent-50/60 p-4 sm:flex-row sm:items-center sm:gap-5 sm:p-5">
+        <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-accent-500 to-accent-600 text-white ring-1 ring-accent-700/10">
+          <Leaf className="h-5 w-5" aria-hidden="true" />
+        </span>
+        <div className="flex-1">
+          <p className="flex flex-wrap items-center gap-2 text-base font-semibold text-secondary-900">
+            EPC Improvement Plan
+            <span className="rounded-full bg-accent-600 px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-white">
+              {`Add-on · £${site.addOns.improvementPlan}`}
+            </span>
+          </p>
+          <p className="mt-1 text-sm leading-relaxed text-secondary-700">
+            Added to an EPC or Pre-Assessment. Your improvement recommendations, a full Energy
+            Report showing where the money actually goes, and a written plan ranking what is worth
+            doing on this building — and in what order.
+          </p>
+        </div>
+        <Link
+          href="/services/epc-improvement-plan"
+          className="inline-flex min-h-[44px] shrink-0 items-center gap-1.5 self-start font-semibold text-accent-700 hover:text-accent-800 sm:self-center"
+        >
+          Learn more
+          <ArrowRight className="h-4 w-4" aria-hidden="true" />
+        </Link>
       </div>
 
       {/*

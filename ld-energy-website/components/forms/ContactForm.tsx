@@ -18,6 +18,7 @@ import {
 } from 'lucide-react'
 import { Field, Input, Textarea } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
+import { MobilePriceBar } from '@/components/forms/MobilePriceBar'
 import { cn } from '@/lib/cn'
 import { pricing, site, EXPRESS_SURCHARGE } from '@/lib/site'
 import { guideEstimate } from '@/lib/pricing-estimate'
@@ -108,6 +109,9 @@ export function ContactForm() {
       watchServices.includes('Floor Plan') || watchServices.includes('Both (Bundle)')
 
     return {
+      // The whole estimate, for anything that renders the breakdown itself
+      // (the mobile bar) rather than picking individual figures out.
+      estimate: e,
       epcPrice: e.epc,
       floorPlanPrice: e.floorPlan,
       discount: e.bundleDiscount,
@@ -115,6 +119,8 @@ export function ContactForm() {
       improvementPlanPrice: e.improvementPlan,
       preAssessmentPrice: e.preAssessment,
       planIncluded: e.planIncluded,
+      canHavePlan: e.canHavePlan,
+      isLodged: e.isLodged,
       total: e.total,
       wantsEpc,
       wantsFloorPlan,
@@ -124,12 +130,15 @@ export function ContactForm() {
   }
 
   const {
+    estimate,
     epcPrice,
     floorPlanPrice,
     discount,
     improvementPlanPrice,
     preAssessmentPrice,
     planIncluded,
+    canHavePlan,
+    isLodged,
     total,
     wantsEpc,
     wantsFloorPlan,
@@ -216,7 +225,9 @@ export function ContactForm() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto grid gap-5 lg:grid-cols-12 items-start">
+    // pb-24 keeps the Next / Back / Submit controls clear of the fixed mobile
+    // price bar; lg:pb-0 because the bar is lg:hidden.
+    <div className="max-w-5xl mx-auto grid gap-5 lg:grid-cols-12 items-start pb-24 lg:pb-0">
       {/* Form Steps Column */}
       <form
         onSubmit={handleSubmit(onSubmit)}
@@ -272,11 +283,14 @@ export function ContactForm() {
                   return (
                     <div className="mt-2 grid gap-2 sm:grid-cols-2">
                       {([
-                        { value: 'EPC Certificate', label: 'EPC only', desc: 'Official 10-year energy rating, lodged on the government register.', badge: undefined },
-                        { value: 'Both (Bundle)', label: 'EPC + Floor Plan', desc: 'Both for the same property in one visit — better value than booking separately.', badge: 'Better value' },
-                        { value: 'Floor Plan', label: 'Floor plan only', desc: 'Laser-measured scale drawing showing layout and room sizes.', badge: undefined },
-                        { value: PRE_ASSESSMENT, label: 'EPC Pre-Assessment', desc: 'Find out your score without it going on the public register. Nothing is lodged.', badge: 'Private' },
-                        { value: 'Bulk / Agency Enquiry', label: 'Bulk / agency enquiry', desc: 'Multiple properties or ongoing instructions — we’ll quote volume rates.', badge: 'Agents' },
+                        { value: 'EPC Certificate', label: 'EPC only', desc: 'Official 10-year energy rating, lodged on the government register.', badge: undefined, wide: false },
+                        { value: 'Both (Bundle)', label: 'EPC + Floor Plan', desc: 'Both for the same property in one visit — better value than booking separately.', badge: 'Better value', wide: false },
+                        { value: 'Floor Plan', label: 'Floor plan only', desc: 'Laser-measured scale drawing showing layout and room sizes.', badge: undefined, wide: false },
+                        { value: PRE_ASSESSMENT, label: 'EPC Pre-Assessment', desc: 'Find out your score without it going on the public register. Nothing is lodged.', badge: 'Private', wide: false },
+                        // Structurally different from the four per-property
+                        // options — no size, no per-property price — so it
+                        // spans the row instead of orphaning a half-cell.
+                        { value: 'Bulk / Agency Enquiry', label: 'Bulk / agency enquiry', desc: 'Multiple properties or ongoing instructions — we’ll quote volume rates.', badge: 'Agents', wide: true },
                       ] as const).map((s) => {
                         const checked = isSelected(s.value)
                         return (
@@ -284,9 +298,23 @@ export function ContactForm() {
                             key={s.value}
                             type="button"
                             aria-pressed={checked}
-                            onClick={() => field.onChange([s.value])}
+                            onClick={() => {
+                              field.onChange([s.value])
+                              // "Homeowner" is the default and is not an option
+                              // on a bulk enquiry, so it would otherwise submit
+                              // invisibly with no card looking selected.
+                              if (s.value === 'Bulk / Agency Enquiry') {
+                                setValue('customerType', 'Estate agent', { shouldValidate: true })
+                              } else if (isBulk) {
+                                // Leaving bulk — `isBulk` is the pre-click
+                                // state, so this only fires on the way out and
+                                // never overrides a genuine agent's own choice.
+                                setValue('customerType', 'Homeowner', { shouldValidate: true })
+                              }
+                            }}
                             className={cn(
                               'flex flex-col text-left p-2.5 rounded-lg border transition-all duration-200 hover:-translate-y-0.5 shadow-sm min-h-[60px]',
+                              s.wide && 'sm:col-span-2',
                               checked
                                 ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-500'
                                 : 'border-secondary-200 bg-white hover:border-secondary-300'
@@ -371,20 +399,32 @@ export function ContactForm() {
             <div>
               <h4 className="text-base font-bold text-secondary-900">Who are you booking as?</h4>
               <p className="text-xs text-secondary-500 mt-0.5">
-                This tells us how to arrange access to the property.
+                {isBulk
+                  ? 'Bulk instructions come from agencies, so we only ask which kind.'
+                  : 'This tells us how to arrange access to the property.'}
               </p>
 
               <Controller
                 control={control}
                 name="customerType"
                 render={({ field }) => (
-                  <div className="mt-2 grid grid-cols-2 gap-2">
-                    {[
-                      { value: 'Homeowner', desc: 'I live in or own the property' },
-                      { value: 'Landlord (tenanted)', desc: 'It’s rented out — tenants live there' },
-                      { value: 'Estate agent', desc: 'Instructing on behalf of a seller' },
-                      { value: 'Letting agent / firm', desc: 'Managing lettings or a portfolio' },
-                    ].map((c) => {
+                  <div className={cn('mt-2 grid gap-2', isBulk ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-2')}>
+                    {/* Nobody books a multi-property bulk enquiry as a
+                        homeowner, and "Homeowner" is the default — so on a bulk
+                        enquiry the two private options are dropped rather than
+                        left as reachable nonsense. */}
+                    {(isBulk
+                      ? [
+                          { value: 'Estate agent', desc: 'Instructing on behalf of sellers' },
+                          { value: 'Letting agent / firm', desc: 'Managing lettings or a portfolio' },
+                        ]
+                      : [
+                          { value: 'Homeowner', desc: 'I live in or own the property' },
+                          { value: 'Landlord (tenanted)', desc: 'It’s rented out — tenants live there' },
+                          { value: 'Estate agent', desc: 'Instructing on behalf of a seller' },
+                          { value: 'Letting agent / firm', desc: 'Managing lettings or a portfolio' },
+                        ]
+                    ).map((c) => {
                       const active = field.value === c.value
                       return (
                         <button
@@ -445,8 +485,10 @@ export function ContactForm() {
               </div>
             )}
 
-            {/* Improvement Plan add-on — per-property, so not shown for bulk */}
-            {!isBulk && !planIncluded && (
+            {/* The plan is written from an assessment, so it is only offered
+                when there is one. `canHavePlan` comes from the estimator so
+                the control and the arithmetic cannot disagree. */}
+            {canHavePlan && !planIncluded && (
             <Controller
               control={control}
               name="improvementPlan"
@@ -495,13 +537,17 @@ export function ContactForm() {
         {/* Step 2: Speed & Date */}
         {step === 2 && (
           <div className="space-y-4 animate-fade-in">
-            {planIncluded ? (
+            {/* Express is a lodgement surcharge. Nothing here is lodged for a
+                Pre-Assessment (by design) or a floor plan (never was), so the
+                choice is withheld in both cases rather than promising a
+                next-day lodgement that cannot happen. */}
+            {!isLodged ? (
               <div className="rounded-lg border border-primary-200 bg-primary-50/60 p-3">
                 <h4 className="text-sm font-bold text-secondary-900">Turnaround</h4>
                 <p className="mt-1 text-sm text-secondary-700 leading-relaxed">
-                  Nothing is lodged on the government register, so there is no certificate to
-                  expedite and no next-day option. Your Energy Report and written plan are sent
-                  within 72 hours of the visit.
+                  {planIncluded
+                    ? 'Nothing is lodged on the government register, so there is no certificate to expedite and no next-day option. Your Energy Report and written plan are sent within 72 hours of the visit.'
+                    : 'Floor plans are not lodged on the government register, so there is no next-day lodgement option. Your plans are supplied as JPG and PDF within 72 hours of the visit.'}
                 </p>
               </div>
             ) : (
@@ -799,9 +845,9 @@ export function ContactForm() {
           )}
 
           <div className="flex justify-between">
-            <span className="font-semibold">{planIncluded ? 'Report sent:' : 'Delivery Speed:'}</span>
+            <span className="font-semibold">{isLodged ? 'Delivery Speed:' : 'Sent within:'}</span>
             <span className="font-bold text-secondary-900">
-              {planIncluded ? 'Within 72 hours' : watchSpeed?.split(' (')[0]}
+              {isLodged ? watchSpeed?.split(' (')[0] : '72 hours'}
             </span>
           </div>
 
@@ -856,21 +902,30 @@ export function ContactForm() {
         <div className="mt-4 border-t border-secondary-100 pt-3 space-y-2">
           <h5 className="text-xs font-bold uppercase tracking-wider text-secondary-500">What&apos;s Included:</h5>
           <ul className="space-y-1.5 text-xs text-secondary-600">
-            {/* A Pre-Assessment is never lodged, so the lodgement and register
-                lines would be straightforwardly untrue for it. */}
-            {(planIncluded
+            {/* Only an EPC is lodged. Asserting a lodgement fee, a register
+                listing or a certificate link against a Pre-Assessment or a
+                floor plan is simply untrue, so each unlodged case states what
+                it actually gets. */}
+            {(isLodged
               ? [
-                  'Full survey by an accredited assessor',
-                  'Nothing lodged — no entry on the public register',
-                  'Energy Report + written Improvement Plan',
-                  'No Travel/Call-out Surcharges',
-                ]
-              : [
                   'Elmhurst Lodgement Fee',
                   'Official Government Register Listing',
                   'No Travel/Call-out Surcharges',
                   'Certificate link sent once lodged',
                 ]
+              : planIncluded
+                ? [
+                    'Full survey by an accredited assessor',
+                    'Nothing lodged — no entry on the public register',
+                    'Energy Report + written Improvement Plan',
+                    'No Travel/Call-out Surcharges',
+                  ]
+                : [
+                    'Laser-measured on site by your assessor',
+                    'Drawn to Rightmove and Zoopla specification',
+                    'High-resolution JPG and PDF supplied',
+                    'No Travel/Call-out Surcharges',
+                  ]
             ).map((item) => (
               <li key={item} className="flex items-center gap-1.5">
                 <ClipboardCheck className="w-3.5 h-3.5 text-primary-600 shrink-0" />
@@ -935,6 +990,10 @@ export function ContactForm() {
           </p>
         </div>
       </div>
+
+      {/* Mobile only: the sidebar above sits below the whole form on a phone,
+          so the running total needs its own pinned home. */}
+      <MobilePriceBar estimate={estimate} />
     </div>
   )
 }

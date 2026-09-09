@@ -30,6 +30,16 @@ export interface PricingServiceCardProps {
   /** Modest elevation for the combined service. Not a "most popular" claim. */
   emphasis?: boolean
   emphasisLabel?: string
+  /**
+   * Quiet line under the CTA for a genuine alternative to this service — a
+   * variant someone comparing cards would want to know exists, without giving
+   * it a card of its own and diluting the three-way choice.
+   */
+  footnote?: {
+    text: string
+    linkLabel: string
+    href: string
+  }
 }
 
 export function PricingServiceCard({
@@ -42,6 +52,7 @@ export function PricingServiceCard({
   saving,
   emphasis = false,
   emphasisLabel,
+  footnote,
 }: PricingServiceCardProps) {
   return (
     <div
@@ -105,6 +116,18 @@ export function PricingServiceCard({
         {ctaLabel}
         <ArrowRight className="h-4 w-4" aria-hidden="true" />
       </Link>
+
+      {footnote && (
+        <p className="mt-3 text-xs leading-relaxed text-secondary-600">
+          {footnote.text}{' '}
+          <Link
+            href={footnote.href}
+            className="font-semibold text-primary-700 underline underline-offset-2 hover:text-primary-800"
+          >
+            {footnote.linkLabel}
+          </Link>
+        </p>
+      )}
     </div>
   )
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { Phone, MessageCircle, CalendarCheck } from 'lucide-react'
 import { site } from '@/lib/site'
 import { cn } from '@/lib/cn'
@@ -8,6 +9,19 @@ import { useScrollDirection } from '@/lib/useScrollDirection'
 
 export function MobileCallBar() {
   const hidden = useScrollDirection()
+  const pathname = usePathname()
+
+  /**
+   * Stand down on the contact page.
+   *
+   * All three actions are redundant there — Call and WhatsApp already sit in
+   * the form's "Prefer to talk?" panel, and "Book an EPC" links to the page
+   * the visitor is already on. More importantly the booking form's running
+   * price bar occupies the same fixed-bottom slot at the same z-index, and
+   * that number is the one doing the work while someone is choosing.
+   */
+  if (pathname === '/contact') return null
+
   return (
     <div
       className={cn(
