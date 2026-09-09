@@ -58,10 +58,16 @@ export default function TermsPage() {
       <p>
         We provide Domestic Energy Performance Certificates (EPCs) and professional property floor plans for residential properties in our service area. EPCs are produced by an Elmhurst-accredited Domestic Energy Assessor (DEA) and lodged on the UK Government EPC Register.
       </p>
+      <p>
+        Your energy rating is calculated by government-approved RdSAP software from the data recorded at the assessment. We collect and submit that data accurately; we cannot select, influence or adjust the rating the software produces, and we do not guarantee any particular rating or band. Ratings produced under RdSAP 10, the methodology in use since June 2025, are not directly comparable with certificates issued before that date.
+      </p>
 
       <h2>2. Booking and pricing</h2>
       <p>
-        Prices shown on our pricing page are guide estimates based mainly on internal floor area (m²), not fixed quotes. We confirm your exact price before the booking is accepted, and that confirmed price is the price you pay. There is no call-out or mileage charge within our normal service area; travel beyond it is included in the quote before booking. Express (next-day) service is available for {`£${EXPRESS_SURCHARGE}`} extra per EPC.
+        Prices shown on our pricing page are guide estimates based mainly on internal floor area (m²), not fixed quotes. We confirm your exact price before the booking is accepted, and that confirmed price is the price you pay, provided the property matches the details given to us at booking. There is no call-out or mileage charge within our normal service area; travel beyond it is included in the quote before booking. Express (next-day) service is available for {`£${EXPRESS_SURCHARGE}`} extra per EPC.
+      </p>
+      <p>
+        If the property turns out to be materially different from those details &mdash; for example a significantly larger floor area, a different property type, or an extension or loft conversion not mentioned at booking &mdash; we will tell you before starting the assessment and either agree a revised price with you or reschedule. We will not change an agreed price without speaking to you first, and you are free to decline and cancel at no charge at that point.
       </p>
       <p>
         Bookings are confirmed once we reply with a confirmed appointment time. We may decline bookings for properties outside our service area or where we cannot deliver the agreed turnaround.
@@ -72,9 +78,13 @@ export default function TermsPage() {
       <ul>
         <li>Provide accurate property details at booking</li>
         <li>Be present at the property (or arrange representative access) at the agreed time</li>
-        <li>Provide normal access to all rooms, lofts (where safely accessible), the boiler, hot water cylinder, and heating controls</li>
+        <li>Provide normal access to all rooms, lofts (where safely accessible), the boiler, hot water cylinder, heating controls, energy meters and windows</li>
+        <li>Share any supporting evidence you hold, such as installation certificates, insulation specifications, window or boiler installation dates, or MCS documentation for solar panels and heat pumps</li>
         <li>Provide accurate information about the property where requested</li>
       </ul>
+      <p>
+        Where evidence is not available, the assessment must use the default assumptions the RdSAP methodology requires. Those defaults are deliberately cautious, so a property with undocumented improvements may score lower than one with the same improvements evidenced. Providing what you have is the single most effective thing you can do to make your rating reflect the property accurately.
+      </p>
       <p>
         Re-visits made necessary by access issues outside our control are charged at £25 per visit.
       </p>
