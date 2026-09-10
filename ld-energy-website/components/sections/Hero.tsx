@@ -8,17 +8,17 @@ const GOOGLE_REVIEWS_URL = site.reviews.profileUrl
 export function Hero() {
   return (
     <section
-      className="relative overflow-hidden -mt-16 md:-mt-20"
+      className="relative overflow-hidden -mt-24"
       style={{ background: 'linear-gradient(160deg, #0D1B33 0%, #142644 45%, #091324 100%)' }}
     >
       {/* Bold dark treatment — reuses the exact navy gradient + sage glow
           already established for HowItWorks/Footer elsewhere on this site,
           rather than a new colour scheme, so the homepage's first impression
           reads as confident/premium and still ties to the rest of the page.
-          The negative top margin pulls this section up underneath the
-          floating pill nav (which reserves its own height in normal flow
-          via `sticky`) so the gradient/pattern reads as one continuous
-          surface behind it, not a separate strip above it. */}
+          The negative top margin deliberately overdraws the tallest header
+          state (84px) so the gradient always reaches the viewport edge behind
+          the floating pill nav. The matching container padding preserves the
+          content position without leaving a body-coloured seam at any width. */}
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
         <div
           className="absolute -top-32 -right-24 h-[560px] w-[560px] rounded-full opacity-[0.22]"
@@ -34,7 +34,7 @@ export function Hero() {
       {/* pt- accounts for the floating pill nav's own height now that this
           section sits underneath it via the negative margin above; pb- keeps
           the original bottom spacing. */}
-      <Container className="relative pt-24 pb-10 md:pt-28 md:pb-14 lg:pt-32 lg:pb-16 grid gap-8 lg:grid-cols-12 lg:gap-12 items-center">
+      <Container className="relative pt-32 pb-10 md:pb-14 lg:pt-36 lg:pb-16 grid gap-8 lg:grid-cols-12 lg:gap-12 items-center">
         <div className="lg:col-span-7">
           <p
             className="inline-flex items-center gap-2 text-xs uppercase tracking-wide font-semibold rounded-full px-3 py-1 animate-fade-in"
