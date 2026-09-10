@@ -33,8 +33,8 @@ export function AssessorCard({
       <div className="p-5 md:p-6">
         {note && <p className="mb-4 text-[13px] leading-relaxed text-secondary-600 md:mb-5 md:text-sm">{note}</p>}
 
-        <dl className="space-y-3 md:space-y-4">
-          <div className="grid grid-cols-2 gap-3 sm:block sm:space-y-3 md:space-y-4">
+        <div className="space-y-3 md:space-y-4">
+          <dl className="grid grid-cols-2 gap-3 sm:block sm:space-y-3 md:space-y-4">
             <div>
               <dt className="text-xs uppercase tracking-wide font-medium text-secondary-500">Name</dt>
               <dd className="mt-0.5 text-[15px] font-semibold leading-snug text-secondary-900 md:text-base">{site.assessor.name}</dd>
@@ -47,10 +47,10 @@ export function AssessorCard({
                 {site.assessor.qualification}
               </dd>
             </div>
-          </div>
+          </dl>
 
           {/* The number people actually type into the register */}
-          <div className="rounded-xl bg-primary-50 px-4 py-2.5 ring-1 ring-primary-100 md:py-3">
+          <dl className="rounded-xl bg-primary-50 px-4 py-2.5 ring-1 ring-primary-100 md:py-3">
             <dt className="text-xs uppercase tracking-wide font-semibold text-primary-700">
               Accreditation number
             </dt>
@@ -58,8 +58,8 @@ export function AssessorCard({
               {site.assessor.accreditationNumber}
             </dd>
             <dd className="mt-1 text-xs text-secondary-600">{site.assessor.scheme}</dd>
-          </div>
-        </dl>
+          </dl>
+        </div>
 
         <a
           href={site.assessor.verifyUrl}
