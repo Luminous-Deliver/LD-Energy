@@ -1,7 +1,7 @@
 const { chromium } = require('playwright')
 const assert = require('node:assert/strict')
 const fs = require('node:fs')
-const out = '../../../audits/website-growth-audit/ld-energy-stage1-2026-09-10'
+const out = '../../../audits/website-growth-audit/ld-energy-stage1-review-fix-2026-09-11'
 
 ;(async () => {
   const browser = await chromium.launch({ channel: 'msedge' })
@@ -16,7 +16,7 @@ const out = '../../../audits/website-growth-audit/ld-energy-stage1-2026-09-10'
     await page.route('**/api/contact', route => { submission = route.request().postDataJSON(); return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, delivered: true }) }) })
     for (const service of ['floor-plan', 'pre-assessment', 'bulk']) {
       await page.goto(`http://localhost:3100/contact?service=${service}&area=unknown&speed=express&plan=1#booking-form`, { waitUntil: 'networkidle' })
-      assert.equal(await page.getByRole('checkbox', { name: /Add the Improvement Plan/ }).count(), 0)
+      assert.equal(await page.getByRole('checkbox', { name: /Add the EPC Improvement Plan/ }).count(), 0)
       if (service === 'pre-assessment') assert.match(await page.locator('form').innerText(), /included in your Pre-Assessment/)
       if (service === 'bulk') {
         assert.equal(await page.locator('input[name="areaBand"]').count(), 0)
@@ -24,6 +24,7 @@ const out = '../../../audits/website-growth-audit/ld-energy-stage1-2026-09-10'
         await page.keyboard.press('Space')
         assert.equal(await page.getByRole('radio', { name: 'Landlord (tenanted)', exact: true }).isChecked(), true)
       }
+      if (service !== 'bulk') await page.getByRole('radio', { name: 'Homeowner', exact: true }).check()
       await page.getByRole('button', { name: 'Continue', exact: true }).click()
       assert.equal(await page.locator('input[name="speed"]').count(), 0)
       assert.equal(await page.locator('input[name="preferredDate"]').count(), service === 'bulk' ? 0 : 1)
@@ -50,9 +51,10 @@ const out = '../../../audits/website-growth-audit/ld-energy-stage1-2026-09-10'
     const errors = []
     storage.on('pageerror', error => errors.push(error.message))
     await storage.addInitScript(() => { if (window.top === window) Object.defineProperty(window, 'localStorage', { get() { throw new DOMException('Storage blocked', 'SecurityError') } }) })
-    await storage.goto('http://localhost:3110/contact', { waitUntil: 'networkidle' })
+    await storage.goto((process.env.BOOKING_PRODUCTION_URL || 'http://localhost:3110') + '/contact', { waitUntil: 'networkidle' })
     await storage.getByRole('button', { name: 'Decline', exact: true }).click()
     await storage.getByRole('radio', { name: 'Not sure of floor area', exact: true }).check()
+    await storage.getByRole('radio', { name: 'Homeowner', exact: true }).check()
     await storage.getByRole('button', { name: 'Continue', exact: true }).click()
     assert.equal(await storage.locator('form h2').innerText(), 'Timing and access')
     assert.deepEqual(errors, [])

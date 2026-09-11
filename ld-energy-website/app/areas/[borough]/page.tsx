@@ -230,7 +230,7 @@ export default async function BoroughPage({ params }: PageProps) {
         eyebrow={`EPC Certificates · ${data.name}`}
         heading={`EPC Certificates in ${data.name}`}
         subheading={`Local Elmhurst-accredited Domestic Energy Assessor covering ${data.name} and surrounding areas. Guide prices from £${priceFrom.epc}, with your exact quote confirmed before booking. Lodged within 72 hours.`}
-        primaryCta={{ label: `Book Your ${data.name} EPC`, href: '#contact' }}
+        primaryCta={{ label: 'Get my exact quote', href: '#contact', ctaId: 'hero' }}
         secondaryCta={{ label: `Call ${site.phone}`, href: site.phoneHref }}
       />
 
@@ -360,12 +360,12 @@ export default async function BoroughPage({ params }: PageProps) {
         </div>
       </Section>
 
-      <ContactSection />
+      <ContactSection areaPage={data.slug} sourcePage="area" />
 
       <CtaStrip
-        heading={`Book Your ${data.name} EPC`}
+        heading={`Get an EPC quote in ${data.name}`}
         body={`Fast, transparent-priced EPC certificates in ${data.name}. Appointments 7 days a week.`}
-        primaryCta={{ label: 'Book Now', href: '/contact' }}
+        primaryCta={{ label: 'Get my exact quote', href: '#contact', ctaId: 'bottom' }}
       />
     </>
   )

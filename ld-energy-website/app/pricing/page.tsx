@@ -1,3 +1,4 @@
+import { quoteHref } from '@/lib/quote-context'
 import type { Metadata } from 'next'
 import { CheckCircle2, XCircle, Sparkles, Ruler, Info } from 'lucide-react'
 import { Section } from '@/components/ui/Section'
@@ -249,7 +250,7 @@ export default function PricingPage() {
                 <tr className="bg-secondary-50 border-t border-secondary-200">
                   <td colSpan={5} className="px-5 py-3 text-xs text-secondary-500 leading-relaxed">
                     All figures are guide estimates and act as starting prices. Internal floor area (m²) is the single biggest factor in the final price, alongside extensions, loft conversions, layout and condition. Savings shown are the difference between the two services booked separately and booked together.{' '}
-                    <a href="/contact#booking-form" className="font-medium text-primary-700 underline">Request an exact quote</a>.
+                    <a href={quoteHref({ sourcePage: 'pricing', ctaId: 'inline' })} className="font-medium text-primary-700 underline">Request an exact quote</a>.
                   </td>
                 </tr>
               </tfoot>

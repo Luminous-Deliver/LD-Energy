@@ -6,6 +6,8 @@ const { contactSchema, PRE_ASSESSMENT, BULK, EXPRESS_SPEED } = require('../lib/v
 const { guideEstimate, guideEstimateLine, guideEstimateRows } = require('../lib/pricing-estimate.ts')
 const { quoteHref, parseQuoteContext, quoteServices } = require('../lib/quote-context.ts')
 const { POST } = require('../app/api/contact/route.ts')
+const { boroughMeta } = require('../lib/boroughs.ts')
+const { sourcePages, ctaIds, customerTypeForSource } = require('../lib/enquiry-attribution.ts')
 
 const sample = { name: 'Test Customer', email: 'test@example.invalid', phone: '07000000000', address: '1 Test Road', postcode: 'E15 1AA', areaBand: '53-70', services: ['EPC Certificate'], customerType: 'Homeowner', speed: 'Standard (72 hours)', consent: true, turnstileToken: 'mock-token', website: '' }
 
@@ -61,6 +63,40 @@ test('quote links allow only safe selections, preserve intent and never contain 
   assert.equal(context.area, undefined)
 })
 
+test('customer type is required; only landlord and agency context initialise it', () => {
+  for (const source of [undefined, 'home', 'contact', 'sellers', 'area']) assert.equal(customerTypeForSource(source), '')
+  assert.equal(customerTypeForSource('landlords'), 'Landlord (tenanted)')
+  assert.equal(customerTypeForSource('estate-agents'), 'Estate agent')
+  assert.equal(contactSchema.safeParse({ ...sample, customerType: '' }).success, false)
+  assert.equal(contactSchema.safeParse({ ...sample, customerType: undefined }).success, false)
+})
+
+test('operational attribution accepts only controlled categories and never URL text or identifiers', () => {
+  for (const sourcePage of sourcePages) for (const ctaId of ctaIds) {
+    const url = new URL(quoteHref({ sourcePage, ctaId }), site.url)
+    assert.equal(parseQuoteContext(url.searchParams).sourcePage, sourcePage)
+    assert.equal(parseQuoteContext(url.searchParams).ctaId, ctaId)
+    assert.equal(contactSchema.safeParse({ ...sample, sourcePage, ctaId }).success, true)
+  }
+  for (const value of ['<script>', 'https://example.invalid/customer', '__proto__', 'click-123']) {
+    assert.equal(contactSchema.safeParse({ ...sample, sourcePage: value }).success, false)
+    assert.equal(contactSchema.safeParse({ ...sample, ctaId: value }).success, false)
+    assert.equal(parseQuoteContext(new URLSearchParams({ source: value, cta: value })).sourcePage, undefined)
+    assert.doesNotMatch(quoteHref({ sourcePage: value, ctaId: value }), /source=|cta=/)
+  }
+  const clean = contactSchema.parse({ ...sample, referrer: 'private', trackingId: 'secret', query: 'address=private' })
+  assert.equal(clean.referrer, undefined)
+  assert.equal(clean.trackingId, undefined)
+  assert.equal(clean.query, undefined)
+})
+
+test('form add-on copy uses the approved additional-product model', () => {
+  const form = require('node:fs').readFileSync(require('node:path').join(__dirname, '../components/forms/ContactForm.tsx'), 'utf8')
+  assert.match(form, /Add the EPC Improvement Plan/)
+  assert.match(form, /Your standard EPC recommendations are included either way\./)
+  assert.doesNotMatch(form, /Recommendations remain on your EPC|£9|fixed rating gains/)
+})
+
 test('contact API security, recalculation and both email representations with delivery mocked', async () => {
   const previous = { fetch: global.fetch, node: process.env.NODE_ENV, turnstile: process.env.TURNSTILE_SECRET_KEY, resend: process.env.RESEND_API_KEY }
   process.env.NODE_ENV = 'production'
@@ -75,6 +111,26 @@ test('contact API security, recalculation and both email representations with de
   }
   const request = (data, origin = site.url) => POST(new Request(site.url + '/api/contact', { method: 'POST', headers: { origin, 'Content-Type': 'application/json' }, body: JSON.stringify(data) }))
   try {
+    assert.equal(Object.keys(boroughMeta).length, 34)
+    for (const [areaPage, area] of Object.entries(boroughMeta)) {
+      messages = []
+      assert.equal((await request({ ...sample, areaPage, sourcePage: 'area', ctaId: 'pricing' })).status, 200)
+      assert.ok(messages[0].text.includes(`Area page: ${area.name}`))
+      assert.ok(messages[0].html.includes(area.name.replace(/&/g, '&amp;').replace(/'/g, '&#39;')))
+      assert.match(messages[0].text, /Source page: area\nCTA: pricing/)
+      assert.match(messages[0].text, /Internal floor area: 53/)
+      assert.doesNotMatch(messages[1].text + messages[1].html, /Area page|Source page|>CTA</)
+    }
+    for (const areaPage of ['__proto__', '<img src=x onerror=alert(1)>', 'invented-borough', '']) {
+      messages = []
+      assert.equal((await request({ ...sample, areaPage })).status, 400)
+      assert.equal(messages.length, 0)
+    }
+    for (const field of ['sourcePage', 'ctaId', 'customerType']) {
+      messages = []
+      assert.equal((await request({ ...sample, [field]: '<script>' })).status, 400)
+      assert.equal(messages.length, 0)
+    }
     for (const services of Object.values(quoteServices).map(value => [value])) {
       messages = []
       const result = await request({ ...sample, services, propertyCount: '12', areaBand: 'unknown', total: 1, name: '<Test Customer>' })

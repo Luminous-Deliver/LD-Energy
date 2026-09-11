@@ -1,3 +1,4 @@
+import { quoteHref } from '@/lib/quote-context'
 import type { Metadata } from 'next'
 import { Section } from '@/components/ui/Section'
 import { BoroughFinder } from '@/components/sections/BoroughFinder'
@@ -53,7 +54,7 @@ export default function AreasPage() {
         eyebrow="Coverage"
         heading="EPC Certificates Across London"
         subheading="Based in Stratford in the London Borough of Newham, we cover all 32 London boroughs and the City of London. The same guide pricing everywhere, 7-day availability, and your exact quote confirmed before booking."
-        primaryCta={{ label: 'Book Your EPC', href: '/contact' }}
+        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'areas', ctaId: 'hero' }) }}
       />
 
       <Section variant="default" id="all-areas">
@@ -89,8 +90,8 @@ export default function AreasPage() {
 
       <CtaStrip
         heading="Can't Find Your Area?"
-        body="Contact us directly and we'll confirm coverage for your postcode, usually within the hour."
-        primaryCta={{ label: 'Contact Us', href: '/contact' }}
+        body="Send your postcode and we'll confirm coverage."
+        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'areas', ctaId: 'bottom' }) }}
       />
     </>
   )

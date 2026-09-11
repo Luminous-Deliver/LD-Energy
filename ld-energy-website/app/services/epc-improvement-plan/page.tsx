@@ -110,7 +110,7 @@ export default function EpcImprovementPlanPage() {
         eyebrow="Add-on service"
         heading="EPC Improvement Plan"
         subheading={`Your EPC tells you the rating. This tells you what to do about it — written up after your assessment and sent with your certificate, for ${PLAN_PRICE}.`}
-        primaryCta={{ label: 'Add it to your booking', href: quoteHref({ service: 'epc', plan: true }) }}
+        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', plan: true, sourcePage: 'improvement-plan', ctaId: 'hero' }) }}
       />
 
       {/* What it is */}
@@ -214,14 +214,14 @@ export default function EpcImprovementPlanPage() {
                 </div>
               </div>
               <p className="mt-4 text-sm text-secondary-700 leading-relaxed">
-                Added to any EPC assessment. Tick the box on the booking form, or mention it when you
+                Added to any EPC assessment. Tick the box on the enquiry form, or mention it when you
                 call — you can also decide on the day, before we lodge.
               </p>
               <Link
-                href={quoteHref({ service: 'epc', plan: true })}
+                href={quoteHref({ service: 'epc', plan: true, sourcePage: 'improvement-plan', ctaId: 'inline' })}
                 className="mt-5 inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-accent-600 to-accent-700 px-4 py-3 text-sm font-bold text-white shadow-md transition-all hover:from-accent-700 hover:to-accent-800"
               >
-                Book an EPC with the plan
+                Get my exact quote
               </Link>
             </Card>
 
@@ -257,10 +257,10 @@ export default function EpcImprovementPlanPage() {
         <p className="mt-8 text-secondary-700">
           Not sure whether it’s worth it?{' '}
           <Link
-            href={quoteHref({ service: 'epc', plan: true })}
+            href={quoteHref({ service: 'epc', plan: true, sourcePage: 'improvement-plan', ctaId: 'inline' })}
             className="font-semibold text-primary-700 hover:text-primary-800 underline underline-offset-2"
           >
-            Ask us when you book
+            Ask us in your enquiry
           </Link>{' '}
           — if your property already rates B or C, we’ll tell you honestly that you probably don’t
           need it.
@@ -268,9 +268,9 @@ export default function EpcImprovementPlanPage() {
       </Section>
 
       <CtaStrip
-        heading="Book an EPC with the Improvement Plan"
+        heading="Get a quote for an EPC with the Improvement Plan"
         body={`Add it to any assessment for ${PLAN_PRICE}. We'll confirm your slot and exact price before booking.`}
-        primaryCta={{ label: 'Book Your EPC', href: quoteHref({ service: 'epc', plan: true }) }}
+        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', plan: true, sourcePage: 'improvement-plan', ctaId: 'bottom' }) }}
       />
     </>
   )

@@ -1,5 +1,8 @@
 # Stage 1 booking repair: review record
 
+Historical `fca8b32` record. See [the independent-review corrections](stage-1-review-fix-report.md)
+for the subsequent fix pass and its verification.
+
 Baseline: `ff9efbf`, following the Phase 1 audit and approved booking specification.
 Evidence folder: `D:/Dev/Abdul-2/audits/website-growth-audit/ld-energy-stage1-2026-09-10/`.
 This is a local implementation for review, not a production deployment.

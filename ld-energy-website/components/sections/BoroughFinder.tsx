@@ -45,7 +45,7 @@ export function BoroughFinder({ boroughs }: BoroughFinderProps) {
       {filtered.length === 0 ? (
         <p className="mt-8 text-secondary-700">
           No borough matches &ldquo;{query}&rdquo;. We still cover all of London and nearby areas,{' '}
-          <Link href={quoteHref()} className="text-primary-700 underline underline-offset-2 hover:text-primary-800">
+          <Link href={quoteHref({ sourcePage: 'areas', ctaId: 'inline' })} className="text-primary-700 underline underline-offset-2 hover:text-primary-800">
             contact us to confirm coverage for your postcode
           </Link>
           .

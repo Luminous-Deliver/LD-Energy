@@ -1,3 +1,4 @@
+import { quoteHref } from '@/lib/quote-context'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Section } from '@/components/ui/Section'
@@ -92,7 +93,7 @@ export default async function BlogCategoryPage({ params }: PageProps) {
         eyebrow="EPC Blog"
         heading={`${cat.name}: EPC Guides for London`}
         subheading={cat.description}
-        primaryCta={{ label: 'Book Your EPC', href: '/contact' }}
+        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'blog', ctaId: 'hero' }) }}
       />
 
       <Section variant="default">
@@ -108,9 +109,9 @@ export default async function BlogCategoryPage({ params }: PageProps) {
       </Section>
 
       <CtaStrip
-        heading="Need an EPC? Book in 60 seconds."
+        heading="Need an EPC? Get your exact quote."
         body={`Elmhurst-accredited assessor. Guide prices from £${priceFrom.epc}. Lodged within 72 hours.`}
-        primaryCta={{ label: 'Book Now', href: '/contact' }}
+        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'blog', ctaId: 'bottom' }) }}
       />
     </>
   )

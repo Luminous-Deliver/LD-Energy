@@ -2,7 +2,7 @@
 # Verification only: isolated copy, existing adapter and lockfile, no deployment.
 set -euo pipefail
 task_source=/mnt/d/Dev/Abdul-2/OtherWorlds/LD-Energy/ld-energy-website
-task_artifacts=/mnt/d/Dev/Abdul-2/audits/website-growth-audit/ld-energy-stage1-2026-09-10
+task_artifacts=${BOOKING_TEST_ARTIFACTS:-/mnt/d/Dev/Abdul-2/audits/website-growth-audit/ld-energy-stage1-2026-09-10}
 task_node="$HOME/.cache/ld-energy-62463ca.DD7Qtb/node-v22.23.2-linux-x64/bin"
 test -x "$task_node/node"
 task_build=${BOOKING_BUILD_WORKSPACE:-$(mktemp -d "$HOME/.cache/ld-energy-stage1.XXXXXX")}

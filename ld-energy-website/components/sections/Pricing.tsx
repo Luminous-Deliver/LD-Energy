@@ -1,3 +1,4 @@
+import type { SourcePage } from '@/lib/enquiry-attribution'
 import { quoteHref } from '@/lib/quote-context'
 import { Section } from '@/components/ui/Section'
 import { SectionHeader } from '@/components/ui/SectionHeader'
@@ -19,7 +20,7 @@ import { priceFrom, maxBundleSaving, site } from '@/lib/site'
  * Now a server component; the interactive part lives in FloorAreaGuide, so the
  * cards and headings ship as static HTML.
  */
-export function Pricing() {
+export function Pricing({ sourcePage }: { sourcePage: SourcePage }) {
   return (
     <Section variant="muted" tier="primary" id="pricing" className="scroll-mt-20 md:scroll-mt-24">
       <SectionHeader
@@ -40,7 +41,7 @@ export function Pricing() {
             'Certificate link sent as soon as it is live on the register',
             `Improvement recommendations and a written plan available for £${site.addOns.improvementPlan}`,
           ]}
-          href={quoteHref({ service: 'epc' })}
+          href={quoteHref({ service: 'epc', sourcePage, ctaId: 'pricing' })}
           alternative={{
             text: 'Don’t want it on the public register? The EPC Pre-Assessment is the same survey at the same price, not lodged.',
             linkLabel: 'See how it works',
@@ -59,7 +60,7 @@ export function Pricing() {
             'Supplied as high-resolution JPG and PDF',
             'Built for landlords, sellers and letting agents',
           ]}
-          href={quoteHref({ service: 'bundle' })}
+          href={quoteHref({ service: 'bundle', sourcePage, ctaId: 'pricing' })}
           emphasis
           emphasisLabel="Better value together"
         />
@@ -73,13 +74,13 @@ export function Pricing() {
             'High-resolution JPG and PDF supplied',
             'Ready for Rightmove, Zoopla and OnTheMarket',
           ]}
-          href={quoteHref({ service: 'floor-plan' })}
+          href={quoteHref({ service: 'floor-plan', sourcePage, ctaId: 'pricing' })}
         />
       </div>
 
-      <ExactQuoteStrip />
+      <ExactQuoteStrip sourcePage={sourcePage} />
 
-      <FloorAreaGuide />
+      <FloorAreaGuide sourcePage={sourcePage} />
     </Section>
   )
 }

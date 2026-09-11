@@ -1,3 +1,4 @@
+import { quoteHref } from '@/lib/quote-context'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import {
@@ -177,7 +178,7 @@ export default function SellersPage() {
         eyebrow="For Home Sellers"
         heading="EPCs for Selling Your London Home"
         subheading={`An EPC is required by law before your property goes on the market. We provide fast, transparently priced certificates so your sale isn't held up — lodged within 72 hours as standard, or next day for £${EXPRESS_SURCHARGE} extra.`}
-        primaryCta={{ label: 'Book Your Seller EPC', href: '/contact' }}
+        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'sellers', ctaId: 'hero' }) }}
       />
 
       {/* Why it matters */}
@@ -290,7 +291,7 @@ export default function SellersPage() {
         </div>
       </Section>
 
-      <Pricing />
+      <Pricing sourcePage="sellers" />
 
       {/* Seller FAQ */}
       <Section variant="default" id="seller-faq">
@@ -308,7 +309,7 @@ export default function SellersPage() {
       <CtaStrip
         heading="Don’t Let an EPC Delay Your Sale"
         body={`Standard 72-hour lodgement or next-day for £${EXPRESS_SURCHARGE}. We'll fit you in around your viewings.`}
-        primaryCta={{ label: 'Book Your EPC', href: '/contact' }}
+        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'sellers', ctaId: 'bottom' }) }}
       />
     </>
   )

@@ -12,6 +12,7 @@ import { guideEstimate, guideEstimateRows } from '@/lib/pricing-estimate'
 import { turnaroundCopy, includedList, contactStepIntro } from '@/lib/booking-copy'
 import { parseQuoteContext, quoteContextFromForm, quoteHref, quoteServices } from '@/lib/quote-context'
 import { conversionEvent } from '@/lib/conversion-events'
+import { ctaIds, customerTypeForSource, sourcePageForPath, type SourcePage, type CtaId } from '@/lib/enquiry-attribution'
 import { useTurnstile } from '@/lib/useTurnstile'
 import { contactSchema, customerTypes, EXPRESS_SPEED, PRE_ASSESSMENT, type ContactInput } from '@/lib/validators'
 
@@ -59,7 +60,7 @@ function focusBookingElement(element: HTMLElement | null) {
   element.scrollIntoView({ block: 'start', behavior: 'instant' })
 }
 
-export function ContactForm() {
+export function ContactForm({ areaPage, sourcePage }: { areaPage?: string; sourcePage?: SourcePage }) {
   const pathname = usePathname()
   const dedicated = pathname === '/contact'
   const [step, setStep] = useState(1)
@@ -72,29 +73,46 @@ export function ContactForm() {
   const started = useRef(false)
   const submitting = useRef(false)
   const moveFocus = useRef(false)
+  const initialised = useRef(false)
   const { register, handleSubmit, control, reset, watch, getValues, setValue, trigger, formState: { errors } } = useForm<ContactInput>({
     resolver: zodResolver(contactSchema),
     shouldFocusError: false,
     defaultValues: {
       name: '', phone: '', email: '', address: '', postcode: '', services: ['EPC Certificate'],
-      areaBand: '', customerType: 'Homeowner', improvementPlan: false, speed: 'Standard (72 hours)',
+      areaBand: '', customerType: '', improvementPlan: false, speed: 'Standard (72 hours)',
+      areaPage, sourcePage: sourcePage || sourcePageForPath(pathname), ctaId: dedicated ? 'direct' : 'embedded',
       propertyCount: '', preferredDate: '', notes: '', website: '', turnstileToken: '', consent: false,
     },
   })
 
   useEffect(() => {
-    if (!dedicated) return
-    const readContext = () => {
+    if (initialised.current) return
+    initialised.current = true
+    let initialSource = sourcePage || sourcePageForPath(pathname)
+    if (dedicated) {
       const context = parseQuoteContext(new URLSearchParams(window.location.search))
       setValue('services', [quoteServices[context.service || 'epc']])
       setValue('areaBand', context.area || '')
       setValue('speed', context.speed === 'express' ? EXPRESS_SPEED : 'Standard (72 hours)')
       setValue('improvementPlan', !!context.plan)
+      initialSource = context.sourcePage || initialSource
+      setValue('sourcePage', initialSource)
+      setValue('ctaId', context.ctaId || 'direct')
     }
-    readContext()
-    if (window.location.hash === '#booking-form') focusBookingElement(document.getElementById('booking-form'))
-    window.addEventListener('popstate', readContext)
-    return () => window.removeEventListener('popstate', readContext)
+    setValue('customerType', customerTypeForSource(initialSource))
+    if (dedicated && window.location.hash === '#booking-form') focusBookingElement(document.getElementById('booking-form'))
+    // URL context seeds a new form only. Browser history must never overwrite edits.
+  }, [dedicated, pathname, sourcePage, setValue])
+
+  useEffect(() => {
+    if (dedicated) return
+    const captureCta = (event: MouseEvent) => {
+      const anchor = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>('a[data-enquiry-cta]') : null
+      const ctaId = anchor?.dataset.enquiryCta as CtaId
+      if (anchor?.getAttribute('href') === '#contact' && ctaIds.includes(ctaId)) setValue('ctaId', ctaId)
+    }
+    document.addEventListener('click', captureCta)
+    return () => document.removeEventListener('click', captureCta)
   }, [dedicated, setValue])
 
   useEffect(() => {
@@ -179,21 +197,20 @@ export function ContactForm() {
       <p className="text-sm font-semibold text-primary-800">Step {step} of 3</p>
       <h2 ref={headingRef} tabIndex={-1} className="mt-1 text-2xl font-bold text-secondary-900">{STEP_TITLES[step - 1]}</h2>
 
-      <div className="my-4 rounded-lg bg-secondary-50 p-3 text-sm text-secondary-800">
+      {estimate.state !== 'awaiting-area' && <div data-estimate-summary className="my-4 rounded-lg bg-secondary-50 p-3 text-sm text-secondary-800">
         <p aria-live="polite" aria-atomic="true">
           {estimate.state === 'priced' ? <><strong>Guide estimate: £{estimate.total}</strong> · {areaLabel(values.areaBand)}</> :
-            estimate.state === 'manual-quote' ? <strong>{isBulk ? 'Your portfolio will be quoted individually.' : 'Exact quote after reviewing your property details.'}</strong> :
-            <>Choose your floor area below for a guide estimate, or select “Not sure of floor area”.</>}
+            <strong>{isBulk ? 'Your portfolio will be quoted individually.' : 'Exact quote after reviewing your property details.'}</strong>}
         </p>
         {estimate.state === 'priced' && <details className="mt-1"><summary className="cursor-pointer py-3 font-semibold">Estimate breakdown</summary>
           <dl>{guideEstimateRows(estimate).map(([label, amount]) => <div key={label} className="flex flex-wrap justify-between gap-2 py-1"><dt>{label}</dt><dd>{amount}</dd></div>)}</dl>
         </details>}
         <p className="mt-1">Your exact quote is confirmed before booking.</p>
-      </div>
+      </div>}
 
       <div className="hidden" aria-hidden="true"><label>Website<input type="text" tabIndex={-1} autoComplete="off" {...register('website')} /></label></div>
 
-      {step === 1 && <div className="space-y-6">
+      {step === 1 && <div className="mt-4 space-y-6">
         <Controller control={control} name="services" render={({ field }) => <Choices name="services" legend="What service do you need?"
           value={field.value[0]} inputRef={field.ref} error={errors.services?.message}
           onChange={value => {
@@ -210,12 +227,12 @@ export function ContactForm() {
 
         {isBulk ? <p className="text-base text-secondary-700">A single floor area does not apply to a portfolio. We’ll ask for an approximate property count on the last step.</p> :
           <Controller control={control} name="areaBand" render={({ field }) => <Choices name="areaBand" legend="Internal floor area"
-            hint="Floor area in m² is the main pricing factor. Bedroom counts are only a rough reference."
+            hint="Choose your internal floor area for a guide estimate. Floor area in m² is the main pricing factor. Bedroom counts are only a rough reference."
             value={field.value || ''} inputRef={field.ref} error={errors.areaBand?.message}
             onChange={value => { field.onChange(value); rememberSelection(); conversionEvent('estimator_use', quoteContextFromForm(getValues())) }}
             options={[...areaBands.map((band, index) => ({ value: band, label: pricing[index].areaLabel, description: pricing[index].typicalLabel })), { value: 'unknown', label: 'Not sure of floor area', description: 'Continue without an estimate. We will review the property details before quoting.' }]} />} />}
 
-        <Controller control={control} name="customerType" render={({ field }) => <Choices name="customerType" legend="Who are you booking as?"
+        <Controller control={control} name="customerType" render={({ field }) => <Choices name="customerType" legend="Which best describes you?"
           value={field.value} onChange={field.onChange} inputRef={field.ref} error={errors.customerType?.message}
           options={customerTypes.map(value => ({ value, label: value }))} />} />
 
@@ -223,8 +240,8 @@ export function ContactForm() {
         {planIncluded && <p className="rounded-lg bg-primary-50 p-3 text-base">The Energy Report and written Improvement Plan are included in your Pre-Assessment.</p>}
         {canHavePlan && !planIncluded && <label className="flex min-h-[48px] cursor-pointer items-start gap-3 rounded-lg border border-secondary-300 p-3">
           <input type="checkbox" className="mt-1 h-5 w-5 shrink-0 accent-primary-700" {...register('improvementPlan', { onChange: rememberSelection })} />
-          <span className="min-w-0"><span className="block text-base font-semibold">Add the Improvement Plan (+£{site.addOns.improvementPlan})</span>
-            <span className="mt-1 block text-sm text-secondary-700">Recommendations remain on your EPC. Also receive an Energy Report with modelled energy costs and a written plan prioritising improvements for your property, prepared after the visit.</span></span>
+          <span className="min-w-0"><span className="block text-base font-semibold">Add the EPC Improvement Plan (+£{site.addOns.improvementPlan})</span>
+            <span className="mt-1 block text-sm text-secondary-700">Your full Energy Report plus Abdul&apos;s personalised plan explaining what&apos;s holding the rating back and which improvements to consider first. Your standard EPC recommendations are included either way.</span></span>
         </label>}
       </div>}
 

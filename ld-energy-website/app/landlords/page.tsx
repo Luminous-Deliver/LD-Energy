@@ -1,3 +1,4 @@
+import { quoteHref } from '@/lib/quote-context'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { AlertTriangle, CheckCircle2, Clock, ShieldCheck, FileText, CalendarRange } from 'lucide-react'
@@ -145,7 +146,7 @@ export default function LandlordsPage() {
         eyebrow="For Landlords"
         heading="EPCs for London Landlords &amp; Domestic MEES Compliance"
         subheading="Accredited domestic EPC assessments across London, from our base in Stratford. Your certificate tells you exactly where the property stands against the current band E requirement — lodged within 72 hours, or next day if you need it urgently."
-        primaryCta={{ label: 'Book Your Landlord EPC', href: '/contact' }}
+        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'landlords', ctaId: 'hero' }) }}
       />
 
       {/* Opening: scope the service honestly before anything else. The SERP for
@@ -311,7 +312,7 @@ export default function LandlordsPage() {
         </ul>
       </Section>
 
-      <Pricing />
+      <Pricing sourcePage="landlords" />
 
       {/* Landlord FAQ */}
       <Section variant="default" id="landlord-faq">
@@ -328,8 +329,8 @@ export default function LandlordsPage() {
 
       <CtaStrip
         heading="Protect Your Rental Income"
-        body="Book your EPC today and stay ahead of MEES. Portfolio enquiries welcome."
-        primaryCta={{ label: 'Book Now', href: '/contact' }}
+        body="Request your EPC quote and stay ahead of MEES. Portfolio enquiries welcome."
+        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'landlords', ctaId: 'bottom' }) }}
       />
     </>
   )

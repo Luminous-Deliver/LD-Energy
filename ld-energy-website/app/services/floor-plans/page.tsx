@@ -44,7 +44,7 @@ const included = [
 
 const process = [
   {
-    title: 'Book',
+    title: 'Request a quote',
     body: 'Contact us by phone, WhatsApp, email, or use our online form. Tell us your property address and preferred time.',
   },
   {
@@ -109,7 +109,7 @@ export default function FloorPlansPage() {
         eyebrow="Floor Plans"
         heading="Professional Property Floor Plans"
         subheading={`Laser-measured floor plans for property marketing. Guide prices from £${priceFrom.floorPlan} — save up to £${maxBundleSaving} when booked together with an EPC in the same visit.`}
-        primaryCta={{ label: 'Get Your Floor Plan', href: quoteHref({ service: 'floor-plan' }) }}
+        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'floor-plan', sourcePage: 'floor-plans', ctaId: 'hero' }) }}
       />
 
       {/* Why Floor Plans */}
@@ -228,9 +228,9 @@ export default function FloorPlansPage() {
       </Section>
 
       <CtaStrip
-        heading="Ready to Order Your Floor Plan?"
-        body="Book online or call us. We'll arrange a visit at a time that suits you."
-        primaryCta={{ label: 'Get Your Floor Plan', href: quoteHref({ service: 'floor-plan' }) }}
+        heading="Ready for your floor plan quote?"
+        body="Request your exact quote online or call us. We'll arrange a visit at a time that suits you."
+        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'floor-plan', sourcePage: 'floor-plans', ctaId: 'bottom' }) }}
       />
     </>
   )

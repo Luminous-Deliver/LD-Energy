@@ -1,3 +1,4 @@
+import type { SourcePage } from '@/lib/enquiry-attribution'
 import { quoteHref } from '@/lib/quote-context'
 import Link from 'next/link'
 import { ArrowRight, BadgeCheck } from 'lucide-react'
@@ -13,7 +14,7 @@ import { cn } from '@/lib/cn'
  * first and the variables follow as the reason it can be given. Compact by
  * design — this is a reassurance line, not another section.
  */
-export function ExactQuoteStrip({ className }: { className?: string }) {
+export function ExactQuoteStrip({ className, sourcePage }: { className?: string; sourcePage: SourcePage }) {
   return (
     <div
       className={cn(
@@ -37,7 +38,7 @@ export function ExactQuoteStrip({ className }: { className?: string }) {
         </div>
 
         <Link
-          href={quoteHref()}
+          href={quoteHref({ sourcePage, ctaId: 'pricing' })}
           className="inline-flex min-h-[44px] shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-primary-800 shadow-sm ring-1 ring-primary-200 transition-all hover:bg-primary-100 hover:ring-primary-300"
         >
           Get my exact quote

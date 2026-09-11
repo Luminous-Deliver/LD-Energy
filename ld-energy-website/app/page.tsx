@@ -89,7 +89,7 @@ export default function HomePage() {
       <SocialProof />
       <PrepPreview />
       <GoodToKnow />
-      <Pricing />
+      <Pricing sourcePage="home" />
       <CtaBand />
       <HowItWorks />
       <WhatIsEpc />

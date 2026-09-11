@@ -1,3 +1,4 @@
+import { quoteHref } from '@/lib/quote-context'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Section } from '@/components/ui/Section'
@@ -75,7 +76,7 @@ export default async function BlogIndexPage() {
         eyebrow="EPC Blog"
         heading="EPC Insights & Guides for London Homeowners & Landlords"
         subheading="Expert guidance on Energy Performance Certificates, MEES compliance, and improving your rating, written by a working London DEA."
-        primaryCta={{ label: 'Book Your EPC', href: '/contact' }}
+        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'blog', ctaId: 'hero' }) }}
       />
 
       {allPosts.length === 0 ? (
@@ -87,8 +88,8 @@ export default async function BlogIndexPage() {
                 Domestic EPC service
               </Link>{' '}
               or{' '}
-              <Link href="/contact#booking-form" className="text-primary-700 underline">
-                book an assessment
+              <Link href={quoteHref({ sourcePage: 'blog', ctaId: 'inline' })} className="text-primary-700 underline">
+                request an assessment quote
               </Link>
               .
             </p>
@@ -155,9 +156,9 @@ export default async function BlogIndexPage() {
       )}
 
       <CtaStrip
-        heading="Need an EPC? Book in 60 seconds."
+        heading="Need an EPC? Get your exact quote."
         body={`Elmhurst-accredited assessor. Guide prices from £${priceFrom.epc}. Lodged within 72 hours.`}
-        primaryCta={{ label: 'Book Now', href: '/contact' }}
+        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'blog', ctaId: 'bottom' }) }}
       />
     </>
   )

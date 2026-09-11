@@ -1,3 +1,4 @@
+import { quoteHref } from '@/lib/quote-context'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import {
@@ -165,7 +166,7 @@ export default function DomesticEnergyAssessorPage() {
         eyebrow="Domestic Energy Assessor"
         heading="Your Local Domestic Energy Assessor in London"
         subheading={`L&D Energy is an Elmhurst-accredited Domestic Energy Assessor (DEA) based in Stratford, East London. We produce official EPC certificates for homes across all 32 London boroughs, with guide prices from £${priceFrom.epc} and next-day appointments available.`}
-        primaryCta={{ label: 'Book an Assessment', href: '/contact' }}
+        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'assessor', ctaId: 'hero' }) }}
       />
 
       {/* What is a DEA */}
@@ -318,7 +319,7 @@ export default function DomesticEnergyAssessorPage() {
         </ul>
       </Section>
 
-      <Pricing />
+      <Pricing sourcePage="assessor" />
 
       {/* FAQ */}
       <Section variant="default" id="faq">
@@ -341,9 +342,9 @@ export default function DomesticEnergyAssessorPage() {
       </Section>
 
       <CtaStrip
-        heading="Book Your London Domestic Energy Assessor"
+        heading="Get a quote from your London Domestic Energy Assessor"
         body={`Elmhurst-accredited, all 32 boroughs, guide prices from £${priceFrom.epc}. Lodged in 72 hours, or next day for £${EXPRESS_SURCHARGE} extra.`}
-        primaryCta={{ label: 'Book an Assessment', href: '/contact' }}
+        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'assessor', ctaId: 'bottom' }) }}
       />
     </>
   )

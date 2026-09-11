@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { sourcePages, ctaIds } from '@/lib/enquiry-attribution'
 import { areaChoices, legacyArea } from '@/lib/floor-area'
 import { propertyTypes, services, customerTypes, speeds, BULK, ukPostcodeRegex } from '@/lib/booking-options'
 export { propertyTypes, services, customerTypes, speeds, BULK, PRE_ASSESSMENT, EXPRESS_SPEED, ukPostcodeRegex } from '@/lib/booking-options'
@@ -23,13 +24,16 @@ export const contactSchema = z
   postcode: z.string().trim().toUpperCase().max(12),
   propertyType: z.enum(propertyTypes).optional(),
   areaBand: z.union([z.enum(areaChoices), z.literal('')]).optional(),
-  customerType: z.enum(customerTypes, { required_error: 'Please tell us who you are' }),
+  customerType: z.union([z.enum(customerTypes), z.literal('')]).refine((value): boolean => value !== '', 'Please tell us who you are'),
+  sourcePage: z.enum(sourcePages).optional(),
+  ctaId: z.enum(ctaIds).optional(),
+  // Borough membership is checked against server-owned boroughMeta in the API.
+  areaPage: z.string().max(64).optional(),
   services: z
     .array(z.enum(services))
     .min(1, 'Please choose at least one service'),
-  /** Optional add-on (£ from site.addOns.improvementPlan): recommendations kept
-   *  on the lodged certificate, plus an Energy Report and a written plan
-   *  ranking the measures. Produced after the visit, never on the doorstep. */
+  /** Additional Energy Report and personalised plan. Standard EPC recommendations
+   *  are included whether or not this optional add-on is selected. */
   improvementPlan: z.boolean().optional().default(false),
   speed: z.enum(speeds, { required_error: 'Please choose a service speed' }),
   preferredDate: z.string().trim().max(40).optional().or(z.literal('')),

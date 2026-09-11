@@ -80,12 +80,12 @@ export default function ContactPage() {
       <BreadcrumbNav items={breadcrumbs} />
 
       {/* Form first in both the reading order and mobile layout. */}
-      <Section variant="default" id="contact-methods" className="!py-6 sm:!py-8">
+      <Section variant="default" id="contact-methods" className="!py-4 sm:!py-6">
         <div className="grid gap-8 lg:grid-cols-12">
           <div className="min-w-0 lg:col-span-8">
             <h1 id="booking-form" tabIndex={-1} className="scroll-mt-32 text-3xl font-bold tracking-tight text-secondary-900 md:text-4xl">Get your exact quote</h1>
             <p className="mt-2 text-base text-secondary-700">Send your property details. We’ll confirm the exact price and an available appointment before booking.</p>
-            <div className="mt-5"><ContactForm /></div>
+            <div className="mt-4"><ContactForm /></div>
           </div>
           <div className="min-w-0 lg:col-span-4 space-y-4">
             {methods.map((m) => (

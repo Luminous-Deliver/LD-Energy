@@ -3,7 +3,7 @@ const assert = require('node:assert/strict')
 const fs = require('node:fs')
 const path = require('node:path')
 const base = process.env.BOOKING_TEST_URL || 'http://localhost:3100'
-const out = path.resolve('../../../audits/website-growth-audit/ld-energy-stage1-2026-09-10')
+const out = path.resolve('../../../audits/website-growth-audit/ld-energy-stage1-review-fix-2026-09-11')
 
 ;(async () => {
   const browser = await chromium.launch({ channel: 'msedge', headless: true })
@@ -26,7 +26,7 @@ const out = path.resolve('../../../audits/website-growth-audit/ld-energy-stage1-
       await cta.click()
       await page.getByRole('form', { name: 'Exact quote enquiry' }).waitFor()
       await page.waitForFunction(label => [...document.querySelectorAll('input[type="radio"]')].some(input => input.getAttribute('aria-label') === label && input.checked), label)
-      if (plan) assert.equal(await page.getByRole('checkbox', { name: /Add the Improvement Plan/ }).isChecked(), true)
+      if (plan) assert.equal(await page.getByRole('checkbox', { name: /Add the EPC Improvement Plan/ }).isChecked(), true)
       assert.equal(await page.locator('link[rel="canonical"]').getAttribute('href'), 'https://epc.luminousanddeliver.co.uk/contact')
       assert.equal(await page.locator('h1').count(), 1)
       report.push({ route, href, service, passed: true })
@@ -49,9 +49,13 @@ const out = path.resolve('../../../audits/website-growth-audit/ld-energy-stage1-
     assert.match(await page.locator('form').innerText(), /Guide estimate: £115/)
     await page.getByRole('radio', { name: 'Floor Plan', exact: true }).check()
     assert.doesNotMatch(page.url(), /speed=express|plan=1/)
+    // Same-document history may change the URL, but must not reapply its defaults.
+    await page.evaluate(() => history.pushState(history.state, '', '/contact#booking-form'))
+    await page.getByRole('radio', { name: 'EPC + Floor Plan', exact: true }).check()
+    await page.locator('input[value="38-52"]').check()
     await page.goBack({ waitUntil: 'networkidle' })
-    assert.equal(await page.getByRole('radio', { name: 'Floor Plan', exact: true }).isChecked(), true)
-    assert.equal(await page.locator('input[value="71-95"]').isChecked(), true)
+    assert.equal(await page.getByRole('radio', { name: 'EPC + Floor Plan', exact: true }).isChecked(), true)
+    assert.equal(await page.locator('input[value="38-52"]').isChecked(), true)
     for (const width of [320,390,768,1024,1440]) {
       await page.setViewportSize({ width, height: 900 })
       await page.goto(base, { waitUntil: 'networkidle' })

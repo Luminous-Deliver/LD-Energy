@@ -1,4 +1,4 @@
-import { quoteHref } from '@/lib/quote-context'
+import type { CtaId } from '@/lib/enquiry-attribution'
 import { Phone, MessageCircle } from 'lucide-react'
 import { Section } from '@/components/ui/Section'
 import { Button } from '@/components/ui/Button'
@@ -7,13 +7,13 @@ import { site } from '@/lib/site'
 interface CtaStripProps {
   heading: string
   body?: string
-  primaryCta?: { label: string; href: string }
+  primaryCta: { label: string; href: string; ctaId?: CtaId }
 }
 
 export function CtaStrip({
   heading,
   body,
-  primaryCta = { label: 'Book Now', href: '/contact' },
+  primaryCta,
 }: CtaStripProps) {
   return (
     <Section variant="primary">
@@ -26,8 +26,8 @@ export function CtaStrip({
             md band (768–1023), which pushed the row past the viewport. Stack the
             buttons there and go horizontal again once there is room at lg. */}
         <div className="flex flex-col gap-3 sm:flex-row md:flex-col lg:flex-row shrink-0">
-          <Button href={primaryCta.href === '/contact' || primaryCta.href === '#contact' ? quoteHref({ service: 'epc' }) : primaryCta.href} variant="accent" size="lg">
-            {primaryCta.href === '/contact' || primaryCta.href === '#contact' ? 'Get my exact quote' : primaryCta.label}
+          <Button href={primaryCta.href} data-enquiry-cta={primaryCta.ctaId} variant="accent" size="lg">
+            {primaryCta.label}
           </Button>
           <Button
             href={site.phoneHref}

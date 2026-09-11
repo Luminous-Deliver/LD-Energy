@@ -1,4 +1,4 @@
-import { quoteHref } from '@/lib/quote-context'
+import type { CtaId } from '@/lib/enquiry-attribution'
 import { Phone } from 'lucide-react'
 import { Container } from '@/components/ui/Container'
 import { Button } from '@/components/ui/Button'
@@ -8,7 +8,7 @@ interface PageHeroProps {
   eyebrow?: string
   heading: string
   subheading: string
-  primaryCta?: { label: string; href: string }
+  primaryCta: { label: string; href: string; ctaId?: CtaId }
   secondaryCta?: { label: string; href: string }
 }
 
@@ -16,7 +16,7 @@ export function PageHero({
   eyebrow,
   heading,
   subheading,
-  primaryCta = { label: 'Book Your EPC', href: '#contact' },
+  primaryCta,
   secondaryCta,
 }: PageHeroProps) {
   return (
@@ -37,8 +37,8 @@ export function PageHero({
           {subheading}
         </p>
         <div className="mt-8 flex flex-col sm:flex-row gap-3">
-          <Button href={primaryCta.href === '/contact' || primaryCta.href === '#contact' ? quoteHref({ service: 'epc' }) : primaryCta.href} variant="accent" size="lg">
-            {primaryCta.href === '/contact' || primaryCta.href === '#contact' ? 'Get my exact quote' : primaryCta.label}
+          <Button href={primaryCta.href} data-enquiry-cta={primaryCta.ctaId} variant="accent" size="lg">
+            {primaryCta.label}
           </Button>
           {secondaryCta ? (
             <Button href={secondaryCta.href} variant="secondary" size="lg">

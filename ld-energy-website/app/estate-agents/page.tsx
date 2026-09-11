@@ -157,7 +157,7 @@ export default function EstateAgentsPage() {
         eyebrow="For Estate & Letting Agents"
         heading="Your EPC Partner for New Instructions"
         subheading="Elmhurst-accredited assessor covering all 32 London boroughs, available for new agency partnerships now. Fast, reliable EPCs and floor plans so your listings go live on time."
-        primaryCta={{ label: 'Partner With Us', href: quoteHref({ service: 'bulk' }) }}
+        primaryCta={{ label: 'Partner With Us', href: quoteHref({ service: 'bulk', sourcePage: 'estate-agents', ctaId: 'hero' }) }}
       />
 
       {/* Availability banner */}
@@ -254,7 +254,7 @@ export default function EstateAgentsPage() {
         </div>
       </Section>
 
-      <Pricing />
+      <Pricing sourcePage="estate-agents" />
 
       {/* Agent FAQ */}
       <Section variant="default" id="agent-faq">
@@ -294,8 +294,8 @@ export default function EstateAgentsPage() {
 
       <CtaStrip
         heading="Add a Reliable EPC Supplier to Your Panel"
-        body="Call, WhatsApp, or email with your typical volume and we'll come back with an agency rate card the same day."
-        primaryCta={{ label: 'Get In Touch', href: quoteHref({ service: 'bulk' }) }}
+        body="Send an enquiry with your typical volume and we'll confirm an agency quote."
+        primaryCta={{ label: 'Get In Touch', href: quoteHref({ service: 'bulk', sourcePage: 'estate-agents', ctaId: 'bottom' }) }}
       />
     </>
   )

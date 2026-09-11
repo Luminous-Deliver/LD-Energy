@@ -1,5 +1,6 @@
 'use client'
 
+import type { SourcePage } from '@/lib/enquiry-attribution'
 import { useState } from 'react'
 import Link from 'next/link'
 import { ArrowRight, Ruler } from 'lucide-react'
@@ -37,7 +38,9 @@ import {
 function BandPicker({
   selected,
   onSelect,
+  sourcePage,
 }: {
+  sourcePage: SourcePage
   selected: PropertyType | 'unknown' | undefined
   onSelect: (t: PropertyType | 'unknown') => void
 }) {
@@ -76,7 +79,7 @@ function BandPicker({
       <p className="mt-3.5 text-sm text-secondary-600">
         Not sure of your floor area? You can{' '}
         <Link
-          href={quoteHref({ area: 'unknown' })}
+          href={quoteHref({ area: 'unknown', sourcePage, ctaId: 'estimator' })}
           className="font-semibold text-primary-700 underline underline-offset-2 hover:text-primary-800"
         >
           send us the address
@@ -87,10 +90,10 @@ function BandPicker({
   )
 }
 
-function ResultPanel({ band, unknown }: { band?: PricingBand; unknown?: boolean }) {
+function ResultPanel({ band, unknown, sourcePage }: { band?: PricingBand; unknown?: boolean; sourcePage: SourcePage }) {
   if (!band) return <div className="rounded-2xl border border-secondary-200 bg-white p-5 shadow-premium">
     <p className="text-base text-secondary-800">{unknown ? 'Your exact quote will be confirmed after reviewing the property details.' : 'Choose an internal floor area band to see guide estimates. Your exact quote is confirmed before booking.'}</p>
-    <Link href={quoteHref({ area: unknown ? 'unknown' : undefined })} className="mt-4 inline-flex min-h-[48px] items-center rounded-lg bg-primary-700 px-4 py-3 text-base font-semibold text-white">Get my exact quote</Link>
+    <Link href={quoteHref({ area: unknown ? 'unknown' : undefined, sourcePage, ctaId: 'estimator' })} className="mt-4 inline-flex min-h-[48px] items-center rounded-lg bg-primary-700 px-4 py-3 text-base font-semibold text-white">Get my exact quote</Link>
   </div>
   const areaBand = areaBands[pricing.indexOf(band)]
   const epc = guideEstimate({ areaBand, services: ['EPC Certificate'] })
@@ -144,7 +147,7 @@ function ResultPanel({ band, unknown }: { band?: PricingBand; unknown?: boolean 
       </p>
 
       <Link
-        href={quoteHref({ service: 'epc', area: areaBand })}
+        href={quoteHref({ service: 'epc', area: areaBand, sourcePage, ctaId: 'estimator' })}
         className="mt-4 inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-accent-600 to-accent-700 px-4 py-3 text-sm font-bold text-white shadow-md transition-all hover:from-accent-700 hover:to-accent-800"
       >
         Get my exact quote
@@ -154,7 +157,7 @@ function ResultPanel({ band, unknown }: { band?: PricingBand; unknown?: boolean 
   )
 }
 
-export function FloorAreaGuide() {
+export function FloorAreaGuide({ sourcePage }: { sourcePage: SourcePage }) {
   const [selected, setSelected] = useState<PropertyType | 'unknown'>()
   const band = pricing.find((p) => p.type === selected)
   const selectBand = (value: PropertyType | 'unknown') => {
@@ -176,10 +179,10 @@ export function FloorAreaGuide() {
       {/* Tablet and desktop: always visible */}
       <div className="mt-5 hidden gap-5 md:grid lg:grid-cols-12">
         <div className="lg:col-span-7">
-          <BandPicker selected={selected} onSelect={selectBand} />
+          <BandPicker sourcePage={sourcePage} selected={selected} onSelect={selectBand} />
         </div>
         <div className="lg:col-span-5">
-          <ResultPanel band={band} unknown={selected === 'unknown'} />
+          <ResultPanel sourcePage={sourcePage} band={band} unknown={selected === 'unknown'} />
         </div>
       </div>
 
@@ -189,8 +192,8 @@ export function FloorAreaGuide() {
       <div className="mt-4 md:hidden">
         <Disclosure summary="View guide prices by floor area">
           <div className="grid gap-5">
-            <BandPicker selected={selected} onSelect={selectBand} />
-            <ResultPanel band={band} unknown={selected === 'unknown'} />
+            <BandPicker sourcePage={sourcePage} selected={selected} onSelect={selectBand} />
+            <ResultPanel sourcePage={sourcePage} band={band} unknown={selected === 'unknown'} />
           </div>
         </Disclosure>
       </div>

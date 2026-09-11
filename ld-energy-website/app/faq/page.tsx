@@ -1,3 +1,4 @@
+import { quoteHref } from '@/lib/quote-context'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Section } from '@/components/ui/Section'
@@ -66,7 +67,7 @@ export default function FaqPage() {
         eyebrow="Frequently Asked Questions"
         heading="EPC Questions, Answered"
         subheading="Everything we get asked about Energy Performance Certificates, what they are, the legal requirements, our process, pricing, and improvements."
-        primaryCta={{ label: 'Book Your EPC', href: '/contact' }}
+        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'faq', ctaId: 'hero' }) }}
       />
 
       <Section variant="default" id="faq-jump">
@@ -129,9 +130,9 @@ export default function FaqPage() {
       </Section>
 
       <CtaStrip
-        heading="Ready to Book?"
+        heading="Ready for your exact quote?"
         body="Get your London EPC sorted. Transparent pricing, fast delivery, no surprises."
-        primaryCta={{ label: 'Book Your EPC', href: '/contact' }}
+        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'faq', ctaId: 'bottom' }) }}
       />
     </>
   )

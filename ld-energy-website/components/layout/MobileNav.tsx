@@ -176,7 +176,7 @@ export function MobileNav() {
           {/* Contact + CTA Footer */}
           <div className="shrink-0 border-t border-secondary-100 bg-secondary-50/50 p-4 flex flex-col gap-3">
             <Link
-              href={pathname === '/contact' ? '#booking-form' : quoteHref(quoteContextForPath(pathname))}
+              href={pathname === '/contact' ? '#booking-form' : quoteHref({ ...quoteContextForPath(pathname), ctaId: 'mobile-menu' })}
               onClick={close}
               tabIndex={open ? undefined : -1}
               className="flex items-center justify-center w-full bg-gradient-to-r from-accent-600 to-accent-700 hover:from-accent-700 hover:to-accent-800 text-white font-bold px-4 py-3.5 rounded-xl shadow-md text-[15px]"

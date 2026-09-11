@@ -1,3 +1,4 @@
+import { quoteHref } from '@/lib/quote-context'
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { Award, MapPin, Clock, BadgeCheck, FileText, Users } from 'lucide-react'
@@ -117,7 +118,7 @@ export default function AboutPage() {
         eyebrow="About Us"
         heading="About L&D Energy"
         subheading="Elmhurst-accredited Domestic Energy Assessor based in Stratford, East London. We deliver fast, transparent-priced EPC certificates and floor plans across every London borough."
-        primaryCta={{ label: 'Get in Touch', href: '/contact' }}
+        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'about', ctaId: 'hero' }) }}
       />
 
       {/* Who we are */}
@@ -305,8 +306,8 @@ export default function AboutPage() {
 
       <CtaStrip
         heading="Ready to Work With Us?"
-        body="Book your EPC online, or get in touch with any question. We reply during our opening hours, Mon–Sun 8am–8pm."
-        primaryCta={{ label: 'Get in Touch', href: '/contact' }}
+        body="Request your EPC quote online, or get in touch with any question. We reply during our opening hours, Mon–Sun 8am–8pm."
+        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'about', ctaId: 'bottom' }) }}
       />
     </>
   )

@@ -53,7 +53,7 @@ export function Hero() {
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row gap-3">
-            <Button href={quoteHref()} variant="accent" size="lg" className="w-full sm:w-auto text-base">
+            <Button href={quoteHref({ sourcePage: 'home', ctaId: 'hero' })} variant="accent" size="lg" className="w-full sm:w-auto text-base">
               Get my exact quote
             </Button>
             <Button

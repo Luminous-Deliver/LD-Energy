@@ -4,6 +4,8 @@ import { contactSchema } from '@/lib/validators'
 import { site } from '@/lib/site'
 import { areaLabel, legacyArea } from '@/lib/floor-area'
 import { guideEstimate, guideEstimateLine } from '@/lib/pricing-estimate'
+import { boroughMeta } from '@/lib/boroughs'
+import type { EnquiryAttribution } from '@/lib/enquiry-attribution'
 
 export const runtime = 'edge'
 
@@ -35,7 +37,7 @@ function escapeHtml(value: string) {
     .replace(/'/g, '&#39;')
 }
 
-interface ParsedInput {
+interface ParsedInput extends EnquiryAttribution {
   name: string
   phone: string
   email: string
@@ -43,6 +45,7 @@ interface ParsedInput {
   postcode: string
   propertyType?: string
   areaBand?: string
+  areaPage?: string
   customerType: string
   services: string[]
   /** Bulk enquiries only — roughly how many properties. */
@@ -87,8 +90,11 @@ function buildEmail(data: ParsedInput) {
       : ([['Postcode', data.postcode]] as Array<[string, string]>)),
     // Bulk has no single property size; new clients submit explicit area bands.
     ['Internal floor area', estimate.isBulk ? 'Not applicable - bulk enquiry' : areaLabel(data.areaBand || legacyArea(data.propertyType))],
-    ['Booking as', data.customerType],
+    ['Customer type', data.customerType],
     ['Service(s)', data.services.join(', ')],
+    ...(data.sourcePage ? [['Source page', data.sourcePage] as [string, string]] : []),
+    ...(data.ctaId ? [['CTA', data.ctaId] as [string, string]] : []),
+    ...(data.areaPage ? [['Area page', boroughMeta[data.areaPage].name] as [string, string]] : []),
     [
       'Improvement Plan',
       estimate.planIncluded
@@ -189,7 +195,7 @@ function buildConfirmation(data: ParsedInput) {
 <html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light only"><title>We've received your request</title></head>
 <body style="margin:0;padding:0;background:${CANVAS};-webkit-text-size-adjust:100%">
-  <div style="display:none;max-height:0;overflow:hidden;opacity:0">We've received your EPC request — we'll confirm your slot and exact price shortly.</div>
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0">We've received your EPC quote request.</div>
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${CANVAS}">
     <tr><td align="center" style="padding:28px 12px">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%">
@@ -306,6 +312,12 @@ export async function POST(req: Request) {
     )
   }
 
+  // This server-owned list is also the source of all 34 area landing pages.
+  // Do not import its full local content into client-side validation or trust URL text.
+  if (parsed.data.areaPage !== undefined && !Object.hasOwn(boroughMeta, parsed.data.areaPage)) {
+    return NextResponse.json({ error: 'Invalid area page' }, { status: 400 })
+  }
+
   // Honeypot triggered — accept silently to avoid signalling bots.
   if (parsed.data.website && parsed.data.website.length > 0) {
     return NextResponse.json({ ok: true })
@@ -326,7 +338,7 @@ export async function POST(req: Request) {
     // fallback while the deployment configuration is repaired.
     console.error('[contact] TURNSTILE_SECRET_KEY is not configured in production.')
     return NextResponse.json(
-      { error: 'Booking requests are temporarily unavailable. Please call or WhatsApp us instead.' },
+      { error: 'Quote requests are temporarily unavailable. Please call or WhatsApp us instead.' },
       { status: 503 },
     )
   }
@@ -352,6 +364,9 @@ export async function POST(req: Request) {
     postcode: parsed.data.postcode,
     propertyType: parsed.data.propertyType,
     areaBand: parsed.data.areaBand || legacyArea(parsed.data.propertyType),
+    areaPage: parsed.data.areaPage,
+    sourcePage: parsed.data.sourcePage,
+    ctaId: parsed.data.ctaId,
     propertyCount: parsed.data.propertyCount || undefined,
     customerType: parsed.data.customerType,
     services: parsed.data.services,
@@ -377,7 +392,7 @@ export async function POST(req: Request) {
     // or put the customer's personal details into application logs.
     console.error('[contact] RESEND_API_KEY is not configured.')
     return NextResponse.json(
-      { error: 'Booking requests are temporarily unavailable. Please call or WhatsApp us instead.' },
+      { error: 'Quote requests are temporarily unavailable. Please call or WhatsApp us instead.' },
       { status: 503 },
     )
   }
@@ -408,7 +423,7 @@ export async function POST(req: Request) {
       const body = await res.text()
       console.error('[contact] Resend error', res.status, body)
       return NextResponse.json(
-        { error: 'We could not send your booking right now. Please call us on 07492 575 396.' },
+        { error: 'We could not send your quote request right now. Please call us on 07492 575 396.' },
         { status: 502 },
       )
     }

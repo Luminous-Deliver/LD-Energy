@@ -86,7 +86,7 @@ export function Coverage() {
         </Link>
         <p className="text-sm text-secondary-600">
           Don&apos;t see your area? We cover all 32 boroughs,{' '}
-          <Link href={quoteHref()} className="font-semibold text-primary-700 hover:text-primary-800">
+          <Link href={quoteHref({ sourcePage: 'home', ctaId: 'inline' })} className="font-semibold text-primary-700 hover:text-primary-800">
             get in touch
           </Link>
           .

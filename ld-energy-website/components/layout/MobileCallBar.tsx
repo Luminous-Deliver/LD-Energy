@@ -50,12 +50,12 @@ export function MobileCallBar() {
           WhatsApp
         </a>
         <Link
-          href={pathname === '/contact' ? '#booking-form' : quoteHref(quoteContextForPath(pathname))}
+          href={pathname === '/contact' ? '#booking-form' : quoteHref({ ...quoteContextForPath(pathname), ctaId: 'mobile-bar' })}
           className="flex items-center justify-center gap-1.5 py-3.5 text-sm font-bold bg-accent-600 text-white active:bg-accent-700"
-          aria-label="Book your EPC"
+          aria-label="Get my exact quote"
         >
           <CalendarCheck className="w-4 h-4" aria-hidden="true" />
-          Book
+          Quote
         </Link>
       </div>
     </div>

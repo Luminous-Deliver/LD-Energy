@@ -72,7 +72,7 @@ const personas = [
 
 const process = [
   {
-    title: 'Book your appointment',
+    title: 'Request your quote',
     body: 'Online form, phone, WhatsApp, or email, whichever suits you.',
   },
   {
@@ -190,7 +190,7 @@ export default function DomesticEpcPage() {
         eyebrow="Domestic EPC Certificates"
         heading="Domestic EPC Certificates in London"
         subheading={`Official Energy Performance Certificates for selling or renting your home. Elmhurst accredited. Guide prices from £${priceFrom.epc}, with your exact quote confirmed before booking. Lodged on the official GOV.UK EPC Register.`}
-        primaryCta={{ label: 'Book Your EPC', href: quoteHref({ service: 'epc' }) }}
+        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'domestic-epc', ctaId: 'hero' }) }}
       />
 
       {/* What is a Domestic EPC */}
@@ -307,7 +307,7 @@ export default function DomesticEpcPage() {
         </div>
       </Section>
 
-      <Pricing />
+      <Pricing sourcePage="domestic-epc" />
 
       {/* Service-specific FAQ */}
       <Section variant="muted" id="epc-faq">
@@ -328,9 +328,9 @@ export default function DomesticEpcPage() {
       <Faq />
 
       <CtaStrip
-        heading="Ready to Book Your EPC?"
+        heading="Ready for your EPC quote?"
         body="Fast, transparent-priced EPC certificates across London. We'll arrange your assessment at a time that suits you."
-        primaryCta={{ label: 'Book Your EPC', href: quoteHref({ service: 'epc' }) }}
+        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'domestic-epc', ctaId: 'bottom' }) }}
       />
     </>
   )
