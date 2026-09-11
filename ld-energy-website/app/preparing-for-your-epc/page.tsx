@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { quoteHref } from '@/lib/quote-context'
 import { Section } from '@/components/ui/Section'
 import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { PageHero } from '@/components/sections/PageHero'
@@ -71,7 +72,7 @@ export default function PreparingPage() {
         eyebrow="Before the visit"
         heading="Preparing for your EPC assessment"
         subheading="A short checklist so the survey takes 45–60 minutes and nothing needs a second visit. Nothing here is difficult — it is mostly about access."
-        primaryCta={{ label: 'Book your EPC', href: '/contact' }}
+        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ sourcePage: 'preparation', ctaId: 'hero' }) }}
       />
       <CustomerBriefing />
       <Container className="pt-8">
@@ -102,9 +103,9 @@ export default function PreparingPage() {
       </Section>
       <ImportantToKnow govUkHref={govUk.epcGuidance} />
       <CtaStrip
-        heading="Ready to book your assessment?"
+        heading="Ready to get your EPC quote?"
         body="Send us the property details and we'll confirm your exact quote and a time slot."
-        primaryCta={{ label: 'Get my exact quote', href: '/contact' }}
+        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ sourcePage: 'preparation', ctaId: 'bottom' }) }}
       />
     </>
   )

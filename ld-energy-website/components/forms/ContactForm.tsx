@@ -13,6 +13,7 @@ import { turnaroundCopy, includedList, contactStepIntro } from '@/lib/booking-co
 import { parseQuoteContext, quoteContextFromForm, quoteHref, quoteServices } from '@/lib/quote-context'
 import { conversionEvent } from '@/lib/conversion-events'
 import { ctaIds, customerTypeForSource, sourcePageForPath, type SourcePage, type CtaId } from '@/lib/enquiry-attribution'
+import { restoredCustomerType, rememberCustomerType } from '@/lib/customer-type-history'
 import { useTurnstile } from '@/lib/useTurnstile'
 import { contactSchema, customerTypes, EXPRESS_SPEED, PRE_ASSESSMENT, type ContactInput } from '@/lib/validators'
 
@@ -74,6 +75,8 @@ export function ContactForm({ areaPage, sourcePage }: { areaPage?: string; sourc
   const submitting = useRef(false)
   const moveFocus = useRef(false)
   const initialised = useRef(false)
+  const estimateRef = useRef<HTMLDivElement>(null)
+  const revealEstimate = useRef(false)
   const { register, handleSubmit, control, reset, watch, getValues, setValue, trigger, formState: { errors } } = useForm<ContactInput>({
     resolver: zodResolver(contactSchema),
     shouldFocusError: false,
@@ -99,7 +102,7 @@ export function ContactForm({ areaPage, sourcePage }: { areaPage?: string; sourc
       setValue('sourcePage', initialSource)
       setValue('ctaId', context.ctaId || 'direct')
     }
-    setValue('customerType', customerTypeForSource(initialSource))
+    setValue('customerType', restoredCustomerType(window.history.state) ?? customerTypeForSource(initialSource))
     if (dedicated && window.location.hash === '#booking-form') focusBookingElement(document.getElementById('booking-form'))
     // URL context seeds a new form only. Browser history must never overwrite edits.
   }, [dedicated, pathname, sourcePage, setValue])
@@ -129,6 +132,29 @@ export function ContactForm({ areaPage, sourcePage }: { areaPage?: string; sourc
   const values = watch()
   const estimate = guideEstimate(values)
   const { isBulk, isLodged, canHavePlan, planIncluded, productKind } = estimate
+  const estimateText = estimate.state === 'awaiting-area' ? '' : estimate.state === 'priced'
+    ? `Guide estimate: £${estimate.total} · ${areaLabel(values.areaBand)}`
+    : isBulk ? 'Your portfolio will be quoted individually.' : "We'll confirm your exact quote after reviewing your property details."
+  const estimatePanel = estimateText && <div ref={estimateRef} data-estimate-summary className="my-4 rounded-lg bg-secondary-50 p-3 text-sm text-secondary-800">
+    <p className="font-semibold">{estimateText}</p>
+    {step > 1 && <>
+      {estimate.state === 'priced' && <details className="mt-1"><summary className="cursor-pointer py-3 font-semibold">Estimate breakdown</summary>
+        <dl>{guideEstimateRows(estimate).map(([label, amount]) => <div key={label} className="flex flex-wrap justify-between gap-2 py-1"><dt>{label}</dt><dd>{amount}</dd></div>)}</dl>
+      </details>}
+      <p className="mt-1">Your exact quote is confirmed before booking.</p>
+    </>}
+  </div>
+
+  useEffect(() => {
+    if (!revealEstimate.current || step !== 1) return
+    revealEstimate.current = false
+    const bottom = estimateRef.current?.getBoundingClientRect().bottom
+    // The result follows the entire size group, so an early band can leave it
+    // below the screen. Reveal it only after a choice, without moving focus or scrolling up.
+    if (bottom && bottom > window.innerHeight - 16) {
+      window.scrollBy({ top: bottom - window.innerHeight + 16, behavior: 'instant' })
+    }
+  }, [estimateText, step])
 
   function start() {
     if (!started.current) { started.current = true; conversionEvent('form_start', quoteContextFromForm(getValues())) }
@@ -183,6 +209,7 @@ export function ContactForm({ areaPage, sourcePage }: { areaPage?: string; sourc
       <p className="mt-3 text-base leading-relaxed">Thanks. Abdul will confirm the exact price and an available appointment. Your visit is confirmed once you agree those details.</p>
       <button type="button" className={`${controlClass} mt-4 border border-primary-700 text-primary-800`} onClick={() => {
         reset(); started.current = false; setStatus('idle'); moveFocus.current = true; setStep(1)
+        rememberCustomerType('', window.history)
         if (dedicated) window.history.replaceState(window.history.state, '', quoteHref())
       }}>Send another request</button>
     </div>
@@ -197,16 +224,9 @@ export function ContactForm({ areaPage, sourcePage }: { areaPage?: string; sourc
       <p className="text-sm font-semibold text-primary-800">Step {step} of 3</p>
       <h2 ref={headingRef} tabIndex={-1} className="mt-1 text-2xl font-bold text-secondary-900">{STEP_TITLES[step - 1]}</h2>
 
-      {estimate.state !== 'awaiting-area' && <div data-estimate-summary className="my-4 rounded-lg bg-secondary-50 p-3 text-sm text-secondary-800">
-        <p aria-live="polite" aria-atomic="true">
-          {estimate.state === 'priced' ? <><strong>Guide estimate: £{estimate.total}</strong> · {areaLabel(values.areaBand)}</> :
-            <strong>{isBulk ? 'Your portfolio will be quoted individually.' : 'Exact quote after reviewing your property details.'}</strong>}
-        </p>
-        {estimate.state === 'priced' && <details className="mt-1"><summary className="cursor-pointer py-3 font-semibold">Estimate breakdown</summary>
-          <dl>{guideEstimateRows(estimate).map(([label, amount]) => <div key={label} className="flex flex-wrap justify-between gap-2 py-1"><dt>{label}</dt><dd>{amount}</dd></div>)}</dl>
-        </details>}
-        <p className="mt-1">Your exact quote is confirmed before booking.</p>
-      </div>}
+      {/* Keep this node mounted and empty before the first estimate. Only its text changes. */}
+      <p data-estimate-announcement className="sr-only" aria-live="polite" aria-atomic="true">{estimateText}</p>
+      {step > 1 && estimatePanel}
 
       <div className="hidden" aria-hidden="true"><label>Website<input type="text" tabIndex={-1} autoComplete="off" {...register('website')} /></label></div>
 
@@ -214,6 +234,7 @@ export function ContactForm({ areaPage, sourcePage }: { areaPage?: string; sourc
         <Controller control={control} name="services" render={({ field }) => <Choices name="services" legend="What service do you need?"
           value={field.value[0]} inputRef={field.ref} error={errors.services?.message}
           onChange={value => {
+            if (value === 'Bulk / Agency Enquiry') revealEstimate.current = true
             field.onChange([value]); const lodged = value === 'EPC Certificate' || value === 'Both (Bundle)'
             if (!lodged) { setValue('speed', 'Standard (72 hours)'); setValue('improvementPlan', false) }
             rememberSelection(); conversionEvent('service_selection', quoteContextFromForm(getValues()))
@@ -227,13 +248,18 @@ export function ContactForm({ areaPage, sourcePage }: { areaPage?: string; sourc
 
         {isBulk ? <p className="text-base text-secondary-700">A single floor area does not apply to a portfolio. We’ll ask for an approximate property count on the last step.</p> :
           <Controller control={control} name="areaBand" render={({ field }) => <Choices name="areaBand" legend="Internal floor area"
-            hint="Choose your internal floor area for a guide estimate. Floor area in m² is the main pricing factor. Bedroom counts are only a rough reference."
+            hint="Choose your internal floor area for a guide estimate."
             value={field.value || ''} inputRef={field.ref} error={errors.areaBand?.message}
-            onChange={value => { field.onChange(value); rememberSelection(); conversionEvent('estimator_use', quoteContextFromForm(getValues())) }}
+            onChange={value => { revealEstimate.current = true; field.onChange(value); rememberSelection(); conversionEvent('estimator_use', quoteContextFromForm(getValues())) }}
             options={[...areaBands.map((band, index) => ({ value: band, label: pricing[index].areaLabel, description: pricing[index].typicalLabel })), { value: 'unknown', label: 'Not sure of floor area', description: 'Continue without an estimate. We will review the property details before quoting.' }]} />} />}
 
+        {estimatePanel}
+
         <Controller control={control} name="customerType" render={({ field }) => <Choices name="customerType" legend="Which best describes you?"
-          value={field.value} onChange={field.onChange} inputRef={field.ref} error={errors.customerType?.message}
+          value={field.value} onChange={value => {
+            field.onChange(value)
+            rememberCustomerType(value as ContactInput['customerType'], window.history)
+          }} inputRef={field.ref} error={errors.customerType?.message}
           options={customerTypes.map(value => ({ value, label: value }))} />} />
 
         {values.customerType === 'Landlord (tenanted)' && <p className="text-sm text-secondary-700">Please let your tenants know about the visit and include any access arrangements in the notes.</p>}

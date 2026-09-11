@@ -156,7 +156,7 @@ export default function PricingPage() {
         eyebrow="Pricing"
         heading="EPC and Floor Plan Pricing"
         subheading="Every figure here is a starting guide, not a fixed quote. Your final cost depends mainly on internal floor area (m²), plus any extensions, loft conversions, layout and condition. We confirm the exact price before you book — never after."
-        primaryCta={{ label: 'Request a Quote', href: '/contact' }}
+        primaryCta={{ label: 'Request a Quote', href: quoteHref({ sourcePage: 'pricing', ctaId: 'hero' }) }}
       />
 
       {/* Full pricing table */}
@@ -351,7 +351,7 @@ export default function PricingPage() {
       <CtaStrip
         heading="Get a Personalised Quote"
         body="Send us the address and property size, and we'll confirm your exact price before anything is booked."
-        primaryCta={{ label: 'Request a Quote', href: '/contact' }}
+        primaryCta={{ label: 'Request a Quote', href: quoteHref({ sourcePage: 'pricing', ctaId: 'bottom' }) }}
       />
     </>
   )
