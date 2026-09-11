@@ -1,5 +1,6 @@
 import { pricing, site, EXPRESS_SURCHARGE, type PricingBand } from '@/lib/site'
-import { propertyTypes, PRE_ASSESSMENT } from '@/lib/validators'
+import { PRE_ASSESSMENT } from '@/lib/booking-options'
+import { areaBands, legacyArea, type AreaBand } from '@/lib/floor-area'
 
 /**
  * The product a booking resolves to. Exhaustive by design — see `productKind`.
@@ -13,17 +14,19 @@ export type ProductKind = 'epc' | 'bundle' | 'floorPlan' | 'preAssessment' | 'bu
 /**
  * ONE definition of the live guide estimate.
  *
- * The contact form (client) shows this number in "Live Price Estimate"; the
+ * The contact form (client) shows this number in its in-flow summary; the
  * contact API route (edge) puts the same number in the internal booking email
  * so Abdul can see what the customer was anchored on before he confirms the
  * real quote. Both call this — there is no second copy of the arithmetic to
  * drift.
  *
  * Every figure is a GUIDE, never a fixed quote. Internal floor area drives the
- * real price; `propertyType` is the proxy the customer can answer.
+ * real price; `propertyType` is accepted only for cached-client compatibility.
+ * Missing area and unknown area have explicit states and no numeric total.
  */
 export interface GuideEstimate {
-  band: PricingBand
+  band: PricingBand | undefined
+  state: 'priced' | 'awaiting-area' | 'manual-quote'
   /** Bulk / agency enquiries are quoted individually — no estimate applies. */
   isBulk: boolean
   epc: number
@@ -79,19 +82,20 @@ export interface GuideEstimate {
    * This one is for WORDING.
    */
   productKind: ProductKind
-  /** Guide total the customer sees. 0 when nothing priceable is selected. */
-  total: number
+  /** Null until a priceable service and known area are selected. */
+  total: number | null
 }
 
 export function guideEstimate(opts: {
-  propertyType: string | undefined
+  propertyType?: string
+  areaBand?: string
   services: readonly string[]
   speed?: string
   improvementPlan?: boolean
 }): GuideEstimate {
-  // propertyTypes is index-aligned with the pricing bands by design.
-  const i = propertyTypes.indexOf(opts.propertyType as (typeof propertyTypes)[number])
-  const band = pricing[i >= 0 ? i : 0]
+  const area = opts.areaBand || legacyArea(opts.propertyType)
+  const i = areaBands.indexOf(area as AreaBand)
+  const band = i >= 0 ? pricing[i] : undefined
 
   const isBulk = opts.services.includes('Bulk / Agency Enquiry')
   const wantsPreAssessment = opts.services.includes(PRE_ASSESSMENT)
@@ -100,21 +104,21 @@ export function guideEstimate(opts: {
   const wantsFloorPlan =
     opts.services.includes('Floor Plan') || opts.services.includes('Both (Bundle)')
 
-  const epc = wantsEpc ? band.epc : 0
-  const floorPlan = wantsFloorPlan ? band.floorPlan : 0
+  const epc = wantsEpc ? (band?.epc ?? 0) : 0
+  const floorPlan = wantsFloorPlan ? (band?.floorPlan ?? 0) : 0
 
   let bundleDiscount = 0
   let total: number
   if (wantsEpc && wantsFloorPlan) {
-    total = band.bundle
-    bundleDiscount = band.epc + band.floorPlan - band.bundle
+    total = (band?.bundle ?? 0)
+    bundleDiscount = (band?.epc ?? 0) + (band?.floorPlan ?? 0) - (band?.bundle ?? 0)
   } else {
     total = epc + floorPlan
   }
 
   // A Pre-Assessment is the same survey at the same band price. It is
   // single-select in the form, so it never combines with the EPC or the bundle.
-  const preAssessment = wantsPreAssessment ? band.epc : 0
+  const preAssessment = wantsPreAssessment ? (band?.epc ?? 0) : 0
   total += preAssessment
 
   // Express is a LODGEMENT surcharge, not a general turnaround fee. Only an
@@ -122,7 +126,7 @@ export function guideEstimate(opts: {
   // never was. Gating on `isLodged` rather than "not a Pre-Assessment" fixes
   // floor-plan-only too, which had the same defect before Pre-Assessment
   // existed and was missed when that case was handled.
-  const isLodged = wantsEpc
+  const isLodged = !isBulk && wantsEpc
   const express = isLodged && opts.speed?.includes('Express') ? EXPRESS_SURCHARGE : 0
   total += express
 
@@ -151,6 +155,7 @@ export function guideEstimate(opts: {
 
   return {
     band,
+    state: isBulk || area === 'unknown' ? 'manual-quote' : !band || productKind === 'none' ? 'awaiting-area' : 'priced',
     isBulk,
     epc,
     floorPlan,
@@ -162,21 +167,18 @@ export function guideEstimate(opts: {
     canHavePlan,
     isLodged,
     productKind,
-    total,
+    total: isBulk || !band || productKind === 'none' ? null : total,
   }
 }
 
 /**
  * The priced lines of an estimate, as label/value pairs.
  *
- * Derived here rather than assembled in a component so the mobile price bar
- * and any other summary read the same breakdown the arithmetic produced. The
- * desktop sidebar keeps its own richer layout (it also shows non-priced
- * context like who is booking), but every FIGURE in both comes from
- * `guideEstimate`.
+ * The in-flow form summary reads the same breakdown as the shared arithmetic.
+ * Unknown area and portfolio enquiries never acquire a numeric estimate.
  */
 export function guideEstimateRows(e: GuideEstimate): Array<[string, string]> {
-  if (e.isBulk || e.total <= 0) return []
+  if (e.state !== 'priced' || e.total === null) return []
   const rows: Array<[string, string]> = []
 
   if (e.preAssessment) {
@@ -200,7 +202,8 @@ export function guideEstimateRows(e: GuideEstimate): Array<[string, string]> {
 /** One-line summary of a guide estimate for the internal booking email. */
 export function guideEstimateLine(e: GuideEstimate): string {
   if (e.isBulk) return 'Quoted individually — no estimate shown'
-  if (e.total <= 0) return 'No priceable service selected'
+  if (e.state === 'manual-quote') return 'Floor area unknown — exact quote after reviewing property details'
+  if (e.state === 'awaiting-area') return 'Choose a floor area band for a guide estimate'
   const parts: string[] = []
   if (e.epc && e.floorPlan) {
     parts.push(`EPC £${e.epc} + Floor Plan £${e.floorPlan} bundled to £${e.epc + e.floorPlan - e.bundleDiscount}`)

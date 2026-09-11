@@ -24,7 +24,7 @@ export function Logo({ className, href = '/', variant = 'dark', size = 'md' }: L
       height={240}
       priority
       className={cn(
-        'block object-contain w-auto',
+        'block max-w-full object-contain w-auto',
         displayHeights[size],
         // Logo has a transparent bg — render as a solid white silhouette
         // on dark backgrounds so it reads clearly against the dark footer
@@ -33,12 +33,12 @@ export function Logo({ className, href = '/', variant = 'dark', size = 'md' }: L
     />
   )
 
-  const content = <span className={cn('inline-flex items-center shrink-0', className)}>{img}</span>
+  const content = <span className={cn('inline-flex min-w-0 items-center', className)}>{img}</span>
 
   if (!href) return content
 
   return (
-    <Link href={href} aria-label="L&D Energy — home" className="inline-flex shrink-0">
+    <Link href={href} aria-label="L&D Energy — home" className="inline-flex min-w-0">
       {content}
     </Link>
   )

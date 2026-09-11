@@ -1,3 +1,4 @@
+import { quoteHref } from '@/lib/quote-context'
 import Link from 'next/link'
 import { ArrowRight, Ruler } from 'lucide-react'
 import { Section } from '@/components/ui/Section'
@@ -79,7 +80,7 @@ export function LocalPricingSummary({ area }: { area: string }) {
       </p>
 
       <Link
-        href="/contact"
+        href={quoteHref()}
         className="mt-5 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-accent-600 to-accent-700 px-5 py-3 text-sm font-bold text-white shadow-md transition-all hover:from-accent-700 hover:to-accent-800"
       >
         Get my exact quote for {area}

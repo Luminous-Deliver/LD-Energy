@@ -1,3 +1,4 @@
+import { quoteHref } from '@/lib/quote-context'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { CheckCircle2, EyeOff, Hammer, Scale, ShieldAlert } from 'lucide-react'
@@ -111,7 +112,7 @@ export default function EpcPreAssessmentPage() {
         eyebrow="Assessment service"
         heading="EPC Pre-Assessment"
         subheading="Find out what your property would score before anything goes on the public register. A full survey, deliberately not lodged — so there is no certificate, and nothing to undo."
-        primaryCta={{ label: 'Book a pre-assessment', href: '/contact' }}
+        primaryCta={{ label: 'Book a pre-assessment', href: quoteHref({ service: 'pre-assessment' }) }}
       />
 
       {/* What it is */}
@@ -217,7 +218,7 @@ export default function EpcPreAssessmentPage() {
                 </div>
               </dl>
               <Link
-                href="/contact"
+                href={quoteHref({ service: 'pre-assessment' })}
                 className="mt-5 inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-primary-600 to-primary-700 px-4 py-3 text-sm font-bold text-white shadow-md transition-all hover:from-primary-700 hover:to-primary-800"
               >
                 Book a pre-assessment
@@ -262,7 +263,7 @@ export default function EpcPreAssessmentPage() {
         <p className="mt-8 text-secondary-700">
           Not sure which you need?{' '}
           <Link
-            href="/contact"
+            href={quoteHref({ service: 'pre-assessment' })}
             className="font-semibold text-primary-700 hover:text-primary-800 underline underline-offset-2"
           >
             Tell us the situation
@@ -274,7 +275,7 @@ export default function EpcPreAssessmentPage() {
       <CtaStrip
         heading="Know the score before it is public"
         body={`A full survey with nothing lodged, from ${FROM_PRICE}. We'll confirm your slot and exact price before booking.`}
-        primaryCta={{ label: 'Book a pre-assessment', href: '/contact' }}
+        primaryCta={{ label: 'Book a pre-assessment', href: quoteHref({ service: 'pre-assessment' }) }}
       />
     </>
   )

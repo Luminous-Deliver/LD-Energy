@@ -1,3 +1,4 @@
+import { quoteHref } from '@/lib/quote-context'
 import Link from 'next/link'
 import { ArrowRight, BadgeCheck } from 'lucide-react'
 import { cn } from '@/lib/cn'
@@ -36,7 +37,7 @@ export function ExactQuoteStrip({ className }: { className?: string }) {
         </div>
 
         <Link
-          href="/contact"
+          href={quoteHref()}
           className="inline-flex min-h-[44px] shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-primary-800 shadow-sm ring-1 ring-primary-200 transition-all hover:bg-primary-100 hover:ring-primary-300"
         >
           Get my exact quote

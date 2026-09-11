@@ -1,3 +1,4 @@
+import { quoteHref } from '@/lib/quote-context'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { CheckCircle2, Leaf, PoundSterling, ListOrdered, ShieldAlert } from 'lucide-react'
@@ -109,7 +110,7 @@ export default function EpcImprovementPlanPage() {
         eyebrow="Add-on service"
         heading="EPC Improvement Plan"
         subheading={`Your EPC tells you the rating. This tells you what to do about it — written up after your assessment and sent with your certificate, for ${PLAN_PRICE}.`}
-        primaryCta={{ label: 'Add it to your booking', href: '/contact' }}
+        primaryCta={{ label: 'Add it to your booking', href: quoteHref({ service: 'epc', plan: true }) }}
       />
 
       {/* What it is */}
@@ -217,7 +218,7 @@ export default function EpcImprovementPlanPage() {
                 call — you can also decide on the day, before we lodge.
               </p>
               <Link
-                href="/contact"
+                href={quoteHref({ service: 'epc', plan: true })}
                 className="mt-5 inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-accent-600 to-accent-700 px-4 py-3 text-sm font-bold text-white shadow-md transition-all hover:from-accent-700 hover:to-accent-800"
               >
                 Book an EPC with the plan
@@ -256,7 +257,7 @@ export default function EpcImprovementPlanPage() {
         <p className="mt-8 text-secondary-700">
           Not sure whether it’s worth it?{' '}
           <Link
-            href="/contact"
+            href={quoteHref({ service: 'epc', plan: true })}
             className="font-semibold text-primary-700 hover:text-primary-800 underline underline-offset-2"
           >
             Ask us when you book
@@ -269,7 +270,7 @@ export default function EpcImprovementPlanPage() {
       <CtaStrip
         heading="Book an EPC with the Improvement Plan"
         body={`Add it to any assessment for ${PLAN_PRICE}. We'll confirm your slot and exact price before booking.`}
-        primaryCta={{ label: 'Book Your EPC', href: '/contact' }}
+        primaryCta={{ label: 'Book Your EPC', href: quoteHref({ service: 'epc', plan: true }) }}
       />
     </>
   )

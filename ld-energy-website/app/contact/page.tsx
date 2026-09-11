@@ -3,10 +3,9 @@ import { Phone, MessageCircle, Mail, MapPin, Clock, Timer } from 'lucide-react'
 import { Section } from '@/components/ui/Section'
 import { Card } from '@/components/ui/Card'
 import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
-import { PageHero } from '@/components/sections/PageHero'
 import { ContactForm } from '@/components/forms/ContactForm'
 import { AssessorCard } from '@/components/ui/AssessorCard'
-import { site, EXPRESS_SURCHARGE } from '@/lib/site'
+import { site } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'Contact | Book Your London EPC',
@@ -80,24 +79,22 @@ export default function ContactPage() {
 
       <BreadcrumbNav items={breadcrumbs} />
 
-      <PageHero
-        eyebrow="Contact Us"
-        heading="Get in Touch"
-        subheading={`Ready to book? Get in touch and we'll arrange your assessment at a time that suits you. Standard 72-hour lodgement, or next day for £${EXPRESS_SURCHARGE} extra.`}
-        primaryCta={{ label: 'Send Booking Request', href: '#booking-form' }}
-      />
-
-      {/* Contact methods + form */}
-      <Section variant="default" id="contact-methods">
+      {/* Form first in both the reading order and mobile layout. */}
+      <Section variant="default" id="contact-methods" className="!py-6 sm:!py-8">
         <div className="grid gap-8 lg:grid-cols-12">
-          <div className="lg:col-span-5 space-y-4">
+          <div className="min-w-0 lg:col-span-8">
+            <h1 id="booking-form" tabIndex={-1} className="scroll-mt-32 text-3xl font-bold tracking-tight text-secondary-900 md:text-4xl">Get your exact quote</h1>
+            <p className="mt-2 text-base text-secondary-700">Send your property details. We’ll confirm the exact price and an available appointment before booking.</p>
+            <div className="mt-5"><ContactForm /></div>
+          </div>
+          <div className="min-w-0 lg:col-span-4 space-y-4">
             {methods.map((m) => (
               <div key={m.title} className="rounded-lg bg-white border border-secondary-200 p-4 sm:p-6 shadow-sm">
                 <div className="flex items-start gap-4">
                   <span className="inline-flex items-center justify-center w-11 h-11 rounded-full bg-primary-100 text-primary-700 shrink-0">
                     <m.Icon className="w-5 h-5" aria-hidden="true" />
                   </span>
-                  <div className="flex-1">
+                  <div className="min-w-0 flex-1 [overflow-wrap:anywhere]">
                     <h2 className="text-base font-semibold text-secondary-900">{m.title}</h2>
                     <p className="mt-0.5 text-secondary-800 [overflow-wrap:anywhere]">{m.value}</p>
                     <p className="text-sm text-secondary-500">{m.detail}</p>
@@ -114,7 +111,7 @@ export default function ContactPage() {
             ))}
 
             <Card>
-              <h3 className="text-base font-semibold text-secondary-900">Office hours</h3>
+              <h2 className="text-base font-semibold text-secondary-900">Office hours</h2>
               <ul className="mt-3 space-y-2 text-sm text-secondary-700">
                 <li className="flex items-center gap-2.5">
                   <Clock className="w-4 h-4 text-primary-600" aria-hidden="true" />
@@ -131,23 +128,10 @@ export default function ContactPage() {
               </ul>
             </Card>
 
-            <AssessorCard />
-          </div>
-
-          <div className="lg:col-span-7">
-            <h2 id="booking-form" className="text-2xl md:text-3xl font-bold tracking-tight text-secondary-900">
-              Booking request
-            </h2>
-            <p className="mt-2 text-secondary-700">
-              Send the details below and we’ll come back to you with a time slot and confirmed price.
-            </p>
-            <div className="mt-6">
-              <ContactForm />
-            </div>
+            <AssessorCard headingLevel={2} />
           </div>
         </div>
       </Section>
-
       {/* Service area */}
       <Section variant="muted" id="service-area">
         <div className="max-w-3xl">

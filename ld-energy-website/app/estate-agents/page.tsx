@@ -1,3 +1,4 @@
+import { quoteHref } from '@/lib/quote-context'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { CheckCircle2, Zap, LayoutPanelTop, PhoneCall, BadgePercent, CalendarClock, FileCheck2, Camera } from 'lucide-react'
@@ -156,7 +157,7 @@ export default function EstateAgentsPage() {
         eyebrow="For Estate & Letting Agents"
         heading="Your EPC Partner for New Instructions"
         subheading="Elmhurst-accredited assessor covering all 32 London boroughs, available for new agency partnerships now. Fast, reliable EPCs and floor plans so your listings go live on time."
-        primaryCta={{ label: 'Partner With Us', href: '/contact' }}
+        primaryCta={{ label: 'Partner With Us', href: quoteHref({ service: 'bulk' }) }}
       />
 
       {/* Availability banner */}
@@ -294,7 +295,7 @@ export default function EstateAgentsPage() {
       <CtaStrip
         heading="Add a Reliable EPC Supplier to Your Panel"
         body="Call, WhatsApp, or email with your typical volume and we'll come back with an agency rate card the same day."
-        primaryCta={{ label: 'Get In Touch', href: '/contact' }}
+        primaryCta={{ label: 'Get In Touch', href: quoteHref({ service: 'bulk' }) }}
       />
     </>
   )

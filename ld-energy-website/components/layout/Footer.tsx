@@ -19,7 +19,7 @@ export function Footer() {
 
   return (
     <footer
-      className="relative overflow-hidden pb-20 md:pb-0"
+      className="relative overflow-hidden pb-20 [overflow-wrap:anywhere] md:pb-0"
       style={{
         background: 'linear-gradient(160deg, #0D1B33 0%, #142644 40%, #0D1B33 70%, #091324 100%)',
       }}
@@ -38,7 +38,7 @@ export function Footer() {
 
       {/* Main content */}
       <Container className="relative pt-14 pb-10 md:pt-16 md:pb-12">
-        <div className="grid gap-10 md:grid-cols-12">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-12">
 
           {/* Brand column */}
           <div className="md:col-span-4">

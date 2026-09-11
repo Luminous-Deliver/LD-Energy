@@ -1,5 +1,8 @@
 'use client'
 
+import { usePathname } from 'next/navigation'
+import { quoteHref, quoteContextForPath } from '@/lib/quote-context'
+
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { Phone, ChevronDown } from 'lucide-react'
@@ -119,6 +122,7 @@ function ServicesDropdown() {
 }
 
 export function Header() {
+  const pathname = usePathname()
   const hidden = useScrollDirection()
   return (
     // Floating island nav: a self-contained pill, not a full-width bar, so it
@@ -167,12 +171,12 @@ export function Header() {
               {site.phone}
             </a>
             <Button
-              href="/contact"
+              href={pathname === '/contact' ? '#booking-form' : quoteHref(quoteContextForPath(pathname))}
               variant="accent"
               className="hidden lg:inline-flex rounded-full px-5 py-2.5 min-h-0"
               size="md"
             >
-              Book an EPC
+              Get my exact quote
             </Button>
             <MobileNav />
           </div>

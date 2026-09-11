@@ -1,3 +1,4 @@
+import { quoteHref } from '@/lib/quote-context'
 import { Phone, MessageCircle } from 'lucide-react'
 import { Section } from '@/components/ui/Section'
 import { Button } from '@/components/ui/Button'
@@ -25,8 +26,8 @@ export function CtaStrip({
             md band (768–1023), which pushed the row past the viewport. Stack the
             buttons there and go horizontal again once there is room at lg. */}
         <div className="flex flex-col gap-3 sm:flex-row md:flex-col lg:flex-row shrink-0">
-          <Button href={primaryCta.href} variant="accent" size="lg">
-            {primaryCta.label}
+          <Button href={primaryCta.href === '/contact' || primaryCta.href === '#contact' ? quoteHref({ service: 'epc' }) : primaryCta.href} variant="accent" size="lg">
+            {primaryCta.href === '/contact' || primaryCta.href === '#contact' ? 'Get my exact quote' : primaryCta.label}
           </Button>
           <Button
             href={site.phoneHref}

@@ -1,3 +1,4 @@
+import { quoteHref } from '@/lib/quote-context'
 import { Container } from '@/components/ui/Container'
 import { Button } from '@/components/ui/Button'
 import { CalendarClock, FileSpreadsheet, KeyRound, Layers } from 'lucide-react'
@@ -67,7 +68,7 @@ export function TradeAgency() {
             regularly. Individual customers get exactly the same standard.
           </p>
 
-          <Button href="/contact" variant="accent" size="lg" className="mt-7">
+          <Button href={quoteHref({ service: 'bulk' })} variant="accent" size="lg" className="mt-7">
             Talk about agency rates
           </Button>
 

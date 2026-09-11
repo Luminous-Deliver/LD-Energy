@@ -1,8 +1,8 @@
-import { forwardRef } from 'react'
+import { forwardRef, cloneElement, isValidElement, type ReactElement } from 'react'
 import { cn } from '@/lib/cn'
 
 const fieldBase =
-  'block w-full min-h-[44px] rounded-md border border-secondary-300 bg-white px-3 py-2.5 text-base text-secondary-900 placeholder:text-secondary-500 shadow-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40 disabled:bg-secondary-50 disabled:text-secondary-500'
+  'block w-full min-h-[48px] rounded-md border border-secondary-500 bg-white px-3 py-2.5 text-base text-secondary-900 placeholder:text-secondary-500 shadow-sm transition-colors focus:border-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-700 disabled:bg-secondary-50 disabled:text-secondary-500'
 
 const errorRing = 'border-danger focus:border-danger focus:ring-danger/30'
 
@@ -17,16 +17,21 @@ interface FieldWrapperProps {
 }
 
 export function Field({ label, htmlFor, required, error, hint, children, className }: FieldWrapperProps) {
+  const describedBy = [hint ? `${htmlFor}-hint` : '', error ? `${htmlFor}-error` : ''].filter(Boolean).join(' ') || undefined
+  const child = isValidElement(children) ? children as ReactElement<InputProps> : null
+  const control = child?.props.id === htmlFor
+    ? cloneElement(child, { required, hasError: !!error, 'aria-invalid': !!error, 'aria-describedby': describedBy })
+    : children
   return (
-    <div className={cn('flex flex-col gap-1.5', className)}>
+    <div className={cn('flex min-w-0 flex-col gap-1.5', className)}>
       <label htmlFor={htmlFor} className="text-sm font-medium text-secondary-800">
         {label}
-        {required && <span className="text-danger ml-0.5" aria-hidden="true">*</span>}
+        {required && <span className="text-red-700 ml-0.5" aria-hidden="true">*</span>}
       </label>
-      {children}
-      {hint && !error && <p className="text-xs text-secondary-500">{hint}</p>}
+      {control}
+      {hint && <p id={`${htmlFor}-hint`} className="text-sm text-secondary-700">{hint}</p>}
       {error && (
-        <p className="text-sm text-danger" role="alert">
+        <p id={`${htmlFor}-error`} className="text-sm text-red-700" role="alert">
           {error}
         </p>
       )}

@@ -207,7 +207,7 @@ export function useTurnstile({
             callbacksRef.current.onError?.('unsupported-browser')
           },
           theme: 'light',
-          size: 'flexible',
+          size: containerRef.current.clientWidth < 300 ? 'compact' : 'flexible',
         })
         setIsLoading(false)
       } catch (renderError) {

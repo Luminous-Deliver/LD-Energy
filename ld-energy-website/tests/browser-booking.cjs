@@ -1,0 +1,110 @@
+const { chromium } = require('playwright')
+const assert = require('node:assert/strict')
+const fs = require('node:fs')
+const path = require('node:path')
+const base = process.env.BOOKING_TEST_URL || 'http://localhost:3100'
+if (!['localhost', '127.0.0.1'].includes(new URL(base).hostname)) throw new Error('Booking interaction tests run locally only')
+const out = path.resolve('../../../audits/website-growth-audit/ld-energy-stage1-2026-09-10')
+fs.mkdirSync(out, { recursive: true })
+const widths = [[320,568],[360,800],[375,812],[390,844],[412,915],[430,932],[768,1024],[1440,900]]
+
+;(async () => {
+  const browser = await chromium.launch({ channel: 'msedge', headless: true })
+  const report = []
+  try {
+    for (const [width, height] of widths) {
+      const context = await browser.newContext({ viewport: { width, height }, reducedMotion: 'reduce' })
+      await context.addInitScript(() => {
+        if (window.top !== window) return
+        localStorage.setItem('cookie-consent', 'declined')
+        window.testEvents = []
+        window.addEventListener('ld-energy:conversion', event => window.testEvents.push(event.detail))
+        let callback
+        window.turnstile = {
+          render: (container, options) => { callback = options.callback; window.expireChallenge = options['expired-callback']; window.verifyChallenge = () => callback('test-token'); setTimeout(window.verifyChallenge, 20); return 'mock-widget' },
+          reset: () => setTimeout(() => callback('fresh-token'), 20), remove: () => {}, getResponse: () => 'test-token',
+        }
+      })
+      const page = await context.newPage()
+      const errors = []
+      page.on('pageerror', error => errors.push(error.message))
+      let submissions = [], fail = true
+      await page.route('**/api/contact', async route => {
+        submissions.push(route.request().postDataJSON())
+        await new Promise(resolve => setTimeout(resolve, 150))
+        await route.fulfill({ status: fail ? 502 : 200, contentType: 'application/json', body: JSON.stringify(fail ? { error: 'Mock delivery failure' } : { ok: true, delivered: true }) })
+      })
+      await page.goto(base + '/contact', { waitUntil: 'networkidle' })
+      await page.evaluate(() => document.fonts.ready)
+      const form = page.getByRole('form', { name: 'Exact quote enquiry' })
+      assert.equal(await form.locator('[name="areaBand"]:checked').count(), 0)
+      assert.doesNotMatch(await form.innerText(), /£85/)
+      assert.equal((await page.evaluate(() => window.testEvents)).length, 0)
+      const firstControlTop = (await form.locator('input[name="services"]').first().boundingBox()).y
+      if (width === 390) assert.ok(firstControlTop < height, 'First form controls must fit in initial viewport')
+      await page.screenshot({ path: path.join(out, `contact-${width}-initial.png`), fullPage: true })
+      await form.getByRole('button', { name: 'Continue', exact: true }).click()
+      assert.equal(await form.locator('h2').innerText(), 'Service and property')
+      assert.equal(await page.evaluate(() => document.activeElement.name), 'areaBand')
+      await form.getByRole('radio', { name: 'Not sure of floor area', exact: true }).check()
+      await form.getByRole('radio', { name: 'EPC + Floor Plan', exact: true }).check()
+      assert.match(page.url(), /service=bundle/)
+      assert.match(page.url(), /area=unknown/)
+      await form.getByRole('button', { name: 'Continue', exact: true }).click()
+      assert.equal(await page.evaluate(() => document.activeElement.textContent), 'Timing and access')
+      await form.getByLabel('Access notes or other instructions', { exact: true }).fill('Private test note')
+      await form.getByRole('button', { name: 'Continue', exact: true }).click()
+      const nameBox = await form.getByLabel('Full name', { exact: false }).boundingBox()
+      const postcodeBox = await form.getByLabel('Postcode', { exact: false }).boundingBox()
+      assert.ok(nameBox.width > (width < 640 ? width - 110 : 150), `Name field width ${nameBox.width} at ${width}`)
+      assert.ok(postcodeBox.width > (width < 640 ? width - 110 : 150))
+      await page.waitForFunction(() => !document.querySelector('button[type="submit"]').disabled)
+      await form.getByRole('button', { name: 'Send my quote request', exact: true }).click()
+      assert.equal(await page.evaluate(() => document.activeElement.id), 'name')
+      assert.equal(await form.locator('#name').getAttribute('aria-describedby'), 'name-error')
+      assert.equal(await form.locator('#name').getAttribute('required'), '')
+      await page.screenshot({ path: path.join(out, `contact-${width}-errors.png`), fullPage: true })
+      await form.locator('#name').fill('Test Customer')
+      await form.locator('#phone').fill('07000000000')
+      await form.locator('#email').fill('test@example.invalid')
+      await form.locator('#address').fill('1 Test Road')
+      await form.locator('#postcode').fill('E15 1AA')
+      await form.locator('#consent').check()
+      await form.getByRole('button', { name: 'Back', exact: true }).click()
+      assert.equal(await form.locator('#notes').inputValue(), 'Private test note')
+      await form.getByRole('button', { name: 'Continue', exact: true }).click()
+      assert.equal(await form.locator('#name').inputValue(), 'Test Customer')
+      assert.doesNotMatch(page.url(), /Customer|private|Test|postcode|price|email/i)
+      await page.waitForFunction(() => !document.querySelector('button[type="submit"]').disabled)
+      await page.evaluate(() => window.expireChallenge())
+      assert.equal(await form.locator('button[type="submit"]').isDisabled(), true)
+      await page.evaluate(() => window.verifyChallenge())
+      await form.getByRole('button', { name: 'Send my quote request', exact: true }).click()
+      await page.waitForFunction(() => document.querySelector('form').textContent.includes('could not be received'))
+      assert.equal(await form.locator('#name').inputValue(), 'Test Customer')
+      assert.equal((await page.evaluate(() => window.testEvents)).filter(e => e.name === 'enquiry_submitted').length, 0)
+      fail = false
+      await page.waitForFunction(() => !document.querySelector('button[type="submit"]').disabled)
+      await form.locator('button[type="submit"]').evaluate(button => { button.click(); button.click() })
+      await page.getByRole('heading', { name: 'Your quote request has been received' }).waitFor()
+      assert.equal(submissions.length, 2, 'One failed request and one successful retry, with double click suppressed')
+      assert.equal(submissions[1].areaBand, 'unknown')
+      assert.deepEqual(submissions[1].services, ['Both (Bundle)'])
+      const events = await page.evaluate(() => window.testEvents)
+      assert.equal(events.filter(e => e.name === 'form_start').length, 1)
+      assert.equal(events.filter(e => e.name === 'enquiry_submitted').length, 1)
+      assert.doesNotMatch(JSON.stringify(events), /Test Customer|example.invalid|Private test|070000|Test Road/)
+      await page.reload({ waitUntil: 'networkidle' })
+      assert.equal(await page.getByRole('radio', { name: 'EPC + Floor Plan', exact: true }).isChecked(), true)
+      assert.equal(await page.getByRole('radio', { name: 'Not sure of floor area', exact: true }).isChecked(), true)
+      await page.addStyleTag({ content: 'html { font-size: 200% !important }' })
+      assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `200% reflow at ${width}`)
+      await page.screenshot({ path: path.join(out, `contact-${width}-text200.png`), fullPage: true })
+      assert.deepEqual(errors, [])
+      report.push({ width, height, firstControlTop, nameWidth: nameBox.width, postcodeWidth: postcodeBox.width, passed: true })
+      console.log(`PASS ${width}px: intent, focus, validation, retry, submission, privacy, reflow`)
+      await context.close()
+    }
+    fs.writeFileSync(path.join(out, 'booking-breakpoints.json'), JSON.stringify(report, null, 2))
+  } finally { await browser.close() }
+})().catch(error => { console.error(error); process.exitCode = 1 })

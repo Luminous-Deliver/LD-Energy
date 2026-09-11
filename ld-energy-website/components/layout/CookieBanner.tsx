@@ -10,18 +10,21 @@ export function CookieBanner() {
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
-    if (!localStorage.getItem(STORAGE_KEY)) {
+    try {
+      if (!localStorage.getItem(STORAGE_KEY)) setVisible(true)
+    } catch {
+      // Browser storage restrictions must not crash the enquiry page.
       setVisible(true)
     }
   }, [])
 
   function accept() {
-    localStorage.setItem(STORAGE_KEY, 'accepted')
+    try { localStorage.setItem(STORAGE_KEY, 'accepted') } catch { /* Choice lasts for this mounted visit. */ }
     setVisible(false)
   }
 
   function decline() {
-    localStorage.setItem(STORAGE_KEY, 'declined')
+    try { localStorage.setItem(STORAGE_KEY, 'declined') } catch { /* Choice lasts for this mounted visit. */ }
     setVisible(false)
   }
 

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getRequestContext } from '@cloudflare/next-on-pages'
 import { contactSchema } from '@/lib/validators'
 import { site } from '@/lib/site'
+import { areaLabel, legacyArea } from '@/lib/floor-area'
 import { guideEstimate, guideEstimateLine } from '@/lib/pricing-estimate'
 
 export const runtime = 'edge'
@@ -40,7 +41,8 @@ interface ParsedInput {
   email: string
   address: string
   postcode: string
-  propertyType: string
+  propertyType?: string
+  areaBand?: string
   customerType: string
   services: string[]
   /** Bulk enquiries only — roughly how many properties. */
@@ -69,6 +71,7 @@ async function verifyTurnstile(token: string, secret: string, remoteip: string):
 function buildEmail(data: ParsedInput) {
   const estimate = guideEstimate({
     propertyType: data.propertyType,
+    areaBand: data.areaBand,
     services: data.services,
     speed: data.speed,
     improvementPlan: data.improvementPlan,
@@ -82,9 +85,8 @@ function buildEmail(data: ParsedInput) {
     ...(estimate.isBulk
       ? ([['Property count', data.propertyCount || '—']] as Array<[string, string]>)
       : ([['Postcode', data.postcode]] as Array<[string, string]>)),
-    // The form hides property size on a bulk enquiry, so the schema default
-    // ('2 Bedroom') would otherwise be reported as if the customer picked it.
-    ['Property Type', estimate.isBulk ? 'Not applicable — bulk enquiry' : data.propertyType],
+    // Bulk has no single property size; new clients submit explicit area bands.
+    ['Internal floor area', estimate.isBulk ? 'Not applicable - bulk enquiry' : areaLabel(data.areaBand || legacyArea(data.propertyType))],
     ['Booking as', data.customerType],
     ['Service(s)', data.services.join(', ')],
     [
@@ -148,7 +150,7 @@ function buildConfirmation(data: ParsedInput) {
   } else {
     summary.push([
       'Property',
-      `${data.propertyType} — ${data.address}, ${data.postcode}`,
+      `${areaLabel(data.areaBand || legacyArea(data.propertyType))} — ${data.address}, ${data.postcode}`,
     ])
     summary.push(['Turnaround', estimate.isLodged ? data.speed : 'Within 72 hours of the visit'])
   }
@@ -158,17 +160,20 @@ function buildConfirmation(data: ParsedInput) {
   } else if (estimate.improvementPlan > 0) {
     summary.push(['Add-on', `Improvement Plan (+£${site.addOns.improvementPlan})`])
   }
+  summary.push(['Guide estimate', estimate.state === 'priced'
+    ? `£${estimate.total} guide; exact quote confirmed before booking.`
+    : guideEstimateLine(estimate)])
   if (data.preferredDate) summary.push(['Preferred date', data.preferredDate])
 
   const text =
     `Hi ${firstName},\n\n` +
-    `Thanks for your booking request with L&D Energy — we've received it and will be in touch during our opening hours (Mon–Sun, 8am–8pm) to confirm your appointment slot and exact price.\n\n` +
+    `Thanks for your quote request with L&D Energy — we've received it. Abdul will be in touch during our opening hours (Mon–Sun, 8am–8pm) with your exact price and an available appointment.\n\n` +
     `Your request:\n` +
     summary.map(([k, v]) => `  ${k}: ${v}`).join('\n') +
     `\n\nNeed us sooner? Call or text ${PHONE}, or message us on WhatsApp.\n\n` +
     `L&D Energy — Elmhurst-accredited Domestic Energy Assessor\n` +
     `Covering all 32 London boroughs · ${SITE_URL}\n\n` +
-    `This is a confirmation that we received your enquiry — it is not a confirmed booking until we reply.`
+    `This confirms receipt of your enquiry. Your visit is confirmed only once you agree the price and appointment.`
 
   const summaryRows = summary
     .map(
@@ -213,7 +218,7 @@ function buildConfirmation(data: ParsedInput) {
             <tr><td style="padding:30px 32px 8px">
               <p style="margin:0 0 14px;font-size:16px;color:${INK}">Hi ${escapeHtml(firstName)},</p>
               <p style="margin:0 0 22px;font-size:15px;line-height:1.6;color:${INK}">
-                Thanks for choosing <strong style="color:${NAVY}">L&amp;D Energy</strong>. We've received your booking request and one of our team will be in touch during our opening hours (Monday–Sunday, 8am–8pm) to confirm your appointment and exact price.
+                Thanks for choosing <strong style="color:${NAVY}">L&amp;D Energy</strong>. We've received your quote request. Abdul will be in touch during our opening hours (Monday–Sunday, 8am–8pm) with your exact price and an available appointment.
               </p>
 
               <!-- Summary -->
@@ -256,7 +261,7 @@ function buildConfirmation(data: ParsedInput) {
         <!-- Legal note -->
         <tr><td style="padding:18px 20px 4px" align="center">
           <p style="margin:0;font-size:11px;line-height:1.5;color:${MUTED}">
-            This confirms we received your enquiry — it isn't a confirmed booking until we reply.
+            This confirms receipt of your enquiry. Your visit is confirmed only once you agree the price and appointment.
             You're receiving this because you submitted a request at epc.luminousanddeliver.co.uk.
           </p>
         </td></tr>
@@ -346,6 +351,7 @@ export async function POST(req: Request) {
     address: parsed.data.address,
     postcode: parsed.data.postcode,
     propertyType: parsed.data.propertyType,
+    areaBand: parsed.data.areaBand || legacyArea(parsed.data.propertyType),
     propertyCount: parsed.data.propertyCount || undefined,
     customerType: parsed.data.customerType,
     services: parsed.data.services,
@@ -356,7 +362,7 @@ export async function POST(req: Request) {
   }
 
   const { text, html } = buildEmail(data)
-  const subject = `EPC booking: ${data.name} — ${data.propertyType} (${data.postcode})`
+  const subject = `EPC booking: ${data.name} — ${data.services.includes('Bulk / Agency Enquiry') ? 'Portfolio' : areaLabel(data.areaBand)} (${data.postcode})`
   const confirmation = buildConfirmation(data)
 
   const apiKey = cfEnv.RESEND_API_KEY || process.env.RESEND_API_KEY

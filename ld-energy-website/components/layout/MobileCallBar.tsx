@@ -1,5 +1,7 @@
 'use client'
 
+import { quoteHref, quoteContextForPath } from '@/lib/quote-context'
+
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Phone, MessageCircle, CalendarCheck } from 'lucide-react'
@@ -14,11 +16,9 @@ export function MobileCallBar() {
   /**
    * Stand down on the contact page.
    *
-   * All three actions are redundant there — Call and WhatsApp already sit in
-   * the form's "Prefer to talk?" panel, and "Book an EPC" links to the page
-   * the visitor is already on. More importantly the booking form's running
-   * price bar occupies the same fixed-bottom slot at the same z-index, and
-   * that number is the one doing the work while someone is choosing.
+   * The quote form and its estimate stay in the page flow. Support channels
+   * follow the form; no marketing or price overlay competes with the keyboard.
+   * The marketing bar's visual redesign belongs to the next approved stage.
    */
   if (pathname === '/contact') return null
 
@@ -50,7 +50,7 @@ export function MobileCallBar() {
           WhatsApp
         </a>
         <Link
-          href="/contact"
+          href={pathname === '/contact' ? '#booking-form' : quoteHref(quoteContextForPath(pathname))}
           className="flex items-center justify-center gap-1.5 py-3.5 text-sm font-bold bg-accent-600 text-white active:bg-accent-700"
           aria-label="Book your EPC"
         >

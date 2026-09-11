@@ -1,3 +1,4 @@
+import { quoteHref } from '@/lib/quote-context'
 import type { Metadata } from 'next'
 import { CheckCircle2, Sparkles } from 'lucide-react'
 import { Section } from '@/components/ui/Section'
@@ -108,7 +109,7 @@ export default function FloorPlansPage() {
         eyebrow="Floor Plans"
         heading="Professional Property Floor Plans"
         subheading={`Laser-measured floor plans for property marketing. Guide prices from £${priceFrom.floorPlan} — save up to £${maxBundleSaving} when booked together with an EPC in the same visit.`}
-        primaryCta={{ label: 'Get Your Floor Plan', href: '/contact' }}
+        primaryCta={{ label: 'Get Your Floor Plan', href: quoteHref({ service: 'floor-plan' }) }}
       />
 
       {/* Why Floor Plans */}
@@ -229,7 +230,7 @@ export default function FloorPlansPage() {
       <CtaStrip
         heading="Ready to Order Your Floor Plan?"
         body="Book online or call us. We'll arrange a visit at a time that suits you."
-        primaryCta={{ label: 'Get Your Floor Plan', href: '/contact' }}
+        primaryCta={{ label: 'Get Your Floor Plan', href: quoteHref({ service: 'floor-plan' }) }}
       />
     </>
   )

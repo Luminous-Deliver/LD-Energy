@@ -1,3 +1,4 @@
+import { quoteHref } from '@/lib/quote-context'
 import Link from 'next/link'
 import { ArrowRight, Phone, MessageCircle } from 'lucide-react'
 import { Container } from '@/components/ui/Container'
@@ -36,7 +37,7 @@ export function CtaBand() {
 
         <div className="flex shrink-0 flex-col gap-3 sm:flex-row">
           <Link
-            href="/contact"
+            href={quoteHref()}
             className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-accent-600 to-accent-700 px-6 py-3.5 text-base font-bold text-white shadow-md transition-all hover:from-accent-700 hover:to-accent-800"
           >
             Get my exact quote

@@ -1,3 +1,4 @@
+import { quoteHref } from '@/lib/quote-context'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { CheckCircle2, User, Building2, Users } from 'lucide-react'
@@ -189,7 +190,7 @@ export default function DomesticEpcPage() {
         eyebrow="Domestic EPC Certificates"
         heading="Domestic EPC Certificates in London"
         subheading={`Official Energy Performance Certificates for selling or renting your home. Elmhurst accredited. Guide prices from £${priceFrom.epc}, with your exact quote confirmed before booking. Lodged on the official GOV.UK EPC Register.`}
-        primaryCta={{ label: 'Book Your EPC', href: '#contact' }}
+        primaryCta={{ label: 'Book Your EPC', href: quoteHref({ service: 'epc' }) }}
       />
 
       {/* What is a Domestic EPC */}
@@ -329,7 +330,7 @@ export default function DomesticEpcPage() {
       <CtaStrip
         heading="Ready to Book Your EPC?"
         body="Fast, transparent-priced EPC certificates across London. We'll arrange your assessment at a time that suits you."
-        primaryCta={{ label: 'Book Your EPC', href: '/contact' }}
+        primaryCta={{ label: 'Book Your EPC', href: quoteHref({ service: 'epc' }) }}
       />
     </>
   )

@@ -2,9 +2,8 @@ import { Section } from '@/components/ui/Section'
 import { ContactForm } from '@/components/forms/ContactForm'
 
 /**
- * Homepage booking section. Deliberately lean: the contact channels now live
- * in the form's own sidebar, so this section is just a short lead-in and the
- * form itself rather than a screen of cards before anyone can start.
+ * Existing embedded booking section. The shared form repairs apply here too;
+ * replacing the homepage embed belongs to the later homepage design stage.
  */
 export function ContactSection() {
   return (

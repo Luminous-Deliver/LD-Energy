@@ -1,3 +1,4 @@
+import { quoteHref } from '@/lib/quote-context'
 import { Phone } from 'lucide-react'
 import { Container } from '@/components/ui/Container'
 import { Button } from '@/components/ui/Button'
@@ -36,8 +37,8 @@ export function PageHero({
           {subheading}
         </p>
         <div className="mt-8 flex flex-col sm:flex-row gap-3">
-          <Button href={primaryCta.href} variant="accent" size="lg">
-            {primaryCta.label}
+          <Button href={primaryCta.href === '/contact' || primaryCta.href === '#contact' ? quoteHref({ service: 'epc' }) : primaryCta.href} variant="accent" size="lg">
+            {primaryCta.href === '/contact' || primaryCta.href === '#contact' ? 'Get my exact quote' : primaryCta.label}
           </Button>
           {secondaryCta ? (
             <Button href={secondaryCta.href} variant="secondary" size="lg">

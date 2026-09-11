@@ -1,5 +1,8 @@
 'use client'
 
+import { usePathname } from 'next/navigation'
+import { quoteHref, quoteContextForPath } from '@/lib/quote-context'
+
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
@@ -8,6 +11,7 @@ import { servicesMenu, topNav, site } from '@/lib/site'
 import { cn } from '@/lib/cn'
 
 export function MobileNav() {
+  const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const closeRef = useRef<HTMLButtonElement>(null)
@@ -172,12 +176,12 @@ export function MobileNav() {
           {/* Contact + CTA Footer */}
           <div className="shrink-0 border-t border-secondary-100 bg-secondary-50/50 p-4 flex flex-col gap-3">
             <Link
-              href="/contact"
+              href={pathname === '/contact' ? '#booking-form' : quoteHref(quoteContextForPath(pathname))}
               onClick={close}
               tabIndex={open ? undefined : -1}
               className="flex items-center justify-center w-full bg-gradient-to-r from-accent-600 to-accent-700 hover:from-accent-700 hover:to-accent-800 text-white font-bold px-4 py-3.5 rounded-xl shadow-md text-[15px]"
             >
-              Book an EPC
+              Get my exact quote
             </Link>
             <div className="grid grid-cols-2 gap-2">
               <a

@@ -187,3 +187,9 @@
     .hover\:-translate-y-1:hover { transform: none; }
   }
 }
+
+/* Honour reduced motion for form navigation and existing navigation transitions. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}

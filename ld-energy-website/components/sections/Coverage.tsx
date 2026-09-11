@@ -1,3 +1,4 @@
+import { quoteHref } from '@/lib/quote-context'
 import Link from 'next/link'
 import { Section } from '@/components/ui/Section'
 import { ArrowRight, ArrowUpRight } from 'lucide-react'
@@ -85,7 +86,7 @@ export function Coverage() {
         </Link>
         <p className="text-sm text-secondary-600">
           Don&apos;t see your area? We cover all 32 boroughs,{' '}
-          <Link href="#contact" className="font-semibold text-primary-700 hover:text-primary-800">
+          <Link href={quoteHref()} className="font-semibold text-primary-700 hover:text-primary-800">
             get in touch
           </Link>
           .

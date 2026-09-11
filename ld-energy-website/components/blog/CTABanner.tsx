@@ -1,3 +1,4 @@
+import { quoteHref } from '@/lib/quote-context'
 import Link from 'next/link'
 import { Phone } from 'lucide-react'
 import { site, priceFrom } from '@/lib/site'
@@ -24,7 +25,7 @@ export function CTABanner({
       <p className={`mb-5 ${isFinal ? 'text-secondary-200' : 'text-primary-50'}`}>{body}</p>
       <div className="flex flex-wrap gap-3">
         <Link
-          href="/contact"
+          href={quoteHref()}
           className="inline-flex items-center justify-center bg-white text-primary-700 hover:bg-primary-50 font-semibold px-5 py-2.5 rounded-md"
         >
           Book Online

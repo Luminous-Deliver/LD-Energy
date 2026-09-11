@@ -1,1141 +1,289 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
-import { useForm, Controller } from 'react-hook-form'
+import { Controller, useForm, type FieldErrors } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { 
-  CheckCircle2, 
-  AlertTriangle, 
-  Loader2, 
-  ChevronRight, 
-  ChevronLeft, 
-  BadgePoundSterling,
-  Sparkles,
-  ClipboardCheck,
-  Phone,
-  MessageCircle,
-  Mail
-} from 'lucide-react'
 import { Field, Input, Textarea } from '@/components/ui/Input'
-import { Button } from '@/components/ui/Button'
-import { MobilePriceBar } from '@/components/forms/MobilePriceBar'
 import { cn } from '@/lib/cn'
 import { pricing, site, EXPRESS_SURCHARGE } from '@/lib/site'
-import { guideEstimate, type ProductKind } from '@/lib/pricing-estimate'
+import { areaBands, areaLabel } from '@/lib/floor-area'
+import { guideEstimate, guideEstimateRows } from '@/lib/pricing-estimate'
+import { turnaroundCopy, includedList, contactStepIntro } from '@/lib/booking-copy'
+import { parseQuoteContext, quoteContextFromForm, quoteHref, quoteServices } from '@/lib/quote-context'
+import { conversionEvent } from '@/lib/conversion-events'
 import { useTurnstile } from '@/lib/useTurnstile'
-import {
-  contactSchema,
-  propertyTypes,
-  EXPRESS_SPEED,
-  PRE_ASSESSMENT,
-  type ContactInput,
-} from '@/lib/validators'
+import { contactSchema, customerTypes, EXPRESS_SPEED, PRE_ASSESSMENT, type ContactInput } from '@/lib/validators'
 
-type Status = 'idle' | 'submitting' | 'success' | 'error'
+const STEP_TITLES = ['Service and property', 'Timing and access', 'Your details']
+const controlClass = 'inline-flex min-h-[48px] items-center justify-center rounded-lg px-4 py-3 text-base font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-700 disabled:opacity-60'
 
-const STEP_TITLES = [
-  'Services & Size',
-  'Speed & Date',
-  'Contact Details'
-]
-
-/**
- * Copy that describes what a booking produces, keyed on ONE exhaustive value.
- *
- * These switches are the whole point of `ProductKind`. Every previous version
- * of this copy was a two-branch ternary over `isLodged` / `planIncluded`, and
- * each time a product was added a third case fell silently through to the
- * nearest branch — floor-plan bookings promised a certificate, bulk enquiries
- * were told about JPG floor plans. A `switch` with a `never` fallthrough turns
- * the next such omission into a build failure.
- */
-function assertNever(kind: never): never {
-  throw new Error(`Unhandled product kind: ${String(kind)}`)
+interface ChoiceProps {
+  name: string; legend: string; value: string; onChange: (value: string) => void
+  options: { value: string; label: string; description?: string }[]
+  error?: string; hint?: string; inputRef?: (element: HTMLInputElement | null) => void
 }
 
-/** Shown in place of the speed choice when nothing is lodged. */
-function turnaroundCopy(kind: ProductKind): string {
-  switch (kind) {
-    case 'bulk':
-      return 'Turnaround and visit dates are agreed per property once we have quoted your volume rate, so there is nothing to choose here yet.'
-    case 'preAssessment':
-      return 'Nothing is lodged on the government register, so there is no certificate to expedite and no next-day option. Your Energy Report and written plan are sent within 72 hours of the visit.'
-    case 'floorPlan':
-      return 'Floor plans are not lodged on the government register, so there is no next-day lodgement option. Your plans are supplied as JPG and PDF within 72 hours of the visit.'
-    case 'none':
-      return 'Choose a service on the previous step and we will show the turnaround options that apply to it.'
-    case 'epc':
-    case 'bundle':
-      // Lodged, so the speed cards are shown instead and this is unreachable.
-      return 'Standard lodgement is within 72 hours of the visit.'
-    default:
-      return assertNever(kind)
-  }
+function Choices({ name, legend, value, onChange, options, error, hint, inputRef }: ChoiceProps) {
+  return (
+    <fieldset className="min-w-0" aria-invalid={!!error} aria-describedby={`${name}-hint${error ? ` ${name}-error` : ''}`}>
+      <legend className="text-base font-semibold text-secondary-900">{legend}</legend>
+      <p id={`${name}-hint`} className="mt-1 text-sm text-secondary-700">{hint || 'Choose one option.'}</p>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        {options.map((option, index) => (
+          <label key={option.value} className={cn('flex min-h-[48px] min-w-0 cursor-pointer items-start gap-3 rounded-lg border p-3', value === option.value ? 'border-primary-700 bg-primary-50 ring-1 ring-primary-700' : 'border-secondary-300 bg-white')}>
+            <input type="radio" name={name} value={option.value} checked={value === option.value}
+              id={`${name}-${index}`} ref={index === 0 ? inputRef : undefined}
+              onChange={() => onChange(option.value)} required
+              aria-label={option.label} aria-describedby={`${name}-hint ${name}-description-${index}${error ? ` ${name}-error` : ''}`}
+              className="mt-1 h-5 w-5 shrink-0 accent-primary-700" />
+            <span className="min-w-0">
+              <span className="block text-base font-semibold text-secondary-900">{option.label}</span>
+              <span id={`${name}-description-${index}`} className="mt-1 block text-sm text-secondary-700">{option.description}</span>
+            </span>
+          </label>
+        ))}
+      </div>
+      {error && <p id={`${name}-error`} className="mt-2 text-sm text-red-700" role="alert">{error}</p>}
+    </fieldset>
+  )
 }
 
-/** The sidebar's "What's included" list — must describe THIS product, not another. */
-function includedList(kind: ProductKind): string[] {
-  switch (kind) {
-    case 'epc':
-    case 'bundle':
-      return [
-        'Elmhurst Lodgement Fee',
-        'Official Government Register Listing',
-        'No Travel/Call-out Surcharges',
-        'Certificate link sent once lodged',
-      ]
-    case 'preAssessment':
-      return [
-        'Full survey by an accredited assessor',
-        'Nothing lodged — no entry on the public register',
-        'Energy Report + written Improvement Plan',
-        'No Travel/Call-out Surcharges',
-      ]
-    case 'floorPlan':
-      return [
-        'Laser-measured on site by your assessor',
-        'Drawn to Rightmove and Zoopla specification',
-        'High-resolution JPG and PDF supplied',
-        'No Travel/Call-out Surcharges',
-      ]
-    case 'bulk':
-      return [
-        'Volume rates across the whole portfolio',
-        'One point of contact for every property',
-        'Scheduling arranged around your tenants',
-        'No Travel/Call-out Surcharges',
-      ]
-    case 'none':
-      return ['No Travel/Call-out Surcharges']
-    default:
-      return assertNever(kind)
-  }
-}
-
-/** Sub-heading on step 3, which must not promise a certificate that isn't coming. */
-function contactStepIntro(kind: ProductKind): string {
-  switch (kind) {
-    case 'bulk':
-      return 'Tell us where to send the quote, and list the properties you need covered.'
-    case 'preAssessment':
-      return 'Provide the property details and where we should send your report. Nothing is lodged on the public register.'
-    case 'floorPlan':
-      return 'Provide the property details and where we should send the invoice and your floor plans.'
-    case 'epc':
-    case 'bundle':
-      return 'Provide the property details and where we should send the invoice and certificate.'
-    case 'none':
-      return 'Provide the property details and where we should send the invoice.'
-    default:
-      return assertNever(kind)
-  }
+/** Focus with an offset measured from the actual floating header, including when enlarged. */
+function focusBookingElement(element: HTMLElement | null) {
+  if (!element) return
+  const header = document.querySelector('header')
+  const offset = (header?.getBoundingClientRect().height || 80) + 16
+  element.style.scrollMarginTop = `${offset}px`
+  element.focus({ preventScroll: true })
+  element.scrollIntoView({ block: 'start', behavior: 'instant' })
 }
 
 export function ContactForm() {
   const pathname = usePathname()
-  /**
-   * The pinned mobile price bar belongs to the dedicated booking page only.
-   *
-   * This form is also embedded on the homepage and every borough page via
-   * ContactSection, where it is a secondary conversion path a long way down
-   * the page — a bar pinned from the top of the homepage would advertise a
-   * price for a form nobody has reached, and would sit on top of MobileCallBar
-   * at the same z-index.
-   *
-   * This condition is the exact complement of the one in MobileCallBar: the
-   * price bar shows precisely where the call bar stands down. Change one and
-   * you must change the other.
-   */
-  const showMobilePriceBar = pathname === '/contact'
-
+  const dedicated = pathname === '/contact'
   const [step, setStep] = useState(1)
-  const [status, setStatus] = useState<Status>('idle')
-  const [serverError, setServerError] = useState<string | null>(null)
-
-  const {
-    register,
-    handleSubmit,
-    control,
-    reset,
-    watch,
-    setValue,
-    trigger,
-    formState: { errors },
-  } = useForm<ContactInput>({
+  const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
+  const [serverError, setServerError] = useState('')
+  const [showErrors, setShowErrors] = useState(false)
+  const headingRef = useRef<HTMLHeadingElement>(null)
+  const successRef = useRef<HTMLDivElement>(null)
+  const formRef = useRef<HTMLFormElement>(null)
+  const started = useRef(false)
+  const submitting = useRef(false)
+  const moveFocus = useRef(false)
+  const { register, handleSubmit, control, reset, watch, getValues, setValue, trigger, formState: { errors } } = useForm<ContactInput>({
     resolver: zodResolver(contactSchema),
+    shouldFocusError: false,
     defaultValues: {
-      name: '',
-      phone: '',
-      email: '',
-      address: '',
-      postcode: '',
-      services: ['EPC Certificate'], // default select
-      propertyType: '2 Bedroom', // default select
-      customerType: 'Homeowner', // default select
-      improvementPlan: false,
-      speed: 'Standard (72 hours)', // default select
-      propertyCount: '', // bulk only; required for bulk in the schema
-      preferredDate: '',
-      notes: '',
-      website: '',
-      turnstileToken: '',
+      name: '', phone: '', email: '', address: '', postcode: '', services: ['EPC Certificate'],
+      areaBand: '', customerType: 'Homeowner', improvementPlan: false, speed: 'Standard (72 hours)',
+      propertyCount: '', preferredDate: '', notes: '', website: '', turnstileToken: '', consent: false,
     },
   })
 
-  const {
-    containerRef: turnstileRef,
-    token: turnstileToken,
-    isLoading: turnstileLoading,
-    error: turnstileError,
-    reset: resetTurnstile,
-  } = useTurnstile({
+  useEffect(() => {
+    if (!dedicated) return
+    const readContext = () => {
+      const context = parseQuoteContext(new URLSearchParams(window.location.search))
+      setValue('services', [quoteServices[context.service || 'epc']])
+      setValue('areaBand', context.area || '')
+      setValue('speed', context.speed === 'express' ? EXPRESS_SPEED : 'Standard (72 hours)')
+      setValue('improvementPlan', !!context.plan)
+    }
+    readContext()
+    if (window.location.hash === '#booking-form') focusBookingElement(document.getElementById('booking-form'))
+    window.addEventListener('popstate', readContext)
+    return () => window.removeEventListener('popstate', readContext)
+  }, [dedicated, setValue])
+
+  useEffect(() => {
+    if (moveFocus.current) { focusBookingElement(headingRef.current); moveFocus.current = false }
+  }, [step])
+  useEffect(() => { if (status === 'success') focusBookingElement(successRef.current) }, [status])
+
+  const { containerRef: turnstileRef, token: turnstileToken, isLoading: turnstileLoading, error: turnstileError, reset: resetTurnstile } = useTurnstile({
     enabled: step === 3 && status !== 'success',
-    onVerify: (token) => setValue('turnstileToken', token, { shouldValidate: true }),
+    onVerify: token => setValue('turnstileToken', token, { shouldValidate: true }),
     onExpire: () => setValue('turnstileToken', '', { shouldValidate: true }),
     onError: () => setValue('turnstileToken', '', { shouldValidate: true }),
   })
+  const values = watch()
+  const estimate = guideEstimate(values)
+  const { isBulk, isLodged, canHavePlan, planIncluded, productKind } = estimate
 
-  // Watch form fields for the live pricing calculator
-  const watchPropertyType = watch('propertyType')
-  const watchServices = watch('services') || []
-  const watchSpeed = watch('speed')
-  const watchCustomerType = watch('customerType')
-  const watchImprovementPlan = watch('improvementPlan')
-
-  // Calculate live pricing. The arithmetic lives in one place — lib/pricing-estimate
-  // — so the number here and the "Guide shown to customer" line in the booking
-  // email can never disagree.
-  const calculatePrice = () => {
-    const e = guideEstimate({
-      propertyType: watchPropertyType,
-      services: watchServices,
-      speed: watchSpeed,
-      improvementPlan: watchImprovementPlan,
-    })
-    const wantsEpc =
-      watchServices.includes('EPC Certificate') || watchServices.includes('Both (Bundle)')
-    const wantsFloorPlan =
-      watchServices.includes('Floor Plan') || watchServices.includes('Both (Bundle)')
-
-    return {
-      // The whole estimate, for anything that renders the breakdown itself
-      // (the mobile bar) rather than picking individual figures out.
-      estimate: e,
-      epcPrice: e.epc,
-      floorPlanPrice: e.floorPlan,
-      discount: e.bundleDiscount,
-      speedPrice: e.express,
-      improvementPlanPrice: e.improvementPlan,
-      preAssessmentPrice: e.preAssessment,
-      planIncluded: e.planIncluded,
-      canHavePlan: e.canHavePlan,
-      isLodged: e.isLodged,
-      productKind: e.productKind,
-      total: e.total,
-      wantsEpc,
-      wantsFloorPlan,
-      isExpress: e.express > 0,
-      isBulk: e.isBulk,
-    }
+  function start() {
+    if (!started.current) { started.current = true; conversionEvent('form_start', quoteContextFromForm(getValues())) }
   }
 
-  const {
-    estimate,
-    epcPrice,
-    floorPlanPrice,
-    discount,
-    improvementPlanPrice,
-    preAssessmentPrice,
-    planIncluded,
-    canHavePlan,
-    isLodged,
-    productKind,
-    total,
-    wantsEpc,
-    wantsFloorPlan,
-    isExpress,
-    isBulk,
-  } = calculatePrice()
+  function rememberSelection() {
+    const context = quoteContextFromForm(getValues())
+    if (dedicated) window.history.replaceState(window.history.state, '', quoteHref(context))
+  }
 
-  const onSubmit = async (data: ContactInput) => {
-    setStatus('submitting')
-    setServerError(null)
-    try {
-      const res = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+  function focusError(errorFields: FieldErrors<ContactInput>) {
+    // Follow visible DOM order; the schema's object-key order is not the user's reading order.
+    const names = new Set(Object.keys(errorFields))
+    const input = Array.from(formRef.current?.querySelectorAll<HTMLElement>('input, textarea, button') || [])
+      .find(element => names.has(element.getAttribute('name') || '') && element.getClientRects().length > 0)
+    focusBookingElement(input || document.getElementById('security-check'))
+  }
+
+  async function next() {
+    start()
+    const fields: (keyof ContactInput)[] = step === 1 ? ['areaBand', 'services', 'customerType'] : ['speed', 'preferredDate', 'notes']
+    if (await trigger(fields)) {
+      conversionEvent('form_step_complete', { ...quoteContextFromForm(getValues()), step })
+      moveFocus.current = true; setStep(step + 1)
+    } else {
+      requestAnimationFrame(() => {
+        const invalid = formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')
+        focusBookingElement(invalid?.querySelector<HTMLElement>('input') || invalid || headingRef.current)
       })
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}))
-        throw new Error(body?.error || 'Something went wrong. Please call us instead.')
-      }
+    }
+  }
+
+  async function onSubmit(data: ContactInput) {
+    if (submitting.current) return
+    submitting.current = true
+    setStatus('submitting'); setServerError('')
+    try {
+      const response = await fetch('/api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+      const body = await response.json().catch(() => ({}))
+      if (!response.ok || body.ok !== true || body.delivered !== true) throw new Error('Your request could not be received. Please try again, or use the support links below.')
+      conversionEvent('enquiry_submitted', quoteContextFromForm(data))
       setStatus('success')
-      reset()
-    } catch (err) {
-      // Turnstile tokens are single-use. A failed request needs a fresh token
-      // before the visitor can retry, regardless of where the request failed.
-      resetTurnstile()
-      setStatus('error')
-      setServerError(err instanceof Error ? err.message : 'Unknown error')
-    }
+    } catch (error) {
+      resetTurnstile(); setStatus('error')
+      setServerError(error instanceof Error ? error.message : 'Please try again.')
+    } finally { submitting.current = false }
   }
 
-  const handleNext = async () => {
-    let isValid = false
-    if (step === 1) {
-      isValid = await trigger(['propertyType', 'services', 'customerType'])
-    } else if (step === 2) {
-      isValid = await trigger(['speed'])
-    }
-    if (isValid) {
-      setStep((prev) => prev + 1)
-    }
-  }
-
-  const handleBack = () => {
-    setStep((prev) => prev - 1)
-  }
-
-  if (status === 'success') {
-    return (
-      <div
-        className="rounded-2xl border border-primary-200 bg-primary-50 p-6 md:p-8 shadow-premium"
-        role="status"
-        aria-live="polite"
-      >
-        <div className="flex items-start gap-4">
-          <CheckCircle2 className="w-8 h-8 text-primary-700 mt-0.5 shrink-0" aria-hidden="true" />
-          <div>
-            <h3 className="text-xl font-bold text-secondary-900">Booking Request Received!</h3>
-            <p className="mt-3 text-secondary-700 leading-relaxed text-sm md:text-base">
-              Thank you for choosing L&D Energy. We have received your request and will contact you within **2 hours** to confirm your booking slot (Mon–Sun, 8am–8pm).
-            </p>
-            <p className="mt-3 text-secondary-700 text-sm">
-              If your request is urgent, please feel free to call or text us directly on{' '}
-              <a href="tel:+447492575396" className="font-bold text-primary-700 hover:underline">
-                07492 575 396
-              </a>
-              .
-            </p>
-            <button
-              type="button"
-              onClick={() => {
-                setStatus('idle')
-                setStep(1)
-              }}
-              className="mt-6 inline-flex items-center gap-1 text-sm font-bold text-primary-700 hover:text-primary-800"
-            >
-              Send another request
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  if (status === 'success') return (
+    <div ref={successRef} tabIndex={-1} className="rounded-xl border border-primary-200 bg-primary-50 p-6" role="status">
+      <h2 className="text-2xl font-bold">Your quote request has been received</h2>
+      <p className="mt-3 text-base leading-relaxed">Thanks. Abdul will confirm the exact price and an available appointment. Your visit is confirmed once you agree those details.</p>
+      <button type="button" className={`${controlClass} mt-4 border border-primary-700 text-primary-800`} onClick={() => {
+        reset(); started.current = false; setStatus('idle'); moveFocus.current = true; setStep(1)
+        if (dedicated) window.history.replaceState(window.history.state, '', quoteHref())
+      }}>Send another request</button>
+    </div>
+  )
 
   return (
-    // pb-24 keeps the Next / Back / Submit controls clear of the fixed mobile
-    // price bar; lg:pb-0 because the bar is lg:hidden, and no padding at all
-    // where the bar is not rendered.
-    <div
-      className={cn(
-        'max-w-5xl mx-auto grid gap-5 lg:grid-cols-12 items-start',
-        showMobilePriceBar && 'pb-24 lg:pb-0',
-      )}
-    >
-      {/* Form Steps Column */}
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        noValidate
-        className="lg:col-span-7 rounded-2xl border border-secondary-200 bg-white p-4 md:p-5 shadow-premium"
-        aria-describedby="form-help"
-      >
-        {/* Progress Tracker */}
-        <div className="mb-4">
-          <div className="flex justify-between items-center text-[11px] font-semibold text-secondary-500 uppercase tracking-wider mb-2">
-            <span>Step {step} of 3</span>
-            <span className="text-primary-700 font-bold">{STEP_TITLES[step - 1]}</span>
-          </div>
-          <div className="h-1.5 w-full bg-secondary-100 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-gradient-to-r from-primary-500 to-primary-600 rounded-full transition-all duration-300"
-              style={{ width: `${(step / 3) * 100}%` }}
-            />
-          </div>
-        </div>
+    <form ref={formRef} noValidate aria-label="Exact quote enquiry" aria-busy={status === 'submitting'}
+      onChangeCapture={start} onSubmit={event => {
+        if (step < 3) { event.preventDefault(); void next(); return }
+        void handleSubmit(onSubmit, invalid => { setShowErrors(true); requestAnimationFrame(() => focusError(invalid)) })(event)
+      }} className="min-w-0 rounded-xl border border-secondary-200 bg-white p-4 [overflow-wrap:anywhere] sm:p-6">
+      <p className="text-sm font-semibold text-primary-800">Step {step} of 3</p>
+      <h2 ref={headingRef} tabIndex={-1} className="mt-1 text-2xl font-bold text-secondary-900">{STEP_TITLES[step - 1]}</h2>
 
-        {/* Honeypot */}
-        <div className="hidden" aria-hidden="true">
-          <label>
-            Website
-            <input type="text" tabIndex={-1} autoComplete="off" {...register('website')} />
-          </label>
-        </div>
-
-        {/* Step 1: Services & Size */}
-        {step === 1 && (
-          <div className="space-y-3 animate-fade-in">
-            <div>
-              <h4 className="text-base font-bold text-secondary-900">What service do you need?</h4>
-              <p className="text-xs text-secondary-500 mt-0.5">
-                Choose one. Picking the EPC and floor plan together applies the bundle discount automatically.
-              </p>
-
-              <Controller
-                control={control}
-                name="services"
-                render={({ field }) => {
-                  const value = field.value ?? []
-                  const isBundleSelected = value.includes('Both (Bundle)')
-                  // The bundle tile also lights up when EPC + Floor Plan are both picked
-                  const isSelected = (v: ContactInput['services'][number]) =>
-                    v === 'Both (Bundle)'
-                      ? isBundleSelected
-                      : isBundleSelected
-                        ? false
-                        : value.includes(v)
-
-                  return (
-                    <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                      {([
-                        { value: 'EPC Certificate', label: 'EPC only', desc: 'Official 10-year energy rating, lodged on the government register.', badge: undefined, wide: false },
-                        { value: 'Both (Bundle)', label: 'EPC + Floor Plan', desc: 'Both for the same property in one visit — better value than booking separately.', badge: 'Better value', wide: false },
-                        { value: 'Floor Plan', label: 'Floor plan only', desc: 'Laser-measured scale drawing showing layout and room sizes.', badge: undefined, wide: false },
-                        { value: PRE_ASSESSMENT, label: 'EPC Pre-Assessment', desc: 'Find out your score without it going on the public register. Nothing is lodged.', badge: 'Private', wide: false },
-                        // Structurally different from the four per-property
-                        // options — no size, no per-property price — so it
-                        // spans the row instead of orphaning a half-cell.
-                        { value: 'Bulk / Agency Enquiry', label: 'Bulk / agency enquiry', desc: 'Multiple properties or ongoing instructions — we’ll quote volume rates.', badge: 'Agents', wide: true },
-                      ] as const).map((s) => {
-                        const checked = isSelected(s.value)
-                        return (
-                          <button
-                            key={s.value}
-                            type="button"
-                            aria-pressed={checked}
-                            // Choosing a service must never overwrite who the
-                            // customer already said they are, in either
-                            // direction. An earlier version force-set this to
-                            // 'Estate agent' on bulk, silently switching a
-                            // landlord who had answered correctly.
-                            onClick={() => field.onChange([s.value])}
-                            className={cn(
-                              'flex flex-col text-left p-2.5 rounded-lg border transition-all duration-200 hover:-translate-y-0.5 shadow-sm min-h-[60px]',
-                              s.wide && 'sm:col-span-2',
-                              checked
-                                ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-500'
-                                : 'border-secondary-200 bg-white hover:border-secondary-300'
-                            )}
-                          >
-                            <span className="flex items-center gap-1.5 font-bold text-sm text-secondary-900">
-                              {s.label}
-                              {s.badge && (
-                                <span
-                                  className={cn(
-                                    'text-[10px] uppercase tracking-wider font-black px-1.5 py-0.5 rounded text-white',
-                                    s.value === 'Both (Bundle)' ? 'bg-accent-600' : 'bg-primary-600'
-                                  )}
-                                >
-                                  {s.badge}
-                                </span>
-                              )}
-                            </span>
-                            <span className="text-[11px] text-secondary-500 mt-1 leading-snug">{s.desc}</span>
-                          </button>
-                        )
-                      })}
-                    </div>
-                  )
-                }}
-              />
-              {errors.services && (
-                <p className="mt-1.5 text-xs text-danger" role="alert">
-                  {errors.services.message}
-                </p>
-              )}
-            </div>
-
-            {/* Bulk enquiries cover many properties, so a single size doesn't apply. */}
-            {isBulk ? (
-              <div className="rounded-lg border border-primary-200 bg-primary-50/60 p-3">
-                <h4 className="text-sm font-bold text-secondary-900">Property size</h4>
-                <p className="mt-1 text-sm text-secondary-700 leading-relaxed">
-                  Not needed for a bulk enquiry — we’ll ask how many properties you have on the last
-                  step, and come back to you with volume rates.
-                </p>
-              </div>
-            ) : (
-            <div>
-              <h4 className="text-base font-bold text-secondary-900">Select Property Size</h4>
-              <p className="text-xs text-secondary-500 mt-0.5">
-                Pricing depends mainly on internal floor area. Bedroom count helps us estimate when
-                the exact floor area isn&apos;t known — pick the closest match.
-              </p>
-
-              <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {propertyTypes.map((p) => {
-                  const active = watchPropertyType === p
-                  return (
-                    <button
-                      key={p}
-                      type="button"
-                      onClick={() => setValue('propertyType', p, { shouldValidate: true })}
-                      className={cn(
-                        'flex flex-col items-center justify-center p-2 rounded-lg border text-center transition-all duration-200 hover:-translate-y-0.5 shadow-sm',
-                        active
-                          ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-500'
-                          : 'border-secondary-200 bg-white hover:border-secondary-300'
-                      )}
-                    >
-                      {/* Floor area leads; bedrooms caption it. lib/site.ts:
-                          areaLabel is the "Primary pricing driver", the bedroom
-                          label is "Secondary to floor area — never lead with
-                          this". FloorAreaGuide on the pricing page already does
-                          it this way; the form had the two inverted. */}
-                      <span className="font-bold text-sm text-secondary-900">
-                        {pricing[propertyTypes.indexOf(p)]?.areaLabel}
-                      </span>
-                      <span className="mt-0.5 text-[10px] leading-tight text-secondary-500">{p}</span>
-                    </button>
-                  )
-                })}
-              </div>
-              {errors.propertyType && (
-                <p className="mt-1.5 text-xs text-danger" role="alert">
-                  {errors.propertyType.message}
-                </p>
-              )}
-            </div>
-            )}
-
-            <div>
-              <h4 className="text-base font-bold text-secondary-900">Who are you booking as?</h4>
-              <p className="text-xs text-secondary-500 mt-0.5">
-                This tells us how to arrange access to the property.
-              </p>
-
-              <Controller
-                control={control}
-                name="customerType"
-                render={({ field }) => (
-                  <div className="mt-2 grid grid-cols-2 gap-2">
-                    {/* Only "Homeowner" is genuinely singular — its own
-                        description reads "I live in or own the property". A
-                        portfolio landlord with several tenanted properties is a
-                        textbook bulk enquiry, so Landlord stays on the list. */}
-                    {(isBulk
-                      ? [
-                          { value: 'Landlord (tenanted)', desc: 'I own several rented properties', wide: false },
-                          { value: 'Estate agent', desc: 'Instructing on behalf of sellers', wide: false },
-                          { value: 'Letting agent / firm', desc: 'Managing lettings or a portfolio', wide: true },
-                        ]
-                      : [
-                          { value: 'Homeowner', desc: 'I live in or own the property', wide: false },
-                          { value: 'Landlord (tenanted)', desc: 'It’s rented out — tenants live there', wide: false },
-                          { value: 'Estate agent', desc: 'Instructing on behalf of a seller', wide: false },
-                          { value: 'Letting agent / firm', desc: 'Managing lettings or a portfolio', wide: false },
-                        ]
-                    ).map((c) => {
-                      const active = field.value === c.value
-                      return (
-                        <button
-                          key={c.value}
-                          type="button"
-                          aria-pressed={active}
-                          onClick={() => field.onChange(c.value)}
-                          className={cn(
-                            'flex flex-col text-left p-2 rounded-lg border transition-all duration-200 hover:-translate-y-0.5 shadow-sm',
-                            // Three options would otherwise orphan the last one.
-                            c.wide && 'col-span-2',
-                            active
-                              ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-500'
-                              : 'border-secondary-200 bg-white hover:border-secondary-300'
-                          )}
-                        >
-                          <span className="font-bold text-sm text-secondary-900">{c.value}</span>
-                          <span className="text-[11px] text-secondary-500 mt-0.5 leading-snug">{c.desc}</span>
-                        </button>
-                      )
-                    })}
-                  </div>
-                )}
-              />
-              {errors.customerType && (
-                <p className="mt-1.5 text-xs text-danger" role="alert">
-                  {errors.customerType.message}
-                </p>
-              )}
-
-              {/* Tenanted properties need notice — surface it as soon as it's relevant */}
-              {watchCustomerType === 'Landlord (tenanted)' && (
-                <p className="mt-2.5 rounded-lg bg-primary-50 ring-1 ring-primary-100 px-3 py-2 text-xs leading-relaxed text-secondary-700 animate-fade-in">
-                  Please let your tenants know we’re coming so they can expect us. If it’s easier, share
-                  their contact details in the notes and we’ll arrange access directly, giving proper notice.
-                  Evening and weekend slots are available at no extra cost.
-                </p>
-              )}
-            </div>
-
-            {/* Already inside a Pre-Assessment: without a certificate the customer
-                would otherwise get nothing actionable, so it is never sold again. */}
-            {planIncluded && (
-              <div className="flex items-start gap-3 rounded-lg border border-accent-500 bg-accent-50/60 p-2.5 shadow-sm">
-                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 border-accent-600 bg-accent-600">
-                  <CheckCircle2 className="h-4 w-4 text-white" />
-                </span>
-                <span>
-                  <span className="flex flex-wrap items-center gap-1.5 font-bold text-sm text-secondary-900">
-                    Improvement Plan
-                    <span className="text-xs uppercase tracking-wider bg-accent-600 text-white font-black px-1.5 py-0.5 rounded">
-                      Included
-                    </span>
-                  </span>
-                  <span className="block text-xs text-secondary-500 mt-1 leading-snug">
-                    Nothing is lodged, so there is no certificate to read your recommendations
-                    from. The Energy Report and your written plan are part of the price.
-                  </span>
-                </span>
-              </div>
-            )}
-
-            {/* The plan is written from an assessment, so it is only offered
-                when there is one. `canHavePlan` comes from the estimator so
-                the control and the arithmetic cannot disagree. */}
-            {canHavePlan && !planIncluded && (
-            <Controller
-              control={control}
-              name="improvementPlan"
-              render={({ field }) => (
-                <button
-                  type="button"
-                  aria-pressed={!!field.value}
-                  onClick={() => field.onChange(!field.value)}
-                  className={cn(
-                    'flex w-full items-start gap-3 text-left p-2.5 rounded-lg border transition-all duration-200 shadow-sm',
-                    field.value
-                      ? 'border-accent-500 bg-accent-50/60 ring-2 ring-accent-500'
-                      : 'border-secondary-200 bg-white hover:border-secondary-300'
-                  )}
-                >
-                  <span
-                    className={cn(
-                      'mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 transition-colors',
-                      field.value ? 'border-accent-600 bg-accent-600' : 'border-secondary-300 bg-white'
-                    )}
-                    aria-hidden="true"
-                  >
-                    {field.value && <CheckCircle2 className="h-4 w-4 text-white" />}
-                  </span>
-                  <span>
-                    <span className="flex flex-wrap items-center gap-1.5 font-bold text-sm text-secondary-900">
-                      Add the Improvement Plan
-                      <span className="text-xs uppercase tracking-wider bg-accent-600 text-white font-black px-1.5 py-0.5 rounded">
-                        +£{site.addOns.improvementPlan}
-                      </span>
-                    </span>
-                    <span className="block text-xs text-secondary-500 mt-1 leading-snug">
-                      Keeps the improvement recommendations on your certificate, and adds two things
-                      sent after the visit: a full Energy Report showing where your money actually goes
-                      and what each measure costs to install, plus a written plan ranking which ones are
-                      worth doing on your building and in what order. Useful for MEES planning.
-                    </span>
-                  </span>
-                </button>
-              )}
-            />
-            )}
-          </div>
-        )}
-
-        {/* Step 2: Speed & Date */}
-        {step === 2 && (
-          <div className="space-y-4 animate-fade-in">
-            {/* Express is a lodgement surcharge, so it only applies to a lodged
-                product. Everything else states what it actually gets instead.
-                Switched on productKind rather than nested booleans: an earlier
-                two-way version sent bulk enquiries down the floor-plan branch
-                and told agencies about JPGs. */}
-            {!isLodged ? (
-              <div className="rounded-lg border border-primary-200 bg-primary-50/60 p-3">
-                <h4 className="text-sm font-bold text-secondary-900">Turnaround</h4>
-                <p className="mt-1 text-sm text-secondary-700 leading-relaxed">
-                  {turnaroundCopy(productKind)}
-                </p>
-              </div>
-            ) : (
-            <div>
-              <h4 className="text-base font-bold text-secondary-900">Select Delivery Speed</h4>
-              <p className="text-xs text-secondary-500 mt-0.5">Need your certificate quickly? Next-day service is available.</p>
-
-              <div className="mt-2.5 grid gap-2 sm:grid-cols-2">
-                {([
-                  { value: 'Standard (72 hours)', label: 'Standard Delivery', desc: 'Lodged on the GOV.UK register within 72 hours of the visit', priceBadge: 'Included' },
-                  { value: EXPRESS_SPEED, label: `Express Delivery (+£${EXPRESS_SURCHARGE})`, desc: 'Lodged within 24 hours of the visit', priceBadge: `£${EXPRESS_SURCHARGE} extra` },
-                ] as const).map((s) => {
-                  const active = watchSpeed === s.value
-                  return (
-                    <button
-                      key={s.value}
-                      type="button"
-                      onClick={() => setValue('speed', s.value, { shouldValidate: true })}
-                      className={cn(
-                        'flex flex-col text-left p-3 rounded-lg border transition-all duration-200 hover:-translate-y-0.5 shadow-sm min-h-[74px]',
-                        active
-                          ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-500'
-                          : 'border-secondary-200 bg-white hover:border-secondary-300'
-                      )}
-                    >
-                      <span className="flex justify-between items-center w-full font-bold text-sm text-secondary-900">
-                        {s.label}
-                        <span className={cn(
-                          'text-[11px] font-bold px-2 py-0.5 rounded-full',
-                          active ? 'bg-primary-600 text-white' : 'bg-secondary-100 text-secondary-600'
-                        )}>
-                          {s.priceBadge}
-                        </span>
-                      </span>
-                      <span className="text-[11px] text-secondary-500 mt-1 leading-snug">{s.desc}</span>
-                    </button>
-                  )
-                })}
-              </div>
-              {errors.speed && (
-                <p className="mt-1.5 text-xs text-danger" role="alert">
-                  {errors.speed.message}
-                </p>
-              )}
-            </div>
-            )}
-
-            <div className="grid gap-3 sm:grid-cols-2">
-              {/* A single visit date is meaningless across many properties —
-                  those are scheduled per property after the quote. */}
-              {!isBulk && (
-                <Field label="Preferred Visit Date" htmlFor="preferredDate" hint="Select a date for the assessor's visit. Optional.">
-                  <div className="relative">
-                    <Input id="preferredDate" type="date" {...register('preferredDate')} />
-                  </div>
-                </Field>
-              )}
-              <Field
-                label="Additional Instructions"
-                htmlFor="notes"
-                hint={
-                  isBulk
-                    ? 'Access arrangements, timescales, or anything else about the portfolio. Optional.'
-                    : 'e.g. key codes, parking info, property details. Optional.'
-                }
-                className={isBulk ? 'sm:col-span-2' : undefined}
-              >
-                <Input id="notes" placeholder="Notes for the assessor..." {...register('notes')} />
-              </Field>
-            </div>
-          </div>
-        )}
-
-        {/* Step 3: Contact Details */}
-        {step === 3 && (
-          <div className="space-y-3 animate-fade-in">
-            <div>
-              <h4 className="text-base font-bold text-secondary-900">
-                {isBulk ? 'Enter Contact & Portfolio Details' : 'Enter Contact & Property Address'}
-              </h4>
-              <p className="text-xs text-secondary-500 mt-0.5">{contactStepIntro(productKind)}</p>
-            </div>
-
-            <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
-              <Field label="Full Name" htmlFor="name" required error={errors.name?.message}>
-                <Input
-                  id="name"
-                  autoComplete="name"
-                  hasError={!!errors.name}
-                  aria-invalid={!!errors.name}
-                  {...register('name')}
-                />
-              </Field>
-              <Field label="Phone Number" htmlFor="phone" required error={errors.phone?.message}>
-                <Input
-                  id="phone"
-                  type="tel"
-                  inputMode="tel"
-                  autoComplete="tel"
-                  hasError={!!errors.phone}
-                  aria-invalid={!!errors.phone}
-                  {...register('phone')}
-                />
-              </Field>
-              <Field
-                label="Email Address"
-                htmlFor="email"
-                required
-                error={errors.email?.message}
-                className="col-span-2"
-              >
-                <Input
-                  id="email"
-                  type="email"
-                  inputMode="email"
-                  autoComplete="email"
-                  hasError={!!errors.email}
-                  aria-invalid={!!errors.email}
-                  {...register('email')}
-                />
-              </Field>
-              {/* A bulk enquiry has many properties and no single address, so
-                  the same textarea becomes the property list and the separate
-                  postcode field drops away. The schema applies the address and
-                  postcode requirements conditionally to match. */}
-              {isBulk && (
-                <Field
-                  label="How many properties?"
-                  htmlFor="propertyCount"
-                  required
-                  error={errors.propertyCount?.message}
-                  hint="A rough number is fine — it just sizes the quote."
-                  className="col-span-2"
-                >
-                  <Input
-                    id="propertyCount"
-                    placeholder="e.g. 12, or 20+"
-                    hasError={!!errors.propertyCount}
-                    aria-invalid={!!errors.propertyCount}
-                    {...register('propertyCount')}
-                  />
-                </Field>
-              )}
-              <Field
-                label={isBulk ? 'Properties & postcodes' : 'Full Property Address'}
-                htmlFor="address"
-                required={!isBulk}
-                error={errors.address?.message}
-                hint={
-                  isBulk
-                    ? 'Paste the addresses or postcodes if you have them to hand. Optional — we can take them later.'
-                    : undefined
-                }
-                className="col-span-2"
-              >
-                <Textarea
-                  id="address"
-                  rows={isBulk ? 5 : 2}
-                  placeholder={
-                    isBulk
-                      ? 'One property per line, or just the postcodes...'
-                      : 'Include street number, block name, and flat number...'
-                  }
-                  autoComplete={isBulk ? 'off' : 'street-address'}
-                  hasError={!!errors.address}
-                  aria-invalid={!!errors.address}
-                  {...register('address')}
-                />
-              </Field>
-              {!isBulk && (
-                <Field label="Postcode" htmlFor="postcode" required error={errors.postcode?.message}>
-                  <Input
-                    id="postcode"
-                    autoComplete="postal-code"
-                    placeholder="e.g. E15 3JZ"
-                    hasError={!!errors.postcode}
-                    aria-invalid={!!errors.postcode}
-                    {...register('postcode')}
-                  />
-                </Field>
-              )}
-            </div>
-
-            <div className="pt-1">
-              <label className="flex items-start gap-2.5 text-xs text-secondary-600 cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="mt-0.5 h-4 w-4 rounded border-secondary-300 text-primary-600 focus:ring-primary-500"
-                  {...register('consent')}
-                />
-                <span>
-                  I agree to be contacted about my enquiry. We only use your details for this booking request. Read our{' '}
-                  <a href="/privacy-policy" className="text-primary-700 font-semibold hover:underline">
-                    privacy policy
-                  </a>
-                  .
-                </span>
-              </label>
-              {errors.consent && (
-                <p className="mt-1.5 text-xs text-danger" role="alert">
-                  {errors.consent.message}
-                </p>
-              )}
-            </div>
-
-            <div className="flex flex-col items-center gap-2 pt-1">
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-secondary-400">
-                Quick security check
-              </p>
-              {/* Turnstile's "flexible" size needs an unconstrained width to lay
-                  out correctly — the old max-w-[300px] + padding box left it
-                  under 300px, which caused the widget to overflow its own
-                  border. w-full lets it size itself against the step column. */}
-              <div className="w-full flex justify-center" ref={turnstileRef} />
-              {turnstileLoading && (
-                <p className="text-xs text-secondary-500" role="status">
-                  Loading security check...
-                </p>
-              )}
-              {turnstileError && (
-                <div className="text-center" role="alert">
-                  <p className="text-xs text-danger">
-                    The security check could not complete. Check your connection and try again.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={resetTurnstile}
-                    className="mt-1 min-h-[44px] px-3 text-xs font-bold text-primary-700 hover:text-primary-800 hover:underline"
-                  >
-                    Retry security check
-                  </button>
-                </div>
-              )}
-              {errors.turnstileToken && (
-                <p className="text-xs text-danger" role="alert">
-                  {errors.turnstileToken.message}
-                </p>
-              )}
-            </div>
-
-            {status === 'error' && serverError && (
-              <div className="flex items-start gap-2 rounded-lg border border-danger/30 bg-danger/5 p-2.5 text-xs text-danger animate-fade-in" role="alert">
-                <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" aria-hidden="true" />
-                <p>{serverError}</p>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Wizard Controls */}
-        <div className="mt-5 pt-4 border-t border-secondary-100 flex items-center justify-between">
-          {step > 1 ? (
-            <button
-              type="button"
-              onClick={handleBack}
-              className="inline-flex items-center gap-1.5 min-h-[44px] font-bold text-sm text-secondary-700 hover:text-secondary-900 px-4 rounded-xl border border-secondary-200 hover:bg-secondary-50"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              Back
-            </button>
-          ) : (
-            <div />
-          )}
-
-          {step < 3 ? (
-            <button
-              type="button"
-              onClick={handleNext}
-              className="inline-flex items-center gap-1.5 min-h-[44px] font-bold text-sm bg-primary-600 text-white hover:bg-primary-700 px-5 rounded-xl shadow-sm hover:shadow-md transition-all ml-auto"
-            >
-              Next Step
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          ) : (
-            <Button
-              type="submit"
-              variant="accent"
-              size="md"
-              className="ml-auto"
-              disabled={status === 'submitting' || !turnstileToken}
-            >
-              {status === 'submitting' ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
-                  Sending...
-                </>
-              ) : (
-                'Submit Booking Request'
-              )}
-            </Button>
-          )}
-        </div>
-      </form>
-
-      {/* Live Quote Summary Sidebar */}
-      <div className="lg:col-span-5 rounded-2xl border border-secondary-200 bg-glass p-4 md:p-5 shadow-premium lg:sticky lg:top-24 lg:mt-0 mt-4">
-        <h4 className="text-sm font-bold text-secondary-900 tracking-wider uppercase flex items-center gap-1.5 border-b border-secondary-100 pb-2.5 mb-3">
-          <BadgePoundSterling className="w-4 h-4 text-primary-600" />
-          Live Price Estimate
-        </h4>
-
-        <div className="space-y-3 text-xs text-secondary-700">
-          <div className="flex justify-between items-start">
-            <div>
-              <span className="font-semibold block text-secondary-900">Services:</span>
-              <span className="text-xs text-secondary-500 mt-0.5 block leading-relaxed">
-                {isBulk
-                  ? 'Bulk / agency enquiry'
-                  : planIncluded
-                    ? 'EPC Pre-Assessment — not lodged'
-                    : wantsEpc && wantsFloorPlan
-                      ? 'EPC + Floor Plan Bundle (same property)'
-                      : wantsEpc
-                        ? 'Domestic EPC Only'
-                        : wantsFloorPlan
-                          ? 'Floor Plan Only'
-                          : 'No service selected'}
-              </span>
-            </div>
-            {!isBulk &&
-              (planIncluded ? (
-                <span className="font-bold text-secondary-900">{`£${preAssessmentPrice}`}</span>
-              ) : wantsEpc && wantsFloorPlan ? (
-                <div className="text-right">
-                  <span className="text-secondary-600 line-through">{`£${epcPrice + floorPlanPrice}`}</span>
-                  <span className="font-bold text-secondary-900 block">{`£${epcPrice + floorPlanPrice - discount}`}</span>
-                </div>
-              ) : (
-                <span className="font-bold text-secondary-900">{`£${epcPrice + floorPlanPrice}`}</span>
-              ))}
-          </div>
-
-          <div className="flex justify-between">
-            <span className="font-semibold">Booking as:</span>
-            <span className="font-bold text-secondary-900 text-right">{watchCustomerType}</span>
-          </div>
-
-          {!isBulk && (
-            <div className="flex justify-between">
-              <span className="font-semibold">Property Size:</span>
-              <span className="font-bold text-secondary-900">{watchPropertyType}</span>
-            </div>
-          )}
-
-          <div className="flex justify-between">
-            <span className="font-semibold">{isLodged ? 'Delivery Speed:' : 'Sent within:'}</span>
-            <span className="font-bold text-secondary-900">
-              {isLodged ? watchSpeed?.split(' (')[0] : '72 hours'}
-            </span>
-          </div>
-
-          {isExpress && !isBulk && (
-            <div className="flex justify-between text-xs text-secondary-900">
-              <span>Express Delivery Surcharge:</span>
-              <span className="font-bold">+{`£${EXPRESS_SURCHARGE}`}</span>
-            </div>
-          )}
-
-          {improvementPlanPrice > 0 && !isBulk && (
-            <div className="flex justify-between text-xs text-secondary-900">
-              <span>Improvement Plan:</span>
-              <span className="font-bold">+{`£${improvementPlanPrice}`}</span>
-            </div>
-          )}
-
-          {planIncluded && (
-            <div className="flex justify-between text-xs text-secondary-900">
-              <span>Improvement Plan:</span>
-              <span className="font-bold text-accent-700">Included</span>
-            </div>
-          )}
-
-          {discount > 0 && !isBulk && (
-            <div className="flex justify-between text-xs text-success font-semibold bg-success/5 border border-success/20 p-2 rounded-lg items-center">
-              <span className="flex items-center gap-1">
-                <Sparkles className="w-3.5 h-3.5" />
-                Bundle saving included:
-              </span>
-              <span>-{`£${discount}`}</span>
-            </div>
-          )}
-
-          <div className="border-t border-secondary-100 pt-3 mt-3 flex justify-between items-baseline">
-            <span className="text-sm font-bold text-secondary-900">Guide estimate:</span>
-            {isBulk ? (
-              <span className="text-sm font-bold text-primary-700 text-right">Quoted individually</span>
-            ) : (
-              <span className="text-right">
-                <span className="block text-2xl font-black text-primary-700 font-display">{`£${total}`}</span>
-                <span className="block text-[11px] font-medium text-secondary-500">Not a final quote</span>
-              </span>
-            )}
-          </div>
-          <p className="mt-2 text-[11px] leading-snug text-secondary-500">
-            A guide estimate based on the size you picked. We confirm your exact quote before
-            anything is booked.
-          </p>
-        </div>
-
-        <div className="mt-4 border-t border-secondary-100 pt-3 space-y-2">
-          <h5 className="text-xs font-bold uppercase tracking-wider text-secondary-500">What&apos;s Included:</h5>
-          <ul className="space-y-1.5 text-xs text-secondary-600">
-            {/* Every product states what IT includes. The nested-boolean version
-                of this sent bulk enquiries down the floor-plan branch and told
-                agencies their portfolio would arrive as JPGs. */}
-            {includedList(productKind).map((item) => (
-              <li key={item} className="flex items-center gap-1.5">
-                <ClipboardCheck className="w-3.5 h-3.5 text-primary-600 shrink-0" />
-                {item}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Direct channels — fills the space beside the taller form and gives
-            anyone who'd rather not fill in a form a one-tap route out. */}
-        <div className="mt-4 border-t border-secondary-100 pt-3">
-          <h5 className="text-xs font-bold uppercase tracking-wider text-secondary-500">
-            Prefer to talk?
-          </h5>
-          <div className="mt-2.5 space-y-2">
-            <a
-              href={site.phoneHref}
-              className="flex items-center gap-2.5 rounded-lg border border-secondary-200 bg-white px-3 py-2.5 transition-colors hover:border-primary-300 hover:bg-primary-50"
-            >
-              <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary-600 text-white">
-                <Phone className="h-4 w-4" aria-hidden="true" />
-              </span>
-              <span className="min-w-0">
-                <span className="block text-xs font-bold text-secondary-900">Tap to call</span>
-                <span className="block truncate text-xs text-secondary-500">{site.phone}</span>
-              </span>
-            </a>
-            <a
-              href={site.whatsappHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2.5 rounded-lg border border-secondary-200 bg-white px-3 py-2.5 transition-colors hover:border-[#25D366] hover:bg-[#25D366]/5"
-            >
-              <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#25D366] text-white">
-                <MessageCircle className="h-4 w-4" aria-hidden="true" />
-              </span>
-              <span className="min-w-0">
-                <span className="block text-xs font-bold text-secondary-900">Open WhatsApp</span>
-                <span className="block truncate text-xs text-secondary-500">
-                  Great for photos &amp; details
-                </span>
-              </span>
-            </a>
-            <a
-              href={site.emailHref}
-              className="flex items-center gap-2.5 rounded-lg border border-secondary-200 bg-white px-3 py-2.5 transition-colors hover:border-primary-300 hover:bg-primary-50"
-            >
-              <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-secondary-700 text-white">
-                <Mail className="h-4 w-4" aria-hidden="true" />
-              </span>
-              <span className="min-w-0">
-                <span className="block text-xs font-bold text-secondary-900">Send email</span>
-                <span className="block truncate text-xs text-secondary-500">
-                  Reply during opening hours
-                </span>
-              </span>
-            </a>
-          </div>
-          <p className="mt-3 text-xs leading-relaxed text-secondary-500">
-            No call-out fees · Free quote · Exact price confirmed before booking
-          </p>
-        </div>
+      <div className="my-4 rounded-lg bg-secondary-50 p-3 text-sm text-secondary-800">
+        <p aria-live="polite" aria-atomic="true">
+          {estimate.state === 'priced' ? <><strong>Guide estimate: £{estimate.total}</strong> · {areaLabel(values.areaBand)}</> :
+            estimate.state === 'manual-quote' ? <strong>{isBulk ? 'Your portfolio will be quoted individually.' : 'Exact quote after reviewing your property details.'}</strong> :
+            <>Choose your floor area below for a guide estimate, or select “Not sure of floor area”.</>}
+        </p>
+        {estimate.state === 'priced' && <details className="mt-1"><summary className="cursor-pointer py-3 font-semibold">Estimate breakdown</summary>
+          <dl>{guideEstimateRows(estimate).map(([label, amount]) => <div key={label} className="flex flex-wrap justify-between gap-2 py-1"><dt>{label}</dt><dd>{amount}</dd></div>)}</dl>
+        </details>}
+        <p className="mt-1">Your exact quote is confirmed before booking.</p>
       </div>
 
-      {/* Mobile only: the sidebar above sits below the whole form on a phone,
-          so the running total needs its own pinned home. */}
-      {showMobilePriceBar && <MobilePriceBar estimate={estimate} />}
-    </div>
+      <div className="hidden" aria-hidden="true"><label>Website<input type="text" tabIndex={-1} autoComplete="off" {...register('website')} /></label></div>
+
+      {step === 1 && <div className="space-y-6">
+        <Controller control={control} name="services" render={({ field }) => <Choices name="services" legend="What service do you need?"
+          value={field.value[0]} inputRef={field.ref} error={errors.services?.message}
+          onChange={value => {
+            field.onChange([value]); const lodged = value === 'EPC Certificate' || value === 'Both (Bundle)'
+            if (!lodged) { setValue('speed', 'Standard (72 hours)'); setValue('improvementPlan', false) }
+            rememberSelection(); conversionEvent('service_selection', quoteContextFromForm(getValues()))
+          }} options={[
+            { value: 'EPC Certificate', label: 'Domestic EPC', description: 'On-site assessment and an EPC lodged on the government register.' },
+            { value: 'Both (Bundle)', label: 'EPC + Floor Plan', description: 'Both services for the same property in one visit, with the bundle price.' },
+            { value: 'Floor Plan', label: 'Floor Plan', description: 'Laser-measured drawing showing layout and room sizes.' },
+            { value: PRE_ASSESSMENT, label: 'EPC Pre-Assessment', description: 'Find out your score privately. Nothing is lodged.' },
+            { value: 'Bulk / Agency Enquiry', label: 'Agency / portfolio enquiry', description: 'Multiple properties or ongoing instructions, quoted individually.' },
+          ]} />} />
+
+        {isBulk ? <p className="text-base text-secondary-700">A single floor area does not apply to a portfolio. We’ll ask for an approximate property count on the last step.</p> :
+          <Controller control={control} name="areaBand" render={({ field }) => <Choices name="areaBand" legend="Internal floor area"
+            hint="Floor area in m² is the main pricing factor. Bedroom counts are only a rough reference."
+            value={field.value || ''} inputRef={field.ref} error={errors.areaBand?.message}
+            onChange={value => { field.onChange(value); rememberSelection(); conversionEvent('estimator_use', quoteContextFromForm(getValues())) }}
+            options={[...areaBands.map((band, index) => ({ value: band, label: pricing[index].areaLabel, description: pricing[index].typicalLabel })), { value: 'unknown', label: 'Not sure of floor area', description: 'Continue without an estimate. We will review the property details before quoting.' }]} />} />}
+
+        <Controller control={control} name="customerType" render={({ field }) => <Choices name="customerType" legend="Who are you booking as?"
+          value={field.value} onChange={field.onChange} inputRef={field.ref} error={errors.customerType?.message}
+          options={customerTypes.map(value => ({ value, label: value }))} />} />
+
+        {values.customerType === 'Landlord (tenanted)' && <p className="text-sm text-secondary-700">Please let your tenants know about the visit and include any access arrangements in the notes.</p>}
+        {planIncluded && <p className="rounded-lg bg-primary-50 p-3 text-base">The Energy Report and written Improvement Plan are included in your Pre-Assessment.</p>}
+        {canHavePlan && !planIncluded && <label className="flex min-h-[48px] cursor-pointer items-start gap-3 rounded-lg border border-secondary-300 p-3">
+          <input type="checkbox" className="mt-1 h-5 w-5 shrink-0 accent-primary-700" {...register('improvementPlan', { onChange: rememberSelection })} />
+          <span className="min-w-0"><span className="block text-base font-semibold">Add the Improvement Plan (+£{site.addOns.improvementPlan})</span>
+            <span className="mt-1 block text-sm text-secondary-700">Recommendations remain on your EPC. Also receive an Energy Report with modelled energy costs and a written plan prioritising improvements for your property, prepared after the visit.</span></span>
+        </label>}
+      </div>}
+
+      {step === 2 && <div className="space-y-6">
+        {isLodged ? <Controller control={control} name="speed" render={({ field }) => <Choices name="speed" legend="Lodgement speed"
+          value={field.value} inputRef={field.ref} error={errors.speed?.message} onChange={value => { field.onChange(value); rememberSelection() }} options={[
+            { value: 'Standard (72 hours)', label: 'Standard lodgement', description: 'Lodged on the GOV.UK register within 72 hours of the visit.' },
+            { value: EXPRESS_SPEED, label: `Next-day lodgement (+£${EXPRESS_SURCHARGE})`, description: 'Lodged within 24 hours of the visit.' },
+          ]} />} /> : <p className="text-base text-secondary-700">{turnaroundCopy(productKind)}</p>}
+        {!isBulk && <Field label="Preferred visit date" htmlFor="preferredDate" hint="Optional. A requested date is not a confirmed appointment." error={errors.preferredDate?.message}>
+          <Input id="preferredDate" type="date" {...register('preferredDate')} />
+        </Field>}
+        <Field label="Access notes or other instructions" htmlFor="notes" hint="Optional. Tell us about access, parking or relevant property details." error={errors.notes?.message}>
+          <Textarea id="notes" {...register('notes')} />
+        </Field>
+      </div>}
+
+      {step === 3 && <div className="space-y-5">
+        <p className="text-base text-secondary-700">{contactStepIntro(productKind)}</p>
+        <p className="text-sm text-secondary-700">Fields marked * are required.</p>
+        {showErrors && Object.keys(errors).length > 0 && <div role="alert" className="rounded-lg border border-danger p-3 text-sm text-red-700">
+          <p className="font-semibold">Please check the following:</p>
+          <ul>{Object.entries(errors).map(([name, error]) => <li key={name}><a href={`#${name === 'turnstileToken' ? 'security-check' : name}`} className="inline-block py-2 underline" onClick={event => {
+            event.preventDefault(); focusBookingElement(document.getElementById(name === 'turnstileToken' ? 'security-check' : name))
+          }}>{error.message}</a></li>)}</ul>
+        </div>}
+        <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">
+          <Field label="Full name" htmlFor="name" required error={errors.name?.message}><Input id="name" autoComplete="name" {...register('name')} /></Field>
+          <Field label="Phone number" htmlFor="phone" required error={errors.phone?.message}><Input id="phone" type="tel" inputMode="tel" autoComplete="tel" {...register('phone')} /></Field>
+          <Field label="Email address" htmlFor="email" required error={errors.email?.message} className="sm:col-span-2"><Input id="email" type="email" inputMode="email" autoComplete="email" {...register('email')} /></Field>
+          {isBulk && <Field label="How many properties?" htmlFor="propertyCount" required error={errors.propertyCount?.message} hint="A rough number is fine." className="sm:col-span-2"><Input id="propertyCount" placeholder="e.g. 12, or 20+" {...register('propertyCount')} /></Field>}
+          <Field label={isBulk ? 'Properties and postcodes' : 'Property address'} htmlFor="address" required={!isBulk} error={errors.address?.message}
+            hint={isBulk ? 'Optional. Paste a list if you have one, or supply it later.' : undefined} className="sm:col-span-2">
+            <Textarea id="address" rows={isBulk ? 5 : 2} autoComplete={isBulk ? 'off' : 'street-address'} {...register('address')} />
+          </Field>
+          {!isBulk && <Field label="Postcode" htmlFor="postcode" required error={errors.postcode?.message}><Input id="postcode" autoComplete="postal-code" {...register('postcode')} /></Field>}
+        </div>
+        <label className="flex min-h-[48px] cursor-pointer items-start gap-3 py-2 text-base">
+          <input id="consent" type="checkbox" required aria-invalid={!!errors.consent} aria-describedby={errors.consent ? 'consent-error' : undefined} className="mt-1 h-5 w-5 shrink-0 accent-primary-700" {...register('consent')} />
+          <span>I agree to be contacted about my enquiry. We only use your details for this request. Read our <a href="/privacy-policy" className="underline">privacy policy</a>.</span>
+        </label>
+        {errors.consent && <p id="consent-error" role="alert" className="text-sm text-red-700">{errors.consent.message}</p>}
+        <div id="security-check" tabIndex={-1} aria-describedby={errors.turnstileToken ? 'turnstileToken-error' : undefined}>
+          <p className="mb-2 text-sm font-semibold">Security check</p>
+          <div ref={turnstileRef} className="min-w-0" />
+          {turnstileLoading && <p role="status" className="text-sm">Loading security check…</p>}
+          {turnstileError && <div role="alert" className="text-sm text-red-700"><p>The security check could not complete. Check your connection and try again.</p><button type="button" className={`${controlClass} underline`} onClick={resetTurnstile}>Retry security check</button></div>}
+          {errors.turnstileToken && <p id="turnstileToken-error" role="alert" className="text-sm text-red-700">{errors.turnstileToken.message}</p>}
+        </div>
+        {serverError && <p role="alert" className="rounded-lg border border-danger p-3 text-base text-red-700">{serverError}</p>}
+      </div>}
+
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-secondary-200 pt-4">
+        {step > 1 && <button type="button" disabled={status === 'submitting'} className={`${controlClass} border border-secondary-400 text-secondary-900`} onClick={() => { moveFocus.current = true; setStep(step - 1) }}>Back</button>}
+        {step < 3 ? <button type="button" onClick={() => void next()} className={`${controlClass} ml-auto bg-primary-700 text-white`}>Continue</button> :
+          <button type="submit" disabled={status === 'submitting' || !turnstileToken} className={`${controlClass} ml-auto bg-primary-700 text-white`}>{status === 'submitting' ? 'Sending…' : 'Send my quote request'}</button>}
+      </div>
+      <details className="mt-4 text-sm text-secondary-700"><summary className="cursor-pointer py-3 font-semibold">What’s included</summary><ul className="list-disc space-y-2 pl-5">{includedList(productKind).map(item => <li key={item}>{item}</li>)}</ul></details>
+      <p className="mt-3 text-sm text-secondary-700">Need help? <a href={site.phoneHref} className="inline-flex min-h-[44px] items-center px-2 underline">Call</a> or <a href={site.whatsappHref} className="inline-flex min-h-[44px] items-center px-2 underline">WhatsApp</a>.</p>
+    </form>
   )
 }

@@ -1,3 +1,4 @@
+import { quoteHref } from '@/lib/quote-context'
 import { Section } from '@/components/ui/Section'
 import { SectionHeader } from '@/components/ui/SectionHeader'
 import { PricingServiceCard } from '@/components/ui/PricingServiceCard'
@@ -39,7 +40,7 @@ export function Pricing() {
             'Certificate link sent as soon as it is live on the register',
             `Improvement recommendations and a written plan available for £${site.addOns.improvementPlan}`,
           ]}
-          href="/contact"
+          href={quoteHref({ service: 'epc' })}
           alternative={{
             text: 'Don’t want it on the public register? The EPC Pre-Assessment is the same survey at the same price, not lodged.',
             linkLabel: 'See how it works',
@@ -58,7 +59,7 @@ export function Pricing() {
             'Supplied as high-resolution JPG and PDF',
             'Built for landlords, sellers and letting agents',
           ]}
-          href="/contact"
+          href={quoteHref({ service: 'bundle' })}
           emphasis
           emphasisLabel="Better value together"
         />
@@ -72,7 +73,7 @@ export function Pricing() {
             'High-resolution JPG and PDF supplied',
             'Ready for Rightmove, Zoopla and OnTheMarket',
           ]}
-          href="/contact"
+          href={quoteHref({ service: 'floor-plan' })}
         />
       </div>
 

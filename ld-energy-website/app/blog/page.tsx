@@ -87,7 +87,7 @@ export default async function BlogIndexPage() {
                 Domestic EPC service
               </Link>{' '}
               or{' '}
-              <Link href="/contact" className="text-primary-700 underline">
+              <Link href="/contact#booking-form" className="text-primary-700 underline">
                 book an assessment
               </Link>
               .

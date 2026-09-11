@@ -1,62 +1,7 @@
 import { z } from 'zod'
-import { EXPRESS_SURCHARGE } from '@/lib/site'
-
-/**
- * Familiar bedroom references, in the SAME ORDER as the canonical pricing
- * bands in lib/site.ts. The form maps by index, so the two lists must stay
- * aligned — floor area is the real driver, this is the input customers can
- * answer without measuring anything.
- */
-
-export const propertyTypes = [
-  'Studio',
-  '1 Bedroom',
-  '2 Bedroom',
-  '3 Bedroom',
-  '4 Bedroom',
-  '5+ Bedroom',
-] as const
-
-/**
- * A full survey that is deliberately NOT lodged, so no certificate is ever
- * published. Named once here because the form, the Zod schema, the estimator
- * and the booking email all have to agree on the exact string.
- */
-export const PRE_ASSESSMENT = 'EPC Pre-Assessment (not lodged)' as const
-
-/**
- * Service options. "Both (Bundle)" is the better-value pairing and only applies
- * when the EPC and floor plan are for the SAME property — selecting EPC and
- * Floor Plan together in the form resolves to this automatically.
- */
-export const services = [
-  'EPC Certificate',
-  'Floor Plan',
-  'Both (Bundle)',
-  PRE_ASSESSMENT,
-  'Bulk / Agency Enquiry',
-] as const
-
-/** Who is booking — drives access arrangements and how we word the reply. */
-export const customerTypes = [
-  'Homeowner',
-  'Landlord (tenanted)',
-  'Estate agent',
-  'Letting agent / firm',
-] as const
-
-/**
- * Derived from the canonical surcharge so the stored enquiry value, the form
- * label and the pricing page can never disagree about the express price.
- * EXPRESS_SURCHARGE is a literal type, so this keeps a literal string type too.
- */
-export const EXPRESS_SPEED = `Express (Next day, +£${EXPRESS_SURCHARGE})` as const
-export const speeds = ['Standard (72 hours)', EXPRESS_SPEED] as const
-
-export const ukPostcodeRegex = /^[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}$/i
-
-/** The one service value that means "many properties, quoted individually". */
-export const BULK = 'Bulk / Agency Enquiry' as const
+import { areaChoices, legacyArea } from '@/lib/floor-area'
+import { propertyTypes, services, customerTypes, speeds, BULK, ukPostcodeRegex } from '@/lib/booking-options'
+export { propertyTypes, services, customerTypes, speeds, BULK, PRE_ASSESSMENT, EXPRESS_SPEED, ukPostcodeRegex } from '@/lib/booking-options'
 
 export const contactSchema = z
   .object({
@@ -76,7 +21,8 @@ export const contactSchema = z
   address: z.string().trim().max(2000),
   /** Not asked for on a bulk enquiry — see the `superRefine` below. */
   postcode: z.string().trim().toUpperCase().max(12),
-  propertyType: z.enum(propertyTypes, { required_error: 'Please select a property type' }),
+  propertyType: z.enum(propertyTypes).optional(),
+  areaBand: z.union([z.enum(areaChoices), z.literal('')]).optional(),
   customerType: z.enum(customerTypes, { required_error: 'Please tell us who you are' }),
   services: z
     .array(z.enum(services))
@@ -94,9 +40,7 @@ export const contactSchema = z
    * would make people guess precisely rather than usefully.
    */
   propertyCount: z.string().trim().max(60).optional().or(z.literal('')),
-  consent: z.literal(true, {
-    errorMap: () => ({ message: 'Please confirm you agree to be contacted' }),
-  }),
+  consent: z.boolean().refine(value => value, 'Please confirm you agree to be contacted'),
   /** Honeypot, must remain empty */
   website: z.string().max(0).optional().or(z.literal('')),
   turnstileToken: z.string().min(1, 'Please complete the security check'),
@@ -109,6 +53,17 @@ export const contactSchema = z
    */
   .superRefine((data, ctx) => {
     const isBulk = data.services.includes(BULK)
+    const legacy = legacyArea(data.propertyType)
+    if (data.areaBand && legacy && data.areaBand !== legacy) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['areaBand'], message: 'Conflicting property size selections. Please choose your floor area again.' })
+    }
+    const combinedLegacy = data.services.length === 2 && data.services.includes('EPC Certificate') && data.services.includes('Floor Plan')
+    if (data.services.length !== 1 && !combinedLegacy) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['services'], message: 'Please choose one service or the EPC and floor plan bundle.' })
+    }
+    if (!isBulk && !data.areaBand && !legacy) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['areaBand'], message: 'Choose a floor area band or Not sure of floor area.' })
+    }
 
     if (isBulk) {
       if (!data.propertyCount) {

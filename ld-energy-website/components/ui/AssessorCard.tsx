@@ -12,19 +12,22 @@ import { site } from '@/lib/site'
 export function AssessorCard({
   className,
   note,
+  headingLevel = 3,
 }: {
   className?: string
   /** Optional line above the credentials, e.g. an invitation to verify independently. */
   note?: string
+  headingLevel?: 2 | 3
 }) {
+  const Heading = headingLevel === 2 ? 'h2' : 'h3'
   return (
     <div
-      className={`overflow-hidden rounded-2xl border border-secondary-200 bg-white shadow-premium ${className ?? ''}`}
+      className={`overflow-hidden rounded-2xl border border-secondary-200 bg-white shadow-premium [overflow-wrap:anywhere] ${className ?? ''}`}
     >
       {/* Header band — sets this apart from an ordinary content card */}
-      <div className="flex items-center gap-2.5 border-b border-secondary-100 bg-secondary-50/70 px-5 py-3 md:px-6 md:py-4">
+      <div className="flex flex-wrap items-center gap-2.5 border-b border-secondary-100 bg-secondary-50/70 px-5 py-3 md:px-6 md:py-4">
         <ShieldCheck className="w-5 h-5 text-accent-600 shrink-0" aria-hidden="true" />
-        <h3 className="text-base font-bold text-secondary-900">Your Assessor</h3>
+        <Heading className="text-base font-bold text-secondary-900">Your Assessor</Heading>
         <span className="ml-auto rounded-full bg-accent-50 px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-accent-700 ring-1 ring-accent-200">
           Verified
         </span>

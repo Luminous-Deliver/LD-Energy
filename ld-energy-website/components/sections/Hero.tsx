@@ -1,3 +1,4 @@
+import { quoteHref } from '@/lib/quote-context'
 import { ShieldCheck, Clock, MapPin, Star, BadgePoundSterling } from 'lucide-react'
 import { Container } from '@/components/ui/Container'
 import { Button } from '@/components/ui/Button'
@@ -52,7 +53,7 @@ export function Hero() {
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row gap-3">
-            <Button href="/contact" variant="accent" size="lg" className="w-full sm:w-auto text-base">
+            <Button href={quoteHref()} variant="accent" size="lg" className="w-full sm:w-auto text-base">
               Get my exact quote
             </Button>
             <Button
