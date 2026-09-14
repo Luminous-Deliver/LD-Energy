@@ -87,7 +87,7 @@ const agentFaq: FaqItem[] = [
   },
   {
     q: 'How quickly can you assess a new instruction?',
-    a: 'We offer appointments 7 days a week including evenings, and can usually attend within one to two working days of the instruction. Certificates are lodged within 72 hours of the visit as standard, or within 24 hours with our next-day service, so your listing is portal-ready fast.',
+    a: 'Tell us your listing deadline and access requirements. We confirm an available appointment and delivery timing before accepting the instruction. Standard lodgement is within 72 hours of the visit; the next-day option is agreed before booking and does not guarantee a next-day appointment.',
   },
   {
     q: 'Can you deal with the vendor or tenant directly?',
