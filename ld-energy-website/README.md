@@ -37,7 +37,9 @@ Set these in the Cloudflare Pages dashboard (Settings → Environment variables)
 | `RESEND_TO` | Email address that receives contact-form submissions |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Public Turnstile widget key, embedded at build time |
 | `TURNSTILE_SECRET_KEY` | Secret used by `/api/contact` to validate Turnstile tokens |
-| `NEXT_PUBLIC_CF_BEACON_TOKEN` | Optional. Cloudflare Web Analytics site token. If unset, the beacon is omitted. |
+| `NEXT_PUBLIC_CF_BEACON_TOKEN` | Cloudflare Web Analytics public site token. If unset, the beacon is omitted. Use the controlled `WebAnalytics` loader only; automatic injection must be disabled for the EPC hostname. |
+
+Web Analytics setup, privacy choices and rollback are documented in `docs/stage-2-measurement-privacy.md`. Do not enable an additional Pages/dashboard beacon: that would bypass the website's objection control.
 
 ## Project structure
 

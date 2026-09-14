@@ -245,7 +245,7 @@ export function Footer() {
             © {year} {site.name}. Part of {site.parentBrand}.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
-            <Link prefetch={false} href="/privacy-policy" className="inline-flex min-h-[44px] items-center hover:text-white transition-colors">Privacy Policy</Link>
+            <a href="/privacy-policy#analytics-choices" className="inline-flex min-h-[44px] items-center hover:text-white transition-colors">Privacy &amp; analytics choices</a>
             <Link prefetch={false} href="/terms" className="inline-flex min-h-[44px] items-center hover:text-white transition-colors">Terms of Service</Link>
             <a
               href="https://digital.luminousanddeliver.co.uk/"

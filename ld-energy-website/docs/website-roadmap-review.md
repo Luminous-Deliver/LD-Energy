@@ -7,8 +7,8 @@ Started 14 September 2026. User authorised focused self-review and shipment of S
 | Stage | Objective and boundary | Acceptance / evidence | State |
 |---|---|---|---|
 | 1 | Repair enquiry journey | Approved exact commit `14a6813`; production smoke passed | Deployed |
-| 1b | Content/recommendations/MEES accuracy | `f6e37a2` plus follow-up self-review; typecheck, lint, production build, rendered content and production smoke | Self-review |
-| 2 | Cloudflare Web Analytics, truthful privacy/consent | One beacon, verified storage/network behaviour, objection control, no provider migration or custom-event system; enquiry attribution preserved | Pending |
+| 1b | Content/recommendations/MEES accuracy | `f6e37a2` + `c51e298`; static/build/rendered and nine-route production smoke passed | Deployed |
+| 2 | Cloudflare Web Analytics, truthful privacy/consent | One beacon, verified storage/network behaviour, objection control, no provider migration or custom-event system; enquiry attribution preserved | Final validation; see stage-2-measurement-privacy.md |
 | 3 | Concise homepage with early pricing and primary form journey | 320/390/768/1440 screenshots, height/CTA/pricing/trust measurements, interactions, Lighthouse | Pending |
 | 4 | Coherent visible business/person/credential schema | Rendered JSON-LD parse and entity/visible-content assertions on key templates | Pending |
 | 5 | Accessibility and measured performance improvements | Keyboard, 200% text, reduced motion, contrast, overflow; Lighthouse/network comparisons | Pending |

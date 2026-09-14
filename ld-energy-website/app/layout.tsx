@@ -3,7 +3,7 @@ import { Inter, Plus_Jakarta_Sans, Fraunces } from 'next/font/google'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { MobileCallBar } from '@/components/layout/MobileCallBar'
-import { CookieBanner } from '@/components/layout/CookieBanner'
+import { WebAnalytics } from '@/components/layout/WebAnalytics'
 import { LondonSkyline } from '@/components/ui/LondonSkyline'
 import { site, pricing, priceFrom, EXPRESS_SURCHARGE } from '@/lib/site'
 import { boroughMeta } from '@/lib/boroughs'
@@ -228,13 +228,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify([localBusinessSchema, organizationSchema]) }}
         />
-        {cfBeaconToken ? (
-          <script
-            defer
-            src="https://static.cloudflareinsights.com/beacon.min.js"
-            data-cf-beacon={JSON.stringify({ token: cfBeaconToken })}
-          />
-        ) : null}
       </head>
       <body className="min-h-screen flex flex-col">
         <a
@@ -251,7 +244,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <LondonSkyline className="text-[#0D1B33] -mb-1" />
         <Footer />
         <MobileCallBar />
-        <CookieBanner />
+        <WebAnalytics token={cfBeaconToken} />
       </body>
     </html>
   )
