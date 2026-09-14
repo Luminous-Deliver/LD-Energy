@@ -22,11 +22,11 @@ export const homepageFaq: FaqItem[] = [
   },
   {
     q: 'Do I need an EPC to sell my house in London?',
-    a: 'Yes. You’re legally required to have a valid EPC before marketing your property for sale in England and Wales. Estate agents cannot legally list your property without one.',
+    a: 'Generally, an EPC must be commissioned before marketing a home for sale in England and Wales. Reasonable efforts must be made to obtain it within seven days; a further 21 days is allowed if those efforts do not succeed. Exemptions apply. Provide it to prospective buyers as required.',
   },
   {
     q: 'Do I need an EPC to rent out my property?',
-    a: 'Yes. Under MEES regulations, landlords must have a valid EPC rated E or above to legally let a property in England and Wales. Letting without one can result in fines up to £5,000 per property.',
+    a: 'For domestic rentals within MEES scope in England and Wales, the minimum is EPC E unless a valid exemption is registered. Current MEES financial penalties are capped at £5,000 per property in total. EPC provision duties and their penalties are separate.',
   },
   {
     q: 'How much does an EPC cost in London?',
@@ -46,27 +46,27 @@ export const homepageFaq: FaqItem[] = [
   },
   {
     q: 'Can I improve my EPC rating?',
-    a: 'Yes. Your EPC includes specific improvement recommendations. Common cost-effective upgrades include loft insulation, LED lighting, cavity wall insulation, and modern condensing boilers.',
+    a: 'Yes. The standard EPC includes software-generated recommendations where applicable, without buying an add-on. Their suitability, costs and modelled savings depend on the assessed property.',
   },
   {
     q: 'What are MEES regulations?',
-    a: 'Minimum Energy Efficiency Standards (MEES) require all rental properties in England and Wales to have an EPC rating of E or above. Government has set out an aim of raising this to band C for privately rented homes by 2030, on a phased basis. That is not yet law.',
+    a: 'For domestic rentals covered by MEES in England and Wales, the current minimum is EPC E unless a valid exemption is registered. Government has confirmed a higher standard equivalent to C for 1 October 2030, using reformed EPC metrics, but implementing legislation is still required. There is one compliance date for tenancies in scope, not an earlier new-tenancy phase.',
   },
   {
     q: 'Can I get a same-day or next-day EPC in London?',
-    a: `Often, yes. Next-day lodgement is available for £${EXPRESS_SURCHARGE} extra, and same-day slots are regularly available across London when you book early in the day. Call or WhatsApp ${site.phone} and we’ll tell you straight away what’s free.`,
+    a: `Tell us your deadline in your enquiry. We confirm appointment availability and delivery timing before booking. Next-day lodgement costs £${EXPRESS_SURCHARGE} extra when agreed; it does not mean a next-day appointment is always available.`,
   },
   {
     q: 'When is an EPC legally required?',
-    a: 'Whenever a property is marketed for sale or rent in England and Wales, and at the start of a new tenancy. It must be commissioned before marketing begins, so it’s best to book as soon as you decide to sell or let.',
+    a: 'EPC requirements generally apply when a home is constructed, sold or let in England and Wales. Commission an EPC before marketing where required; exemptions and time limits apply. A private pre-assessment does not replace that duty.',
   },
   {
     q: 'How do I get my property to EPC band C?',
-    a: `It depends on the building — for most London homes it’s a combination of insulation, heating controls, and lighting, done in the right order. Our £${site.addOns.improvementPlan} EPC Improvement Plan is written up after your assessment and covers exactly that: what would realistically lift your rating, what each measure costs to install, where your energy money currently goes, and what to do first.`,
+    a: `Your standard EPC includes its software-generated recommendation report at no extra charge, unless there is no reasonable potential for improvements. The optional £${site.addOns.improvementPlan} Improvement Plan adds Abdul’s personalised interpretation and priorities, supported by the full Elmhurst Energy Report. Costs and savings are modelled estimates, not guarantees.`,
   },
   {
     q: 'Can I find out my rating without it going on the public register?',
-    a: `Yes — that is an EPC Pre-Assessment. We carry out the full survey exactly as we would for a real EPC, but we do not lodge it, so no certificate is published and nothing appears on the GOV.UK register. You get the score, a breakdown of what is holding it back, and a written improvement plan. It is priced on the same floor-area bands as an EPC because it is the same visit and the same measuring. If you decide you want the certificate afterwards, we can usually lodge the same survey for £${site.addOns.lodgeLater} without a second visit, as long as nothing at the property has changed. It is not a substitute for an EPC where one is legally required, such as marketing a property for sale or rent.`,
+    a: `Yes — that is an EPC Pre-Assessment. We carry out the full survey exactly as we would for a real EPC, but we do not lodge it, so no certificate is published and nothing appears on the GOV.UK register. You get the score, a breakdown of what is holding it back, and a written improvement plan. It is priced on the same floor-area bands as an EPC because it is the same visit and the same measuring. If you decide you want the certificate afterwards, we can usually lodge the same survey for £${site.addOns.lodgeLater} without a second visit, as long as nothing at the property has changed and the survey data remains valid for lodgement under the applicable rules. It is not a substitute for an EPC where one is legally required, such as marketing a property for sale or rent.`,
   },
   {
     q: 'How do I check my assessor is genuinely accredited?',
@@ -202,23 +202,23 @@ export const fullFaq: FaqCategory[] = [
     items: [
       {
         q: 'Do I need an EPC to sell my home?',
-        a: 'Yes. You’re legally required to have an EPC commissioned before marketing your property for sale in England and Wales. Estate agents cannot legally list your property without one.',
+        a: 'Generally, an EPC must be commissioned before marketing a home for sale in England and Wales. Reasonable efforts must be made to obtain it within seven days; a further 21 days is allowed if those efforts do not succeed. Exemptions apply. Provide it to prospective buyers as required.',
       },
       {
         q: 'Do I need an EPC to rent out my property?',
-        a: 'Yes. Under MEES regulations, all rental properties in England and Wales must have a valid EPC rated E or above. Letting without a compliant EPC can result in fines up to £5,000 per property.',
+        a: 'For domestic rentals within MEES scope in England and Wales, the minimum is EPC E unless a valid exemption is registered. Current MEES financial penalties are capped at £5,000 per property in total. EPC provision duties and their penalties are separate.',
       },
       {
         q: 'What are MEES regulations?',
-        a: 'Minimum Energy Efficiency Standards (MEES) require all rental properties to have an EPC rating of E or above. Government has set out an aim of raising this to band C for privately rented homes by 2030, on a phased basis. That is not yet law.',
+        a: 'For domestic rentals covered by MEES in England and Wales, the current minimum is EPC E unless a valid exemption is registered. Government has confirmed a higher standard equivalent to C for 1 October 2030, using reformed EPC metrics, but implementing legislation is still required. There is one compliance date for tenancies in scope, not an earlier new-tenancy phase.',
       },
       {
         q: 'What if my property is below an E rating?',
-        a: 'You cannot legally let a property rated F or G unless you have a registered exemption. You’ll need to make improvements to reach at least E. Your EPC report includes specific recommendations to help you do this.',
+        a: 'If the property is covered by domestic MEES, you must improve it to E or register a valid exemption before letting or continuing to let it. Your standard recommendation report helps identify relevant measures.',
       },
       {
         q: 'Are there any exemptions?',
-        a: 'Yes, limited exemptions exist (for example, all relevant improvements completed but rating still below E, third-party consent refused, or wall insulation that would damage the fabric of the property). Exemptions must be registered on the PRS Exemptions Register and last up to 5 years.',
+        a: 'Yes, limited exemptions exist (for example, all relevant improvements completed but rating still below E, third-party consent refused, or wall insulation that would damage the fabric of the property). MEES exemptions require evidence and registration on the PRS Exemptions Register; most last five years, but duration depends on the exemption.',
       },
     ],
   },
@@ -270,7 +270,7 @@ export const fullFaq: FaqCategory[] = [
       },
       {
         q: 'What is the next-day service?',
-        a: `For £${EXPRESS_SURCHARGE} extra, your EPC certificate is lodged within 24 hours of the assessment rather than the standard 72. This applies to assessments completed during our standard hours. Book before noon for the best chance of a same-day or next-morning appointment.`,
+        a: `For £${EXPRESS_SURCHARGE} extra, your EPC certificate is lodged within 24 hours of the assessment rather than the standard 72. This applies to assessments completed during our standard hours. Appointment availability and the delivery deadline are confirmed before booking.`,
       },
     ],
   },
@@ -280,7 +280,7 @@ export const fullFaq: FaqCategory[] = [
     items: [
       {
         q: 'How can I improve my EPC rating?',
-        a: 'Your EPC includes specific improvement recommendations tailored to your property. Common cost-effective upgrades include loft insulation, LED lighting, cavity wall insulation, modern condensing boilers with smart controls, double glazing, and renewable systems like solar PV or heat pumps.',
+        a: 'Your standard EPC includes its software-generated recommendation report where applicable. Insulation, heating, lighting and other measures may be suggested depending on the property. Seek appropriate installation advice before proceeding; a particular rating or saving is not guaranteed.',
       },
       {
         q: 'Which improvements give the best return?',

@@ -57,9 +57,9 @@ ${priceTable()}
 - Next-day (express) service: add £${EXPRESS_SURCHARGE} to the EPC price above.
 - Booking an EPC and floor plan together saves up to £${formatPrice(maxBundleSaving)} against booking them separately, because both are completed in a single property visit.
 - Properties over 121 m² vary considerably; that band is a starting point and an exact quote is always required.
-- EPC Improvement Plan add-on: £${site.addOns.improvementPlan}. Written up after the visit, not delivered verbally on the day. Covers three things: the improvement recommendations kept on the lodged GOV.UK certificate, a full Energy Report (end-use cost split, CO2 rating and heat-loss figure, none of which appear on the certificate), and a written plan ranking which measures are worth doing on that specific building and in what order.
-- Without the Improvement Plan add-on, an EPC is lodged with the rating and property description but WITHOUT improvement recommendations.
-- EPC Pre-Assessment: a full RdSAP survey that is deliberately NOT lodged, so no certificate is published on the GOV.UK register. Priced on the same floor-area bands as an EPC (from £${priceFrom.epc}) because it is the same visit and the same measuring; only the lodgement is saved. The Energy Report and the written Improvement Plan are included, not an extra. Lodging the same survey afterwards costs £${site.addOns.lodgeLater} with no second visit, provided nothing at the property has changed. It is NOT a substitute for an EPC where one is legally required — marketing a property for sale or rent, or MEES compliance.
+- EPC Improvement Plan add-on: £${site.addOns.improvementPlan}. Abdul’s personalised written plan explaining what is holding the rating back and which improvements to consider first, supported by the full Elmhurst Energy Report. Prepared after the visit. Energy costs and savings use standard occupancy assumptions; they are not actual household bills or guaranteed outcomes.
+- Standard EPCs include the software-generated recommendation report at no extra charge, unless there is no reasonable potential for improvement. Legitimate omissions follow assessment rules, not the customer’s choice of add-on.
+- EPC Pre-Assessment: a full RdSAP survey that is deliberately NOT lodged, so no certificate is published on the GOV.UK register. Priced on the same floor-area bands as an EPC (from £${priceFrom.epc}) because it is the same visit and the same measuring; only the lodgement is saved. The Energy Report and the written Improvement Plan are included, not an extra. Lodging the same survey afterwards costs £${site.addOns.lodgeLater} with no second visit, provided nothing at the property has changed and the survey remains valid for lodgement under the applicable rules. It is NOT a substitute for an EPC where one is legally required — marketing a property for sale or rent, or MEES compliance.
 - There is no call-out or mileage charge within the normal service area.
 
 Estate and letting agents: we act as an EPC and floor plan supplier for London agencies, with volume
@@ -71,24 +71,18 @@ Details: ${site.url}/estate-agents
 - Express (next-day): lodged within 24 hours of the assessment.
 - We do NOT email the EPC certificate as a PDF. The certificate is lodged on the official GOV.UK EPC
   Register, and the customer is sent the link to their certificate on that register once it is live.
-- Floor plans ARE supplied as real files: high-resolution JPG and PDF.
+- Floor plans ARE supplied as real files: high-resolution JPG and PDF. They are illustrative marketing plans with approximate dimensions, not architectural or legal plans. Their floor area may differ from EPC floor area because EPC conventions differ.
 
 ## What is an EPC?
 An Energy Performance Certificate (EPC) rates a property's energy efficiency from A (most efficient)
-to G (least efficient). It is a legal requirement in England and Wales when selling or renting a
-property. EPCs are valid for 10 years.
+to G (least efficient). An EPC generally needs to be commissioned before marketing a home for sale or rent in England and Wales; exemptions and time limits apply. EPCs are normally valid for 10 years unless replaced.
 
 ## Legal requirement
-An EPC is required by law:
-- When letting a residential property (minimum rating: E)
-- When selling a residential property
-- For newly built homes
-Landlords must meet a minimum EPC rating of E under the Minimum Energy Efficiency Standards (MEES).
-Government proposals would raise the minimum standard for rented homes in future; see our guides for
-the current position.
+For domestic rentals covered by MEES in England and Wales, the current minimum is EPC E unless a valid exemption is registered. Government has confirmed a higher standard equivalent to C for 1 October 2030, using reformed EPC metrics, but implementing legislation is still required. There is one compliance date for tenancies in scope, not an earlier new-tenancy phase.
+New dwellings normally need an on-construction EPC, which uses a different assessment method. Our service is domestic assessment of existing homes.
 
-## How to book
-Visit ${site.url}/contact, call ${site.phone}, or WhatsApp the same number. We confirm your exact
+## Request an exact quote
+Use ${site.url}/contact#booking-form. Call ${site.phone} or WhatsApp for support. We confirm your exact
 quote before booking.
 
 ## Website structure
@@ -107,7 +101,7 @@ quote before booking.
 - FAQ: ${site.url}/faq
 - Blog and guides: ${site.url}/blog
 - About: ${site.url}/about
-- Contact/book: ${site.url}/contact
+- Enquiry form: ${site.url}/contact
 
 ## Area pages
 We have dedicated pages for every London borough we cover: ${areaNames.join(', ')}.

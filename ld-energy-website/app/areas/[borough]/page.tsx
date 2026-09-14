@@ -92,11 +92,11 @@ function boroughFaq(name: string, postcodeFaq: { q: string; a: string }): FaqIte
     },
     {
       q: `Do I need an EPC to let my property in ${name}?`,
-      a: `Yes. Under MEES regulations, all rental properties in England and Wales must have a valid EPC rated E or above. Landlords in ${name} who let without a compliant EPC can face fines of up to £5,000 per property.`,
+      a: `For domestic rentals within MEES scope, landlords in ${name} must meet EPC E or register a valid exemption. Current MEES financial penalties are capped at £5,000 per property in total. EPC provision duties apply separately.`,
     },
     {
       q: `Do I need an EPC to sell my home in ${name}?`,
-      a: `Yes. You're legally required to have an EPC commissioned before marketing your property for sale. Estate agents cannot legally list your ${name} property without one.`,
+      a: `Generally, an EPC must be commissioned before marketing your ${name} home for sale. Reasonable efforts must be made to obtain it within seven days, with a further 21 days allowed if those efforts fail. Exemptions apply.`,
     },
     {
       q: `Do you also provide floor plans in ${name}?`,

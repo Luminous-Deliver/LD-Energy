@@ -37,12 +37,12 @@ const breadcrumbs = [
 const penalties = [
   { breach: 'False information on PRS Exemptions Register', fine: '£1,000' },
   { breach: 'Failing to comply with a compliance notice', fine: '£2,000' },
-  { breach: 'Letting a non-compliant property under 3 months', fine: '£4,000' },
-  { breach: 'Letting a non-compliant property 3+ months', fine: '£5,000' },
+  { breach: 'Letting a non-compliant property under 3 months', fine: '£2,000' },
+  { breach: 'Letting a non-compliant property 3+ months', fine: '£4,000' },
 ]
 
 const landlordNeeds = [
-  'Valid EPC rated E or above (legal minimum)',
+  'For rentals within MEES scope: EPC E or above, or a registered valid exemption',
   'EPC must be provided to tenants before signing',
   'Certificate must be lodged on the government register',
   'Valid for 10 years',
@@ -58,12 +58,12 @@ const ourService = [
   {
     Icon: ShieldCheck,
     title: 'Improvement advice',
-    body: 'Every EPC includes specific recommendations to help you reach EPC C ahead of upcoming MEES changes.',
+    body: 'Standard EPC recommendations are included where applicable. They identify potential improvements; they do not guarantee EPC C or future compliance.',
   },
   {
     Icon: Clock,
-    title: 'Same-week appointments',
-    body: 'Fast turnaround for urgent tenancies, including evening and weekend slots.',
+    title: 'Appointment requests',
+    body: 'Tell us your tenancy deadline and access needs. We confirm an available appointment and delivery timing before booking.',
   },
   {
     Icon: CalendarRange,
@@ -106,15 +106,15 @@ const landlordFaq: FaqItem[] = [
   },
   {
     q: 'Do I need a new EPC for every new tenant?',
-    a: 'No. An EPC lasts 10 years and covers consecutive tenancies within that period, as long as it stays valid on the government register. You only need a new one when it expires or after major works that change the property’s energy performance.',
+    a: 'No. An EPC lasts 10 years and covers consecutive tenancies within that period, as long as it stays valid on the government register. A replacement is needed when an EPC is legally required and the existing one is no longer valid. Improvements do not automatically invalidate it, but a fresh assessment can record the changed property.',
   },
   {
     q: 'What happens if I let a property without a valid EPC?',
-    a: 'It is a breach of MEES. Local authorities can currently issue civil penalties of up to £5,000 per property (the government has proposed raising this to £30,000 under future EPC C standards). A property rated F or G cannot be let at all unless you have a registered exemption.',
+    a: 'Failing to provide an EPC and letting a sub-standard property under MEES are separate breaches. For rentals within MEES scope, an F- or G-rated property must be improved to E or have a valid registered exemption. Current MEES financial penalties total up to £5,000 per property; a planned £30,000 maximum still requires legislation.',
   },
   {
     q: 'My rental is rated F or G — what are my options?',
-    a: 'You must either improve it to at least band E before re-letting, or register a valid exemption on the PRS Exemptions Register. Your EPC report lists the specific improvements; common routes are loft and cavity insulation, LED lighting, and a modern boiler with controls.',
+    a: 'If MEES applies, you must improve it to at least E or register a valid exemption before letting or continuing to let it. Your EPC report lists the specific improvements; common routes are loft and cavity insulation, LED lighting, and a modern boiler with controls.',
   },
   {
     q: 'Can you handle EPCs for my whole portfolio in one booking?',
@@ -193,7 +193,7 @@ export default function LandlordsPage() {
             </Link>{' '}
             and{' '}
             <Link href="/blog/mees-timeline-2026-2030" className="text-primary-700 underline underline-offset-2 hover:text-primary-800">
-              what is proposed between now and 2030
+              current law and the confirmed 2030 policy
             </Link>
             .
           </p>
@@ -208,7 +208,7 @@ export default function LandlordsPage() {
             Penalties for Non-Compliance
           </h2>
           <p className="mt-5 text-lg text-secondary-700 leading-relaxed">
-            Local authorities can issue civil penalties for breaches of MEES. Maximum fines escalate with the length of the breach.
+            The current domestic MEES maxima are shown below. Financial penalties are capped at £5,000 per property in total; a publication penalty may also apply.
           </p>
         </div>
 
@@ -234,7 +234,7 @@ export default function LandlordsPage() {
         <div className="mt-6 rounded-lg border border-warm-200 bg-warm-50 p-4 flex items-start gap-3">
           <AlertTriangle className="w-5 h-5 text-warm-700 shrink-0 mt-0.5" aria-hidden="true" />
           <p className="text-sm text-warm-800">
-            <span className="font-semibold">Heads up:</span> Government consultations have proposed penalty increases to £30,000 per property when EPC C becomes the new minimum standard.
+            <span className="font-semibold">Heads up:</span> Government intends to raise the maximum to £30,000 per property per breach under the future standard. This requires legislation and is not the current penalty limit.
           </p>
         </div>
       </Section>
@@ -248,14 +248,14 @@ export default function LandlordsPage() {
               EPC C by 2030
             </h2>
             <p className="mt-5 text-lg text-secondary-700 leading-relaxed">
-              The UK government is moving towards requiring EPC C for rental properties. Exact dates may shift but the direction is set. Acting now gives you time to plan improvements.
+              The January 2026 government response confirmed a higher standard equivalent to EPC C for 1 October 2030, using reformed metrics. Implementing legislation is still required; the current E minimum remains in force.
             </p>
             <ul className="mt-6 space-y-2.5">
               {[
-                'Proposed, not yet law: band C for privately rented homes, aimed at 2030',
-                'Proposed: All tenancies must be EPC C by 2030',
-                'Dates may shift but direction is set',
-                'Acting now gives you time to plan improvements',
+                'One compliance date: 1 October 2030 for tenancies in scope',
+                'Confirmed policy: fabric performance plus heating system or smart readiness',
+                'Confirmed policy cost cap: £10,000, subject to implementing legislation',
+                'Existing EER C certificates issued before 1 October 2029 can qualify under the transitional policy until expiry or replacement',
               ].map((item) => (
                 <li key={item} className="flex items-start gap-2.5 text-secondary-700">
                   <CheckCircle2 className="w-5 h-5 text-primary-600 shrink-0 mt-0.5" aria-hidden="true" />

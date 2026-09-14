@@ -16,17 +16,17 @@ const PLAN_PRICE = `£${site.addOns.improvementPlan}`
 export const metadata: Metadata = {
   title: `EPC Improvement Plan London | ${PLAN_PRICE}`,
   description:
-    `A written plan added to your EPC: which improvements would genuinely lift your London property's rating, what each costs to install, where your energy money currently goes, and the order to do them in. ${PLAN_PRICE}.`,
+    `Abdul's personalised plan explaining what is holding your EPC rating back and which improvements to consider first, supported by the full Elmhurst Energy Report. ${PLAN_PRICE} extra.`,
   alternates: { canonical: `${site.url}/services/epc-improvement-plan` },
   openGraph: {
     title: `EPC Improvement Plan London | ${PLAN_PRICE} | L&D Energy`,
     description:
-      `Improvement recommendations kept on your certificate, a full Energy Report, and a written plan ranking what is worth doing on your building. ${PLAN_PRICE}, added to any EPC assessment.`,
+      `A personalised written plan and the full Elmhurst Energy Report for ${PLAN_PRICE} extra. Standard EPC recommendations are included either way.`,
     url: `${site.url}/services/epc-improvement-plan`,
   },
   twitter: {
     title: `EPC Improvement Plan London | ${PLAN_PRICE}`,
-    description: `A written route to a better EPC rating, added to your assessment. ${PLAN_PRICE}.`,
+    description: `Personalised EPC improvement priorities supported by the full Elmhurst Energy Report. ${PLAN_PRICE} extra, with no guaranteed rating or savings.`,
   },
 }
 
@@ -36,30 +36,30 @@ const breadcrumbs = [
 ]
 
 const covered = [
-  'Which improvements would actually move your score, based on the survey we just carried out',
-  'What each measure typically costs to install, and what it saves per year',
-  'Where your energy money currently goes — heating, hot water and lighting, split out',
-  'The order to do them in, so you don’t pay twice',
-  'Which measures count toward MEES compliance for rented homes',
+  'What is holding the rating back, based on the assessment data',
+  'Indicative installation costs and modelled savings, with their limitations',
+  'Estimated energy-cost distribution for heating, hot water and lighting under standard occupancy assumptions',
+  'Which improvements to consider first and which need further investigation',
+  'How the EPC recommendations relate to current MEES requirements, where applicable',
   'What is realistic for the property type — solid wall, flat, period conversion',
-  'What to ignore for this building, and why',
+  'Which measures may be unsuitable or need specialist advice, and why',
 ]
 
 const audience = [
   {
     Icon: ShieldAlert,
     title: 'Landlords facing MEES',
-    body: 'Rented homes must reach band E today, with band C proposed for future tenancies. If your property scored D or E, this is the fastest way to understand your options.',
+    body: 'For rentals covered by MEES, the current minimum is E unless a valid exemption is registered. The confirmed higher standard for 1 October 2030 still needs legislation. The plan helps you consider property-specific options.',
   },
   {
     Icon: PoundSterling,
     title: 'Owners planning works',
-    body: 'About to replace a boiler, insulate a loft or change windows? Knowing the running order stops you spending money in the wrong sequence.',
+    body: 'Considering insulation, heating or glazing work? A personalised plan helps you consider priorities before seeking installation advice and quotes.',
   },
   {
     Icon: ListOrdered,
     title: 'Buyers and sellers',
-    body: 'A low rating is a negotiating point. Understand what it would genuinely take to improve before you price or purchase.',
+    body: 'Understand the assessed property and possible improvements before making decisions about a sale or purchase.',
   },
 ]
 
@@ -70,7 +70,7 @@ const serviceSchema = {
   name: 'EPC Improvement Plan',
   serviceType: 'Energy efficiency improvement report',
   description:
-    'A written improvement plan prepared by an accredited Domestic Energy Assessor, covering the practical route to a better EPC rating for a residential property. Includes the improvement recommendations on the lodged certificate and a full Energy Report, and is delivered alongside an EPC assessment.',
+    'An additional personalised written plan from Abdul Motaleb Taher explaining what is holding the EPC rating back and which improvements to consider first, supported by the full Elmhurst Energy Report. Standard EPC recommendations are included independently of this add-on. No rating or savings are guaranteed.',
   provider: { '@id': `${site.url}/#organization` },
   areaServed: areaServedLondon,
   offers: {
@@ -109,7 +109,7 @@ export default function EpcImprovementPlanPage() {
       <PageHero
         eyebrow="Add-on service"
         heading="EPC Improvement Plan"
-        subheading={`Your EPC tells you the rating. This tells you what to do about it — written up after your assessment and sent with your certificate, for ${PLAN_PRICE}.`}
+        subheading={`Abdul's personalised plan explains what is holding your rating back and which improvements to consider first. Written after your assessment, with the full Elmhurst Energy Report as supporting evidence. ${PLAN_PRICE} extra.`}
         primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', plan: true, sourcePage: 'improvement-plan', ctaId: 'hero' }) }}
       />
 
@@ -122,12 +122,12 @@ export default function EpcImprovementPlanPage() {
               What it is
             </div>
             <h2 className="mt-3 text-3xl md:text-4xl font-bold tracking-tight text-secondary-900">
-              Three things, not one
+              Personalised advice, supported by your assessment
             </h2>
             <p className="mt-5 text-lg text-secondary-700 leading-relaxed">
-              A standard EPC gives you a rating and a description of the property. The Improvement
-              Plan adds the part that tells you what to do next — and it is written up properly,
-              not talked through on the doorstep.
+              Your standard EPC already includes its software-generated recommendation report,
+              where applicable. The optional Improvement Plan adds Abdul&apos;s interpretation
+              of the assessment and priorities for your property.
             </p>
 
             <ol className="mt-6 space-y-4">
@@ -137,10 +137,10 @@ export default function EpcImprovementPlanPage() {
                 </span>
                 <span className="text-secondary-700 leading-relaxed">
                   <strong className="font-semibold text-secondary-900">
-                    Improvement recommendations on your certificate.
+                    A personalised written plan.
                   </strong>{' '}
-                  The measures, their installation costs and their yearly savings, published on your
-                  official GOV.UK certificate.
+                  Abdul explains what is holding the rating back and which improvements to
+                  consider first, based on the property assessed.
                 </span>
               </li>
               <li className="flex gap-4">
@@ -148,9 +148,9 @@ export default function EpcImprovementPlanPage() {
                   2
                 </span>
                 <span className="text-secondary-700 leading-relaxed">
-                  <strong className="font-semibold text-secondary-900">A full Energy Report.</strong>{' '}
-                  Where your money actually goes, split between heating, hot water and lighting, with
-                  your carbon rating and heat-loss figure. None of this appears on the certificate.
+                  <strong className="font-semibold text-secondary-900">The full Elmhurst Energy Report.</strong>{' '}
+                  Supporting assessment evidence, including modelled energy use and costs.
+                  These estimates use standard occupancy assumptions, not your household bills.
                 </span>
               </li>
               <li className="flex gap-4">
@@ -159,20 +159,19 @@ export default function EpcImprovementPlanPage() {
                 </span>
                 <span className="text-secondary-700 leading-relaxed">
                   <strong className="font-semibold text-secondary-900">
-                    A written plan from your assessor.
+                    Priorities and practical limitations.
                   </strong>{' '}
-                  The judgement part: which of those measures are worth doing on your building, in
-                  what order, and which to ignore.
+                  What to investigate first, how measures relate to each other, and where
+                  installer or other specialist advice is needed before proceeding.
                 </span>
               </li>
             </ol>
 
             <p className="mt-6 text-secondary-700 leading-relaxed">
-              The software’s list is generic and never explains what to do first. Because we have
-              just surveyed the property, we can rank it against what is actually there — a solid
-              wall, a flat with neighbours above and below, a period conversion — rather than a
-              template. It costs <strong className="text-secondary-900">{PLAN_PRICE}</strong> on top
-              of your EPC.
+              Standard recommendations come from the assessment software. Abdul&apos;s additional
+              plan puts them in context for your property and explains the priorities in writing.
+              It costs <strong className="text-secondary-900">{PLAN_PRICE}</strong> on top of
+              your EPC and is already included in an EPC Pre-Assessment.
             </p>
 
             <h3 className="mt-10 text-xl font-bold text-secondary-900">What it covers</h3>
@@ -190,12 +189,12 @@ export default function EpcImprovementPlanPage() {
 
             <div className="mt-8 rounded-2xl border border-warm-200 bg-warm-50 p-5">
               <p className="text-sm leading-relaxed text-secondary-800">
-                <strong className="font-semibold text-secondary-900">Please note:</strong> without
-                this add-on, your EPC is lodged with the rating and the property description but
-                without improvement recommendations. The plan itself is written guidance based on
-                professional judgement and your survey data — it is not a formal retrofit assessment
-                (PAS 2035) and not a guarantee of a future rating. Installation costs are typical
-                national ranges, not fixed quotations.
+                <strong className="font-semibold text-secondary-900">Standard recommendations are included either way.</strong>{' '}
+                A recommendation report may be omitted where there is no reasonable potential
+                for improvement; any legitimate omission follows assessment rules, not your add-on
+                choice. The plan is not a PAS 2035 retrofit assessment or an installation design.
+                Costs and savings are estimates, not quotes or guarantees. No particular rating
+                or improvement is guaranteed.
               </p>
             </div>
           </div>
@@ -262,8 +261,7 @@ export default function EpcImprovementPlanPage() {
           >
             Ask us in your enquiry
           </Link>{' '}
-          — if your property already rates B or C, we’ll tell you honestly that you probably don’t
-          need it.
+          — tell us what you want to understand and we can explain whether the plan fits that need.
         </p>
       </Section>
 

@@ -67,16 +67,10 @@ export const site = {
   /**
    * Add-on services quoted alongside an EPC.
    *
-   * `improvementPlan` covers three deliverables, not one: the improvement
-   * recommendations left on the lodged certificate, the Elmhurst Energy Report
-   * (which costs ~£9 to output and is the only source of the end-use cost
-   * split, the CO2 graph and the HTC figure), and our own written plan ranking
-   * the measures for that specific building.
-   *
-   * Priced at £35 rather than £25 as a packaging decision, not a margin one:
-   * £25 without the Energy Report nets £25, £35 with it nets £26. For the same
-   * income the customer receives materially more, so the Energy Report is
-   * always bought. It is a cost of goods, never a separate quote line.
+   * `improvementPlan` is additional personalised interpretation and priorities,
+   * supported by the full Elmhurst Energy Report. The standard EPC includes its
+   * software-generated recommendation report independently of this add-on.
+   * The Energy Report is included in the £35 product, never a separate charge.
    */
   addOns: {
     improvementPlan: 35,

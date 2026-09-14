@@ -158,9 +158,10 @@ export function ServicesOverview() {
             </span>
           </p>
           <p className="mt-1 text-sm leading-relaxed text-secondary-700">
-            Added to an EPC or Pre-Assessment. Your improvement recommendations, a full Energy
-            Report showing where the money actually goes, and a written plan ranking what is worth
-            doing on this building — and in what order.
+            Abdul&apos;s personalised plan explains what is holding the rating back and which
+            improvements to consider first, supported by the full Elmhurst Energy Report.
+            Standard EPC recommendations are included either way. The plan is already included
+            in a Pre-Assessment.
           </p>
         </div>
         <Link

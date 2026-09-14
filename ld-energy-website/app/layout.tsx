@@ -151,7 +151,7 @@ const localBusinessSchema = {
           '@type': 'Service',
           name: 'EPC Improvement Plan',
           description:
-            'Written improvement plan delivered alongside an EPC assessment: the improvement recommendations on the lodged certificate, a full Energy Report, and a prioritised plan of which measures are worth doing on the property',
+            'Optional personalised written plan explaining what is holding the EPC rating back and which improvements to consider first, supported by the full Elmhurst Energy Report. Standard EPC recommendations are included independently of this add-on.',
         },
         price: site.addOns.improvementPlan,
         priceCurrency: 'GBP',

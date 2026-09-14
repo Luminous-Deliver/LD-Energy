@@ -56,12 +56,12 @@ const personas = [
   {
     Icon: User,
     title: 'Homeowners Selling',
-    body: 'You need a valid EPC before marketing your property. Estate agents cannot legally list your home without one. We provide same-week service to avoid delaying your sale.',
+    body: 'Generally, commission an EPC before marketing your home. Exemptions and time limits apply. Tell us your listing deadline so we can confirm an available appointment.',
   },
   {
     Icon: Building2,
     title: 'Landlords',
-    body: 'MEES regulations require all rental properties to have an EPC rated E or above. Fines reach £5,000 per non-compliant property. We help landlords stay compliant with fast, transparent pricing.',
+    body: 'For domestic rentals within MEES scope, the minimum is E unless a valid exemption is registered. Current financial penalties are capped at £5,000 per property in total. An assessment establishes the rating; it does not itself guarantee compliance.',
   },
   {
     Icon: Users,
@@ -85,7 +85,7 @@ const process = [
   },
   {
     title: 'Software processing',
-    body: 'Data is processed through Elmhurst SAP (RdSAP 10), the same software used by all registered UK assessors.',
+    body: 'The assessment data is processed through Elmhurst’s government-approved RdSAP software. The software calculates the rating and standard recommendations for the property.',
   },
   {
     title: 'Certificate delivered',
@@ -105,7 +105,7 @@ const assessed = [
   'Heating controls and programmer',
   'Hot water system and cylinder insulation',
   'Ventilation systems',
-  'Lighting (count of low-energy fittings)',
+  'Lighting (lamp counts and types in permanent fittings)',
   'Renewable energy systems (solar PV, heat pumps, etc.)',
 ]
 
@@ -116,7 +116,7 @@ const serviceFaq: FaqItem[] = [
   },
   {
     q: 'Can I get a next-day EPC?',
-    a: `Yes. Add our next-day service for £${EXPRESS_SURCHARGE} and your certificate is lodged within 24 hours of the assessment rather than the standard 72. Book before noon for the best chance of a same-day or next-morning appointment.`,
+    a: `Yes. Add our next-day service for £${EXPRESS_SURCHARGE} and your certificate is lodged within 24 hours of the assessment rather than the standard 72. Appointment availability and delivery timing are confirmed before booking.`,
   },
   {
     q: 'How long does an EPC assessment take?',
@@ -124,7 +124,7 @@ const serviceFaq: FaqItem[] = [
   },
   {
     q: 'Do I legally need an EPC?',
-    a: 'Yes. You must have a valid EPC before marketing a property for sale or letting it to a new tenant. Estate agents cannot legally list a property without one, and landlords currently face fines of up to £5,000 per property for letting without a compliant EPC (the government has proposed raising this to £30,000 under future EPC C standards).',
+    a: 'Generally, commission an EPC before marketing a home for sale or rent; exemptions and time limits apply. Reasonable efforts must be made to obtain it within seven days, with a further 21 days allowed if those efforts fail. Domestic MEES duties apply separately to rentals within scope: the current minimum is E unless a valid exemption is registered.',
   },
   {
     q: 'How long is an EPC valid for?',

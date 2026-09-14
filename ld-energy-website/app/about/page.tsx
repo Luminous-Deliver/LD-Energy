@@ -72,7 +72,7 @@ const credentials = [
   {
     Icon: FileText,
     title: 'Elmhurst SAP Software',
-    body: 'We assess using Elmhurst SAP with the current RdSAP 10 methodology (October 2025+), the same official software used by all government-approved UK assessors.',
+    body: 'We use Elmhurst’s government-approved software with RdSAP 10, the methodology approved for existing dwellings in England and Wales from 15 June 2025. Other accredited assessors may use other approved software.',
   },
   {
     Icon: Award,

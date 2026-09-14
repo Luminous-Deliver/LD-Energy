@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: `EPC Pre-Assessment London | From ${FROM_PRICE} | L&D Energy`,
     description:
-      `A full EPC survey that is never lodged, so no certificate is published. Your score, what is holding it back, and a written plan to improve it. From ${FROM_PRICE}.`,
+      `A full survey deliberately not lodged as part of this service, so no certificate is published. Your score, what is holding it back, and a written plan to improve it. From ${FROM_PRICE}.`,
     url: `${site.url}/services/epc-pre-assessment`,
   },
   twitter: {
@@ -38,9 +38,9 @@ const breadcrumbs = [
 
 const included = [
   'A full survey of the property by an Elmhurst-accredited assessor — the same visit and the same measuring as a real EPC',
-  'The rating and score the property would receive today',
+  'The score calculated from the assessed property data',
   'A full breakdown of what is helping and what is holding the score back',
-  'A written Improvement Plan: which measures are worth doing on your building, what they cost, and the order to do them in',
+  'Abdul’s personalised Improvement Plan and full Elmhurst Energy Report: priorities, indicative costs and modelled outcomes',
   'Nothing lodged, nothing published — no entry appears on the GOV.UK register',
 ]
 
@@ -53,12 +53,12 @@ const audience = [
   {
     Icon: ShieldAlert,
     title: 'Landlords checking MEES',
-    body: 'You suspect the property is below band E and want to know before anything is on the public record. A pre-assessment tells you the gap and what closes it.',
+    body: 'You suspect the property is below band E and want to know before anything is on the public record. A pre-assessment helps you understand the assessed property, but does not replace an EPC or satisfy MEES duties.',
   },
   {
     Icon: Scale,
     title: 'Buyers weighing a purchase',
-    body: 'Considering a property with no valid EPC, or an old one. Understand the real running costs and the cost of improvement before you commit.',
+    body: 'Considering a property with no valid EPC, or an old one. Review modelled energy costs and possible improvement priorities before you commit; actual bills and installation prices will differ.',
   },
 ]
 
@@ -124,12 +124,12 @@ export default function EpcPreAssessmentPage() {
               What it is
             </div>
             <h2 className="mt-3 text-3xl md:text-4xl font-bold tracking-tight text-secondary-900">
-              An EPC that never gets published
+              A private assessment, not a lodged EPC
             </h2>
             <p className="mt-5 text-lg text-secondary-700 leading-relaxed">
-              Once an EPC is lodged it is public, and it stays on the register for ten years. That
-              is exactly what you want when the property is ready. It is the wrong order if you are
-              about to improve it.
+              A lodged EPC is normally valid for ten years unless replaced; historical records may
+              remain on the register longer. A pre-assessment is private advisory work. It does not
+              postpone a legal duty to obtain an EPC, even if improvements are planned.
             </p>
             <p className="mt-4 text-secondary-700 leading-relaxed">
               A pre-assessment is the same survey by the same accredited assessor, with one
@@ -158,7 +158,8 @@ export default function EpcPreAssessmentPage() {
               survey for{' '}
               <strong className="text-secondary-900">{LODGE_LATER}</strong> without coming back —
               provided nothing about the property has changed since the visit, and the survey is
-              still current. Ask us and we will confirm what is possible for your timing.
+              still valid for lodgement under the applicable scheme and methodology rules. Ask us
+              to confirm this before relying on the later-lodgement option.
             </p>
             <p className="mt-3 text-secondary-700 leading-relaxed">
               If work <em>has</em> been done — an extension, new windows, new heating, new
@@ -180,8 +181,8 @@ export default function EpcPreAssessmentPage() {
                   domestic EPC
                 </Link>{' '}
                 instead. A pre-assessment also cannot produce a better rating than the property
-                earns — the score comes from government-approved software, and the only way to move
-                it is to change the building.
+                earns. The score comes from approved software and the evidence recorded; changes to
+                evidence or methodology can also affect a later rating without physical works.
               </p>
             </div>
           </div>

@@ -34,11 +34,10 @@ export interface GuideEstimate {
   /** Positive when EPC + Floor Plan are bundled. */
   bundleDiscount: number
   express: number
-  /** Not-lodged full survey. Same visit and measuring as an EPC, so the same
-   *  band price; only the ~£9 lodgement is saved. */
+  /** Not-lodged full survey, priced on the same floor-area bands as an EPC. */
   preAssessment: number
-  /** Improvement Plan add-on: recommendations kept on the certificate, plus
-   *  the Energy Report and our written plan. Produced after the visit.
+  /** Additional personalised plan supported by the full Elmhurst Energy Report.
+   *  Standard EPC recommendations are included either way. Produced after the visit.
    *  Zero when it is bundled into a Pre-Assessment — see `planIncluded`. */
   improvementPlan: number
   /** True when the plan comes free inside a Pre-Assessment. Without a

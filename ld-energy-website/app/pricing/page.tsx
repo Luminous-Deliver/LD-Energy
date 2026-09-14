@@ -42,12 +42,12 @@ const included = [
   'On-site assessment by an Elmhurst-accredited DEA',
   'Official lodgement on the UK Government EPC Register',
   'Certificate link sent once lodged on the government register',
-  'Full data report',
+  'Standard software-generated EPC recommendation report, where applicable',
   'No call-out or mileage charge within our normal service area',
 ]
 
 const notIncluded = [
-  `Energy improvement recommendations — available with the £${site.addOns.improvementPlan} EPC Improvement Plan`,
+  `Optional personalised EPC Improvement Plan and full Elmhurst Energy Report — £${site.addOns.improvementPlan} extra`,
   'Re-visits due to access issues, charged at £25 per visit',
   'Properties outside our normal service area (contact for a quote)',
 ]
@@ -79,11 +79,11 @@ const pricingFaq: FaqItem[] = [
   },
   {
     q: 'Does my EPC include improvement recommendations?',
-    a: `Not as standard. Your certificate shows the energy rating and a full description of the property — walls, windows, heating, hot water and lighting. Improvement recommendations come with the £${site.addOns.improvementPlan} EPC Improvement Plan, which also includes a full Energy Report and a written plan ranking which measures are worth doing on your building and in what order. You can add it when you book, or decide on the day before we lodge.`,
+    a: `Yes. Your standard EPC includes its software-generated recommendation report at no extra charge, unless there is no reasonable potential for improvements. The optional £${site.addOns.improvementPlan} EPC Improvement Plan adds Abdul's personalised interpretation and priorities, supported by the full Elmhurst Energy Report. It explains what is holding the rating back and which improvements to consider first. It does not guarantee a rating or savings.`,
   },
   {
     q: 'How much is an EPC Pre-Assessment?',
-    a: `The same as the EPC for that floor-area band — from £${pricing[0].epc} — because it is the same visit, the same measuring and the same evidence gathering; only the lodgement is skipped. The Energy Report and the written Improvement Plan are included rather than charged on top. If you later decide you want the certificate after all, we can usually lodge the same survey for £${site.addOns.lodgeLater} with no second visit, provided nothing at the property has changed. It is not a substitute for an EPC where one is legally required.`,
+    a: `The same as the EPC for that floor-area band — from £${pricing[0].epc} — because it is the same visit, the same measuring and the same evidence gathering; only the lodgement is skipped. The Energy Report and the written Improvement Plan are included rather than charged on top. If you later decide you want the certificate after all, we can usually lodge the same survey for £${site.addOns.lodgeLater} with no second visit, provided nothing at the property has changed and the survey remains valid for lodgement under applicable rules. It is not a substitute for an EPC where one is legally required.`,
   },
   {
     q: 'Do you charge for travel?',
@@ -95,7 +95,7 @@ const pricingFaq: FaqItem[] = [
   },
   {
     q: 'What is the next-day service?',
-    a: `For £${EXPRESS_SURCHARGE} extra per EPC, your certificate is lodged within 24 hours of the assessment rather than the standard 72. This applies to assessments completed during our standard hours (Mon–Sun, 8am–8pm). Book before noon for the best chance of a same-day or next-morning appointment.`,
+    a: `For £${EXPRESS_SURCHARGE} extra per EPC, your certificate is lodged within 24 hours of the assessment rather than the standard 72. This applies to assessments completed during our standard hours (Mon–Sun, 8am–8pm). Appointment availability and the delivery deadline are confirmed before booking.`,
   },
   {
     q: 'How much does a floor plan cost?',

@@ -32,7 +32,7 @@ const breadcrumbs = [
 ]
 
 const included = [
-  'Accurate measurements using laser distance tools',
+  'On-site laser measurements, with approximate dimensions shown',
   'Individual room dimensions',
   'Total floor area (gross internal area)',
   'Room labels and layout',
@@ -67,7 +67,7 @@ const serviceSchema = {
   serviceType: 'Property Floor Plan',
   name: 'Professional Property Floor Plans',
   description:
-    'Accurate, professionally measured floor plans for property marketing across London.',
+    'Professionally measured illustrative floor plans for property marketing across London, with approximate dimensions. Not architectural or legal plans.',
   provider: { '@id': `${site.url}/#business` },
   url: `${site.url}/services/floor-plans`,
   areaServed: areaServedLondon,
@@ -123,7 +123,7 @@ export default function FloorPlansPage() {
             Why Floor Plans?
           </h2>
           <p className="mt-5 text-lg text-secondary-700 leading-relaxed">
-            Floor plans help buyers and tenants visualise property layout before viewing. Properties marketed with floor plans receive significantly more enquiries than those without. Estate agents widely consider floor plans essential for serious listings. A professional floor plan shows room dimensions, layout flow, total floor area, and key features, helping potential buyers make faster decisions.
+            Floor plans help buyers and tenants understand the layout before viewing. They show room dimensions, floor area and key features to support a property listing.
           </p>
         </div>
       </Section>
@@ -141,6 +141,12 @@ export default function FloorPlansPage() {
             </h2>
             <p className="mt-5 text-secondary-700 leading-relaxed">
               Every floor plan we produce is measured on-site with laser tools and drawn in professional software.
+            </p>
+            <p className="mt-4 text-secondary-700 leading-relaxed">
+              Plans are for marketing and illustration. Dimensions and areas are approximate,
+              not architectural measurements or legal boundaries. EPC floor area may differ
+              because EPC measurement conventions differ. Check dimensions independently before
+              relying on them for a purchase, fit-out or building work.
             </p>
             <ul className="mt-6 space-y-2.5">
               {included.map((item) => (

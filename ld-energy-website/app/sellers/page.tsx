@@ -24,18 +24,18 @@ import type { FaqItem } from '@/lib/faq'
 export const metadata: Metadata = {
   title: `EPC for Selling Your Home London | From £${priceFrom.epc}`,
   description:
-    `EPC certificates for selling your London home. Required by law before marketing. Lodged within 72 hours, next-day available. Guide prices from £${priceFrom.epc}.`,
+    `EPC certificates for selling your London home. Generally commissioned before marketing; exemptions apply. Lodged within 72 hours, next-day available. Guide prices from £${priceFrom.epc}.`,
   alternates: { canonical: `${site.url}/sellers` },
   openGraph: {
     title: `EPC for Selling Your Home London | From £${priceFrom.epc} | L&D Energy`,
     description:
-      `EPC certificates for selling your London home. Required by law before marketing. Lodged within 72 hours, next-day available. Guide prices from £${priceFrom.epc}.`,
+      `EPC certificates for selling your London home. Generally commissioned before marketing; exemptions apply. Lodged within 72 hours, next-day available. Guide prices from £${priceFrom.epc}.`,
     url: `${site.url}/sellers`,
   },
   twitter: {
     title: `EPC for Selling Your Home London | From £${priceFrom.epc}`,
     description:
-      'EPC certificates for selling your London home. Required by law before marketing. Book today.',
+      'EPC certificates for selling your London home. Generally commissioned before marketing; exemptions apply. Book today.',
   },
 }
 
@@ -82,7 +82,7 @@ const improvements = [
   {
     Icon: Sun,
     title: 'Renewables',
-    body: 'Solar PV or a heat pump can move a property up several bands, useful if you’re aiming for EPC C or above.',
+    body: 'Solar PV or a heat pump may be suitable, depending on the building and system design. A particular rating gain is not guaranteed.',
   },
 ]
 
@@ -90,7 +90,7 @@ const whyMatters = [
   {
     Icon: Clock,
     title: 'Legal requirement',
-    body: 'You must have an EPC commissioned before your property is marketed for sale in England and Wales, and your estate agent cannot legally list it without one.',
+    body: 'Generally, an EPC must be commissioned before marketing a home for sale in England and Wales. The rules allow limited time to obtain it; exemptions apply.',
   },
   {
     Icon: TrendingUp,
@@ -119,7 +119,7 @@ const serviceSchema = {
   serviceType: 'Energy Performance Certificate',
   name: 'EPC for Selling a Home',
   description:
-    'Domestic EPC certificates for homeowners selling in London. Legally required before marketing, delivered within 72 hours or next day.',
+    'Domestic EPC certificates for homeowners selling in London. Generally commissioned before marketing, subject to exemptions. Appointment and delivery timing confirmed before booking.',
   provider: { '@id': `${site.url}/#business` },
   url: `${site.url}/sellers`,
   areaServed: areaServedLondon,
@@ -134,7 +134,7 @@ const serviceSchema = {
 const sellerFaq: FaqItem[] = [
   {
     q: 'Do I need the EPC before or after I list my home?',
-    a: 'Before. You must have commissioned an EPC before your property is marketed for sale — estate agents cannot legally advertise your home on Rightmove, Zoopla or any portal without one. Booking it early means nothing delays your listing going live.',
+    a: 'Generally, commission the EPC before marketing. Make reasonable efforts to obtain it within seven days; a further 21 days is allowed if those efforts fail. Exemptions apply. Arranging it early helps avoid delays.',
   },
   {
     q: 'Should I arrange the EPC myself or leave it to my estate agent?',
@@ -150,7 +150,7 @@ const sellerFaq: FaqItem[] = [
   },
   {
     q: 'I already have an EPC from when I bought the property — can I reuse it?',
-    a: 'Yes, as long as it is still within its 10-year validity. The certificate is tied to the property, not the owner. If it has expired, or you have made significant changes since, you will need a fresh assessment before marketing.',
+    a: 'Yes, as long as it is still within its 10-year validity. The certificate is tied to the property, not the owner. If it has expired and an EPC is required, commission a new one before marketing. Improvements do not automatically invalidate an EPC, but a fresh assessment can record the changed property.',
   },
 ]
 
@@ -192,7 +192,7 @@ export default function SellersPage() {
             Why You Need an EPC to Sell
           </h2>
           <p className="mt-5 text-lg text-secondary-700 leading-relaxed">
-            An EPC is legally required before any residential property is marketed for sale in England and Wales. It must be commissioned before your property is advertised and provided to potential buyers on request.
+            An EPC generally must be commissioned before a home is marketed for sale in England and Wales. It must be obtained within the applicable time limits and provided to prospective buyers as required; exemptions apply.
           </p>
           <p className="mt-4 text-secondary-700 leading-relaxed">
             You can book directly with us, often faster and cheaper than an agent-arranged panel provider, and if

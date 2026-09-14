@@ -44,7 +44,7 @@ export default function TermsPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageSchema) }} />
       <LegalPage
       title="Terms of Service"
-      lastUpdated="May 2026"
+      lastUpdated="14 September 2026"
       breadcrumbs={[
         { href: '/', label: 'Home' },
         { href: '/terms', label: 'Terms of Service' },
@@ -59,13 +59,17 @@ export default function TermsPage() {
         We provide Domestic Energy Performance Certificates (EPCs) and professional property floor plans for residential properties in our service area. EPCs are produced by an Elmhurst-accredited Domestic Energy Assessor (DEA) and lodged on the UK Government EPC Register.
       </p>
       <p>
-        We also provide two optional services. The <strong>EPC Improvement Plan</strong> is an add-on to an EPC: your improvement recommendations are retained on the lodged certificate, and we additionally supply an Energy Report and a written plan prioritising the recommended measures for the property. The <strong>EPC Pre-Assessment</strong> is a full survey that is deliberately <strong>not</strong> lodged, so no certificate is produced or published; it includes the Energy Report and the written plan. Section 5 sets out the terms specific to it.
+        We also provide two optional services. The <strong>EPC Improvement Plan</strong> adds Abdul&apos;s personalised written interpretation and prioritisation, supported by the full Elmhurst Energy Report, for {`£${site.addOns.improvementPlan}`}. It explains what is holding the rating back and which improvements to consider first. The <strong>EPC Pre-Assessment</strong> is a full survey that is deliberately <strong>not</strong> lodged, so no certificate is produced or published; it includes the Energy Report and the written plan. Section 5 sets out the terms specific to it.
       </p>
       <p>
-        An EPC supplied without the Improvement Plan add-on is lodged with the energy rating and the property description, but without improvement recommendations. This is stated on our pricing page and confirmed before booking.
+        A standard EPC includes its software-generated recommendation report at no additional charge, unless there is no reasonable potential for energy performance improvements. Any legitimate omission must follow the applicable assessment rules, regardless of whether you buy the Improvement Plan. The optional plan does not unlock standard recommendations and does not guarantee a rating or savings.
       </p>
       <p>
         Your energy rating is calculated by government-approved RdSAP software from the data recorded at the assessment. We collect and submit that data accurately; we cannot select, influence or adjust the rating the software produces, and we do not guarantee any particular rating or band. Ratings produced under RdSAP 10, the methodology in use since June 2025, are not directly comparable with certificates issued before that date.
+      </p>
+
+      <p>
+        Floor plans are for property marketing and illustration. Dimensions and areas are approximate; the plans are not architectural drawings or documents for legal boundaries or construction. Floor-plan area may differ from EPC floor area because EPC measurement conventions differ. Check dimensions independently before relying on them for a purchase, fit-out or building work.
       </p>
 
       <h2>2. Booking and pricing</h2>
@@ -111,7 +115,7 @@ export default function TermsPage() {
         Because it is the same visit, the same measuring and the same evidence gathering, a Pre-Assessment is priced on the same floor-area bands as an EPC. The Energy Report and the written Improvement Plan are included in that price.
       </p>
       <p>
-        If you subsequently decide you want a lodged certificate, we can in most cases lodge the same survey for {`£${site.addOns.lodgeLater}`} without a further visit. That price is conditional on <strong>both</strong> of the following: nothing about the property has changed since the survey, and the survey data is still current enough to lodge. Where work has been carried out since the assessment &mdash; including an extension, a loft conversion, replacement glazing, a new or altered heating system, or added insulation &mdash; the recorded data no longer reflects the property, and a fresh visit with new photographs and measurements is required, priced as a new EPC. We will tell you which applies before taking payment.
+        If you subsequently decide you want a lodged certificate, we can in most cases lodge the same survey for {`£${site.addOns.lodgeLater}`} without a further visit. That price is conditional on <strong>both</strong> of the following: nothing about the property has changed since the survey, and the survey data remains valid for lodgement under the applicable scheme and methodology rules. Where work has been carried out since the assessment &mdash; including an extension, a loft conversion, replacement glazing, a new or altered heating system, or added insulation &mdash; the recorded data no longer reflects the property, and a fresh visit with new photographs and measurements is required, priced as a new EPC. We will tell you which applies before taking payment.
       </p>
       <p>
         We cannot influence, select or withhold the rating a Pre-Assessment produces. It is generated by the same government-approved software as an EPC, from the same data, and a Pre-Assessment is not a means of obtaining a more favourable rating.
