@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter, Plus_Jakarta_Sans, Fraunces } from 'next/font/google'
 import { Header } from '@/components/layout/Header'
-import { Footer } from '@/components/layout/Footer'
-import { MobileCallBar } from '@/components/layout/MobileCallBar'
+import { CompactFooter } from '@/components/layout/CompactFooter'
+import { MobileQuoteBar } from '@/components/layout/MobileQuoteBar'
 import { WebAnalytics } from '@/components/layout/WebAnalytics'
 import { LondonSkyline } from '@/components/ui/LondonSkyline'
 import { site, pricing, priceFrom, EXPRESS_SURCHARGE } from '@/lib/site'
@@ -242,8 +242,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </main>
         {/* Skyline transition, ivory canvas fades into forest dark */}
         <LondonSkyline className="text-[#0D1B33] -mb-1" />
-        <Footer />
-        <MobileCallBar />
+        <CompactFooter />
+        <MobileQuoteBar />
         <WebAnalytics token={cfBeaconToken} />
       </body>
     </html>
