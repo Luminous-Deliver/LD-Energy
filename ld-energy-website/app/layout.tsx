@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter, Plus_Jakarta_Sans, Fraunces } from 'next/font/google'
+import { Inter, Fraunces } from 'next/font/google'
 import { Header } from '@/components/layout/Header'
 import { CompactFooter } from '@/components/layout/CompactFooter'
 import { MobileQuoteBar } from '@/components/layout/MobileQuoteBar'
@@ -16,18 +16,12 @@ const inter = Inter({
   display: 'swap',
 })
 
-const jakarta = Plus_Jakarta_Sans({
-  subsets: ['latin'],
-  variable: '--font-jakarta',
-  display: 'swap',
-})
-
 // Editorial display serif for headlines, warm, optical, distinctly not-Inter.
 const fraunces = Fraunces({
   subsets: ['latin'],
   variable: '--font-serif',
   display: 'swap',
-  axes: ['SOFT', 'opsz'],
+  axes: ['opsz'],
 })
 
 export const metadata: Metadata = {
@@ -164,7 +158,7 @@ const localBusinessSchema = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const cfBeaconToken = process.env.NEXT_PUBLIC_CF_BEACON_TOKEN
   return (
-    <html lang="en-GB" className={`${inter.variable} ${jakarta.variable} ${fraunces.variable}`}>
+    <html lang="en-GB" className={`${inter.variable} ${fraunces.variable}`}>
       <head>
         <script
           type="application/ld+json"

@@ -101,13 +101,14 @@ function ServicesDropdown() {
                 <ul>
                   {group.links.map((item) => (
                     <li key={item.href}>
-                      <Link
+                      <Link prefetch={false}
+
                         href={item.href}
                         onClick={() => setOpen(false)}
                         className="flex flex-col px-4 py-2.5 hover:bg-primary-50 transition-colors group"
                       >
                         <span className="text-sm font-semibold text-secondary-900 group-hover:text-primary-700">{item.label}</span>
-                        <span className="text-xs text-secondary-500 mt-0.5">{item.desc}</span>
+                        <span className="text-sm text-secondary-600 mt-0.5">{item.desc}</span>
                       </Link>
                     </li>
                   ))}
@@ -130,24 +131,20 @@ export function Header() {
     // pattern, a dark hero) with no scroll-triggered colour flip needed.
     <header
       className={cn(
-        'sticky top-0 z-40 pt-3 md:pt-4 transition-transform duration-300 will-change-transform',
+        'sticky top-0 z-40 pt-3 md:pt-4 transition-transform duration-300 will-change-transform focus-within:translate-y-0',
         hidden ? '-translate-y-[150%] lg:translate-y-0' : 'translate-y-0',
       )}
     >
       <Container as="div">
-        {/* overflow-hidden: a rounded pill has nothing behind it to catch
-            overflow the way a full-width bar did -- anything that doesn't
-            fit spills visibly onto the hero/page background around it
-            instead of just extending an edge-to-edge white strip. The
-            lg-everything breakpoints below are the real fix (nothing tries
-            to cram in past its available width); this is the safety net. */}
-        <div className="flex items-center justify-between gap-3 overflow-hidden rounded-full bg-white/90 ring-1 ring-secondary-900/5 shadow-premium-lg backdrop-blur-md px-4 py-2.5 md:px-5">
-          <Logo size="sm" />
+        {/* Keep navigation disclosures and enlarged text outside the rounded background unclipped. */}
+        <div className="flex items-center justify-between gap-3 rounded-[2rem] bg-white/90 ring-1 ring-secondary-900/5 shadow-premium-lg backdrop-blur-md px-4 py-2.5 md:px-5">
+          <Logo size="sm" priority />
 
           <nav aria-label="Primary" className="hidden lg:flex items-center gap-6">
             <ServicesDropdown />
             {topNav.map((link) => (
-              <Link
+              <Link prefetch={false}
+
                 key={link.href}
                 href={link.href}
                 className="inline-flex min-h-[44px] items-center text-sm font-medium text-secondary-700 hover:text-primary-700 transition-colors"

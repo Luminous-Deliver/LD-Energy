@@ -67,6 +67,7 @@ export const Button = forwardRef<HTMLElement, ButtonProps>(function Button(
     return (
       <Link
         ref={ref as React.Ref<HTMLAnchorElement>}
+        prefetch={false}
         href={href}
         className={classes}
         {...rest}

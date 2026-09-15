@@ -22,6 +22,14 @@ export function MobileNav() {
     setMounted(true)
   }, [])
 
+  // A desktop resize must not leave an invisible modal focus trap active.
+  useEffect(() => {
+    const desktop = window.matchMedia('(min-width: 1024px)')
+    const closeOnDesktop = () => { if (desktop.matches) setOpen(false) }
+    desktop.addEventListener('change', closeOnDesktop)
+    return () => desktop.removeEventListener('change', closeOnDesktop)
+  }, [])
+
   // Scroll lock
   useEffect(() => {
     if (!open) return
@@ -109,12 +117,12 @@ export function MobileNav() {
           aria-label="Navigation menu"
           style={{ backgroundColor: '#ffffff' }}
           className={cn(
-            'absolute right-0 top-0 h-full w-4/5 max-w-sm bg-white shadow-2xl flex flex-col transition-transform duration-200',
+            'absolute right-0 top-0 h-full w-full max-w-sm overflow-y-auto bg-white shadow-2xl flex flex-col transition-transform duration-200',
             open ? 'translate-x-0' : 'translate-x-full',
           )}
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-4 h-14 border-b border-secondary-100 shrink-0 bg-white">
+          <div className="sticky top-0 z-10 flex items-center justify-between gap-3 px-4 min-h-14 py-1 border-b border-secondary-100 shrink-0 bg-white">
             <span className="font-display font-bold text-secondary-900">{site.name}</span>
             <button
               ref={closeRef}
@@ -130,23 +138,24 @@ export function MobileNav() {
 
 
           {/* Nav */}
-          <nav aria-label="Mobile" className="flex-1 min-h-0 overflow-y-auto px-3 py-2 bg-white">
+          <nav aria-label="Mobile" className="shrink-0 px-3 py-2 bg-white">
             {servicesMenu.map((group) => (
               <div key={group.heading}>
-                <p className="px-3 pt-3 pb-1 text-xs font-bold uppercase tracking-widest text-secondary-600">
+                <p className="px-3 pt-3 pb-1 text-sm font-bold uppercase tracking-widest text-secondary-600">
                   {group.heading}
                 </p>
                 <ul className="flex flex-col mb-1">
                   {group.links.map((link) => (
                     <li key={link.href}>
-                      <Link
+                      <Link prefetch={false}
+
                         href={link.href}
                         onClick={close}
                         tabIndex={open ? undefined : -1}
                         className="flex min-h-[44px] flex-col justify-center w-full px-3 py-2.5 rounded-lg hover:bg-primary-50 transition-colors group"
                       >
-                        <span className="text-[15px] font-semibold text-secondary-800 group-hover:text-primary-700">{link.label}</span>
-                        <span className="text-xs text-secondary-600">{link.desc}</span>
+                        <span className="text-base font-semibold text-secondary-800 group-hover:text-primary-700">{link.label}</span>
+                        <span className="text-sm text-secondary-600">{link.desc}</span>
                       </Link>
                     </li>
                   ))}
@@ -160,11 +169,12 @@ export function MobileNav() {
             <ul className="flex flex-col">
               {[...topNav, { href: '/about', label: 'About' }].map((link) => (
                 <li key={link.href}>
-                  <Link
+                  <Link prefetch={false}
+
                     href={link.href}
                     onClick={close}
                     tabIndex={open ? undefined : -1}
-                    className="flex min-h-[44px] items-center w-full px-3 py-2.5 rounded-lg text-[15px] font-semibold text-secondary-800 hover:bg-secondary-50 hover:text-primary-700 transition-colors"
+                    className="flex min-h-[44px] items-center w-full px-3 py-2.5 rounded-lg text-base font-semibold text-secondary-800 hover:bg-secondary-50 hover:text-primary-700 transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -175,15 +185,16 @@ export function MobileNav() {
 
           {/* Contact + CTA Footer */}
           <div className="shrink-0 border-t border-secondary-100 bg-secondary-50/50 p-4 flex flex-col gap-3">
-            <Link
+            <Link prefetch={false}
+
               href={pathname === '/contact' ? '#booking-form' : quoteHref({ ...quoteContextForPath(pathname), ctaId: 'mobile-menu' })}
               onClick={close}
               tabIndex={open ? undefined : -1}
-              className="flex items-center justify-center w-full bg-gradient-to-r from-accent-600 to-accent-700 hover:from-accent-700 hover:to-accent-800 text-white font-bold px-4 py-3.5 rounded-xl shadow-md text-[15px]"
+              className="flex items-center justify-center w-full bg-gradient-to-r from-accent-600 to-accent-700 hover:from-accent-700 hover:to-accent-800 text-white font-bold px-4 py-3.5 rounded-xl shadow-md text-base"
             >
               Get my exact quote
             </Link>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="flex flex-wrap gap-2">
               <a
                 href={site.phoneHref}
                 tabIndex={open ? undefined : -1}
@@ -195,7 +206,7 @@ export function MobileNav() {
               <a
                 href={site.whatsappHref}
                 tabIndex={open ? undefined : -1}
-                className="flex min-h-[44px] items-center justify-center gap-1.5 bg-[#25D366] hover:bg-[#20bd5a] text-white text-sm font-semibold px-3 py-2.5 rounded-lg transition-colors"
+                className="flex min-h-[44px] items-center justify-center gap-1.5 bg-white border border-secondary-200 hover:bg-secondary-100 text-secondary-800 text-sm font-semibold px-3 py-2.5 rounded-lg transition-colors"
               >
                 <MessageCircle className="w-4 h-4 shrink-0" aria-hidden="true" />
                 WhatsApp

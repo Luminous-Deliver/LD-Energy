@@ -7,6 +7,7 @@ interface LogoProps {
   href?: string | null
   variant?: 'dark' | 'light'
   size?: 'sm' | 'md' | 'lg'
+  priority?: boolean
 }
 
 const displayHeights: Record<string, string> = {
@@ -15,14 +16,14 @@ const displayHeights: Record<string, string> = {
   lg: 'h-14 md:h-16',
 }
 
-export function Logo({ className, href = '/', variant = 'dark', size = 'md' }: LogoProps) {
+export function Logo({ className, href = '/', variant = 'dark', size = 'md', priority = false }: LogoProps) {
   const img = (
     <Image
-      src="/logo.webp"
+      src="/logo.svg"
       alt="L&D Energy"
       width={552}
       height={240}
-      priority
+      priority={priority}
       className={cn(
         'block max-w-full object-contain w-auto',
         displayHeights[size],
@@ -38,7 +39,7 @@ export function Logo({ className, href = '/', variant = 'dark', size = 'md' }: L
   if (!href) return content
 
   return (
-    <Link href={href} aria-label="L&D Energy — home" className="inline-flex min-w-0">
+    <Link prefetch={false} href={href} aria-label="L&D Energy — home" className="inline-flex min-w-0">
       {content}
     </Link>
   )
