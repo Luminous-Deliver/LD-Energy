@@ -101,7 +101,7 @@ export default async function BlogPostPage({ params }: PageProps) {
           worksFor: { '@id': `${site.url}/#business` },
         }
       : undefined,
-    publisher: { '@id': `${site.url}/#organization` },
+    publisher: { '@id': `${site.url}/#business` },
     datePublished: post.publishedAt,
     dateModified: post.updatedAt || post.publishedAt,
     image: post.ogImage ? `${site.url}${post.ogImage}` : `${site.url}/opengraph-image`,

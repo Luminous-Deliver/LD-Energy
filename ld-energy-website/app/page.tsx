@@ -36,7 +36,7 @@ const websiteSchema = {
   url: site.url,
   name: site.name,
   description: site.description,
-  publisher: { '@id': `${site.url}/#organization` },
+  publisher: { '@id': `${site.url}/#business` },
   // No potentialAction/SearchAction: the Sitelinks Search Box it targeted was
   // retired in 2024, and the urlTemplate pointed at /areas/{query}, which 404s
   // for anything that is not an exact borough slug.

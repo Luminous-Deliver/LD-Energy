@@ -27,7 +27,7 @@ const webPageSchema = {
   name: 'Terms of Service',
   url: `${site.url}/terms`,
   description: 'Terms of service governing the supply of EPC certificates and floor plans by L&D Energy.',
-  publisher: { '@id': `${site.url}/#organization` },
+  publisher: { '@id': `${site.url}/#business` },
   inLanguage: 'en-GB',
   breadcrumb: {
     '@type': 'BreadcrumbList',

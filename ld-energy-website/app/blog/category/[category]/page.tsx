@@ -71,7 +71,7 @@ export default async function BlogCategoryPage({ params }: PageProps) {
     name: `${cat.name}, EPC Guides`,
     description: cat.description,
     url: `${site.url}/blog/category/${cat.slug}`,
-    publisher: { '@id': `${site.url}/#organization` },
+    publisher: { '@id': `${site.url}/#business` },
     hasPart: posts.map((p) => ({
       '@type': 'Article',
       headline: p.title,

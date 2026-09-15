@@ -7,6 +7,7 @@ import { WebAnalytics } from '@/components/layout/WebAnalytics'
 import { LondonSkyline } from '@/components/ui/LondonSkyline'
 import { site, pricing, priceFrom, EXPRESS_SURCHARGE } from '@/lib/site'
 import { boroughMeta } from '@/lib/boroughs'
+import { assessorSchema } from '@/lib/assessor-schema'
 import './globals.css'
 
 const inter = Inter({
@@ -101,22 +102,13 @@ const localBusinessSchema = {
     latitude: site.geo.lat,
     longitude: site.geo.lng,
   },
-  openingHoursSpecification: {
-    '@type': 'OpeningHoursSpecification',
-    dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-    opens: '08:00',
-    closes: '20:00',
-  },
   areaServed: [
     { '@type': 'City', name: 'London' },
     ...Object.values(boroughMeta).map((b) => ({ '@type': 'AdministrativeArea', name: b.name, containedInPlace: { '@type': 'City', name: 'London' } })),
   ],
   priceRange: '££',
   currenciesAccepted: 'GBP',
-  paymentAccepted: 'Cash, Credit Card, Bank Transfer',
-  // Local pack signals: map/profile link, service radius from the Stratford base,
-  // and the languages we can actually serve enquiries in.
-  hasMap: site.reviews.profileUrl,
+  paymentAccepted: 'Credit Card, Bank Transfer',
   // No aggregateRating. Google's review-snippet policy disallows self-serving
   // review markup — content a business publishes about itself — and the rating
   // was emitted on all 72 URLs while being visible on one. Star ratings in the
@@ -136,7 +128,7 @@ const localBusinessSchema = {
       })),
       {
         '@type': 'Offer',
-        itemOffered: { '@type': 'Service', name: 'Next-Day EPC Service', description: 'Certificate lodged within 24 hours of the assessment' },
+        itemOffered: { '@type': 'Service', name: 'Next-Day EPC Service', description: 'Optional next-day lodgement, subject to confirmed availability before booking' },
         priceSpecification: { '@type': 'PriceSpecification', price: EXPRESS_SURCHARGE, priceCurrency: 'GBP', description: 'Additional charge on top of the confirmed EPC price' },
       },
       ...pricing.map((p) => ({
@@ -158,64 +150,14 @@ const localBusinessSchema = {
       },
     ],
   },
-  hasCredential: {
-    '@type': 'EducationalOccupationalCredential',
-    credentialCategory: 'Domestic Energy Assessor Accreditation',
-    identifier: site.assessor.accreditationNumber,
-    recognizedBy: { '@type': 'Organization', name: site.assessor.scheme },
-  },
-  // Sole trader: the operator IS the assessor. Expressed as founder rather
-  // than legalName, which would imply a registered company.
+  // One LocalBusiness node also represents the organisation. The Person owns the credential.
   founder: { '@id': `${site.url}/about#assessor` },
-  employee: {
-    '@type': 'Person',
-    '@id': `${site.url}/about#assessor`,
-    name: site.assessor.name,
-    jobTitle: 'Domestic Energy Assessor',
-    identifier: site.assessor.accreditationNumber,
-  },
-  sameAs: [
-    site.reviews.profileUrl,
-    site.assessor.verifyUrl,
-    'https://www.elmhurstenergy.co.uk',
-  ],
-  // The LocalBusiness and Organization nodes describe one business.
-  brand: { '@id': `${site.url}/#organization` },
   knowsAbout: [
     'Energy Performance Certificates',
     'Domestic EPC',
     'MEES Compliance',
     'RdSAP Assessment',
     'Elmhurst Energy Accreditation',
-  ],
-}
-
-const organizationSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  '@id': `${site.url}/#organization`,
-  name: 'L&D Energy',
-  alternateName: ['LD Energy', 'L and D Energy'],
-  disambiguatingDescription: 'L&D Energy is a domestic Energy Performance Certificate (EPC) provider based in Stratford, East London. We provide official EPC certificates and floor plans for residential properties across all London boroughs. L&D Energy is not related to learning and development, oil and gas training, L&Q Energy, or LD Energy Solutions.',
-  description: `Elmhurst-accredited domestic Energy Performance Certificate (EPC) provider serving all 32 London boroughs. Official EPC certificates for homeowners, landlords, and letting agents, with guide prices from £${priceFrom.epc}.`,
-  url: site.url,
-  logo: { '@type': 'ImageObject', url: `${site.url}/logo.svg` },
-  telephone: site.phoneIntl,
-  email: site.email,
-  contactPoint: {
-    '@type': 'ContactPoint',
-    telephone: site.phoneIntl,
-    contactType: 'customer service',
-    areaServed: 'GB',
-    availableLanguage: 'English',
-  },
-  founder: { '@id': `${site.url}/about#assessor` },
-  foundingLocation: { '@type': 'Place', name: 'Stratford, East London', address: { '@type': 'PostalAddress', addressLocality: 'Stratford', postalCode: 'E15', addressCountry: 'GB' } },
-  areaServed: { '@type': 'City', name: 'London' },
-  sameAs: [
-    site.reviews.profileUrl,
-    site.assessor.verifyUrl,
-    'https://www.elmhurstenergy.co.uk',
   ],
 }
 
@@ -226,7 +168,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify([localBusinessSchema, organizationSchema]) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify([localBusinessSchema, assessorSchema]) }}
         />
       </head>
       <body className="min-h-screen flex flex-col">

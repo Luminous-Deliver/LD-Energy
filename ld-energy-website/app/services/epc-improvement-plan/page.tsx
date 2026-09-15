@@ -71,7 +71,7 @@ const serviceSchema = {
   serviceType: 'Energy efficiency improvement report',
   description:
     'An additional personalised written plan from Abdul Motaleb Taher explaining what is holding the EPC rating back and which improvements to consider first, supported by the full Elmhurst Energy Report. Standard EPC recommendations are included independently of this add-on. No rating or savings are guaranteed.',
-  provider: { '@id': `${site.url}/#organization` },
+  provider: { '@id': `${site.url}/#business` },
   areaServed: areaServedLondon,
   offers: {
     '@type': 'Offer',

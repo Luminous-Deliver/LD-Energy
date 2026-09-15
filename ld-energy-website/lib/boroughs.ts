@@ -754,7 +754,7 @@ export const boroughList = Object.values(boroughMeta)
  * Service nodes so their service-area signals stay consistent.
  */
 export const areaServedLondon = [
-  { '@type': 'City', name: 'London', addressCountry: 'GB' },
+  { '@type': 'City', name: 'London', containedInPlace: { '@type': 'Country', name: 'United Kingdom' } },
   ...boroughList.map((b) => ({
     '@type': 'AdministrativeArea',
     name: b.name,

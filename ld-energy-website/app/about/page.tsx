@@ -40,29 +40,6 @@ const breadcrumbSchema = {
   ],
 }
 
-const personSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'Person',
-  '@id': `${site.url}/about#assessor`,
-  name: site.assessor.name,
-  jobTitle: 'Domestic Energy Assessor (DEA)',
-  worksFor: { '@id': `${site.url}/#organization` },
-  knowsAbout: [
-    'Energy Performance Certificates',
-    'Domestic EPC assessment',
-    'RdSAP 10 methodology',
-    'MEES compliance',
-    'Energy efficiency improvements',
-  ],
-  hasCredential: {
-    '@type': 'EducationalOccupationalCredential',
-    credentialCategory: 'Accreditation',
-    recognizedBy: { '@type': 'Organization', name: site.assessor.scheme },
-    identifier: site.assessor.accreditationNumber,
-  },
-  url: `${site.url}/about`,
-}
-
 const credentials = [
   {
     Icon: BadgeCheck,
@@ -109,7 +86,7 @@ export default function AboutPage() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify([breadcrumbSchema, personSchema]) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
 
       <BreadcrumbNav items={breadcrumbs} />

@@ -55,7 +55,7 @@ export default async function BlogIndexPage() {
     name: 'L&D Energy Blog',
     description:
       'Expert guidance on EPCs, MEES compliance, and improving energy efficiency from a working London DEA.',
-    publisher: { '@id': `${site.url}/#organization` },
+    publisher: { '@id': `${site.url}/#business` },
     blogPost: allPosts.slice(0, 20).map((p) => ({
       '@type': 'BlogPosting',
       headline: p.title,

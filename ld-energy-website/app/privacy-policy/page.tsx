@@ -27,7 +27,7 @@ const webPageSchema = {
   name: 'Privacy Policy',
   url: `${site.url}/privacy-policy`,
   description: 'How L&D Energy uses your information and provides privacy and analytics choices.',
-  publisher: { '@id': `${site.url}/#organization` },
+  publisher: { '@id': `${site.url}/#business` },
   inLanguage: 'en-GB',
   breadcrumb: {
     '@type': 'BreadcrumbList',

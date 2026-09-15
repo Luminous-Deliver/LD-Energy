@@ -70,7 +70,7 @@ const serviceSchema = {
   serviceType: 'Domestic energy assessment (not lodged)',
   description:
     'A full RdSAP survey of a residential property carried out by an accredited Domestic Energy Assessor and deliberately not lodged on the GOV.UK EPC Register, so no certificate is published. Includes an Energy Report and a written improvement plan. Not a substitute for an Energy Performance Certificate where one is legally required.',
-  provider: { '@id': `${site.url}/#organization` },
+  provider: { '@id': `${site.url}/#business` },
   areaServed: areaServedLondon,
   offers: {
     '@type': 'Offer',
