@@ -11,7 +11,7 @@ Parent: Stage 1b `c51e298337b588769289ed465c16b5b8d7630365`, deployed as Cloudfl
 
 ## Implementation
 
-Reuse the existing Cloudflare analytics site. A zone Configuration Rule with expression `http.host eq "epc.luminousanddeliver.co.uk"` and `disable_rum: true` disables automatic injection only for this website. The initial attempt to add an ordinary Web Analytics exclusion returned 409 `maxRulesError` and made no change. The documented Configuration Rule succeeded; no other hostname, zone setting or existing rule was changed. The Pages production binding adds only the public beacon token and preserves the existing bindings.
+Use a dedicated manual Cloudflare Web Analytics site for the exact EPC hostname; retain the existing parent-domain site for other hosts. A zone Configuration Rule with expression `http.host eq "epc.luminousanddeliver.co.uk"` and `disable_rum: true` disables automatic injection only for this website. The initial attempt to add an ordinary Web Analytics exclusion returned 409 `maxRulesError` and made no change. The documented Configuration Rule succeeded; no other hostname, zone setting or existing rule was changed. The Pages production binding adds only the public beacon token and preserves the existing bindings.
 
 `WebAnalytics` loads the vendor's module once, after reading the browser preference. Rejections, the old banner's declined state, supported DNT/GPC signals and unavailable storage keep it off. No new tracking identifiers or custom-event layer. Existing email attribution and booking contracts remain unchanged.
 
@@ -50,4 +50,11 @@ Parent audit folder: `audits/website-growth-audit/ld-energy-roadmap-2026-09-14/`
 
 Revert this stage commit to restore the previous code, then remove the public beacon token before rebuilding if restoring the old unconditional loader. Keep host-only automatic-injection suppression until the privacy behaviour of the replacement is confirmed. The created configuration rule ID is recorded in the audit; delete only that rule if explicitly restoring the former zone behaviour. No platform/dependency change.
 
-Check actual production ingestion, UK and non-UK script counts, privacy objection and Turnstile after deployment. Aggregate outcome reporting and correspondence-retention reviews still require normal business operations; this stage does not create a CRM or automated inbox purge. Ad blockers and objections mean analytics counts are incomplete.
+Production on 15 September: deployment `38d8d78e-ddc2-4505-b2ea-0552adb4b6c7` builds exact commit `036b67e5e733ff721ed5097794d4e479b2f99388`. Real vendor measurements returned 204, with one script and no console errors. The browser recorded only the separate security cookie `cf_clearance`, no analytics cookies and no storage identifiers. Privacy objection and booking controls passed. A non-UK browser location has not been independently exercised; the host-only injection rule is region-independent. Aggregate outcome reporting and correspondence-retention reviews still require normal business operations; this stage does not create a CRM or automated inbox purge. Ad blockers and objections mean analytics counts are incomplete.
+
+## Deployment correction and live evidence
+
+The initial zone token returned 404/CORS errors at the manual ingestion endpoint. Created manual site 083d2aef21de418eaee56a5b990b1aa4 with auto-install disabled, updated the existing public Pages binding, and rebuilt the same application commit. A stale bare /pricing response still supplied the earlier token. Purging the 75 precise sitemap/llms URLs on the EPC hostname removed the stale responses; no other website cache was purged. The final real ingestion check passed (three observed 204 responses, zero console errors). One visibility/navigation request was reported aborted by browser instrumentation; CDP separately observed 204 delivery for a navigation beacon. This was a configuration/cache correction, with no application or dependency change.
+
+Evidence: stage2/manual-site.json, cache-purge.json, rum-network.json and production-ingestion.json. The earlier failed diagnostics remain recorded. Cloudflare package builds passed; deployment IDs and exact commit are recorded above. No enquiry was submitted.
+

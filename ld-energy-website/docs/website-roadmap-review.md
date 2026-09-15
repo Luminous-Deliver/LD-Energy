@@ -8,7 +8,7 @@ Started 14 September 2026. User authorised focused self-review and shipment of S
 |---|---|---|---|
 | 1 | Repair enquiry journey | Approved exact commit `14a6813`; production smoke passed | Deployed |
 | 1b | Content/recommendations/MEES accuracy | `f6e37a2` + `c51e298`; static/build/rendered and nine-route production smoke passed | Deployed |
-| 2 | Cloudflare Web Analytics, truthful privacy/consent | One beacon, verified storage/network behaviour, objection control, no provider migration or custom-event system; enquiry attribution preserved | Final validation; see stage-2-measurement-privacy.md |
+| 2 | Cloudflare Web Analytics, truthful privacy/consent | One beacon, verified storage/network behaviour, objection control, no provider migration or custom-event system; enquiry attribution preserved | Deployed `036b67e`; live ingestion/objection passed; see stage-2-measurement-privacy.md |
 | 3 | Concise homepage with early pricing and primary form journey | 320/390/768/1440 screenshots, height/CTA/pricing/trust measurements, interactions, Lighthouse | Pending |
 | 4 | Coherent visible business/person/credential schema | Rendered JSON-LD parse and entity/visible-content assertions on key templates | Pending |
 | 5 | Accessibility and measured performance improvements | Keyboard, 200% text, reduced motion, contrast, overflow; Lighthouse/network comparisons | Pending |
@@ -29,3 +29,4 @@ Follow-up verification: typecheck, lint and Next production build passed (79 gen
 ## Review discipline
 
 Each completed stage records its exact commit(s), parent boundary, changed areas, acceptance results, deployment ID/hash and production smoke. Failed checks remain in the evidence record with classification. A completed stage does not imply completed long-term conversion or ranking measurement. AI 2 should review stage diffs against these acceptance criteria rather than repeat the entire original audit.
+
