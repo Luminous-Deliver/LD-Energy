@@ -13,7 +13,7 @@ import { RelatedPosts } from '@/components/blog/RelatedPosts'
 import { getAllSlugs, getPostBySlug, getRelatedPosts } from '@/lib/blog'
 import { getCategory } from '@/lib/blog-categories'
 import { getAuthor } from '@/lib/authors'
-import { site, priceFrom, EXPRESS_SURCHARGE } from '@/lib/site'
+import { site, priceFrom } from '@/lib/site'
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -151,8 +151,8 @@ export default async function BlogPostPage({ params }: PageProps) {
           <RelatedPosts posts={related} />
           <CTABanner
             variant="final"
-            heading="Need an EPC? Book in 60 seconds."
-            body={`Elmhurst-accredited assessor. Guide prices from £${priceFrom.epc}. Lodged within 72 hours, or next day for £${EXPRESS_SURCHARGE} extra.`}
+            heading="Ready to get your EPC quote?"
+            body={`Elmhurst-accredited assessor. Guide prices from £${priceFrom.epc}. Exact price and available timing confirmed before booking.`}
           />
         </Container>
       </article>

@@ -9,7 +9,7 @@ import { CtaStrip } from '@/components/sections/CtaStrip'
 import { site, insurance } from '@/lib/site'
 
 export const metadata: Metadata = {
-  title: 'London EPC Assessor | Elmhurst Accredited',
+  title: 'Abdul Motaleb Taher | About Your EPC Assessor',
   description:
     'Elmhurst-accredited Domestic Energy Assessor based in Stratford, East London. EPC certificates and floor plans across all 32 London boroughs.',
   alternates: { canonical: `${site.url}/about` },
@@ -62,7 +62,7 @@ const commitments = [
   {
     Icon: Clock,
     title: 'We answer the phone',
-    body: 'Sounds simple, but it’s the biggest complaint we hear about other assessors. Phone, WhatsApp and email all reach the assessor directly, and we reply during our opening hours, Mon–Sun 8am–8pm.',
+    body: 'Phone, WhatsApp and email reach Abdul directly. Use the enquiry form to send the property details needed for an exact quote.',
   },
   {
     Icon: BadgeCheck,
@@ -77,7 +77,7 @@ const commitments = [
   {
     Icon: Users,
     title: 'No surprise fees',
-    body: 'Transparent guide prices by property type. No travel surcharges, no call-out charges. The quote we give is the price you pay.',
+    body: 'Guide prices are based mainly on internal floor area. Any additional charges are explained before you agree to the quote.',
   },
 ]
 

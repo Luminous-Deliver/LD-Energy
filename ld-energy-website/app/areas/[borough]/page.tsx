@@ -229,7 +229,7 @@ export default async function BoroughPage({ params }: PageProps) {
       <PageHero
         eyebrow={`EPC Certificates · ${data.name}`}
         heading={`EPC Certificates in ${data.name}`}
-        subheading={`Local Elmhurst-accredited Domestic Energy Assessor covering ${data.name} and surrounding areas. Guide prices from £${priceFrom.epc}, with your exact quote confirmed before booking. Lodged within 72 hours.`}
+        subheading={`Elmhurst-accredited Domestic Energy Assessor based in Stratford E15 and serving ${data.name}. Guide prices from £${priceFrom.epc}, with your exact quote and available appointment confirmed before booking.`}
         primaryCta={{ label: 'Get my exact quote', href: '#contact', ctaId: 'hero' }}
         secondaryCta={{ label: `Call ${site.phone}`, href: site.phoneHref }}
       />
@@ -242,7 +242,7 @@ export default async function BoroughPage({ params }: PageProps) {
             EPC Service in {data.name}
           </h2>
           <p className="mt-5 text-lg text-secondary-700 leading-relaxed">
-            Need an EPC in {data.name}? L&amp;D Energy provides fast, affordable domestic Energy Performance Certificates across {data.name} and all surrounding London areas. As an Elmhurst-accredited Domestic Energy Assessor based in East London, we offer flexible appointment times and rapid turnaround for homeowners, landlords, and{' '}
+            Need an EPC in {data.name}? L&amp;D Energy provides fast, affordable domestic Energy Performance Certificates across {data.name} and all surrounding London areas. From our Stratford E15 base, Abdul provides assessment visits with the exact quote and availability confirmed in advance for homeowners, landlords, and{' '}
             <Link href="/estate-agents" className="text-primary-700 underline underline-offset-2 hover:text-primary-800">letting agents</Link>.
           </p>
           {data.kind === 'neighbourhood' && parentBorough && (
@@ -252,6 +252,7 @@ export default async function BoroughPage({ params }: PageProps) {
               , and it is where we are based.
             </p>
           )}
+          {slug === 'newham' && <p className="mt-4 text-secondary-700 leading-relaxed">For our home neighbourhood within Newham, see the <Link href="/areas/stratford" className="text-primary-700 underline underline-offset-2">Stratford E15 and E20 EPC page</Link>. This page covers the wider borough, including East Ham, Forest Gate and the Royal Docks.</p>}
           <p className="mt-4 text-secondary-700 leading-relaxed">{data.blurb}</p>
 
           <h3 className="mt-8 text-xl font-bold text-secondary-900">

@@ -1,9 +1,9 @@
 import Link from 'next/link'
+import { headingText, slugify } from '@/lib/heading-text'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import remarkGfm from 'remark-gfm'
 import { CTABanner } from './CTABanner'
 import { EpcEffectNote } from './EpcEffectNote'
-import { slugify } from './TableOfContents'
 
 type AnchorProps = React.AnchorHTMLAttributes<HTMLAnchorElement>
 type TableProps = React.TableHTMLAttributes<HTMLTableElement>
@@ -14,7 +14,7 @@ function isInternal(href: string): boolean {
 
 const components = {
   h2: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => {
-    const text = typeof children === 'string' ? children : String(children)
+    const text = headingText(children)
     const id = slugify(text)
     return (
       <h2 id={id} {...props}>
@@ -23,7 +23,7 @@ const components = {
     )
   },
   h3: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => {
-    const text = typeof children === 'string' ? children : String(children)
+    const text = headingText(children)
     const id = slugify(text)
     return (
       <h3 id={id} {...props}>

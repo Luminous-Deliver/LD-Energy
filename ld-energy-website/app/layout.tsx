@@ -6,7 +6,7 @@ import { MobileQuoteBar } from '@/components/layout/MobileQuoteBar'
 import { WebAnalytics } from '@/components/layout/WebAnalytics'
 import { LondonSkyline } from '@/components/ui/LondonSkyline'
 import { site, pricing, priceFrom, EXPRESS_SURCHARGE } from '@/lib/site'
-import { boroughMeta } from '@/lib/boroughs'
+import { areaServedLondon } from '@/lib/boroughs'
 import { assessorSchema } from '@/lib/assessor-schema'
 import './globals.css'
 
@@ -45,12 +45,12 @@ export const metadata: Metadata = {
     siteName: site.name,
     title: `Domestic EPC London | From £${priceFrom.epc} | L&D Energy`,
     description:
-      `Elmhurst accredited domestic energy assessor. Guide prices from £${priceFrom.epc}, exact quote before booking. Next-day service available across all London boroughs.`,
+      `Elmhurst accredited domestic energy assessor. Guide prices from £${priceFrom.epc}, exact quote before booking. London-wide service from a Stratford E15 base.`,
   },
   twitter: {
     card: 'summary_large_image',
     title: `Domestic EPC London | From £${priceFrom.epc}`,
-    description: 'Fast, affordable EPC certificates across London. Book today.',
+    description: 'Domestic EPCs across London. Get your exact quote before booking.',
   },
   robots: { index: true, follow: true },
   verification: {
@@ -96,10 +96,7 @@ const localBusinessSchema = {
     latitude: site.geo.lat,
     longitude: site.geo.lng,
   },
-  areaServed: [
-    { '@type': 'City', name: 'London' },
-    ...Object.values(boroughMeta).map((b) => ({ '@type': 'AdministrativeArea', name: b.name, containedInPlace: { '@type': 'City', name: 'London' } })),
-  ],
+  areaServed: areaServedLondon,
   priceRange: '££',
   currenciesAccepted: 'GBP',
   paymentAccepted: 'Credit Card, Bank Transfer',

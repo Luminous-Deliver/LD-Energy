@@ -162,7 +162,7 @@ export const fullFaq: FaqCategory[] = [
       {
         q: 'What happens if my insulation cannot be seen?',
         a: 'Where an improvement cannot be inspected and there is no evidence the assessor can accept, the methodology may require a default assumption based on the age and type of property, which can be less favourable than what is actually installed. Supporting paperwork changes what can legitimately be recorded — it does not guarantee a particular rating.',
-        links: [{ label: 'Documents and evidence that may help', href: '/preparing-for-your-epc#evidence' }],
+        links: [{ label: 'Documents and evidence that may help', href: '/preparing-for-your-epc#documents-and-evidence' }],
       },
       {
         q: 'Do I need my solar or heat-pump documents?',

@@ -16,18 +16,18 @@ import type { FaqItem } from '@/lib/faq'
 import { Accordion } from '@/components/ui/Accordion'
 
 export const metadata: Metadata = {
-  title: `Domestic EPC London | From £${priceFrom.epc} | Next-Day`,
-  description: `Domestic EPC certificate in London from £${priceFrom.epc}. Elmhurst-accredited assessor, next-day available, 72-hour standard lodgement. Exact quote before booking.`,
+  title: `Domestic EPC Certificates in London`,
+  description: `Domestic EPC certificate in London from £${priceFrom.epc}. Elmhurst-accredited assessor, property visit and lodged certificate. Exact quote and timing confirmed before booking.`,
   alternates: { canonical: `${site.url}/services/domestic-epc` },
   openGraph: {
     title: `Domestic EPC Certificate London | From £${priceFrom.epc} | L&D Energy`,
-    description: `Get your domestic EPC certificate in London from £${priceFrom.epc}. Elmhurst accredited assessor, 72-hour standard lodgement, next-day available. Required for selling or renting your home.`,
+    description: `Get your domestic EPC certificate in London from £${priceFrom.epc}. Elmhurst-accredited assessor, property visit and lodged certificate. Exact quote before booking.`,
     url: `${site.url}/services/domestic-epc`,
   },
   twitter: {
     title: `Domestic EPC Certificate London | From £${priceFrom.epc}`,
     description:
-      'Elmhurst accredited assessor, 72-hour standard delivery, next-day available. Required for selling or renting.',
+      'Elmhurst-accredited assessor, property visit and lodged certificate. Exact quote before booking.',
   },
 }
 
@@ -46,10 +46,9 @@ const epcContents = [
 ]
 
 const whenRequired = [
-  'Selling a residential property',
-  'Renting a property to a new tenant',
-  'Marketing a property for sale or rent',
-  'Completing major renovations that change energy performance',
+  'Selling or letting a property that needs a valid EPC, subject to exemptions',
+  'Replacing an expired certificate when a valid EPC is needed',
+  'Reassessing after improvements when you want an updated rating',
 ]
 
 const personas = [
@@ -221,7 +220,7 @@ export default function DomesticEpcPage() {
             </ul>
           </Card>
           <Card>
-            <h3 className="text-xl font-semibold text-secondary-900">EPCs are legally required when</h3>
+            <h3 className="text-xl font-semibold text-secondary-900">Common reasons to arrange an EPC</h3>
             <ul className="mt-4 space-y-2.5">
               {whenRequired.map((item) => (
                 <li key={item} className="flex items-start gap-2.5 text-secondary-700">

@@ -39,9 +39,9 @@ export const boroughMeta: Record<string, BoroughMeta> = {
     housingStock:
       'Stratford spans the East Village apartments of the former athletes’ village, 2010s towers around the International Quarter, long Victorian terraces near Maryland and Forest Lane, and post-war ex-local-authority blocks. It is one of the fastest-changing housing markets in East London, with new E20 stock sitting alongside much older E15 terraced streets.',
     epcIssues:
-      'New-build flats in East Village and the International Quarter usually perform well thanks to modern insulation and communal heat networks. The Victorian terraces around Maryland are a different story, solid brick walls, original sash windows and partial loft insulation regularly limit what the assessment can credit, so internal wall insulation and glazing upgrades are the usual route to compliance.',
+      'For East Village and International Quarter apartments, details of communal heating and any accessible heating controls can help the assessment. For Maryland terraces, evidence of insulation, extensions and loft conversions can be relevant. Construction and installed systems must be assessed; neither an E15/E20 postcode nor the age of the building establishes its EPC rating.',
     transport:
-      'Stratford and Stratford International stations give us the Elizabeth line, Jubilee, Central, DLR, Overground and c2c, so we can reach most appointments quickly, even at short notice.',
+      'Our base is Stratford E15. For an apartment visit, confirm the entrance, intercom and any concierge arrangements. For a rented property, agree access with the occupier. Appointment availability is confirmed after reviewing your enquiry.',
     neighbours: ['newham', 'hackney', 'tower-hamlets', 'waltham-forest', 'redbridge'],
     metaTitle: "EPC Assessor Stratford | Fast Certificates in E15 & E20",
     areasCovered:
@@ -102,9 +102,9 @@ export const boroughMeta: Record<string, BoroughMeta> = {
     housingStock:
       'Newham is built around long Victorian terraces in Forest Gate, East Ham and Plaistow, the Royal Docks and Royal Wharf new-build developments, and a significant volume of ex-local-authority and HMO-converted stock. It has one of the largest private rental markets in London.',
     epcIssues:
-      'With so much rental stock, landlords here frequently need MEES upgrades. Terraced properties with solid walls, ageing boilers and only partial loft insulation typically need fabric or heating upgrades to improve, while HMO conversions often need improved heating controls. Royal Docks new-builds, by contrast, generally benefit from modern insulation and heating.',
+      'The assessment records the actual construction, insulation and heating of each property. For converted homes, explain which rooms form the dwelling and how heating and access are arranged. For Royal Docks apartments with communal systems, any available system information can be useful. The appropriate assessment scope and any recommendations depend on the individual property.',
     transport:
-      'The Elizabeth line, DLR through the Royal Docks, c2c and the District and Hammersmith & City lines give us fast, flexible access across all six Newham postcodes.',
+      'We serve Newham from our Stratford E15 base. Share the full postcode, entrance and occupant or concierge arrangements in your enquiry so access and available appointment times can be confirmed.',
     neighbours: ['tower-hamlets', 'hackney', 'waltham-forest', 'redbridge', 'barking-dagenham', 'greenwich'],
     metaTitle: "EPC Assessor Newham | Forest Gate E7, East Ham E6",
     areasCovered:
@@ -749,16 +749,18 @@ export const boroughMeta: Record<string, BoroughMeta> = {
 export const boroughList = Object.values(boroughMeta)
 
 /**
- * Reusable schema.org areaServed value: London plus every borough as an
- * AdministrativeArea. Shared by the sitewide LocalBusiness and the per-service
+ * Reusable schema.org areaServed value: London, its boroughs, the City and
+ * Stratford. Shared by the sitewide LocalBusiness and the per-service
  * Service nodes so their service-area signals stay consistent.
  */
 export const areaServedLondon = [
   { '@type': 'City', name: 'London', containedInPlace: { '@type': 'Country', name: 'United Kingdom' } },
   ...boroughList.map((b) => ({
-    '@type': 'AdministrativeArea',
+    '@type': b.kind === 'neighbourhood' ? 'Place' : b.kind === 'city' ? 'City' : 'AdministrativeArea',
     name: b.name,
-    containedInPlace: { '@type': 'City', name: 'London' },
+    containedInPlace: b.partOf
+      ? { '@type': 'AdministrativeArea', name: boroughMeta[b.partOf].name, containedInPlace: { '@type': 'City', name: 'London' } }
+      : { '@type': 'City', name: 'London' },
   })),
 ]
 

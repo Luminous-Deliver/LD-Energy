@@ -11,7 +11,7 @@ interface CTABannerProps {
 
 export function CTABanner({
   heading = 'Need an EPC in London?',
-  body = `Elmhurst-accredited assessor. Guide prices from £${priceFrom.epc}. Lodged within 72 hours.`,
+  body = `Elmhurst-accredited assessor. Guide prices from £${priceFrom.epc}. Exact quote before booking.`,
   variant = 'inline',
 }: CTABannerProps) {
   const isFinal = variant === 'final'

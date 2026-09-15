@@ -1,8 +1,5 @@
-interface TocItem {
-  id: string
-  text: string
-  level: number
-}
+import type { TocItem } from '@/lib/heading-text'
+export { extractToc } from '@/lib/heading-text'
 
 interface TableOfContentsProps {
   items: TocItem[]
@@ -29,33 +26,4 @@ export function TableOfContents({ items }: TableOfContentsProps) {
       </ol>
     </nav>
   )
-}
-
-export function extractToc(markdown: string): TocItem[] {
-  const lines = markdown.split('\n')
-  const items: TocItem[] = []
-  let inFence = false
-  for (const line of lines) {
-    if (line.trim().startsWith('```')) {
-      inFence = !inFence
-      continue
-    }
-    if (inFence) continue
-    const m = /^(#{2,3})\s+(.+?)\s*$/.exec(line)
-    if (!m) continue
-    const level = m[1].length
-    const text = m[2].replace(/[#*_`]/g, '').trim()
-    const id = slugify(text)
-    items.push({ id, text, level })
-  }
-  return items
-}
-
-export function slugify(s: string): string {
-  return s
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '')
 }
