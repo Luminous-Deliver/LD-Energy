@@ -91,3 +91,11 @@ At 28/90 days from the 15 September release (13 October / 14 December), compare 
 
 No platform migration, dependency upgrade, real enquiry, new review markup or fabricated local office was introduced. Runtime/field performance and full assistive-technology conformance need ongoing evidence. The parent AIOS working tree contains unrelated edits and its submodule pointer remains a separate owner-workspace commit; it was not bundled into the website push.
 
+## Post-review desktop pass, 16 September 2026
+
+An independent review of this batch found no blockers and no rollback case, but flagged sparse desktop composition, the Stage 3 removal of site-wide priority-area footer links, the Sellers hero legal wording, the Estate Agents delivery guarantee and the dropped `alternateName`. These are addressed in one commit on top of `f32cf33`, documented with before/after evidence in [desktop-homepage-pass.md](desktop-homepage-pass.md). Mobile and tablet homepage content is pixel-verified unchanged; the footer adds one collapsible group. Not deployed as part of the commit.
+
+Measurement note: the restored footer links change internal linking to 12 area pages from this change's deployment date. Treat that date as a Stage 6 baseline break for the 28/90-day review.
+
+Still open from the review, awaiting owner facts: standard and express lodgement timing, reply and appointment hours, travel-charge policy, and current review, DBS and insurance evidence. Operational wording remains inconsistent across pages until those facts are confirmed and centralised.
+

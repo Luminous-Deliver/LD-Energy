@@ -177,7 +177,7 @@ export default function SellersPage() {
       <PageHero
         eyebrow="For Home Sellers"
         heading="EPCs for Selling Your London Home"
-        subheading={`An EPC is required by law before your property goes on the market. We provide fast, transparently priced certificates so your sale isn't held up — lodged within 72 hours as standard, or next day for £${EXPRESS_SURCHARGE} extra.`}
+        subheading={`Generally, an EPC must be commissioned before your home is marketed for sale; exemptions apply. We provide fast, transparently priced certificates so your sale isn't held up — lodged within 72 hours as standard, or next day for £${EXPRESS_SURCHARGE} extra.`}
         primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'sellers', ctaId: 'hero' }) }}
       />
 

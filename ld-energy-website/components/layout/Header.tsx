@@ -101,8 +101,8 @@ function ServicesDropdown() {
                 <ul>
                   {group.links.map((item) => (
                     <li key={item.href}>
-                      <Link prefetch={false}
-
+                      <Link
+                        prefetch={false}
                         href={item.href}
                         onClick={() => setOpen(false)}
                         className="flex flex-col px-4 py-2.5 hover:bg-primary-50 transition-colors group"
@@ -143,8 +143,8 @@ export function Header() {
           <nav aria-label="Primary" className="hidden lg:flex items-center gap-6">
             <ServicesDropdown />
             {topNav.map((link) => (
-              <Link prefetch={false}
-
+              <Link
+                prefetch={false}
                 key={link.href}
                 href={link.href}
                 className="inline-flex min-h-[44px] items-center text-sm font-medium text-secondary-700 hover:text-primary-700 transition-colors"

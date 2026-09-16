@@ -147,8 +147,8 @@ export function MobileNav() {
                 <ul className="flex flex-col mb-1">
                   {group.links.map((link) => (
                     <li key={link.href}>
-                      <Link prefetch={false}
-
+                      <Link
+                        prefetch={false}
                         href={link.href}
                         onClick={close}
                         tabIndex={open ? undefined : -1}
@@ -169,8 +169,8 @@ export function MobileNav() {
             <ul className="flex flex-col">
               {[...topNav, { href: '/about', label: 'About' }].map((link) => (
                 <li key={link.href}>
-                  <Link prefetch={false}
-
+                  <Link
+                    prefetch={false}
                     href={link.href}
                     onClick={close}
                     tabIndex={open ? undefined : -1}
@@ -185,8 +185,8 @@ export function MobileNav() {
 
           {/* Contact + CTA Footer */}
           <div className="shrink-0 border-t border-secondary-100 bg-secondary-50/50 p-4 flex flex-col gap-3">
-            <Link prefetch={false}
-
+            <Link
+              prefetch={false}
               href={pathname === '/contact' ? '#booking-form' : quoteHref({ ...quoteContextForPath(pathname), ctaId: 'mobile-menu' })}
               onClick={close}
               tabIndex={open ? undefined : -1}

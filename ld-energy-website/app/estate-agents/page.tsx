@@ -40,7 +40,7 @@ const whyAgents = [
   {
     Icon: Zap,
     title: 'Fast turnaround on new instructions',
-    body: 'Appointments 7 days a week, 8am–8pm, with certificates lodged within 72 hours and next-day available. Your listing goes live on time, every time.',
+    body: 'Appointments 7 days a week, 8am–8pm, with certificates lodged within 72 hours and next-day available.',
   },
   {
     Icon: LayoutPanelTop,
@@ -55,7 +55,7 @@ const whyAgents = [
   {
     Icon: PhoneCall,
     title: 'A direct line, not a call centre',
-    body: 'You deal with the accredited assessor directly, by phone or WhatsApp. Same-day confirmations during opening hours, and no chasing for certificates.',
+    body: 'You deal with the accredited assessor directly, by phone or WhatsApp, with no chasing for certificates.',
   },
   {
     Icon: CalendarClock,

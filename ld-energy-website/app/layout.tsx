@@ -78,6 +78,7 @@ const localBusinessSchema = {
   '@type': ['LocalBusiness', 'HomeAndConstructionBusiness'],
   '@id': `${site.url}/#business`,
   name: site.name,
+  alternateName: ['LD Energy', 'L and D Energy'],
   description: site.description,
   url: site.url,
   image: `${site.url}/logo.webp`,
