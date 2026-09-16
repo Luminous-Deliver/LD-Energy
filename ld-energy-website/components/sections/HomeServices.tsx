@@ -2,19 +2,20 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { FileText, Layers, LayoutPanelLeft, type LucideIcon } from 'lucide-react'
+import { Check, FileText, Layers, LayoutPanelLeft, type LucideIcon } from 'lucide-react'
 import { Container } from '@/components/ui/Container'
 import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/cn'
 import { areaBands, areaChoices, areaLabel, type AreaChoice } from '@/lib/floor-area'
-import { priceFrom, pricing, site } from '@/lib/site'
+import { maxBundleSaving, priceFrom, pricing, site } from '@/lib/site'
 import { guideEstimate } from '@/lib/pricing-estimate'
 import { quoteHref, quoteServices, type QuoteService } from '@/lib/quote-context'
 
-const products: { service: QuoteService; title: string; from: number; description: string; detail: string; detailLabel: string; Icon: LucideIcon }[] = [
-  { service: 'epc', title: 'Domestic EPC', from: priceFrom.epc, description: 'On-site energy assessment, lodged certificate and standard recommendation report where applicable.', detail: '/services/domestic-epc', detailLabel: 'Domestic EPC details', Icon: FileText },
-  { service: 'bundle', title: 'EPC + Floor Plan', from: priceFrom.bundle, description: 'Your EPC and a measured marketing floor plan, completed in one property visit.', detail: '/pricing', detailLabel: 'EPC and floor plan pricing', Icon: Layers },
-  { service: 'floor-plan', title: 'Floor Plan', from: priceFrom.floorPlan, description: 'A measured marketing plan with approximate room dimensions, supplied as JPG and PDF.', detail: '/services/floor-plans', detailLabel: 'Floor plan details', Icon: LayoutPanelLeft },
+// Points are product facts only: no turnaround, hours or travel-charge promises.
+const products: { service: QuoteService; title: string; from: number; description: string; points: string[]; detail: string; detailLabel: string; Icon: LucideIcon }[] = [
+  { service: 'epc', title: 'Domestic EPC', from: priceFrom.epc, description: 'On-site energy assessment, lodged certificate and standard recommendation report where applicable.', points: ['Accredited Domestic Energy Assessor', 'Lodged on the GOV.UK EPC Register', 'Valid for 10 years', `Optional £${site.addOns.improvementPlan} Improvement Plan`], detail: '/services/domestic-epc', detailLabel: 'Domestic EPC details', Icon: FileText },
+  { service: 'bundle', title: 'EPC + Floor Plan', from: priceFrom.bundle, description: 'Your EPC and a measured marketing floor plan, completed in one property visit.', points: ['Everything in the Domestic EPC', 'Floor plan supplied as JPG and PDF', 'One visit for both services'], detail: '/pricing', detailLabel: 'EPC and floor plan pricing', Icon: Layers },
+  { service: 'floor-plan', title: 'Floor Plan', from: priceFrom.floorPlan, description: 'A measured marketing plan with approximate room dimensions, supplied as JPG and PDF.', points: ['Measured on site', 'Layout and approximate room sizes', 'JPG and PDF files', 'For homes with a valid EPC already'], detail: '/services/floor-plans', detailLabel: 'Floor plan details', Icon: LayoutPanelLeft },
 ]
 
 const pill = 'lg:min-h-11 lg:rounded-full lg:border lg:border-secondary-300 lg:bg-white lg:px-4 lg:no-underline lg:transition-colors lg:hover:border-[#47846E]'
@@ -22,6 +23,8 @@ const pill = 'lg:min-h-11 lg:rounded-full lg:border lg:border-secondary-300 lg:b
 export function HomeServices() {
   const [area, setArea] = useState<AreaChoice | ''>('')
   const totals = products.map((product) => guideEstimate({ services: [quoteServices[product.service]], areaBand: area }).total)
+  const bundle = guideEstimate({ services: [quoteServices.bundle], areaBand: area })
+  const saving = bundle.state === 'priced' ? `Saves £${bundle.bundleDiscount} on this floor area` : `Save up to £${maxBundleSaving} against booking separately`
   const announcement = !area
     ? ''
     : area === 'unknown'
@@ -95,15 +98,27 @@ export function HomeServices() {
         <p aria-live="polite" aria-atomic="true" className="sr-only">{announcement}</p>
         <div className="mt-6 grid gap-4 lg:mt-8 lg:grid-cols-3 lg:gap-6">
           {products.map((product, i) => (
-            <article key={product.service} className="flex min-w-0 flex-col rounded-xl border border-secondary-200 bg-white p-5 lg:rounded-2xl lg:p-7 lg:shadow-premium">
+            <article key={product.service} className={cn('relative flex min-w-0 flex-col rounded-xl border bg-white p-5 lg:rounded-2xl lg:p-7 lg:shadow-premium', product.service === 'bundle' ? 'border-[#47846E] ring-1 ring-[#47846E]' : 'border-secondary-200')}>
+              {product.service === 'bundle' && (
+                <span className="absolute right-4 top-4 rounded-full bg-[#386B59] px-3 py-1 text-xs font-bold uppercase tracking-wide text-white lg:right-6 lg:top-6">Better value</span>
+              )}
               <span aria-hidden="true" className={cn('mb-5 hidden h-12 w-12 items-center justify-center rounded-2xl lg:flex', i === 0 ? 'bg-[#386B59] text-white' : 'bg-primary-50 text-primary-700')}>
                 <product.Icon className="h-6 w-6" />
               </span>
-              <h3 className="text-2xl font-semibold">{product.title}</h3>
+              <h3 className={cn('text-2xl font-semibold', product.service === 'bundle' && 'pr-28 lg:pr-0')}>{product.title}</h3>
               <p data-home-estimate={product.service} className="mt-2 text-lg font-semibold text-primary-800 lg:mt-3 lg:font-serif lg:text-2xl lg:leading-tight lg:tabular-nums">
                 {!area ? `From £${product.from}` : area === 'unknown' ? 'Quote after reviewing your details' : `Guide estimate: £${totals[i]}`}
               </p>
+              {product.service === 'bundle' && area !== 'unknown' && <p className="mt-1 text-sm font-semibold text-[#386B59]">{saving}</p>}
               <p className="mt-3 text-base leading-6 text-secondary-700">{product.description}</p>
+              <ul className="mt-4 space-y-2 border-t border-secondary-100 pt-4">
+                {product.points.map((point) => (
+                  <li key={point} className="flex gap-2.5 text-sm leading-6 text-secondary-800">
+                    <Check aria-hidden="true" className="mt-1 h-4 w-4 shrink-0 text-[#386B59]" />
+                    {point}
+                  </li>
+                ))}
+              </ul>
               <div className="mt-4 flex flex-1 flex-col justify-end lg:mt-6">
                 <Button
                   href={quoteHref({ service: product.service, area: area || undefined, sourcePage: 'home', ctaId: area ? 'estimator' : 'pricing' })}

@@ -1,8 +1,9 @@
 import Link from 'next/link'
-import { BookOpen, Building2, ClipboardCheck, House, KeyRound, MapPin, MessageCircle, Phone, Signpost, type LucideIcon } from 'lucide-react'
+import { BookOpen, Building2, Calculator, CalendarClock, ClipboardCheck, House, KeyRound, MapPin, MessageCircle, Phone, ReceiptText, Signpost, type LucideIcon } from 'lucide-react'
 import { Container } from '@/components/ui/Container'
 import { Button } from '@/components/ui/Button'
 import { Accordion } from '@/components/ui/Accordion'
+import { GoogleRating } from '@/components/ui/GoogleRating'
 import { site } from '@/lib/site'
 import { quoteHref } from '@/lib/quote-context'
 import { homeBookingFaqs } from '@/lib/homepage-content'
@@ -23,6 +24,12 @@ const prep = [
   'Keep heating, hot-water controls and meters accessible.',
   'Have evidence of relevant improvements ready, if available.',
   'Coordinate keys and access with occupants or tenants.',
+]
+// From the former Good to know section: expectation-setting, no promises.
+const worthKnowing: { Icon: LucideIcon; title: string; body: string; href: string }[] = [
+  { Icon: ReceiptText, title: 'Exact quote', body: 'Based on the property details you give us. Anything materially different is discussed and agreed before the assessment begins.', href: '/preparing-for-your-epc#quote-and-property-complexity' },
+  { Icon: Calculator, title: 'Independent rating', body: 'We record the property; the score is calculated by the approved methodology. It cannot be manually adjusted.', href: '/preparing-for-your-epc#how-your-epc-rating-is-calculated' },
+  { Icon: CalendarClock, title: 'RdSAP 10', body: 'Existing homes have used the updated methodology since June 2025, so an older EPC may not reproduce exactly.', href: '/preparing-for-your-epc#rdsap-10' },
 ]
 const areas = [['Stratford', 'stratford'], ['Newham', 'newham'], ['Tower Hamlets', 'tower-hamlets'], ['Hackney', 'hackney'], ['Waltham Forest', 'waltham-forest'], ['Redbridge', 'redbridge']]
 const guides = [
@@ -51,7 +58,7 @@ export function HomeContent() {
             <p className="mt-2 text-sm leading-6">Elmhurst Accredited · {site.assessor.accreditationNumber}</p>
             <a href={site.assessor.verifyUrl} target="_blank" rel="noopener noreferrer" className="home-link">Verify Abdul on GOV.UK ↗</a>
             <div>
-              <a href={site.reviews.profileUrl} target="_blank" rel="noopener noreferrer" className="home-link">Read customer reviews on Google ↗</a>
+              <GoogleRating className="home-link flex-wrap gap-y-1" />
             </div>
             <Link prefetch={false} href="/about" className="home-link">More about your assessor →</Link>
           </div>
@@ -76,23 +83,6 @@ export function HomeContent() {
         </Container>
       </section>
 
-      <section id="who-we-help" className="home-section">
-        <Container>
-          <h2 className="home-heading">An EPC for your next step</h2>
-          <div className="mt-4 grid gap-x-8 sm:grid-cols-2 lg:mt-8 lg:grid-cols-4 lg:gap-5">
-            {audiences.map(([title, copy, href, Icon]) => (
-              <div key={href} id={href === '/estate-agents' ? 'agency' : undefined} className={`border-b border-secondary-200 py-3 lg:relative lg:border lg:p-6 lg:transition-shadow lg:hover:shadow-premium-lg ${card}`}>
-                <span aria-hidden="true" className="mb-4 hidden h-11 w-11 items-center justify-center rounded-xl bg-[#F1F6F3] text-[#386B59] lg:flex">
-                  <Icon className="h-5 w-5" />
-                </span>
-                <Link prefetch={false} href={href} className="home-link text-lg lg:no-underline lg:after:absolute lg:after:inset-0 lg:after:rounded-2xl lg:after:content-['']">{title} →</Link>
-                <p className="text-base leading-6 text-secondary-700 lg:mt-1">{copy}</p>
-              </div>
-            ))}
-          </div>
-        </Container>
-      </section>
-
       <section id="before-the-visit" className="home-section bg-[#F1F6F3]">
         <Container className="grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:items-center lg:gap-16">
           <div>
@@ -110,6 +100,44 @@ export function HomeContent() {
               </li>
             ))}
           </ul>
+        </Container>
+      </section>
+
+      <section id="worth-knowing" className="home-section border-b border-secondary-200 bg-white">
+        <Container>
+          <h2 className="home-heading">Three things worth knowing first</h2>
+          <ul className="mt-5 grid gap-3 md:grid-cols-3 lg:mt-8 lg:gap-6">
+            {worthKnowing.map(({ Icon, title, body, href }) => (
+              <li key={title} className="rounded-xl border border-secondary-200 bg-white p-4 lg:rounded-2xl lg:p-6 lg:shadow-premium">
+                <div className="flex items-center gap-3">
+                  <span aria-hidden="true" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary-50 text-primary-700 lg:h-11 lg:w-11">
+                    <Icon className="h-4 w-4 lg:h-5 lg:w-5" />
+                  </span>
+                  <h3 className="text-lg font-semibold">
+                    <Link prefetch={false} href={href} className="underline-offset-4 hover:underline">{title}</Link>
+                  </h3>
+                </div>
+                <p className="mt-2 text-base leading-6 text-secondary-700 lg:mt-3">{body}</p>
+              </li>
+            ))}
+          </ul>
+        </Container>
+      </section>
+
+      <section id="who-we-help" className="home-section">
+        <Container>
+          <h2 className="home-heading">An EPC for your next step</h2>
+          <div className="mt-4 grid gap-x-8 sm:grid-cols-2 lg:mt-8 lg:grid-cols-4 lg:gap-5">
+            {audiences.map(([title, copy, href, Icon]) => (
+              <div key={href} id={href === '/estate-agents' ? 'agency' : undefined} className={`border-b border-secondary-200 py-3 lg:relative lg:border lg:p-6 lg:transition-shadow lg:hover:shadow-premium-lg ${card}`}>
+                <span aria-hidden="true" className="mb-4 hidden h-11 w-11 items-center justify-center rounded-xl bg-[#F1F6F3] text-[#386B59] lg:flex">
+                  <Icon className="h-5 w-5" />
+                </span>
+                <Link prefetch={false} href={href} className="home-link text-lg lg:no-underline lg:after:absolute lg:after:inset-0 lg:after:rounded-2xl lg:after:content-['']">{title} →</Link>
+                <p className="text-base leading-6 text-secondary-700 lg:mt-1">{copy}</p>
+              </div>
+            ))}
+          </div>
         </Container>
       </section>
 

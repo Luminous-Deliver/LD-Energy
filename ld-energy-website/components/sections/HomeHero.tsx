@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { CalendarCheck, ExternalLink, Landmark, MapPin, Ruler, ShieldCheck, type LucideIcon } from 'lucide-react'
 import { Container } from '@/components/ui/Container'
 import { Button } from '@/components/ui/Button'
+import { GoogleRating } from '@/components/ui/GoogleRating'
 import { site, priceFrom, pricing } from '@/lib/site'
 import { quoteHref } from '@/lib/quote-context'
 
@@ -17,9 +18,9 @@ const facts: { Icon: LucideIcon; label: string; detail: string }[] = [
 ]
 
 /**
- * Below 1024px this renders exactly the compact mobile hero. At lg the price
- * block becomes a panel under the headline, and an assessor card and fact
- * strip (both display:none below lg) use the width a phone does not have.
+ * Below 1024px this renders the compact mobile hero with the Google rating. At lg
+ * the price block becomes a panel under the headline, and an assessor card and
+ * fact strip (both display:none below lg) use the width a phone does not have.
  */
 export function HomeHero() {
   return (
@@ -62,7 +63,10 @@ export function HomeHero() {
               </a>
             </div>
 
-            <p className="text-sm leading-6 text-[#D6E1F0] lg:hidden">Based in Stratford E15 · London-wide coverage</p>
+            <div className="lg:hidden">
+              <GoogleRating className="inline-flex min-h-11 flex-wrap items-center gap-x-2 gap-y-1 text-sm text-white" />
+              <p className="text-sm leading-6 text-[#D6E1F0]">Based in Stratford E15 · London-wide coverage</p>
+            </div>
 
             <div className="hidden min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:block">
               <div className="overflow-hidden rounded-3xl bg-white text-secondary-900 shadow-[0_40px_90px_-30px_rgba(0,0,0,0.6)]">
@@ -75,6 +79,7 @@ export function HomeHero() {
                       <p className="text-xs font-semibold uppercase tracking-[0.14em] text-secondary-500">Your assessor</p>
                       <p className="mt-2 font-serif text-2xl font-semibold leading-tight xl:text-[1.75rem]">{site.assessor.name}</p>
                       <p className="mt-1 text-base text-secondary-600">{site.assessor.qualification}</p>
+                      <GoogleRating className="mt-2 inline-flex min-h-8 flex-wrap items-center gap-x-2 gap-y-1 text-sm text-secondary-700 hover:text-secondary-900" />
                     </div>
                     <span aria-hidden="true" className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#F1F6F3] text-[#386B59]">
                       <ShieldCheck className="h-6 w-6" />
@@ -92,9 +97,6 @@ export function HomeHero() {
                     Speak directly with the person assessing your property.
                   </p>
                   <div className="mt-2 flex flex-wrap gap-x-6">
-                    <a href={site.reviews.profileUrl} target="_blank" rel="noopener noreferrer" className="home-link text-sm">
-                      Read customer reviews on Google <span aria-hidden="true">↗</span>
-                    </a>
                     <Link prefetch={false} href="/about" className="home-link text-sm">
                       More about your assessor <span aria-hidden="true">→</span>
                     </Link>

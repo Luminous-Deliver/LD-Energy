@@ -4,6 +4,7 @@ import { Section } from '@/components/ui/Section'
 import { Card } from '@/components/ui/Card'
 import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { ContactForm } from '@/components/forms/ContactForm'
+import { QuoteSummaryPanel, QuoteSummaryProvider } from '@/components/forms/QuoteSummary'
 import { AssessorCard } from '@/components/ui/AssessorCard'
 import { site } from '@/lib/site'
 
@@ -81,15 +82,20 @@ export default function ContactPage() {
 
       {/* Form first in both the reading order and mobile layout. */}
       <Section variant="default" id="contact-methods" className="!py-4 sm:!py-6">
+        <QuoteSummaryProvider>
         <div className="grid gap-8 lg:grid-cols-12">
           <div className="min-w-0 lg:col-span-8">
             <h1 id="booking-form" tabIndex={-1} className="scroll-mt-32 text-3xl font-bold tracking-tight text-secondary-900 md:text-4xl">Get your exact quote</h1>
             <p className="mt-2 text-base text-secondary-700">Send your property details. We’ll confirm the exact price and an available appointment before booking.</p>
             <div className="mt-4"><ContactForm /></div>
           </div>
-          <div className="min-w-0 lg:col-span-4 space-y-4">
+          <div className="min-w-0 lg:col-span-4 flex flex-col gap-4">
+            {/* Desktop: one sticky summary replaces the stacked support cards below. */}
+            <div className="hidden lg:sticky lg:top-28 lg:block">
+              <QuoteSummaryPanel />
+            </div>
             {methods.map((m) => (
-              <div key={m.title} className="rounded-lg bg-white border border-secondary-200 p-4 sm:p-6 shadow-sm">
+              <div key={m.title} className="rounded-lg bg-white border border-secondary-200 p-4 sm:p-6 shadow-sm lg:hidden">
                 <div className="flex items-start gap-4">
                   <span className="inline-flex items-center justify-center w-11 h-11 rounded-full bg-primary-100 text-primary-700 shrink-0">
                     <m.Icon className="w-5 h-5" aria-hidden="true" />
@@ -110,7 +116,7 @@ export default function ContactPage() {
               </div>
             ))}
 
-            <Card>
+            <Card className="lg:hidden">
               <h2 className="text-base font-semibold text-secondary-900">Office hours</h2>
               <ul className="mt-3 space-y-2 text-sm text-secondary-700">
                 <li className="flex items-center gap-2.5">
@@ -128,9 +134,10 @@ export default function ContactPage() {
               </ul>
             </Card>
 
-            <AssessorCard headingLevel={2} />
+            <AssessorCard headingLevel={2} className="lg:hidden" />
           </div>
         </div>
+        </QuoteSummaryProvider>
       </Section>
       {/* Service area */}
       <Section variant="muted" id="service-area">

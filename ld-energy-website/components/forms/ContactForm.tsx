@@ -9,38 +9,41 @@ import { cn } from '@/lib/cn'
 import { pricing, site, EXPRESS_SURCHARGE } from '@/lib/site'
 import { areaBands, areaLabel } from '@/lib/floor-area'
 import { guideEstimate, guideEstimateRows } from '@/lib/pricing-estimate'
-import { turnaroundCopy, includedList, contactStepIntro } from '@/lib/booking-copy'
+import { turnaroundCopy, includedList, contactStepIntro, serviceChoices } from '@/lib/booking-copy'
 import { parseQuoteContext, quoteContextFromForm, quoteHref, quoteServices } from '@/lib/quote-context'
 import { conversionEvent } from '@/lib/conversion-events'
 import { ctaIds, customerTypeForSource, sourcePageForPath, type SourcePage, type CtaId } from '@/lib/enquiry-attribution'
 import { restoredCustomerType, rememberCustomerType } from '@/lib/customer-type-history'
 import { useTurnstile } from '@/lib/useTurnstile'
-import { contactSchema, customerTypes, EXPRESS_SPEED, PRE_ASSESSMENT, type ContactInput } from '@/lib/validators'
+import { usePublishQuote } from '@/components/forms/QuoteSummary'
+import { contactSchema, customerTypes, EXPRESS_SPEED, type ContactInput } from '@/lib/validators'
 
 const STEP_TITLES = ['Service and property', 'Timing and access', 'Your details']
 const controlClass = 'inline-flex min-h-[48px] items-center justify-center rounded-lg px-4 py-3 text-base font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-700 disabled:opacity-60'
 
 interface ChoiceProps {
   name: string; legend: string; value: string; onChange: (value: string) => void
-  options: { value: string; label: string; description?: string }[]
+  options: { value: string; label: string; description?: string; badge?: string }[]
   error?: string; hint?: string; inputRef?: (element: HTMLInputElement | null) => void
+  /** Extra desktop grid classes, e.g. three floor-area columns. */
+  gridClassName?: string
 }
 
-function Choices({ name, legend, value, onChange, options, error, hint, inputRef }: ChoiceProps) {
+function Choices({ name, legend, value, onChange, options, error, hint, inputRef, gridClassName }: ChoiceProps) {
   return (
     <fieldset className="min-w-0" aria-invalid={!!error} aria-describedby={`${name}-hint${error ? ` ${name}-error` : ''}`}>
       <legend className="text-base font-semibold text-secondary-900">{legend}</legend>
       <p id={`${name}-hint`} className="mt-1 text-sm text-secondary-700">{hint || 'Choose one option.'}</p>
-      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+      <div className={cn('mt-3 grid gap-3 sm:grid-cols-2', gridClassName)}>
         {options.map((option, index) => (
-          <label key={option.value} className={cn('flex min-h-[48px] min-w-0 cursor-pointer items-start gap-3 rounded-lg border p-3', value === option.value ? 'border-primary-700 bg-primary-50 ring-1 ring-primary-700' : 'border-secondary-300 bg-white')}>
+          <label key={option.value} className={cn('flex min-h-[48px] min-w-0 cursor-pointer items-start gap-3 rounded-lg border p-3', value === option.value ? 'border-primary-700 bg-primary-50 ring-1 ring-primary-700' : 'border-secondary-300 bg-white lg:transition-colors lg:hover:border-primary-500')}>
             <input type="radio" name={name} value={option.value} checked={value === option.value}
               id={`${name}-${index}`} ref={index === 0 ? inputRef : undefined}
               onChange={() => onChange(option.value)} required
               aria-label={option.label} aria-describedby={`${name}-hint ${name}-description-${index}${error ? ` ${name}-error` : ''}`}
               className="mt-1 h-5 w-5 shrink-0 accent-primary-700" />
             <span className="min-w-0">
-              <span className="block text-base font-semibold text-secondary-900">{option.label}</span>
+              <span className="block text-base font-semibold text-secondary-900">{option.label}{option.badge && <span className="ml-2 hidden rounded-md bg-[#386B59] px-1.5 py-0.5 align-middle text-xs font-bold uppercase tracking-wide text-white lg:inline-block">{option.badge}</span>}</span>
               <span id={`${name}-description-${index}`} className="mt-1 block text-sm text-secondary-700">{option.description}</span>
             </span>
           </label>
@@ -131,6 +134,13 @@ export function ContactForm({ areaPage, sourcePage }: { areaPage?: string; sourc
   })
   const values = watch()
   const estimate = guideEstimate(values)
+  const publishQuote = usePublishQuote()
+  const [selectedService] = values.services
+  const { areaBand, customerType, speed, improvementPlan } = values
+  useEffect(() => {
+    // Desktop /contact summary only; selections, never customer details.
+    publishQuote?.({ service: selectedService, areaBand: areaBand || '', customerType: customerType || '', speed, improvementPlan: !!improvementPlan })
+  }, [publishQuote, selectedService, areaBand, customerType, speed, improvementPlan])
   const { isBulk, isLodged, canHavePlan, planIncluded, productKind } = estimate
   const estimateText = estimate.state === 'awaiting-area' ? '' : estimate.state === 'priced'
     ? `Guide estimate: £${estimate.total} · ${areaLabel(values.areaBand)}`
@@ -220,7 +230,15 @@ export function ContactForm({ areaPage, sourcePage }: { areaPage?: string; sourc
       onChangeCapture={start} onSubmit={event => {
         if (step < 3) { event.preventDefault(); void next(); return }
         void handleSubmit(onSubmit, invalid => { setShowErrors(true); requestAnimationFrame(() => focusError(invalid)) })(event)
-      }} className="min-w-0 rounded-xl border border-secondary-200 bg-white p-4 [overflow-wrap:anywhere] sm:p-6">
+      }} className="min-w-0 rounded-xl border border-secondary-200 bg-white p-4 [overflow-wrap:anywhere] sm:p-6 lg:rounded-2xl lg:p-8 lg:shadow-premium">
+      <ol aria-hidden="true" className="mb-6 hidden grid-cols-3 gap-3 lg:grid">
+        {STEP_TITLES.map((title, index) => (
+          <li key={title}>
+            <span className={cn('block h-1.5 rounded-full', index < step ? 'bg-primary-700' : 'bg-secondary-200')} />
+            <span className={cn('mt-2 block text-xs font-semibold uppercase tracking-wide', index + 1 === step ? 'text-primary-800' : 'text-secondary-500')}>{title}</span>
+          </li>
+        ))}
+      </ol>
       <p className="text-sm font-semibold text-primary-800">Step {step} of 3</p>
       <h2 ref={headingRef} tabIndex={-1} className="mt-1 text-2xl font-bold text-secondary-900">{STEP_TITLES[step - 1]}</h2>
 
@@ -238,16 +256,10 @@ export function ContactForm({ areaPage, sourcePage }: { areaPage?: string; sourc
             field.onChange([value]); const lodged = value === 'EPC Certificate' || value === 'Both (Bundle)'
             if (!lodged) { setValue('speed', 'Standard (72 hours)'); setValue('improvementPlan', false) }
             rememberSelection(); conversionEvent('service_selection', quoteContextFromForm(getValues()))
-          }} options={[
-            { value: 'EPC Certificate', label: 'Domestic EPC', description: 'On-site assessment and an EPC lodged on the government register.' },
-            { value: 'Both (Bundle)', label: 'EPC + Floor Plan', description: 'Both services for the same property in one visit, with the bundle price.' },
-            { value: 'Floor Plan', label: 'Floor Plan', description: 'Laser-measured drawing showing layout and room sizes.' },
-            { value: PRE_ASSESSMENT, label: 'EPC Pre-Assessment', description: 'Find out your score privately. Nothing is lodged.' },
-            { value: 'Bulk / Agency Enquiry', label: 'Agency / portfolio enquiry', description: 'Multiple properties or ongoing instructions, quoted individually.' },
-          ]} />} />
+          }} options={serviceChoices} />} />
 
         {isBulk ? <p className="text-base text-secondary-700">A single floor area does not apply to a portfolio. We’ll ask for an approximate property count on the last step.</p> :
-          <Controller control={control} name="areaBand" render={({ field }) => <Choices name="areaBand" legend="Internal floor area"
+          <Controller control={control} name="areaBand" render={({ field }) => <Choices name="areaBand" legend="Internal floor area" gridClassName="lg:grid-cols-3"
             hint="Choose your internal floor area for a guide estimate."
             value={field.value || ''} inputRef={field.ref} error={errors.areaBand?.message}
             onChange={value => { revealEstimate.current = true; field.onChange(value); rememberSelection(); conversionEvent('estimator_use', quoteContextFromForm(getValues())) }}

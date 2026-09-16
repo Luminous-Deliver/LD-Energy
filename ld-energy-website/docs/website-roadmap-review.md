@@ -99,3 +99,9 @@ Measurement note: the restored footer links change internal linking to 12 area p
 
 Still open from the review, awaiting owner facts: standard and express lodgement timing, reply and appointment hours, travel-charge policy, and current review, DBS and insurance evidence. Operational wording remains inconsistent across pages until those facts are confirmed and centralised.
 
+## Conversion polish batch 2, 16 September 2026
+
+Owner-directed follow-up: desktop quote summary and form polish, verified Google rating (5.0 from 4, public listing), restored Good to know and service-card points, Before your visit moved up, FAQ internal links on all 31 answers, compact desktop footer, and the Services menu showing the EPC Improvement Plan instead of the assessor page. Stage 1 booking and layout tests pass at all eight widths; Contact below `lg` is pixel-identical to production. Evidence and limits: [conversion-polish-batch-2.md](conversion-polish-batch-2.md).
+
+Google Business Profile mismatch found during review (owner dashboard action): the listing shows "Open 24 hours", an owner post promising same-day lodgement, and "Certificates from £49". The website states guide prices from £65 and does not offer same-day lodgement.
+

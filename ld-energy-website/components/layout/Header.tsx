@@ -73,9 +73,8 @@ function ServicesDropdown() {
       {/*
         Rendered unconditionally and hidden with `visibility`, not unmounted.
         Previously `{open && …}` meant the Services destinations existed only
-        after a click, so /landlords, /sellers, /estate-agents,
-        /services/floor-plans and /domestic-energy-assessor-london had no
-        crawlable link in the server-rendered header at all.
+        after a click, so /landlords, /sellers, /estate-agents and the service
+        pages had no crawlable link in the server-rendered header at all.
 
         `invisible` (visibility: hidden) is the right hiding mechanism here: it
         keeps the anchors in the HTML for crawlers while removing them from the

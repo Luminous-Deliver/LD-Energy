@@ -167,6 +167,7 @@ export const fullFaq: FaqCategory[] = [
       {
         q: 'Do I need my solar or heat-pump documents?',
         a: 'They are useful where you have them, but they are not mandatory. MCS paperwork, commissioning documents or system specifications are examples of evidence an assessor may be able to accept to confirm what is installed, rather than estimating it. The assessor decides what can be accepted under the methodology.',
+        links: [{ label: 'Documents and evidence that may help', href: '/preparing-for-your-epc#documents-and-evidence' }],
       },
       {
         q: 'What if my property is larger than the details used for my quote?',
@@ -177,22 +178,27 @@ export const fullFaq: FaqCategory[] = [
       {
         q: 'What is an EPC?',
         a: 'An Energy Performance Certificate (EPC) is an official UK government document that rates a property’s energy efficiency from A (most efficient) to G (least efficient). It shows current and potential energy efficiency, estimated annual energy costs, CO₂ emissions, and recommendations for improvement.',
+        links: [{ label: 'EPC ratings explained', href: '/blog/epc-ratings-explained' }, { label: 'Domestic EPC service', href: '/services/domestic-epc' }],
       },
       {
         q: 'How long is an EPC valid?',
         a: 'An EPC is valid for 10 years from the date of issue. After 10 years, you’ll need a new EPC if you’re selling or letting the property.',
+        links: [{ label: 'How long an EPC lasts', href: '/blog/how-long-does-epc-last' }],
       },
       {
         q: 'What information is on an EPC?',
         a: 'Your EPC shows the current rating (A–G), the potential rating after recommended improvements, estimated annual energy costs, CO₂ emissions, and a list of specific improvement recommendations with estimated costs and savings.',
+        links: [{ label: 'EPC ratings explained', href: '/blog/epc-ratings-explained' }],
       },
       {
         q: 'Who can issue an EPC?',
         a: 'Only an accredited Domestic Energy Assessor (DEA) registered with a government-approved scheme can issue a domestic EPC. We are accredited with Elmhurst Energy, the UK’s largest energy assessor scheme. Every EPC we produce is lodged on the official UK Government EPC Register.',
+        links: [{ label: 'Your accredited assessor', href: '/about' }, { label: 'Domestic energy assessor in London', href: '/domestic-energy-assessor-london' }],
       },
       {
         q: 'How is the EPC rating calculated?',
         a: 'The rating is calculated using the Reduced data Standard Assessment Procedure (RdSAP), currently RdSAP 10. The assessor records construction details, insulation, heating, hot water, lighting, windows, and ventilation. The software calculates a Standard Assessment Procedure (SAP) score from 1–100, which maps to a band from A to G.',
+        links: [{ label: 'How your EPC rating is calculated', href: '/preparing-for-your-epc#how-your-epc-rating-is-calculated' }, { label: 'RdSAP 10: what changed in 2025', href: '/blog/rdsap-10-what-changed-2025' }],
       },
     ],
   },
@@ -203,22 +209,27 @@ export const fullFaq: FaqCategory[] = [
       {
         q: 'Do I need an EPC to sell my home?',
         a: 'Generally, an EPC must be commissioned before marketing a home for sale in England and Wales. Reasonable efforts must be made to obtain it within seven days; a further 21 days is allowed if those efforts do not succeed. Exemptions apply. Provide it to prospective buyers as required.',
+        links: [{ label: 'EPCs for sellers', href: '/sellers' }, { label: 'EPC guide for selling a house', href: '/blog/epc-for-selling-house' }],
       },
       {
         q: 'Do I need an EPC to rent out my property?',
         a: 'For domestic rentals within MEES scope in England and Wales, the minimum is EPC E unless a valid exemption is registered. Current MEES financial penalties are capped at £5,000 per property in total. EPC provision duties and their penalties are separate.',
+        links: [{ label: 'EPCs for landlords', href: '/landlords' }, { label: 'EPC guide for landlords', href: '/blog/epc-for-landlords-2026' }],
       },
       {
         q: 'What are MEES regulations?',
         a: 'For domestic rentals covered by MEES in England and Wales, the current minimum is EPC E unless a valid exemption is registered. Government has confirmed a higher standard equivalent to C for 1 October 2030, using reformed EPC metrics, but implementing legislation is still required. There is one compliance date for tenancies in scope, not an earlier new-tenancy phase.',
+        links: [{ label: 'MEES regulations explained', href: '/blog/mees-regulations-2026' }, { label: 'MEES timeline to 2030', href: '/blog/mees-timeline-2026-2030' }],
       },
       {
         q: 'What if my property is below an E rating?',
         a: 'If the property is covered by domestic MEES, you must improve it to E or register a valid exemption before letting or continuing to let it. Your standard recommendation report helps identify relevant measures.',
+        links: [{ label: 'How to improve your EPC rating', href: '/blog/how-to-improve-epc-rating' }, { label: 'EPC Improvement Plan', href: '/services/epc-improvement-plan' }],
       },
       {
         q: 'Are there any exemptions?',
         a: 'Yes, limited exemptions exist (for example, all relevant improvements completed but rating still below E, third-party consent refused, or wall insulation that would damage the fabric of the property). MEES exemptions require evidence and registration on the PRS Exemptions Register; most last five years, but duration depends on the exemption.',
+        links: [{ label: 'MEES exemptions and registration', href: '/blog/mees-regulations-2026#exemptions-evidence-and-registration' }],
       },
     ],
   },
@@ -229,22 +240,27 @@ export const fullFaq: FaqCategory[] = [
       {
         q: 'How do I book an EPC?',
         a: `Call us on ${site.phone}, send a WhatsApp message, email ${site.email}, or use our online booking form. Phone, WhatsApp and email all reach the assessor directly, and we reply during our opening hours (${site.hours}).`,
+        links: [{ label: 'Get your exact quote', href: '/contact#booking-form' }],
       },
       {
         q: 'How long does the assessment take?',
         a: 'Typically 45 minutes for a studio and up to 2 hours for a 5+ bedroom property. We’ll provide an accurate time estimate when you book.',
+        links: [{ label: 'What happens during an EPC assessment', href: '/blog/what-happens-during-epc-assessment' }],
       },
       {
         q: 'What do I need to prepare?',
         a: 'No specific preparation is required. Just provide normal access to all rooms, loft hatches if accessible, the boiler, hot water cylinder, and any heating controls. Documentation such as boiler service records or insulation guarantees can be helpful but is not required.',
+        links: [{ label: 'What to have ready', href: '/preparing-for-your-epc#what-to-have-ready' }],
       },
       {
         q: 'How quickly will I get my certificate?',
         a: `Standard lodgement is within 72 hours of the assessment. Our next-day service lodges your certificate within 24 hours for an additional £${EXPRESS_SURCHARGE}.`,
+        links: [{ label: 'The Domestic EPC process', href: '/services/domestic-epc#epc-process' }],
       },
       {
         q: 'Can I see the assessor’s credentials?',
         a: 'Yes. We’re happy to share our Elmhurst Energy accreditation details on request. You can also verify any Domestic Energy Assessor on the EPC Register at gov.uk.',
+        links: [{ label: 'Assessor credentials', href: '/about#credentials' }],
       },
     ],
   },
@@ -255,22 +271,27 @@ export const fullFaq: FaqCategory[] = [
       {
         q: 'How much does an EPC cost?',
         a: `Guide EPC prices in London start at £${pricing[0].epc} for properties up to 37 m² and rise with internal floor area, up to £${pricing[5].epc} for homes over 121 m². Internal floor area (m²) is the main pricing factor — bedroom count is only a familiar reference. Next-day lodgement is available for £${EXPRESS_SURCHARGE} extra, and your exact quote is confirmed before booking.`,
+        links: [{ label: 'Guide prices by floor area', href: '/pricing#pricing-table' }],
       },
       {
         q: 'Are there hidden fees?',
         a: 'No. The price we quote is the price you pay. Quotes are personalised based on property size and condition, so there are no surprise add-ons, call-out charges, or travel surcharges within our service area.',
+        links: [{ label: 'What the price includes', href: '/pricing#whats-included' }],
       },
       {
         q: 'Do you charge for travel?',
         a: 'No. Travel is included in the standard price for all properties within our service area (all 32 London boroughs and the City of London, plus a 1.5-hour radius of Stratford). For properties outside this area, contact us for a tailored quote.',
+        links: [{ label: 'London areas we cover', href: '/areas' }],
       },
       {
         q: 'Can I get a discount for multiple properties?',
         a: 'Yes. We offer portfolio rates for landlords and letting agents with multiple properties. Contact us directly for a quote.',
+        links: [{ label: 'Agencies and portfolios', href: '/estate-agents' }],
       },
       {
         q: 'What is the next-day service?',
         a: `For £${EXPRESS_SURCHARGE} extra, your EPC certificate is lodged within 24 hours of the assessment rather than the standard 72. This applies to assessments completed during our standard hours. Appointment availability and the delivery deadline are confirmed before booking.`,
+        links: [{ label: 'Pricing questions', href: '/pricing#pricing-faq' }],
       },
     ],
   },
@@ -281,14 +302,17 @@ export const fullFaq: FaqCategory[] = [
       {
         q: 'How can I improve my EPC rating?',
         a: 'Your standard EPC includes its software-generated recommendation report where applicable. Insulation, heating, lighting and other measures may be suggested depending on the property. Seek appropriate installation advice before proceeding; a particular rating or saving is not guaranteed.',
+        links: [{ label: 'How to improve your EPC rating', href: '/blog/how-to-improve-epc-rating' }, { label: 'EPC Improvement Plan', href: '/services/epc-improvement-plan' }],
       },
       {
         q: 'Which improvements give the best return?',
         a: 'For most London properties, the highest-return upgrades are LED lighting (low cost, immediate impact), loft insulation, a modern condensing boiler with proper controls, and cavity wall insulation where applicable. Solar PV and heat pumps deliver bigger rating jumps but require larger investment.',
+        links: [{ label: 'EPC improvements by budget', href: '/blog/epc-improvements-by-budget' }, { label: 'Cheapest ways to improve an EPC', href: '/blog/cheapest-ways-improve-epc' }],
       },
       {
         q: 'Will I need a new EPC after improvements?',
         a: 'Your current EPC remains valid for 10 years regardless of improvements. However, if you want the new, higher rating to appear on the EPC Register (for example to prove MEES compliance or support a sale), you’ll need a fresh assessment.',
+        links: [{ label: 'When a new EPC may be worth getting', href: '/blog/how-long-does-epc-last#when-you-might-want-a-new-epc-without-being-legally-required' }],
       },
     ],
   },

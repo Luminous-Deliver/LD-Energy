@@ -103,8 +103,10 @@ export const site = {
    * it satisfies Google's real-world-name policy, is a manual review item.
    */
   reviews: {
+    // Visible Google Maps listing, checked 16/09/2026: 5.0 from 4 reviews. Update by hand
+    // when the count changes; it is shown as text only, never as review markup.
     ratingValue: 5,
-    reviewCount: 3,
+    reviewCount: 4,
     profileUrl: 'https://share.google/ZopGGHvr6wBiGbT4A',
     writeUrl: 'https://g.page/r/CWdJZan0XQzDEAI/review',
   },
@@ -143,7 +145,7 @@ export const servicesMenu = [
       { href: '/services/domestic-epc', label: 'Domestic EPC', desc: 'Lodged on the GOV.UK register' },
       { href: '/services/floor-plans', label: 'Floor Plans', desc: 'Laser-measured, portal-ready' },
       { href: '/services/epc-pre-assessment', label: 'EPC Pre-Assessment', desc: 'Your score, without lodging it' },
-      { href: '/domestic-energy-assessor-london', label: 'Energy Assessor', desc: 'Your accredited London DEA' },
+      { href: '/services/epc-improvement-plan', label: 'EPC Improvement Plan', desc: `£${site.addOns.improvementPlan} personal plan and Energy Report` },
     ],
   },
   {
