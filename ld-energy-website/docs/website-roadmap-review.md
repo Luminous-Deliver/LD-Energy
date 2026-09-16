@@ -93,7 +93,7 @@ No platform migration, dependency upgrade, real enquiry, new review markup or fa
 
 ## Post-review desktop pass, 16 September 2026
 
-An independent review of this batch found no blockers and no rollback case, but flagged sparse desktop composition, the Stage 3 removal of site-wide priority-area footer links, the Sellers hero legal wording, the Estate Agents delivery guarantee and the dropped `alternateName`. These are addressed in one commit on top of `f32cf33`, documented with before/after evidence in [desktop-homepage-pass.md](desktop-homepage-pass.md). Mobile and tablet homepage content is pixel-verified unchanged; the footer adds one collapsible group. Not deployed as part of the commit.
+An independent review of this batch found no blockers and no rollback case, but flagged sparse desktop composition, the Stage 3 removal of site-wide priority-area footer links, the Sellers hero legal wording, the Estate Agents delivery guarantee and the dropped `alternateName`. These are addressed in one commit on top of `f32cf33`, documented with before/after evidence in [desktop-homepage-pass.md](desktop-homepage-pass.md). Mobile and tablet homepage content is pixel-verified unchanged; the footer adds one collapsible group. Deployed exactly as `fe999ce` in Cloudflare deployment `93f24e7d-f7ef-4cac-be68-7890f16ebb10` on 16 September 2026; production checks matched the local evidence.
 
 Measurement note: the restored footer links change internal linking to 12 area pages from this change's deployment date. Treat that date as a Stage 6 baseline break for the 28/90-day review.
 

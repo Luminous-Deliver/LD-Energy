@@ -41,4 +41,6 @@ Parent evidence: `audits/website-growth-audit/desktop-pass-2026-09-16/`. Before 
 - Schema: the Stage 4 twelve-template check re-run with an added `alternateName` assertion; visible FAQ parity passes.
 - Typecheck, lint (existing OG-image warning only), Next production build (79 pages) and 11/11 unit/contract tests pass.
 
-Rollback: revert this commit. Not deployed by this change.
+Deployment: exact commit `fe999ce` shipped as Cloudflare Pages deployment `93f24e7d-f7ef-4cac-be68-7890f16ebb10` on 16 September 2026 (Linux build, packaging and deploy stages succeeded). The same harness against production matched the local after-build heights at all five widths and passed every interaction and area-page check with no page errors. Prerendered pages cached at the edge before the release (`s-maxage=3600`) refresh on expiry; a cache-busted `/estate-agents` served the new content while the bare URL was still a pre-release HIT. No cache purge was run.
+
+Rollback: revert this commit.
