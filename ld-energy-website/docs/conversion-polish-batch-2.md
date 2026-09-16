@@ -34,4 +34,6 @@ Evidence: `audits/website-growth-audit/desktop-pass-2026-09-16/` (`batch2-before
 | 390 | 6,313 | 7,453 | Good to know (+645), card points and saving (+451), hero rating (+44) |
 | 1440 | 5,137 | 5,517 | Good to know section and card points |
 
-Rollback: revert this commit.
+Deployment: exact commit `86869dd` shipped as Cloudflare Pages deployment `d84c147c-1de3-4ace-a95f-4d6f5418e637` on 16 September 2026. The same batch checks against production (cache-busted) passed with heights identical to the local build at all five widths; evidence in `batch2-production/`. Pages cached before the release refresh on expiry; no purge was run.
+
+Rollback: revert `86869dd`.
