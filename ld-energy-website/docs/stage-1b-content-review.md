@@ -1,7 +1,7 @@
 # Stage 1b content accuracy review
 
 Prepared 14 September 2026. Base: `14a6813dc500da17fb9dadc49d48bfe0a96b1f94`.
-Branch: `fix/stage-1b-content-accuracy`. This content commit is for independent review; it has not been pushed or deployed.
+Original branch: `fix/stage-1b-content-accuracy`. This was the pre-release review record. Update 16 September: the user subsequently authorised self-review and shipment; `f6e37a2` plus follow-up `c51e298` are deployed. See `website-roadmap-review.md` for the complete release/evidence chain. Independent AI 2 review remains outstanding.
 
 ## Stage 1 production gate
 
