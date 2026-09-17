@@ -49,3 +49,5 @@ Owner feedback: the form still showed white space and uneven cards. Changes, for
 - "Need help? Call or WhatsApp." loses its touch padding at `lg` only.
 
 Verification (`final-verify3.out`): typecheck, lint, build, 11/11 unit tests, Stage 1 booking tests at eight widths and layout test, homepage harness, batch checks and schema pass. Phones (320/390): Contact and three area pages keep identical heights and the Contact first viewport is pixel-identical. At 768 pages are 60px shorter where orphan options now span the row. At 1440 area pages are 298px shorter; three `#contact` actions and one form retained.
+
+Deployment: exact commit `85506a3` shipped as Cloudflare Pages deployment `c3012b9f-517a-46b6-97d1-72553d0e9872` on 17 September 2026. Production batch checks passed and live form heights matched the local build at 768, 1024, 1280 and 1440 (`form-shots-production/`).
