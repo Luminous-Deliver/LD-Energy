@@ -23,7 +23,7 @@ const controlClass = 'inline-flex min-h-[48px] items-center justify-center round
 
 interface ChoiceProps {
   name: string; legend: string; value: string; onChange: (value: string) => void
-  options: { value: string; label: string; description?: string; badge?: string }[]
+  options: { value: string; label: string; description?: string; shortDescription?: string; badge?: string; fullRow?: boolean }[]
   error?: string; hint?: string; inputRef?: (element: HTMLInputElement | null) => void
   /** Extra desktop grid classes, e.g. three floor-area columns. */
   gridClassName?: string
@@ -36,15 +36,17 @@ function Choices({ name, legend, value, onChange, options, error, hint, inputRef
       <p id={`${name}-hint`} className="mt-1 text-sm text-secondary-700">{hint || 'Choose one option.'}</p>
       <div className={cn('mt-3 grid gap-3 sm:grid-cols-2', gridClassName)}>
         {options.map((option, index) => (
-          <label key={option.value} className={cn('flex min-h-[48px] min-w-0 cursor-pointer items-start gap-3 rounded-lg border p-3', value === option.value ? 'border-primary-700 bg-primary-50 ring-1 ring-primary-700' : 'border-secondary-300 bg-white lg:transition-colors lg:hover:border-primary-500')}>
+          <label key={option.value} className={cn('flex min-h-[48px] min-w-0 cursor-pointer items-start gap-3 rounded-lg border p-3', option.fullRow && 'sm:col-span-full', value === option.value ? 'border-primary-700 bg-primary-50 ring-1 ring-primary-700' : 'border-secondary-300 bg-white lg:transition-colors lg:hover:border-primary-500')}>
             <input type="radio" name={name} value={option.value} checked={value === option.value}
               id={`${name}-${index}`} ref={index === 0 ? inputRef : undefined}
               onChange={() => onChange(option.value)} required
               aria-label={option.label} aria-describedby={`${name}-hint ${name}-description-${index}${error ? ` ${name}-error` : ''}`}
               className="mt-1 h-5 w-5 shrink-0 accent-primary-700" />
             <span className="min-w-0">
-              <span className="block text-base font-semibold text-secondary-900">{option.label}{option.badge && <span className="ml-2 hidden rounded-md bg-[#386B59] px-1.5 py-0.5 align-middle text-xs font-bold uppercase tracking-wide text-white lg:inline-block">{option.badge}</span>}</span>
-              <span id={`${name}-description-${index}`} className="mt-1 block text-sm text-secondary-700">{option.description}</span>
+              <span className="block text-base font-semibold text-secondary-900">{option.label}{option.badge && <span className="ml-2 hidden rounded-md bg-[#386B59] px-1.5 py-0.5 align-middle text-xs font-bold uppercase tracking-wide text-white xl:inline-block">{option.badge}</span>}</span>
+              <span id={`${name}-description-${index}`} className="mt-1 block text-sm text-secondary-700">
+                {option.shortDescription ? <><span className="lg:hidden">{option.description}</span><span className="hidden lg:inline">{option.shortDescription}</span></> : option.description}
+              </span>
             </span>
           </label>
         ))}
@@ -263,7 +265,7 @@ export function ContactForm({ areaPage, sourcePage }: { areaPage?: string; sourc
             hint="Choose your internal floor area for a guide estimate."
             value={field.value || ''} inputRef={field.ref} error={errors.areaBand?.message}
             onChange={value => { revealEstimate.current = true; field.onChange(value); rememberSelection(); conversionEvent('estimator_use', quoteContextFromForm(getValues())) }}
-            options={[...areaBands.map((band, index) => ({ value: band, label: pricing[index].areaLabel, description: pricing[index].typicalLabel })), { value: 'unknown', label: 'Not sure of floor area', description: 'Continue without an estimate. We will review the property details before quoting.' }]} />} />}
+            options={[...areaBands.map((band, index) => ({ value: band, label: pricing[index].areaLabel, description: pricing[index].typicalLabel, shortDescription: pricing[index].label })), { value: 'unknown', label: 'Not sure of floor area', description: 'Continue without an estimate. We will review the property details before quoting.', fullRow: true }]} />} />}
 
         {estimatePanel}
 
@@ -338,7 +340,7 @@ export function ContactForm({ areaPage, sourcePage }: { areaPage?: string; sourc
           <button type="submit" disabled={status === 'submitting' || !turnstileToken} className={`${controlClass} ml-auto bg-primary-700 text-white`}>{status === 'submitting' ? 'Sending…' : 'Send my quote request'}</button>}
       </div>
       <details className="mt-4 text-sm text-secondary-700"><summary className="cursor-pointer py-3 font-semibold">What’s included</summary><ul className="list-disc space-y-2 pl-5">{includedList(productKind).map(item => <li key={item}>{item}</li>)}</ul></details>
-      <p className="mt-3 text-sm text-secondary-700">Need help? <a href={site.phoneHref} className="inline-flex min-h-[44px] items-center px-2 underline">Call</a> or <a href={site.whatsappHref} className="inline-flex min-h-[44px] items-center px-2 underline">WhatsApp</a>.</p>
+      <p className="mt-3 text-sm text-secondary-700">Need help? <a href={site.phoneHref} className="inline-flex min-h-[44px] items-center px-2 underline lg:px-0">Call</a> or <a href={site.whatsappHref} className="inline-flex min-h-[44px] items-center px-2 underline lg:px-0">WhatsApp</a>.</p>
     </form>
   )
 }

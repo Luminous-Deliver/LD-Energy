@@ -3,15 +3,16 @@ import { BULK, PRE_ASSESSMENT } from '@/lib/booking-options'
 
 /**
  * Service choices, shared by the quote form and its desktop summary so labels cannot drift.
- * Badges are desktop-only visual labels; each radio keeps `label` as its accessible name.
+ * Badges are wide-desktop (xl) visual labels; each radio keeps `label` as its accessible name.
+ * `fullRow` spans the grid row from two columns up, so the odd option never leaves an empty cell.
  * "Better value" holds for every band: the bundle is below EPC plus floor plan.
  */
-export const serviceChoices: { value: string; label: string; description: string; badge?: string }[] = [
+export const serviceChoices: { value: string; label: string; description: string; badge?: string; fullRow?: boolean }[] = [
   { value: 'EPC Certificate', label: 'Domestic EPC', description: 'On-site assessment and an EPC lodged on the government register.' },
   { value: 'Both (Bundle)', label: 'EPC + Floor Plan', description: 'Both services for the same property in one visit, with the bundle price.', badge: 'Better value' },
   { value: 'Floor Plan', label: 'Floor Plan', description: 'Laser-measured drawing showing layout and room sizes.' },
   { value: PRE_ASSESSMENT, label: 'EPC Pre-Assessment', description: 'Find out your score privately. Nothing is lodged.', badge: 'Private' },
-  { value: BULK, label: 'Agency / portfolio enquiry', description: 'Multiple properties or ongoing instructions, quoted individually.', badge: 'Agencies' },
+  { value: BULK, label: 'Agency / portfolio enquiry', description: 'Multiple properties or ongoing instructions, quoted individually.', badge: 'Agencies', fullRow: true },
 ]
 
 function assertNever(kind: never): never {

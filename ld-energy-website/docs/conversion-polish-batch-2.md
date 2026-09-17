@@ -37,3 +37,15 @@ Evidence: `audits/website-growth-audit/desktop-pass-2026-09-16/` (`batch2-before
 Deployment: exact commit `86869dd` shipped as Cloudflare Pages deployment `d84c147c-1de3-4ace-a95f-4d6f5418e637` on 16 September 2026. The same batch checks against production (cache-busted) passed with heights identical to the local build at all five widths; evidence in `batch2-production/`. Pages cached before the release refresh on expiry; no purge was run.
 
 Rollback: revert `86869dd`.
+
+## Follow-up: quote form proportions, 17 September 2026
+
+Owner feedback: the form still showed white space and uneven cards. Changes, form presentation only:
+
+- The odd option in a two- or three-column grid spans the row (`fullRow`): Agency / portfolio enquiry and Not sure of floor area. No empty cells from 640px up.
+- At `lg`, floor-area tiles show the short bedroom reference ("1 bedroom"); below `lg` the full caption remains. Accessible names are unchanged.
+- Service badges appear from 1280px, where they fit beside the name; between 1024 and 1279px the cards stay even.
+- Area pages at `lg`: the embedded section places the intro and a sticky quote summary beside the form, instead of stretching the form across the container.
+- "Need help? Call or WhatsApp." loses its touch padding at `lg` only.
+
+Verification (`final-verify3.out`): typecheck, lint, build, 11/11 unit tests, Stage 1 booking tests at eight widths and layout test, homepage harness, batch checks and schema pass. Phones (320/390): Contact and three area pages keep identical heights and the Contact first viewport is pixel-identical. At 768 pages are 60px shorter where orphan options now span the row. At 1440 area pages are 298px shorter; three `#contact` actions and one form retained.
