@@ -13,9 +13,9 @@ import { quoteHref, quoteServices, type QuoteService } from '@/lib/quote-context
 
 // Points are product facts only: no turnaround, hours or travel-charge promises.
 const products: { service: QuoteService; title: string; from: number; description: string; points: string[]; detail: string; detailLabel: string; Icon: LucideIcon }[] = [
-  { service: 'epc', title: 'Domestic EPC', from: priceFrom.epc, description: 'On-site energy assessment, lodged certificate and standard recommendation report where applicable.', points: ['Accredited Domestic Energy Assessor', 'Lodged on the GOV.UK EPC Register', 'Valid for 10 years', `Optional £${site.addOns.improvementPlan} Improvement Plan`], detail: '/services/domestic-epc', detailLabel: 'Domestic EPC details', Icon: FileText },
-  { service: 'bundle', title: 'EPC + Floor Plan', from: priceFrom.bundle, description: 'Your EPC and a measured marketing floor plan, completed in one property visit.', points: ['Everything in the Domestic EPC', 'Floor plan supplied as JPG and PDF', 'One visit for both services'], detail: '/pricing', detailLabel: 'EPC and floor plan pricing', Icon: Layers },
-  { service: 'floor-plan', title: 'Floor Plan', from: priceFrom.floorPlan, description: 'A measured marketing plan with approximate room dimensions, supplied as JPG and PDF.', points: ['Measured on site', 'Layout and approximate room sizes', 'JPG and PDF files', 'For homes with a valid EPC already'], detail: '/services/floor-plans', detailLabel: 'Floor plan details', Icon: LayoutPanelLeft },
+  { service: 'epc', title: 'Domestic EPC', from: priceFrom.epc, description: 'On-site energy assessment, lodged certificate and standard recommendation report where applicable.', points: ['Carried out by an accredited Domestic Energy Assessor', 'Lodged on the official GOV.UK EPC Register', 'Valid for 10 years', 'Certificate link sent once it is live on the register', `Optional £${site.addOns.improvementPlan} Improvement Plan with full Energy Report`], detail: '/services/domestic-epc', detailLabel: 'Domestic EPC details', Icon: FileText },
+  { service: 'bundle', title: 'EPC + Floor Plan', from: priceFrom.bundle, description: 'Your EPC and a measured marketing floor plan, completed in one property visit.', points: ['Everything in the Domestic EPC', 'Laser-measured floor plan for Rightmove, Zoopla and OnTheMarket', 'Total floor area, approximate room dimensions and labels', 'Supplied as high-resolution JPEG and PDF', 'Both surveys completed in one property visit'], detail: '/pricing', detailLabel: 'EPC and floor plan pricing', Icon: Layers },
+  { service: 'floor-plan', title: 'Floor Plan', from: priceFrom.floorPlan, description: 'A measured marketing plan with approximate room dimensions, supplied as JPG and PDF.', points: ['Laser-measured on site, with approximate dimensions shown', 'Total floor area (gross internal area)', 'Individual room dimensions and room labels', 'High-resolution JPEG and PDF files', 'Suitable for Rightmove, Zoopla and OnTheMarket'], detail: '/services/floor-plans', detailLabel: 'Floor plan details', Icon: LayoutPanelLeft },
 ]
 
 const pill = 'lg:min-h-11 lg:rounded-full lg:border lg:border-secondary-300 lg:bg-white lg:px-4 lg:no-underline lg:transition-colors lg:hover:border-[#47846E]'
@@ -120,6 +120,8 @@ export function HomeServices() {
                 ))}
               </ul>
               <div className="mt-4 flex flex-1 flex-col justify-end lg:mt-6">
+                {/* Reassurance at the decision point, as the pre-Stage 3 cards had. */}
+                <p className="mb-2 text-sm leading-6 text-secondary-600">Exact price confirmed before booking</p>
                 <Button
                   href={quoteHref({ service: product.service, area: area || undefined, sourcePage: 'home', ctaId: area ? 'estimator' : 'pricing' })}
                   variant={i === 0 ? 'accent' : 'secondary'}

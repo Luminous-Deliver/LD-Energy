@@ -51,3 +51,13 @@ Owner feedback: the form still showed white space and uneven cards. Changes, for
 Verification (`final-verify3.out`): typecheck, lint, build, 11/11 unit tests, Stage 1 booking tests at eight widths and layout test, homepage harness, batch checks and schema pass. Phones (320/390): Contact and three area pages keep identical heights and the Contact first viewport is pixel-identical. At 768 pages are 60px shorter where orphan options now span the row. At 1440 area pages are 298px shorter; three `#contact` actions and one form retained.
 
 Deployment: exact commit `85506a3` shipped as Cloudflare Pages deployment `c3012b9f-517a-46b6-97d1-72553d0e9872` on 17 September 2026. Production batch checks passed and live form heights matched the local build at 768, 1024, 1280 and 1440 (`form-shots-production/`).
+
+## Follow-up: homepage card depth, 20 September 2026
+
+Owner feedback: the cards were missing points compared with the pre-Stage 3 design, and the guide price should stay at the top rather than move above the button (it is the live output of the floor-area scale, and at the bottom it would update off-screen on mobile).
+
+- Each card now carries five points, taken from the matching service page: portal names and "gross internal area" from the floor plans page, the certificate-link line from the Domestic EPC page. The bundle card went from three points to five.
+- "Exact price confirmed before booking" now sits directly above each button, the reassurance the old cards had at the decision point.
+- Still excluded: "standard lodgement within 72 hours, next day available", pending confirmed operational facts.
+
+Verification (`final-verify4.out`): typecheck, lint, build (79 pages), 11/11 unit tests, Stage 1 booking tests at eight widths, layout test, homepage harness, batch checks and schema pass. Desktop cards are equal height (697px at 1440). Homepage totals against the pre-batch-2 release: 390 6,313 → 7,917; 1440 5,137 → 5,651.
