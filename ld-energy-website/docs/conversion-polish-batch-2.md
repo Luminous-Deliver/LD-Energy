@@ -61,3 +61,5 @@ Owner feedback: the cards were missing points compared with the pre-Stage 3 desi
 - Still excluded: "standard lodgement within 72 hours, next day available", pending confirmed operational facts.
 
 Verification (`final-verify4.out`): typecheck, lint, build (79 pages), 11/11 unit tests, Stage 1 booking tests at eight widths, layout test, homepage harness, batch checks and schema pass. Desktop cards are equal height (697px at 1440). Homepage totals against the pre-batch-2 release: 390 6,313 → 7,917; 1440 5,137 → 5,651.
+
+Deployment: exact commit `35b212f` shipped as Cloudflare Pages deployment `fbaba3da-a7b8-460c-9ee1-24d488cbe01e` on 20 September 2026. Production batch checks passed; live card heights matched the local build (697px each at 1440, 815px at 1024) and homepage totals matched at all five widths (`cards-production/`).
