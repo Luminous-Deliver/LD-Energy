@@ -17,7 +17,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
-      SITE: https://epc.luminousanddeliver.co.uk
+      # The production alias of the same deployment and secrets. The custom domain has Bot Fight
+      # Mode on, which serves runners a "Just a moment..." challenge and cannot be skipped per path
+      # on the Free plan; pages.dev sits outside the zone's bot settings.
+      SITE: https://epc-euc.pages.dev
     steps:
       - name: Runtime secrets resolve in production
         run: |
