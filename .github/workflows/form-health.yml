@@ -1,13 +1,13 @@
-# Hourly proof that the live quote form can accept an enquiry. Sends no email.
-# From 15/09/2026 every production secret resolved empty and the form returned 503
-# for eight days; nobody knew until a customer emailed a screenshot.
+# Daily proof that the live quote form can accept an enquiry. Sends no email.
+# From 14/09/2026 21:50 UTC every production secret resolved empty and the form returned 503
+# for nine days; nobody knew until a customer emailed a screenshot.
 # A failed scheduled run emails whoever last changed the cron line below.
 # GitHub pauses schedules in public repos after 60 days without commits; re-enable in the Actions tab.
 name: Quote form health
 
 on:
   schedule:
-    - cron: '17 * * * *'
+    - cron: '17 7 * * *' # 07:17 UTC, before the working day
   workflow_dispatch:
 
 permissions: {}

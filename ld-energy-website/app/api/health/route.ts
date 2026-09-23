@@ -4,8 +4,8 @@ import { getRequestContext } from '@cloudflare/next-on-pages'
 export const runtime = 'edge'
 
 // A binding can be listed in the Pages dashboard yet resolve empty at runtime.
-// From 15/09/2026 every production secret did, and the quote form returned 503
-// for eight days unnoticed. This reports what the running deployment resolves,
+// From 14/09/2026 every production secret did, and the quote form returned 503
+// for nine days unnoticed. This reports what the running deployment resolves,
 // for the scheduled check in .github/workflows/form-health.yml. Names and
 // booleans only: never values, lengths or prefixes. Presence is not validity,
 // and a revoked key still passes; no upstream call here, because a public
