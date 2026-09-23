@@ -206,7 +206,10 @@ export function ContactForm({ areaPage, sourcePage }: { areaPage?: string; sourc
     try {
       const response = await fetch('/api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
       const body = await response.json().catch(() => ({}))
-      if (!response.ok || body.ok !== true || body.delivered !== true) throw new Error('Your request could not be received. Please try again, or use the support links below.')
+      // The route's customer-facing errors are full sentences ("…call or WhatsApp us instead.");
+      // its internal ones ("Forbidden", "Validation failed") are not. Show only the former.
+      const reason = typeof body.error === 'string' && /[.!]$/.test(body.error) ? body.error : 'Please try again, or use the support links below.'
+      if (!response.ok || body.ok !== true || body.delivered !== true) throw new Error(`Your request could not be received. ${reason}`)
       conversionEvent('enquiry_submitted', quoteContextFromForm(data))
       setStatus('success')
     } catch (error) {

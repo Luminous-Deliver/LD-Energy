@@ -163,3 +163,40 @@ test('contact API security, recalculation and both email representations with de
     for (const [key, value] of [['NODE_ENV', previous.node], ['TURNSTILE_SECRET_KEY', previous.turnstile], ['RESEND_API_KEY', previous.resend]]) value === undefined ? delete process.env[key] : process.env[key] = value
   }
 })
+
+test('health route reports runtime-resolved secrets as booleans, never values', async () => {
+  const { GET } = require('../app/api/health/route.ts')
+  const names = ['TURNSTILE_SECRET_KEY', 'RESEND_API_KEY', 'RESEND_WEBHOOK_SECRET']
+  const previous = Object.fromEntries(names.map(name => [name, process.env[name]]))
+  const previousFetch = global.fetch
+  global.fetch = async () => { throw new Error('health must not call upstream services') }
+  try {
+    for (const name of names) process.env[name] = `test-only-${name}`
+    let response = await GET()
+    assert.equal(response.status, 200)
+    assert.equal(response.headers.get('cache-control'), 'no-store')
+    const body = await response.json()
+    assert.deepEqual(body, { ok: true, checks: { TURNSTILE_SECRET_KEY: true, RESEND_API_KEY: true, RESEND_WEBHOOK_SECRET: true } })
+    assert.doesNotMatch(JSON.stringify(body), /test-only/)
+    // An empty string is how a blanked Pages secret resolves; it must read as missing.
+    process.env.RESEND_API_KEY = ''
+    response = await GET()
+    assert.equal(response.status, 503)
+    assert.deepEqual((await response.json()).checks, { TURNSTILE_SECRET_KEY: true, RESEND_API_KEY: false, RESEND_WEBHOOK_SECRET: true })
+  } finally {
+    global.fetch = previousFetch
+    for (const name of names) previous[name] === undefined ? delete process.env[name] : process.env[name] = previous[name]
+  }
+})
+
+test('form shows only full-sentence server errors to the customer', () => {
+  const form = require('node:fs').readFileSync(require('node:path').join(__dirname, '../components/forms/ContactForm.tsx'), 'utf8')
+  const rule = /\/\[\.!\]\$\/\.test\(body\.error\)/
+  assert.match(form, rule)
+  const route = require('node:fs').readFileSync(require('node:path').join(__dirname, '../app/api/contact/route.ts'), 'utf8')
+  const errors = [...route.matchAll(/\{ error: '([^']+)'/g)].map(match => match[1])
+  for (const internal of ['Forbidden', 'Validation failed', 'Invalid request body', 'Request too large', 'Invalid area page']) {
+    assert.ok(errors.includes(internal)); assert.doesNotMatch(internal, /[.!]$/)
+  }
+  for (const customer of errors.filter(error => /call|WhatsApp|refresh/.test(error))) assert.match(customer, /[.!]$/)
+})
