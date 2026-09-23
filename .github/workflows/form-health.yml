@@ -1,0 +1,37 @@
+# Daily proof that the live quote form can accept an enquiry. Sends no email.
+# From 14/09/2026 21:50 UTC every production secret resolved empty and the form returned 503
+# for nine days; nobody knew until a customer emailed a screenshot.
+# A failed scheduled run emails whoever last changed the cron line below.
+# GitHub pauses schedules in public repos after 60 days without commits; re-enable in the Actions tab.
+name: Quote form health
+
+on:
+  schedule:
+    - cron: '17 7 * * *' # 07:17 UTC, before the working day
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  live-form:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      SITE: https://epc.luminousanddeliver.co.uk
+    steps:
+      - name: Runtime secrets resolve in production
+        run: |
+          code=$(curl -sS --retry 2 -o health.json -w '%{http_code}' "$SITE/api/health")
+          cat health.json; echo
+          test "$code" = "200"
+
+      - name: Contact route reaches Turnstile verification
+        # A schema-valid enquiry with a dummy token must be refused by Turnstile (400),
+        # proving the route runs end to end up to the email step. 503 = a secret is missing.
+        run: |
+          code=$(curl -sS --retry 2 -o contact.json -w '%{http_code}' -X POST "$SITE/api/contact" \
+            -H 'Content-Type: application/json' \
+            -d '{"name":"Health Check","phone":"07000 000000","email":"health-check@example.invalid","address":"1 Health Check Road","postcode":"E15 1AA","services":["Floor Plan"],"areaBand":"71-95","customerType":"Letting agent / firm","improvementPlan":false,"speed":"Standard (72 hours)","sourcePage":"contact","ctaId":"direct","propertyCount":"","preferredDate":"","notes":"","website":"","turnstileToken":"health-check-dummy-token","consent":true}')
+          cat contact.json; echo
+          test "$code" = "400"
+          grep -q 'Security verification failed' contact.json
