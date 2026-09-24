@@ -1,7 +1,7 @@
 const { chromium } = require('playwright')
 const assert = require('node:assert/strict')
 const fs = require('node:fs')
-const out = '../../../audits/website-growth-audit/ld-energy-stage1-review-fix-2026-09-11'
+const out = process.env.BOOKING_EVIDENCE_DIR || '../../../audits/website-growth-audit/ld-energy-stage1-review-fix-2026-09-11'
 
 ;(async () => {
   const browser = await chromium.launch({ channel: 'msedge' })
@@ -15,11 +15,13 @@ const out = '../../../audits/website-growth-audit/ld-energy-stage1-review-fix-20
     let submission
     await page.route('**/api/contact', route => { submission = route.request().postDataJSON(); return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, delivered: true }) }) })
     for (const service of ['floor-plan', 'pre-assessment', 'bulk']) {
-      await page.goto(`http://localhost:3100/contact?service=${service}&area=unknown&speed=express&plan=1#booking-form`, { waitUntil: 'networkidle' })
+      await page.goto(`${process.env.BOOKING_TEST_URL || 'http://localhost:3100'}/contact?service=${service}&area=unknown&speed=express&plan=1#booking-form`, { waitUntil: 'networkidle' })
       assert.equal(await page.getByRole('checkbox', { name: /Add the EPC Improvement Plan/ }).count(), 0)
       if (service === 'pre-assessment') assert.match(await page.locator('form').innerText(), /included in your Pre-Assessment/)
       if (service === 'bulk') {
         assert.equal(await page.locator('input[name="areaBand"]').count(), 0)
+        // A portfolio is never one home someone lives in.
+        assert.equal(await page.getByRole('radio', { name: 'Homeowner', exact: true }).count(), 0)
         await page.getByRole('radio', { name: 'Landlord (tenanted)', exact: true }).focus()
         await page.keyboard.press('Space')
         assert.equal(await page.getByRole('radio', { name: 'Landlord (tenanted)', exact: true }).isChecked(), true)
@@ -40,7 +42,7 @@ const out = '../../../audits/website-growth-audit/ld-energy-stage1-review-fix-20
         await page.locator('#consent').check()
         await page.screenshot({ path: out + '/bulk320-details.png', fullPage: true })
         await page.getByRole('button', { name: 'Send my quote request' }).click()
-        await page.getByRole('heading', { name: 'Your quote request has been received' }).waitFor()
+        await page.getByRole('heading', { name: /^Request sent\. Thanks, Test\.$/ }).waitFor()
         assert.equal(submission.customerType, 'Landlord (tenanted)')
         assert.equal(submission.propertyCount, '20+')
         assert.equal(submission.speed, 'Standard (72 hours)')
@@ -52,7 +54,7 @@ const out = '../../../audits/website-growth-audit/ld-energy-stage1-review-fix-20
     storage.on('pageerror', error => errors.push(error.message))
     await storage.addInitScript(() => { if (window.top === window) Object.defineProperty(window, 'localStorage', { get() { throw new DOMException('Storage blocked', 'SecurityError') } }) })
     await storage.goto((process.env.BOOKING_PRODUCTION_URL || 'http://localhost:3110') + '/contact', { waitUntil: 'networkidle' })
-    await storage.getByRole('button', { name: 'Decline', exact: true }).click()
+    // The cookie banner was removed in 036b67e (14/09); blocked storage must still not break the form.
     await storage.getByRole('radio', { name: 'Not sure of floor area', exact: true }).check()
     await storage.getByRole('radio', { name: 'Homeowner', exact: true }).check()
     await storage.getByRole('button', { name: 'Continue', exact: true }).click()

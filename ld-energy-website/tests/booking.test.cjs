@@ -102,12 +102,13 @@ test('contact API security, recalculation and both email representations with de
   process.env.NODE_ENV = 'production'
   process.env.TURNSTILE_SECRET_KEY = 'test-only-secret'
   process.env.RESEND_API_KEY = 'test-only-key'
-  let messages = [], verification = true, providerStatus = 200
+  let messages = [], verification = true, providerStatus = 200, confirmationStatus = 200
   global.fetch = async (url, options) => {
     if (url.includes('siteverify')) return Response.json({ success: verification })
     assert.equal(url, 'https://api.resend.com/emails')
     messages.push(JSON.parse(options.body))
-    return Response.json({ id: 'mock-message' }, { status: providerStatus })
+    // The first send is the internal notification, the second the customer confirmation.
+    return Response.json({ id: 'mock-message' }, { status: messages.length === 2 ? confirmationStatus : providerStatus })
   }
   const request = (data, origin = site.url) => POST(new Request(site.url + '/api/contact', { method: 'POST', headers: { origin, 'Content-Type': 'application/json' }, body: JSON.stringify(data) }))
   try {
@@ -149,11 +150,59 @@ test('contact API security, recalculation and both email representations with de
     assert.equal((await request({ ...sample, services: ['Both (Bundle)'], speed: EXPRESS_SPEED, improvementPlan: true, total: 1 })).status, 200)
     assert.match(messages[0].text, /£185 guide/)
     assert.match(messages[1].text, /£185 guide/)
+
+    // Downstream scripts and /quote-reply match these subjects exactly.
+    assert.match(messages[0].subject, /^EPC booking: /)
+    assert.equal(messages[1].subject, 'We’ve received your EPC request — L&D Energy')
+    // Internal notification: one tap to the customer.
+    assert.match(messages[0].html, /href="https:\/\/wa\.me\/447000000000"/)
+    assert.match(messages[0].html, /href="tel:07000000000"/)
+    assert.match(messages[0].text, /Reply by WhatsApp: https:\/\/wa\.me\/447000000000/)
+    // Confirmation: next steps, the lodgement promise the customer chose, the prep checklist, no emoji or em dash in the body.
+    for (const body of [messages[1].text, messages[1].html]) {
+      assert.match(body, /What happens next/)
+      assert.match(body, /within 24 hours/)
+      assert.match(body, /Before your visit/)
+      assert.match(body, /preparing-for-your-epc#what-to-have-ready/)
+      assert.match(body, /Booking as/)
+    }
+    assert.doesNotMatch(messages[1].html, /&#128222;/)
+    assert.doesNotMatch(messages[1].text, /—/)
+
+    // Floor plans and portfolios have no EPC survey, so no EPC checklist; tenants are only mentioned to landlords.
+    for (const services of [['Floor Plan'], [BULK]]) {
+      messages = []
+      assert.equal((await request({ ...sample, services, propertyCount: '5' })).status, 200)
+      assert.doesNotMatch(messages[1].html, /Before your visit/)
+    }
+    messages = []
+    assert.equal((await request({ ...sample, customerType: 'Landlord (tenanted)', preferredDate: '2026-10-07', notes: 'Key with <neighbour>' })).status, 200)
+    assert.match(messages[1].html, /Tenanted property\?/)
+    assert.match(messages[1].text, /Preferred date: 07\/10\/2026/)
+    assert.match(messages[0].text, /Preferred Date: 07\/10\/2026/)
+    assert.match(messages[1].html, /Key with &lt;neighbour&gt;/)
+
+    // The response says whether the customer's copy actually went, so the page never claims it did when it did not.
+    messages = []
+    let response = await request(sample)
+    assert.deepEqual(await response.json(), { ok: true, delivered: true, confirmationSent: true })
+    messages = []; confirmationStatus = 500
+    response = await request(sample)
+    assert.equal(response.status, 200)
+    assert.deepEqual(await response.json(), { ok: true, delivered: true, confirmationSent: false })
+    confirmationStatus = 200
+
+    // The production pages.dev alias is the same deployment; other origins stay refused.
+    assert.equal((await request(sample, 'https://epc-euc.pages.dev')).status, 200)
+    assert.equal((await request(sample, 'https://preview.epc-euc.pages.dev')).status, 403)
     assert.equal((await request(sample, 'https://evil.invalid')).status, 403)
     assert.equal((await request({ ...sample, notes: 'x'.repeat(11000) })).status, 413)
     assert.equal((await request({ ...sample, propertyType: 'Studio' })).status, 400)
     assert.equal((await request({ ...sample, website: 'bot' })).status, 400)
-    verification = false; assert.equal((await request(sample)).status, 400)
+    verification = false
+    response = await request(sample)
+    assert.equal(response.status, 400)
+    assert.equal((await response.json()).code, 'security')
     verification = true; providerStatus = 500; assert.equal((await request(sample)).status, 502)
     delete process.env.TURNSTILE_SECRET_KEY; assert.equal((await request(sample)).status, 503)
     process.env.TURNSTILE_SECRET_KEY = 'test-only-secret'; delete process.env.RESEND_API_KEY
@@ -189,14 +238,38 @@ test('health route reports runtime-resolved secrets as booleans, never values', 
   }
 })
 
-test('form shows only full-sentence server errors to the customer', () => {
-  const form = require('node:fs').readFileSync(require('node:path').join(__dirname, '../components/forms/ContactForm.tsx'), 'utf8')
-  const rule = /\/\[\.!\]\$\/\.test\(body\.error\)/
-  assert.match(form, rule)
-  const route = require('node:fs').readFileSync(require('node:path').join(__dirname, '../app/api/contact/route.ts'), 'utf8')
-  const errors = [...route.matchAll(/\{ error: '([^']+)'/g)].map(match => match[1])
-  for (const internal of ['Forbidden', 'Validation failed', 'Invalid request body', 'Request too large', 'Invalid area page']) {
-    assert.ok(errors.includes(internal)); assert.doesNotMatch(internal, /[.!]$/)
+test('form classifies send failures and never shows raw server text to the customer', () => {
+  const fs = require('node:fs'), path = require('node:path')
+  const form = fs.readFileSync(path.join(__dirname, '../components/forms/ContactForm.tsx'), 'utf8')
+  assert.doesNotMatch(form, /body\.error/)
+  assert.match(form, /body\.code === 'security'/)
+  const route = fs.readFileSync(path.join(__dirname, '../app/api/contact/route.ts'), 'utf8')
+  // The daily health check greps this exact sentence; the form reads the code beside it.
+  assert.match(route, /error: 'Security verification failed\. Please refresh and try again\.', code: 'security'/)
+})
+
+test('customer types, next steps, dates and the fallback summary', () => {
+  const { customerTypeChoices, nextSteps, formatPreferredDate, enquirySummaryText, hasPrepChecklist, serviceLabel } = require('../lib/booking-copy.ts')
+  assert.deepEqual(customerTypeChoices(true).map(choice => choice.value), ['Landlord (tenanted)', 'Estate agent', 'Letting agent / firm'])
+  assert.deepEqual(customerTypeChoices(false).map(choice => choice.value), ['Homeowner', 'Landlord (tenanted)', 'Estate agent', 'Letting agent / firm'])
+  for (const kind of ['epc', 'bundle', 'floorPlan', 'preAssessment', 'bulk', 'none']) {
+    const steps = nextSteps(kind, 'Standard (72 hours)')
+    assert.ok(steps.length >= 2)
+    for (const step of steps) assert.doesNotMatch(step, /—|undefined|minutes/)
+    assert.match(steps[0], /Mon–Sun, 8am–8pm/)
   }
-  for (const customer of errors.filter(error => /call|WhatsApp|refresh/.test(error))) assert.match(customer, /[.!]$/)
+  assert.match(nextSteps('epc', EXPRESS_SPEED).at(-1), /within 24 hours/)
+  assert.match(nextSteps('epc', 'Standard (72 hours)').at(-1), /within 72 hours/)
+  assert.match(nextSteps('preAssessment').at(-1), /Nothing is lodged/)
+  assert.deepEqual(['epc', 'bundle', 'preAssessment', 'floorPlan', 'bulk'].map(hasPrepChecklist), [true, true, true, false, false])
+  assert.equal(formatPreferredDate('2026-10-07'), '07/10/2026')
+  assert.equal(formatPreferredDate('next Tuesday'), 'next Tuesday')
+  assert.equal(formatPreferredDate(''), '')
+  assert.equal(serviceLabel(BULK), 'Agency / portfolio enquiry')
+  const summary = enquirySummaryText({ ...sample, services: ['Both (Bundle)'], speed: EXPRESS_SPEED, improvementPlan: true, preferredDate: '2026-10-07', notes: 'Side gate' })
+  for (const expected of ['Service: EPC + Floor Plan', 'Floor area: 53–70 m²', 'I am: Homeowner', 'Lodgement: next day', 'Add-on: EPC Improvement Plan', 'Address: 1 Test Road, E15 1AA', 'Preferred date: 07/10/2026', 'Notes: Side gate', 'Name: Test Customer', 'Phone: 07000000000', 'Email: test@example.invalid']) assert.ok(summary.includes(expected), expected)
+  const bulk = enquirySummaryText({ ...sample, services: [BULK], customerType: 'Estate agent', propertyCount: '20+', address: 'A\nB', postcode: '' })
+  assert.match(bulk, /Properties: 20\+/)
+  assert.match(bulk, /Properties and postcodes: A\nB/)
+  assert.doesNotMatch(bulk, /Floor area|Address:/)
 })

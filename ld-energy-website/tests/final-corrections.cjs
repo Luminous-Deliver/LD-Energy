@@ -1,7 +1,7 @@
 const assert = require('node:assert/strict')
 const fs = require('node:fs')
 const path = require('node:path')
-const out = path.resolve('../../../audits/website-growth-audit/ld-energy-stage1-final-2026-09-11')
+const out = path.resolve(process.env.BOOKING_EVIDENCE_DIR || '../../../audits/website-growth-audit/ld-energy-stage1-final-2026-09-11')
 fs.mkdirSync(path.join(out, 'browser-temp'), { recursive: true })
 // Keep test profiles on D: while the owner recovers C:. No changes to system settings.
 process.env.TEMP = process.env.TMP = path.join(out, 'browser-temp')
@@ -102,7 +102,8 @@ const historyKey = 'ldEnergyQuoteForm'
       assert.deepEqual(router, original.state)
       const entryUrl = page.url()
       // Next client navigation also unmounts the form; its router state must survive.
-      await page.locator('footer a[href="/pricing"]').first().click()
+      // Any client-side link will do; the desktop footer lost its /pricing link on 16/09 (86869dd).
+      await page.locator('a[href="/pricing"]:visible').first().click()
       await page.waitForURL(base + '/pricing')
       assert.equal(await form.count(), 0)
       assert.equal(await page.evaluate(key => history.state[key], historyKey), undefined)

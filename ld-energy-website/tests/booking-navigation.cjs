@@ -3,7 +3,7 @@ const assert = require('node:assert/strict')
 const fs = require('node:fs')
 const path = require('node:path')
 const base = process.env.BOOKING_TEST_URL || 'http://localhost:3100'
-const out = path.resolve('../../../audits/website-growth-audit/ld-energy-stage1-review-fix-2026-09-11')
+const out = path.resolve(process.env.BOOKING_EVIDENCE_DIR || '../../../audits/website-growth-audit/ld-energy-stage1-review-fix-2026-09-11')
 
 ;(async () => {
   const browser = await chromium.launch({ channel: 'msedge', headless: true })
@@ -31,7 +31,8 @@ const out = path.resolve('../../../audits/website-growth-audit/ld-energy-stage1-
       assert.equal(await page.locator('h1').count(), 1)
       report.push({ route, href, service, passed: true })
     }
-    await page.goto(base + '/#pricing', { waitUntil: 'networkidle' })
+    // The floor-area picker left the homepage in 566d3cd (15/09); it lives in the Pricing section of service pages.
+    await page.goto(base + '/services/domestic-epc#pricing', { waitUntil: 'networkidle' })
     await page.getByText('View guide prices by floor area', { exact: true }).click()
     const picker = page.locator('.md\\:hidden').filter({ has: page.getByText('View guide prices by floor area', { exact: true }) })
     await picker.getByRole('button', { name: /71/ }).click()

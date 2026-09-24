@@ -5,7 +5,7 @@ const path = require('node:path')
 const { boroughMeta } = require('../lib/boroughs.ts')
 const base = process.env.BOOKING_TEST_URL || 'http://localhost:3110'
 if (!['localhost', '127.0.0.1'].includes(new URL(base).hostname)) throw new Error('Local preview only')
-const out = path.resolve('../../../audits/website-growth-audit/ld-energy-stage1-review-fix-2026-09-11')
+const out = path.resolve(process.env.BOOKING_EVIDENCE_DIR || '../../../audits/website-growth-audit/ld-energy-stage1-review-fix-2026-09-11')
 
 ;(async () => {
   const report = []

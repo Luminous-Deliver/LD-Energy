@@ -4,7 +4,7 @@ const fs = require('node:fs')
 const path = require('node:path')
 const base = process.env.BOOKING_TEST_URL || 'http://localhost:3100'
 if (!['localhost', '127.0.0.1'].includes(new URL(base).hostname)) throw new Error('Booking interaction tests run locally only')
-const out = path.resolve('../../../audits/website-growth-audit/ld-energy-stage1-review-fix-2026-09-11')
+const out = path.resolve(process.env.BOOKING_EVIDENCE_DIR || '../../../audits/website-growth-audit/ld-energy-stage1-review-fix-2026-09-11')
 fs.mkdirSync(out, { recursive: true })
 const widths = [[320,568],[360,800],[375,812],[390,844],[412,915],[430,932],[768,1024],[1440,900]]
 
@@ -32,7 +32,7 @@ const widths = [[320,568],[360,800],[375,812],[390,844],[412,915],[430,932],[768
       await page.route('**/api/contact', async route => {
         submissions.push(route.request().postDataJSON())
         await new Promise(resolve => setTimeout(resolve, 150))
-        await route.fulfill({ status: fail ? 502 : 200, contentType: 'application/json', body: JSON.stringify(fail ? { error: 'Mock delivery failure' } : { ok: true, delivered: true }) })
+        await route.fulfill({ status: fail ? 502 : 200, contentType: 'application/json', body: JSON.stringify(fail ? { error: 'Mock delivery failure' } : { ok: true, delivered: true, confirmationSent: true }) })
       })
       await page.goto(base + '/contact', { waitUntil: 'networkidle' })
       await page.evaluate(() => document.fonts.ready)
@@ -89,13 +89,22 @@ const widths = [[320,568],[360,800],[375,812],[390,844],[412,915],[430,932],[768
       assert.equal(await form.locator('button[type="submit"]').isDisabled(), true)
       await page.evaluate(() => window.verifyChallenge())
       await form.getByRole('button', { name: 'Send my quote request', exact: true }).click()
-      await page.waitForFunction(() => document.querySelector('form').textContent.includes('could not be received'))
+      await page.waitForFunction(() => document.querySelector('form').textContent.includes('send this online'))
       assert.equal(await form.locator('#name').inputValue(), 'Test Customer')
+      // A failed send offers the same request pre-filled in WhatsApp and email; a 502 may clear, so retry is offered too.
+      const rescue = decodeURIComponent(await form.getByRole('link', { name: 'Send on WhatsApp', exact: true }).getAttribute('href'))
+      for (const detail of ['Test Customer', '07000000000', 'test@example.invalid', '1 Test Road, E15 1AA', 'EPC + Floor Plan', 'Private test note']) assert.ok(rescue.includes(detail), `WhatsApp rescue missing ${detail}`)
+      assert.match(decodeURIComponent(await form.getByRole('link', { name: 'Email it', exact: true }).getAttribute('href')), /^mailto:.*Test Customer/s)
+      assert.match(await form.innerText(), /or try again in a minute/)
+      if (width === 390 || width === 1440) await page.screenshot({ path: path.join(out, `contact-${width}-send-failed.png`), fullPage: true })
       assert.equal((await page.evaluate(() => window.testEvents)).filter(e => e.name === 'enquiry_submitted').length, 0)
       fail = false
       await page.waitForFunction(() => !document.querySelector('button[type="submit"]').disabled)
       await form.locator('button[type="submit"]').evaluate(button => { button.click(); button.click() })
-      await page.getByRole('heading', { name: 'Your quote request has been received' }).waitFor()
+      await page.getByRole('heading', { name: /^Request sent\. Thanks, Test\.$/ }).waitFor()
+      const sentText = await page.locator('[aria-labelledby="request-sent-heading"]').innerText()
+      for (const expected of [/emailed a copy to test@example\.invalid/, /What happens next/, /Before your visit/, /Not sure of floor area/]) assert.match(sentText, expected)
+      if (width === 390 || width === 1440) await page.screenshot({ path: path.join(out, `contact-${width}-sent.png`), fullPage: true })
       assert.equal(submissions.length, 2, 'One failed request and one successful retry, with double click suppressed')
       assert.equal(submissions[1].areaBand, 'unknown')
       assert.deepEqual(submissions[1].services, ['Both (Bundle)'])

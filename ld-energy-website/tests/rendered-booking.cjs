@@ -2,7 +2,7 @@ const assert = require('node:assert/strict')
 const fs = require('node:fs')
 const path = require('node:path')
 const base = process.env.BOOKING_TEST_URL || 'http://localhost:3110'
-const out = path.resolve('../../../audits/website-growth-audit/ld-energy-stage1-2026-09-10')
+const out = path.resolve(process.env.BOOKING_EVIDENCE_DIR || '../../../audits/website-growth-audit/ld-energy-stage1-2026-09-10')
 const baseline = JSON.parse(fs.readFileSync(path.resolve('../../../audits/website-growth-audit/ld-energy-phase1-2026-09-10/crawl.json'), 'utf8'))
 // ff9efbf updated this existing article before Stage 1 began, after the audit crawl.
 function withoutEarlierArticleUpdate(value) {

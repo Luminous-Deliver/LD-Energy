@@ -4,7 +4,7 @@ const fs = require('node:fs')
 const path = require('node:path')
 const base = process.env.BOOKING_TEST_URL || 'http://localhost:3100'
 if (!['localhost', '127.0.0.1'].includes(new URL(base).hostname)) throw new Error('Local preview only')
-const out = path.resolve('../../../audits/website-growth-audit/ld-energy-stage1-review-fix-2026-09-11')
+const out = path.resolve(process.env.BOOKING_EVIDENCE_DIR || '../../../audits/website-growth-audit/ld-energy-stage1-review-fix-2026-09-11')
 fs.mkdirSync(out, { recursive: true })
 const widths = [[320,568],[360,800],[375,812],[390,844],[412,915],[430,932],[768,1024],[1440,900]]
 
@@ -38,7 +38,7 @@ const widths = [[320,568],[360,800],[375,812],[390,844],[412,915],[430,932],[768
         await form.locator('#postcode').fill('E15 1AA')
         await form.locator('#consent').check()
         await form.getByRole('button', { name: 'Send my quote request' }).click()
-        await page.getByRole('heading', { name: 'Your quote request has been received' }).waitFor()
+        await page.getByRole('heading', { name: /^Request sent\. Thanks, Test\.$/ }).waitFor()
       }
 
       // Page-specific defaults are seeds, not rules that can overwrite a customer's selection.

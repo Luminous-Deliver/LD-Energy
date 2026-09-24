@@ -5,6 +5,8 @@ import { site } from '@/lib/site'
 import { areaLabel, legacyArea } from '@/lib/floor-area'
 import { guideEstimate, guideEstimateLine } from '@/lib/pricing-estimate'
 import { boroughMeta } from '@/lib/boroughs'
+import { EXPRESS_SPEED } from '@/lib/booking-options'
+import { formatPreferredDate, hasPrepChecklist, nextSteps, OPENING_HOURS, prepChecklist, PREP_PATH, serviceLabel, TENANT_NOTICE } from '@/lib/booking-copy'
 import type { EnquiryAttribution } from '@/lib/enquiry-attribution'
 
 export const runtime = 'edge'
@@ -35,6 +37,15 @@ function escapeHtml(value: string) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;')
+}
+
+/** International digits for wa.me. UK numbers arrive as 07…; the schema allows only digits, spaces, +, ( ) and -. */
+function whatsappDigits(phone: string): string {
+  const compact = phone.replace(/[^\d+]/g, '')
+  if (compact.startsWith('+')) return compact.slice(1).replace(/\D/g, '')
+  if (compact.startsWith('00')) return compact.slice(2)
+  if (compact.startsWith('0')) return `44${compact.slice(1)}`
+  return compact
 }
 
 interface ParsedInput extends EnquiryAttribution {
@@ -112,14 +123,20 @@ function buildEmail(data: ParsedInput) {
           : 'Within 72 hours — nothing lodged',
     ],
     ['Guide shown to customer', guideEstimateLine(estimate)],
-    ['Preferred Date', data.preferredDate || '—'],
+    ['Preferred Date', formatPreferredDate(data.preferredDate) || '—'],
     ['Notes', data.notes || '—'],
   ]
 
-  const text = rows.map(([k, v]) => `${k}: ${v}`).join('\n')
+  // One tap from the notification to the customer, instead of copying the number across.
+  const tel = `tel:${data.phone.replace(/[^\d+]/g, '')}`
+  const whatsapp = `https://wa.me/${whatsappDigits(data.phone)}`
+  const text = rows.map(([k, v]) => `${k}: ${v}`).join('\n') + `\n\nReply by WhatsApp: ${whatsapp}\nCall: ${tel}`
+  const replyLink = (href: string, label: string) =>
+    `<a href="${escapeHtml(href)}" style="display:inline-block;margin:0 8px 8px 0;padding:8px 14px;border:1px solid #CBD5E1;border-radius:8px;color:#182848;font-weight:600;text-decoration:none">${label}</a>`
 
   const html = `<!doctype html><html><body style="font-family:Inter,Arial,sans-serif;color:#1E293B;line-height:1.5">
 <h2 style="margin:0 0 16px;font-family:'Plus Jakarta Sans',Inter,Arial,sans-serif;color:#0F172A">New EPC booking request</h2>
+<p style="margin:0 0 8px">${replyLink(whatsapp, 'WhatsApp customer')}${replyLink(tel, 'Call customer')}${replyLink(`mailto:${data.email}`, 'Email customer')}</p>
 <table cellpadding="8" cellspacing="0" border="0" style="border-collapse:collapse;width:100%;max-width:560px">
 ${rows
   .map(
@@ -143,23 +160,28 @@ function buildConfirmation(data: ParsedInput) {
   const firstName = data.name.trim().split(/\s+/)[0] || 'there'
   const estimate = guideEstimate(data)
   const isBulkEnquiry = estimate.productKind === 'bulk'
+  const steps = nextSteps(estimate.productKind, data.speed)
+  const showPrep = hasPrepChecklist(estimate.productKind)
+  const tenanted = !isBulkEnquiry && data.customerType === 'Landlord (tenanted)'
+  const prepUrl = `${SITE_URL}${PREP_PATH}`
 
   // Bulk has no single property and no agreed turnaround yet; an unlodged
   // product has no lodgement to expedite. Both read off productKind so a new
   // product cannot silently inherit the wrong line.
-  const summary: Array<[string, string]> = [['Service', data.services.join(' + ')]]
+  const summary: Array<[string, string]> = [['Service', data.services.map(serviceLabel).join(' + ')]]
 
   if (isBulkEnquiry) {
     summary.push(['Properties', data.propertyCount || 'To be confirmed'])
     if (data.address) summary.push(['Addresses supplied', data.address])
     summary.push(['Turnaround', 'Agreed per property once quoted'])
   } else {
-    summary.push([
-      'Property',
-      `${areaLabel(data.areaBand || legacyArea(data.propertyType))} — ${data.address}, ${data.postcode}`,
-    ])
-    summary.push(['Turnaround', estimate.isLodged ? data.speed : 'Within 72 hours of the visit'])
+    summary.push(['Floor area', areaLabel(data.areaBand || legacyArea(data.propertyType))])
+    summary.push(['Property', `${data.address}, ${data.postcode}`])
+    summary.push(['Turnaround', estimate.isLodged
+      ? data.speed === EXPRESS_SPEED ? 'Next-day lodgement, within 24 hours of the visit' : 'Standard lodgement, within 72 hours of the visit'
+      : 'Within 72 hours of the visit'])
   }
+  summary.push(['Booking as', data.customerType])
 
   if (estimate.planIncluded) {
     summary.push(['Included', 'Energy Report + written Improvement Plan'])
@@ -169,34 +191,78 @@ function buildConfirmation(data: ParsedInput) {
   summary.push(['Guide estimate', estimate.state === 'priced'
     ? `£${estimate.total} guide; exact quote confirmed before booking.`
     : guideEstimateLine(estimate)])
-  if (data.preferredDate) summary.push(['Preferred date', data.preferredDate])
+  if (data.preferredDate) summary.push(['Preferred date', formatPreferredDate(data.preferredDate)])
+  if (data.notes) summary.push(['Your notes', data.notes])
+
+  const intro = isBulkEnquiry
+    ? `Thanks for your enquiry with L&D Energy. We've received it. Abdul will be in touch during our opening hours (${OPENING_HOURS}) with volume rates for your portfolio.`
+    : `Thanks for your quote request with L&D Energy. We've received it. Abdul will be in touch during our opening hours (${OPENING_HOURS}) with your exact price and an available appointment.`
+  const preheader = isBulkEnquiry
+    ? 'Abdul will reply with volume rates for your portfolio.'
+    : 'Abdul will reply with your exact price and available times.'
+  const legal = 'This confirms receipt of your enquiry. Your visit is confirmed only once you agree the price and appointment.'
 
   const text =
     `Hi ${firstName},\n\n` +
-    `Thanks for your quote request with L&D Energy — we've received it. Abdul will be in touch during our opening hours (Mon–Sun, 8am–8pm) with your exact price and an available appointment.\n\n` +
+    `${intro}\n\n` +
     `Your request:\n` +
     summary.map(([k, v]) => `  ${k}: ${v}`).join('\n') +
-    `\n\nNeed us sooner? Call or text ${PHONE}, or message us on WhatsApp.\n\n` +
-    `L&D Energy — Elmhurst-accredited Domestic Energy Assessor\n` +
+    `\n\nWhat happens next:\n` +
+    steps.map((step, i) => `  ${i + 1}. ${step}`).join('\n') +
+    (showPrep ? `\n\nBefore your visit:\n${prepChecklist.map(item => `  - ${item}`).join('\n')}\n  Full checklist: ${prepUrl}` : '') +
+    (tenanted ? `\n\nTenanted property? ${TENANT_NOTICE}` : '') +
+    `\n\nNeed us sooner, or want to change something? Reply to this email, call or text ${PHONE}, or message us on WhatsApp.\n\n` +
+    `L&D Energy, Elmhurst-accredited Domestic Energy Assessor\n` +
     `Covering all 32 London boroughs · ${SITE_URL}\n\n` +
-    `This confirms receipt of your enquiry. Your visit is confirmed only once you agree the price and appointment.`
+    legal
+
+  const sectionLabel = (label: string) =>
+    `<p style="margin:0 0 10px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:${SAGE}">${label}</p>`
 
   const summaryRows = summary
     .map(
       ([k, v], i) =>
         `<tr>
-          <td style="padding:12px 16px;${i > 0 ? `border-top:1px solid ${LINE};` : ''}font-size:12px;font-weight:600;color:${MUTED};text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;vertical-align:top">${escapeHtml(k)}</td>
-          <td style="padding:12px 16px;${i > 0 ? `border-top:1px solid ${LINE};` : ''}font-size:14px;color:${INK};font-weight:600">${escapeHtml(v)}</td>
+          <td style="padding:12px 16px;${i > 0 ? `border-top:1px solid ${LINE};` : ''}font-size:12px;font-weight:600;color:${MUTED};text-transform:uppercase;letter-spacing:.04em;width:36%;vertical-align:top">${escapeHtml(k)}</td>
+          <td style="padding:12px 16px;${i > 0 ? `border-top:1px solid ${LINE};` : ''}font-size:14px;color:${INK};font-weight:600">${escapeHtml(v).replace(/\n/g, '<br>')}</td>
         </tr>`,
     )
     .join('')
 
+  const stepRows = steps
+    .map(
+      (step, i) =>
+        `<tr>
+          <td style="width:28px;padding:0 12px 12px 0;vertical-align:top">
+            <div style="width:24px;height:24px;border-radius:999px;background:${NAVY};color:#ffffff;font-size:12px;font-weight:700;line-height:24px;text-align:center">${i + 1}</div>
+          </td>
+          <td style="padding:2px 0 12px;font-size:14px;line-height:1.55;color:${INK};vertical-align:top">${escapeHtml(step)}</td>
+        </tr>`,
+    )
+    .join('')
+
+  const prepBlock = showPrep ? `
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F1F6F3;border-radius:12px;margin:0 0 24px">
+                <tr><td style="padding:18px 20px">
+                  ${sectionLabel('Before your visit')}
+                  <ul style="margin:0 0 12px;padding:0 0 0 18px;font-size:14px;line-height:1.55;color:${INK}">
+                    ${prepChecklist.map(item => `<li style="margin:0 0 6px">${escapeHtml(item)}</li>`).join('')}
+                  </ul>
+                  <a href="${prepUrl}" style="font-size:14px;font-weight:700;color:${NAVY}">See the full checklist</a>
+                </td></tr>
+              </table>` : ''
+
+  const tenantBlock = tenanted ? `
+              <p style="margin:0 0 24px;padding:14px 16px;border-left:3px solid ${SAGE};background:#F8FAFC;font-size:14px;line-height:1.55;color:${INK}">
+                <strong>Tenanted property?</strong> ${escapeHtml(TENANT_NOTICE)}
+              </p>` : ''
+
   const html = `<!doctype html>
 <html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light only"><title>We've received your request</title></head>
-<body style="margin:0;padding:0;background:${CANVAS};-webkit-text-size-adjust:100%">
-  <div style="display:none;max-height:0;overflow:hidden;opacity:0">We've received your EPC quote request.</div>
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${CANVAS}">
+<body style="margin:0;padding:0;background:${CANVAS};font-family:Inter,Arial,Helvetica,sans-serif;-webkit-text-size-adjust:100%">
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0">${preheader}</div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${CANVAS};font-family:Inter,Arial,Helvetica,sans-serif">
     <tr><td align="center" style="padding:28px 12px">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%">
 
@@ -215,7 +281,7 @@ function buildConfirmation(data: ParsedInput) {
                 <td style="width:44px;height:44px;background:${SAGE};border-radius:999px;text-align:center;vertical-align:middle;font-size:24px;line-height:44px;color:#ffffff;font-weight:700">&#10003;</td>
               </tr></table>
               <h1 style="margin:16px 0 4px;font-family:Georgia,'Times New Roman',serif;font-size:24px;line-height:1.25;color:#ffffff;font-weight:700">Request received</h1>
-              <p style="margin:0;font-size:14px;color:#C4D2E8">We'll confirm your slot and exact price</p>
+              <p style="margin:0;font-size:14px;color:#C4D2E8">${isBulkEnquiry ? "We'll come back with volume rates" : "We'll confirm your slot and exact price"}</p>
             </td></tr>
           </table>
 
@@ -223,9 +289,7 @@ function buildConfirmation(data: ParsedInput) {
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
             <tr><td style="padding:30px 32px 8px">
               <p style="margin:0 0 14px;font-size:16px;color:${INK}">Hi ${escapeHtml(firstName)},</p>
-              <p style="margin:0 0 22px;font-size:15px;line-height:1.6;color:${INK}">
-                Thanks for choosing <strong style="color:${NAVY}">L&amp;D Energy</strong>. We've received your quote request. Abdul will be in touch during our opening hours (Monday–Sunday, 8am–8pm) with your exact price and an available appointment.
-              </p>
+              <p style="margin:0 0 22px;font-size:15px;line-height:1.6;color:${INK}">${escapeHtml(intro)}</p>
 
               <!-- Summary -->
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${LINE};border-radius:12px;overflow:hidden;margin:0 0 24px">
@@ -235,20 +299,24 @@ function buildConfirmation(data: ParsedInput) {
                 </td></tr>
               </table>
 
+              <!-- Next steps -->
+              ${sectionLabel('What happens next')}
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 12px">${stepRows}</table>
+${prepBlock}${tenantBlock}
               <!-- CTA row -->
               <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 6px">
                 <tr>
                   <td style="border-radius:10px;background:${SAGE}">
-                    <a href="${PHONE_HREF}" style="display:inline-block;padding:12px 22px;font-size:14px;font-weight:700;color:#ffffff;text-decoration:none">&#128222;&nbsp; Call ${PHONE}</a>
+                    <a href="${PHONE_HREF}" style="display:inline-block;padding:12px 22px;font-size:14px;font-weight:700;color:#ffffff;text-decoration:none;white-space:nowrap">Call us</a>
                   </td>
                   <td style="width:10px">&nbsp;</td>
                   <td style="border-radius:10px;border:1px solid ${LINE}">
-                    <a href="${WHATSAPP_HREF}" style="display:inline-block;padding:12px 22px;font-size:14px;font-weight:700;color:${NAVY};text-decoration:none">WhatsApp us</a>
+                    <a href="${WHATSAPP_HREF}" style="display:inline-block;padding:12px 22px;font-size:14px;font-weight:700;color:${NAVY};text-decoration:none;white-space:nowrap">WhatsApp us</a>
                   </td>
                 </tr>
               </table>
               <p style="margin:14px 0 4px;font-size:13px;line-height:1.6;color:${MUTED}">
-                Need us sooner, or want to change something? Just reply to this email or call the number above.
+                Need us sooner, or want to change something? Just reply to this email or call ${PHONE}.
               </p>
             </td></tr>
           </table>
@@ -267,7 +335,7 @@ function buildConfirmation(data: ParsedInput) {
         <!-- Legal note -->
         <tr><td style="padding:18px 20px 4px" align="center">
           <p style="margin:0;font-size:11px;line-height:1.5;color:${MUTED}">
-            This confirms receipt of your enquiry. Your visit is confirmed only once you agree the price and appointment.
+            ${legal}
             You're receiving this because you submitted a request at epc.luminousanddeliver.co.uk.
           </p>
         </td></tr>
@@ -283,6 +351,9 @@ function buildConfirmation(data: ParsedInput) {
 const MAX_BODY_BYTES = 10_000
 const ALLOWED_ORIGINS = [
   'https://epc.luminousanddeliver.co.uk',
+  // Production alias of the same deployment and secrets. Visitors who land on it
+  // would otherwise fill in the whole form and then be refused at the last step.
+  'https://epc-euc.pages.dev',
   'http://localhost:3000',
 ]
 
@@ -347,8 +418,9 @@ export async function POST(req: Request) {
     const clientIP = req.headers.get('CF-Connecting-IP') || req.headers.get('X-Forwarded-For')?.split(',')[0]?.trim() || ''
     const verified = await verifyTurnstile(parsed.data.turnstileToken, turnstileSecret, clientIP)
     if (!verified) {
+      // `code` lets the form reset the widget and say so, instead of parsing this sentence.
       return NextResponse.json(
-        { error: 'Security verification failed. Please refresh and try again.' },
+        { error: 'Security verification failed. Please refresh and try again.', code: 'security' },
         { status: 400 },
       )
     }
@@ -377,7 +449,8 @@ export async function POST(req: Request) {
   }
 
   const { text, html } = buildEmail(data)
-  const subject = `EPC booking: ${data.name} — ${data.services.includes('Bulk / Agency Enquiry') ? 'Portfolio' : areaLabel(data.areaBand)} (${data.postcode})`
+  // Bulk enquiries have no postcode; keep the "EPC booking:" prefix, booking-followup.py matches it.
+  const subject = `EPC booking: ${data.name} — ${data.services.includes('Bulk / Agency Enquiry') ? 'Portfolio' : areaLabel(data.areaBand)}${data.postcode ? ` (${data.postcode})` : ''}`
   const confirmation = buildConfirmation(data)
 
   const apiKey = cfEnv.RESEND_API_KEY || process.env.RESEND_API_KEY
@@ -436,16 +509,21 @@ export async function POST(req: Request) {
   }
 
   // 2) Customer confirmation — best-effort. The lead is already captured, so a
-  //    failure here must not fail the request; just log it.
+  //    failure here must not fail the request; just log it. The form only tells
+  //    the customer a copy is on its way when this actually succeeded.
+  let confirmationSent = false
   try {
     const res = await sendEmail({
       from,
       to: data.email,
       reply_to: to,
+      // Keep this subject exact: scripts/resend-send.py, scripts/booking-followup.py and
+      // the /quote-reply skill in the parent repo match on it to thread replies.
       subject: 'We’ve received your EPC request — L&D Energy',
       text: confirmation.text,
       html: confirmation.html,
     })
+    confirmationSent = res.ok
     if (!res.ok) {
       console.error('[contact] confirmation email failed', res.status, await res.text())
     }
@@ -453,5 +531,5 @@ export async function POST(req: Request) {
     console.error('[contact] confirmation email fetch failed', err)
   }
 
-  return NextResponse.json({ ok: true, delivered: true })
+  return NextResponse.json({ ok: true, delivered: true, confirmationSent })
 }
