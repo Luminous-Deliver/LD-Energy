@@ -33,6 +33,15 @@ fs.mkdirSync(out, { recursive: true })
       await exact.fill('134')
       assert.equal(await tile('121 m²+').isChecked(), true)
       assert.match(await estimate(), /Guide estimate: £125 · 134 m²/)
+      // The selected tick must never sit on top of the size label.
+      const clash = await tile('121 m²+').evaluate(input => {
+        const label = input.closest('label'), tick = label.querySelector('svg'), text = label.querySelector('span')
+        if (!tick || !tick.getClientRects().length) return false
+        const a = tick.getBoundingClientRect(), range = document.createRange(); range.selectNodeContents(text.firstChild)
+        const b = range.getBoundingClientRect()
+        return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top
+      })
+      assert.equal(clash, false, 'tick overlaps size label')
       await form.screenshot({ path: path.join(out, `typed-134-${width}.png`) })
       await exact.fill('74.3')
       assert.equal(await tile('71–95 m²').isChecked(), true)

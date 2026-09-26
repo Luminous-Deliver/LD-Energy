@@ -71,7 +71,8 @@ function Choices({ name, legend, value, onChange, options, error, hint, inputRef
                 onChange={() => onChange(option.value)} required
                 aria-label={option.label} aria-describedby={[hintId, option.description ? `${name}-description-${index}` : '', errorId].filter(Boolean).join(' ') || undefined}
                 className="absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-lg opacity-0" />
-              {selected && <Check aria-hidden="true" strokeWidth={3} className="pointer-events-none absolute right-1.5 top-1.5 h-3.5 w-3.5 text-primary-700" />}
+              {/* Narrow size tiles have no spare corner; the border and fill already mark the choice. */}
+              {selected && <Check aria-hidden="true" strokeWidth={3} className={cn('pointer-events-none absolute right-1.5 top-1.5 h-3.5 w-3.5 text-primary-700', tiles && 'max-sm:hidden')} />}
               <span className={cn('flex flex-wrap items-center gap-x-2 gap-y-1 font-semibold leading-snug text-secondary-900', tiles ? 'justify-center whitespace-nowrap text-[13px] min-[360px]:text-[15px]' : 'pr-4 text-[15px]')}>
                 {option.label}
                 {option.badge && <span className={cn('rounded px-1.5 py-1 text-[11px] font-bold uppercase leading-none tracking-wide text-white', badgeClass[option.badgeTone || 'green'])}>{option.badge}</span>}
