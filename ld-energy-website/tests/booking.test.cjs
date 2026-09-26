@@ -48,6 +48,34 @@ test('server schema accepts unknown area and legacy clients, rejects missing/con
   assert.equal(contactSchema.safeParse({ ...sample, services: ['EPC Certificate', 'Floor Plan'] }).success, true)
 })
 
+test('an exact floor area is optional, picks its own band and must agree with the band chosen', () => {
+  const { parseExactArea, bandForArea, areaLabel } = require('../lib/floor-area.ts')
+  const { enquirySummaryText } = require('../lib/booking-copy.ts')
+  assert.equal(parseExactArea('85'), 85)
+  assert.equal(parseExactArea(' 74.3 '), 74.3)
+  assert.equal(parseExactArea('85 m2'), 85)
+  assert.equal(parseExactArea('85m²'), 85)
+  assert.equal(parseExactArea('134 sqm'), 134)
+  for (const bad of ['', undefined, 'abc', '0', '9', '2001', '-50', '1,200', '85 sq ft', '1e3', '85.123']) assert.equal(parseExactArea(bad), undefined, String(bad))
+  // "Up to 37 m²" means 37 or less, so anything above a band's top figure is in the next band.
+  for (const [m2, band] of [[10, 'up-to-37'], [37, 'up-to-37'], [37.5, '38-52'], [52, '38-52'], [53, '53-70'], [95, '71-95'], [96, '96-120'], [120, '96-120'], [120.4, '121-plus'], [134, '121-plus'], [2000, '121-plus']]) assert.equal(bandForArea(m2), band, String(m2))
+  for (const [index, band] of pricing.entries()) if (band.areaMax) assert.equal(bandForArea(band.areaMax), areaBands[index])
+  assert.equal(areaLabel('121-plus', '134'), '134 m²')
+  assert.equal(areaLabel('71-95', '74.30'), '74.3 m²')
+  assert.equal(areaLabel('121-plus', ''), '121 m²+')
+  assert.equal(areaLabel('121-plus', 'lots'), '121 m²+')
+  assert.equal(contactSchema.safeParse({ ...sample, areaBand: '121-plus', floorArea: '134' }).success, true)
+  assert.equal(contactSchema.safeParse({ ...sample, floorArea: '' }).success, true)
+  const mismatch = contactSchema.safeParse({ ...sample, areaBand: '53-70', floorArea: '134' })
+  assert.equal(mismatch.success, false)
+  assert.deepEqual(mismatch.error.issues.map(issue => issue.path.join('.')), ['floorArea'])
+  for (const floorArea of ['lots', '5', '5000']) assert.equal(contactSchema.safeParse({ ...sample, floorArea }).success, false, floorArea)
+  assert.equal(contactSchema.safeParse({ ...sample, areaBand: 'unknown', floorArea: '134' }).success, false)
+  // A portfolio has no single floor area, so a stray figure is ignored rather than blocking it.
+  assert.equal(contactSchema.safeParse({ ...sample, services: [BULK], areaBand: '', address: '', postcode: '', propertyCount: '20+', floorArea: 'lots' }).success, true)
+  assert.ok(enquirySummaryText({ ...sample, areaBand: '121-plus', floorArea: '134' }).includes('Floor area: 134 m²'))
+})
+
 test('quote links allow only safe selections, preserve intent and never contain customer data or prices', () => {
   for (const service of Object.keys(quoteServices)) {
     const url = new URL(quoteHref({ service, area: 'unknown', speed: 'express', plan: true, name: 'secret', total: 123 }), site.url)
@@ -150,6 +178,20 @@ test('contact API security, recalculation and both email representations with de
     assert.equal((await request({ ...sample, services: ['Both (Bundle)'], speed: EXPRESS_SPEED, improvementPlan: true, total: 1 })).status, 200)
     assert.match(messages[0].text, /£185 guide/)
     assert.match(messages[1].text, /£185 guide/)
+
+    // A customer's own figure reaches Abdul with the band that priced the guide.
+    messages = []
+    assert.equal((await request({ ...sample, areaBand: '121-plus', floorArea: '134' })).status, 200)
+    assert.equal(messages[0].subject, 'EPC booking: Test Customer — 134 m² (E15 1AA)')
+    assert.match(messages[0].text, /Internal floor area: 134 m² \(customer's figure\) · 121 m²\+ band/)
+    assert.match(messages[0].text, /£125 guide/)
+    assert.match(messages[1].text, /Floor area: 134 m²/)
+    assert.equal((await request({ ...sample, areaBand: '53-70', floorArea: '134' })).status, 400)
+    messages = []
+    assert.equal((await request({ ...sample, services: [BULK], propertyCount: '5', floorArea: '134' })).status, 200)
+    assert.doesNotMatch(messages[0].text + messages[0].subject + messages[1].text, /134 m²/)
+    messages = []
+    assert.equal((await request({ ...sample, services: ['Both (Bundle)'], speed: EXPRESS_SPEED, improvementPlan: true, total: 1 })).status, 200)
 
     // Downstream scripts and /quote-reply match these subjects exactly.
     assert.match(messages[0].subject, /^EPC booking: /)

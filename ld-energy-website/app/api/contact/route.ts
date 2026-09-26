@@ -56,6 +56,8 @@ interface ParsedInput extends EnquiryAttribution {
   postcode: string
   propertyType?: string
   areaBand?: string
+  /** Customer-typed m², already checked against the band. Never set on a bulk enquiry. */
+  floorArea?: string
   areaPage?: string
   customerType: string
   services: string[]
@@ -100,7 +102,11 @@ function buildEmail(data: ParsedInput) {
       ? ([['Property count', data.propertyCount || '—']] as Array<[string, string]>)
       : ([['Postcode', data.postcode]] as Array<[string, string]>)),
     // Bulk has no single property size; new clients submit explicit area bands.
-    ['Internal floor area', estimate.isBulk ? 'Not applicable - bulk enquiry' : areaLabel(data.areaBand || legacyArea(data.propertyType))],
+    ['Internal floor area', estimate.isBulk
+      ? 'Not applicable - bulk enquiry'
+      : data.floorArea
+        ? `${areaLabel(data.areaBand, data.floorArea)} (customer's figure) · ${areaLabel(data.areaBand)} band`
+        : areaLabel(data.areaBand || legacyArea(data.propertyType))],
     ['Customer type', data.customerType],
     ['Service(s)', data.services.join(', ')],
     ...(data.sourcePage ? [['Source page', data.sourcePage] as [string, string]] : []),
@@ -175,7 +181,7 @@ function buildConfirmation(data: ParsedInput) {
     if (data.address) summary.push(['Addresses supplied', data.address])
     summary.push(['Turnaround', 'Agreed per property once quoted'])
   } else {
-    summary.push(['Floor area', areaLabel(data.areaBand || legacyArea(data.propertyType))])
+    summary.push(['Floor area', areaLabel(data.areaBand || legacyArea(data.propertyType), data.floorArea)])
     summary.push(['Property', `${data.address}, ${data.postcode}`])
     summary.push(['Turnaround', estimate.isLodged
       ? data.speed === EXPRESS_SPEED ? 'Next-day lodgement, within 24 hours of the visit' : 'Standard lodgement, within 72 hours of the visit'
@@ -436,6 +442,7 @@ export async function POST(req: Request) {
     postcode: parsed.data.postcode,
     propertyType: parsed.data.propertyType,
     areaBand: parsed.data.areaBand || legacyArea(parsed.data.propertyType),
+    floorArea: parsed.data.services.includes('Bulk / Agency Enquiry') ? undefined : parsed.data.floorArea || undefined,
     areaPage: parsed.data.areaPage,
     sourcePage: parsed.data.sourcePage,
     ctaId: parsed.data.ctaId,
@@ -450,7 +457,7 @@ export async function POST(req: Request) {
 
   const { text, html } = buildEmail(data)
   // Bulk enquiries have no postcode; keep the "EPC booking:" prefix, booking-followup.py matches it.
-  const subject = `EPC booking: ${data.name} — ${data.services.includes('Bulk / Agency Enquiry') ? 'Portfolio' : areaLabel(data.areaBand)}${data.postcode ? ` (${data.postcode})` : ''}`
+  const subject = `EPC booking: ${data.name} — ${data.services.includes('Bulk / Agency Enquiry') ? 'Portfolio' : areaLabel(data.areaBand, data.floorArea)}${data.postcode ? ` (${data.postcode})` : ''}`
   const confirmation = buildConfirmation(data)
 
   const apiKey = cfEnv.RESEND_API_KEY || process.env.RESEND_API_KEY

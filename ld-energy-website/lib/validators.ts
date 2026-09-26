@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { sourcePages, ctaIds } from '@/lib/enquiry-attribution'
-import { areaChoices, legacyArea } from '@/lib/floor-area'
+import { areaChoices, bandForArea, legacyArea, parseExactArea, EXACT_AREA_MAX, EXACT_AREA_MIN } from '@/lib/floor-area'
 import { propertyTypes, services, customerTypes, speeds, BULK, ukPostcodeRegex } from '@/lib/booking-options'
 export { propertyTypes, services, customerTypes, speeds, BULK, PRE_ASSESSMENT, EXPRESS_SPEED, ukPostcodeRegex } from '@/lib/booking-options'
 
@@ -24,6 +24,8 @@ export const contactSchema = z
   postcode: z.string().trim().toUpperCase().max(12),
   propertyType: z.enum(propertyTypes).optional(),
   areaBand: z.union([z.enum(areaChoices), z.literal('')]).optional(),
+  /** Optional exact figure in m². The band stays the pricing input; this must fall inside it. */
+  floorArea: z.string().trim().max(20).optional().or(z.literal('')),
   customerType: z.union([z.enum(customerTypes), z.literal('')]).refine((value): boolean => value !== '', 'Please tell us who you are'),
   sourcePage: z.enum(sourcePages).optional(),
   ctaId: z.enum(ctaIds).optional(),
@@ -78,6 +80,15 @@ export const contactSchema = z
         })
       }
       return
+    }
+
+    if (data.floorArea) {
+      const exact = parseExactArea(data.floorArea)
+      if (exact === undefined) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['floorArea'], message: `Enter the floor area as a number of square metres, between ${EXACT_AREA_MIN} and ${EXACT_AREA_MAX.toLocaleString('en-GB')}, or leave it blank.` })
+      } else if (data.areaBand !== bandForArea(exact)) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['floorArea'], message: 'This figure does not match the size you chose. Check the number or choose the size again.' })
+      }
     }
 
     if (data.address.length < 5) {

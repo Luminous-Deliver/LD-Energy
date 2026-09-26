@@ -100,7 +100,7 @@ export function formatPreferredDate(value?: string): string {
 
 export interface EnquirySummaryInput {
   name: string; phone: string; email: string; address: string; postcode: string
-  services: string[]; areaBand?: string; customerType: string; speed: string
+  services: string[]; areaBand?: string; floorArea?: string; customerType: string; speed: string
   improvementPlan?: boolean; propertyCount?: string; preferredDate?: string; notes?: string
 }
 
@@ -114,7 +114,7 @@ export function enquirySummaryText(data: EnquirySummaryInput): string {
     'Hi, my quote request on your website did not go through, so I am sending it here.',
     '',
     `Service: ${data.services.map(serviceLabel).join(' + ')}`,
-    isBulk ? `Properties: ${data.propertyCount || 'To confirm'}` : `Floor area: ${areaLabel(data.areaBand)}`,
+    isBulk ? `Properties: ${data.propertyCount || 'To confirm'}` : `Floor area: ${areaLabel(data.areaBand, data.floorArea)}`,
     `I am: ${data.customerType || 'Not selected'}`,
     ...(!isBulk && data.speed === EXPRESS_SPEED ? ['Lodgement: next day'] : []),
     ...(data.improvementPlan ? ['Add-on: EPC Improvement Plan'] : []),

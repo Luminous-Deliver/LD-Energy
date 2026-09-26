@@ -13,6 +13,7 @@ import { EXPRESS_SPEED } from '@/lib/booking-options'
 export interface QuoteSnapshot {
   service: string
   areaBand: string
+  floorArea: string
   customerType: string
   speed: string
   improvementPlan: boolean
@@ -59,7 +60,7 @@ export function QuoteSummaryPanel() {
     improvementPlan: snapshot?.improvementPlan,
   })
   const notSelected = 'Not selected yet'
-  const area = estimate.isBulk ? 'Not needed for a portfolio' : snapshot?.areaBand ? areaLabel(snapshot.areaBand) : notSelected
+  const area = estimate.isBulk ? 'Not needed for a portfolio' : snapshot?.areaBand ? areaLabel(snapshot.areaBand, snapshot.floorArea) : notSelected
   const plan = estimate.planIncluded ? 'Included' : snapshot?.improvementPlan && estimate.canHavePlan ? `Added (+£${site.addOns.improvementPlan})` : 'Not added'
   const priced = estimate.state === 'priced' && estimate.total !== null
   const total = priced

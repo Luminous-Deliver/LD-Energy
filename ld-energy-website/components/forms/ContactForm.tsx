@@ -8,7 +8,7 @@ import { ArrowRight, Check, ClipboardList, Mail, MessageCircle, Phone, ShieldAle
 import { Field, Input, Textarea } from '@/components/ui/Input'
 import { cn } from '@/lib/cn'
 import { pricing, site, EXPRESS_SURCHARGE } from '@/lib/site'
-import { areaBands, areaLabel } from '@/lib/floor-area'
+import { areaBands, areaLabel, bandForArea, parseExactArea } from '@/lib/floor-area'
 import { guideEstimate, guideEstimateRows } from '@/lib/pricing-estimate'
 import {
   turnaroundCopy, includedList, contactStepIntro, serviceChoices, serviceLabel, customerTypeChoices, nextSteps,
@@ -130,7 +130,7 @@ function RequestSent({ data, confirmationSent, focusRef, onReset }: {
   const firstName = data.name.trim().split(/\s+/)[0]
   const rows: [string, string][] = [
     ['Service', data.services.map(serviceLabel).join(' + ')],
-    estimate.isBulk ? ['Properties', data.propertyCount || 'To be confirmed'] : ['Floor area', areaLabel(data.areaBand)],
+    estimate.isBulk ? ['Properties', data.propertyCount || 'To be confirmed'] : ['Floor area', areaLabel(data.areaBand, data.floorArea)],
     ['Guide estimate', estimate.state === 'priced' ? `£${estimate.total}` : estimate.isBulk ? 'Quoted individually' : 'Confirmed after review'],
     ...(data.preferredDate ? [['Preferred date', formatPreferredDate(data.preferredDate)] as [string, string]] : []),
   ]
@@ -223,12 +223,12 @@ export function ContactForm({ areaPage, sourcePage }: { areaPage?: string; sourc
   const estimateRef = useRef<HTMLDivElement>(null)
   const revealEstimate = useRef(false)
   const quietReset = useRef(false)
-  const { register, handleSubmit, control, reset, watch, getValues, setValue, trigger, formState: { errors } } = useForm<ContactInput>({
+  const { register, handleSubmit, control, reset, watch, getValues, setValue, trigger, clearErrors, formState: { errors } } = useForm<ContactInput>({
     resolver: zodResolver(contactSchema),
     shouldFocusError: false,
     defaultValues: {
       name: '', phone: '', email: '', address: '', postcode: '', services: ['EPC Certificate'],
-      areaBand: '', customerType: '', improvementPlan: false, speed: 'Standard (72 hours)',
+      areaBand: '', floorArea: '', customerType: '', improvementPlan: false, speed: 'Standard (72 hours)',
       areaPage, sourcePage: sourcePage || sourcePageForPath(pathname), ctaId: dedicated ? 'direct' : 'embedded',
       propertyCount: '', preferredDate: '', notes: '', website: '', turnstileToken: '', consent: false,
     },
@@ -281,14 +281,14 @@ export function ContactForm({ areaPage, sourcePage }: { areaPage?: string; sourc
   const estimate = guideEstimate(values)
   const publishQuote = usePublishQuote()
   const [selectedService] = values.services
-  const { areaBand, customerType, speed, improvementPlan } = values
+  const { areaBand, floorArea, customerType, speed, improvementPlan } = values
   useEffect(() => {
     // Desktop /contact summary only; selections, never customer details.
-    publishQuote?.({ service: selectedService, areaBand: areaBand || '', customerType: customerType || '', speed, improvementPlan: !!improvementPlan })
-  }, [publishQuote, selectedService, areaBand, customerType, speed, improvementPlan])
+    publishQuote?.({ service: selectedService, areaBand: areaBand || '', floorArea: floorArea || '', customerType: customerType || '', speed, improvementPlan: !!improvementPlan })
+  }, [publishQuote, selectedService, areaBand, floorArea, customerType, speed, improvementPlan])
   const { isBulk, isLodged, canHavePlan, planIncluded, productKind } = estimate
   const estimateText = estimate.state === 'awaiting-area' ? '' : estimate.state === 'priced'
-    ? `Guide estimate: £${estimate.total} · ${areaLabel(values.areaBand)}`
+    ? `Guide estimate: £${estimate.total} · ${areaLabel(values.areaBand, values.floorArea)}`
     : isBulk ? 'Your portfolio will be quoted individually.' : "We'll confirm your exact quote after reviewing your property details."
   const estimatePanel = estimateText && <div ref={estimateRef} data-estimate-summary className="rounded-lg bg-secondary-50 px-3 py-2.5 text-sm text-secondary-800">
     <p className="font-semibold">{estimateText}</p>
@@ -330,7 +330,7 @@ export function ContactForm({ areaPage, sourcePage }: { areaPage?: string; sourc
 
   async function next() {
     start()
-    const fields: (keyof ContactInput)[] = step === 1 ? ['areaBand', 'services', 'customerType'] : ['speed', 'preferredDate', 'notes']
+    const fields: (keyof ContactInput)[] = step === 1 ? ['areaBand', 'floorArea', 'services', 'customerType'] : ['speed', 'preferredDate', 'notes']
     if (await trigger(fields)) {
       conversionEvent('form_step_complete', { ...quoteContextFromForm(getValues()), step })
       moveFocus.current = true; setStep(step + 1)
@@ -409,12 +409,42 @@ export function ContactForm({ areaPage, sourcePage }: { areaPage?: string; sourc
             rememberSelection(); conversionEvent('service_selection', quoteContextFromForm(getValues()))
           }} options={serviceChoices} />} />
 
-        {isBulk ? <p className="text-base text-secondary-700">A single floor area does not apply to a portfolio. We’ll ask for an approximate property count on the last step.</p> :
+        {isBulk ? <p className="text-base text-secondary-700">A single floor area does not apply to a portfolio. We’ll ask for an approximate property count on the last step.</p> : <div>
           <Controller control={control} name="areaBand" render={({ field }) => <Choices name="areaBand" legend="Internal floor area" tiles gridClassName="grid-cols-2 sm:grid-cols-3"
             hint="Choose your internal floor area for a guide estimate."
             value={field.value || ''} inputRef={field.ref} error={errors.areaBand?.message}
-            onChange={value => { revealEstimate.current = true; field.onChange(value); rememberSelection(); conversionEvent('estimator_use', quoteContextFromForm(getValues())) }}
-            options={[...areaBands.map((band, index) => ({ value: band, label: pricing[index].areaLabel, description: pricing[index].label })), { value: 'unknown', label: 'Not sure of floor area', description: 'We will review the property details before quoting.', fullRow: true }]} />} />}
+            onChange={value => {
+              revealEstimate.current = true; field.onChange(value)
+              // A typed figure stays only while it agrees with the chosen size.
+              const typed = getValues('floorArea'), exact = parseExactArea(typed)
+              if (typed && (exact === undefined || bandForArea(exact) !== value)) { setValue('floorArea', ''); clearErrors('floorArea') }
+              rememberSelection(); conversionEvent('estimator_use', quoteContextFromForm(getValues()))
+            }}
+            options={[...areaBands.map((band, index) => ({ value: band, label: pricing[index].areaLabel, description: pricing[index].label })), { value: 'unknown', label: 'Not sure of floor area', description: 'We will review the property details before quoting.', fullRow: true }]} />} />
+          {/* Preset sizes first; a known figure selects its own size so the estimate follows it. */}
+          <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+            <label htmlFor="floorArea" className="text-[15px] font-semibold text-secondary-900">Know the exact floor area?</label>
+            <div className="relative w-32">
+              <Input id="floorArea" inputMode="decimal" autoComplete="off" maxLength={10} placeholder="e.g. 134"
+                aria-invalid={!!errors.floorArea} aria-describedby={errors.floorArea ? 'floorArea-error' : 'floorArea-hint'} hasError={!!errors.floorArea} className="pr-11"
+                {...register('floorArea', {
+                  onChange: event => {
+                    const exact = parseExactArea(event.target.value)
+                    if (exact !== undefined && getValues('areaBand') !== bandForArea(exact)) {
+                      setValue('areaBand', bandForArea(exact), { shouldValidate: !!errors.areaBand }); rememberSelection()
+                    }
+                    if (errors.floorArea) void trigger('floorArea')
+                  },
+                  onBlur: () => { if (parseExactArea(getValues('floorArea')) !== undefined) conversionEvent('estimator_use', quoteContextFromForm(getValues())) },
+                })} />
+              <span aria-hidden="true" className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-base text-secondary-600">m²</span>
+            </div>
+          </div>
+          {errors.floorArea ? <p id="floorArea-error" role="alert" className="mt-1.5 text-sm text-red-700">{errors.floorArea.message}</p>
+            : <p id="floorArea-hint" className="mt-1.5 text-sm text-secondary-600">{(parseExactArea(floorArea) ?? 0) > 300
+              ? 'That is a very large home. If your figure is in square feet, divide it by 10.76 to get m².'
+              : 'Optional. It is on a previous EPC or floor plan. We will pick the matching size.'}</p>}
+        </div>}
 
         {estimatePanel}
 
