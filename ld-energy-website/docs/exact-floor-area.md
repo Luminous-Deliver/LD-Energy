@@ -17,6 +17,15 @@ and that band is the one where the quote varies most.
 - An unusable entry blocks Continue with a plain message. Portfolio enquiries ignore the box.
 - The figure is not put in the URL. Only controlled selections go there.
 
+## Compact layout (same day, owner-approved option "3 across + one row")
+
+- Sizes sit 3 across at every width with short captions ("2 bed"). Six sizes, two rows.
+- "Exact size [   m²]" and a "Not sure" chip share one row under them: both are ways out of
+  picking a size. "Not sure" keeps its accessible name "Not sure of floor area".
+- The standing "Optional..." hint is gone. Only the sq ft warning or an error shows under the row.
+- Size section height: 514 → 264px at 360/390, 339 → 244px at 768/1440, 314px at 320 (labels
+  drop to 13px below 360px so nothing overflows). Whole form at 390: 1,896 → 1,664px.
+
 ## Where the figure appears
 
 In-form estimate line, success summary, desktop quote summary, WhatsApp/email fallback text,
@@ -34,7 +43,7 @@ Evidence: `audits/website-growth-audit/ld-energy-exact-floor-area-2026-09-26/` i
 - Typecheck, lint (existing OG-image warning only), Next production build.
 - `node --require ./tests/register.cjs --test tests/*.test.cjs`: 15/15, including parsing, band
   edges from the pricing table, schema mismatch, bulk, both emails and the subject.
-- `tests/exact-floor-area.cjs` at 390 and 1440px: typing selects and prices the band, tile
+- `tests/exact-floor-area.cjs` at 320, 390, 768 and 1440px (two rows of sizes, no label overflow): typing selects and prices the band, tile
   changes clear or keep the figure, sq ft hint, invalid entry blocks Continue, submission carries
   `floorArea` with its band, success summary shows the figure.
 - Existing suites pass: `browser-booking`, `booking-specialists`, `booking-navigation`,

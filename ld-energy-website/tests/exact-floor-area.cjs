@@ -11,7 +11,7 @@ fs.mkdirSync(out, { recursive: true })
 ;(async () => {
   const browser = await chromium.launch({ channel: 'msedge', headless: true })
   try {
-    for (const [width, height] of [[390, 844], [1440, 900]]) {
+    for (const [width, height] of [[320, 568], [390, 844], [768, 1024], [1440, 900]]) {
       const page = await browser.newPage({ viewport: { width, height }, reducedMotion: 'reduce' })
       await page.addInitScript(() => { if (window.top === window) localStorage.setItem('cookie-consent', 'declined') })
       const submissions = []
@@ -21,10 +21,14 @@ fs.mkdirSync(out, { recursive: true })
       })
       await page.goto(`${base}/contact#booking-form`)
       const form = page.getByRole('form', { name: 'Exact quote enquiry' })
-      const exact = form.getByLabel('Know the exact floor area?')
+      const exact = form.getByLabel('Exact size')
       const tile = name => form.getByRole('radio', { name, exact: true })
       const estimate = () => form.locator('[data-estimate-summary]').first().innerText()
 
+      // Three sizes across at every width, and no label spills out of its tile.
+      const tiles = await form.locator('fieldset', { hasText: 'Internal floor area' }).evaluate(fieldset => [...fieldset.querySelectorAll('label:has(input[value$="plus"]), label:has(input[value*="-"])')].map(label => ({ top: Math.round(label.getBoundingClientRect().top), spill: [...label.querySelectorAll('span')].some(span => span.scrollWidth > label.clientWidth) })))
+      assert.equal(new Set(tiles.map(t => t.top)).size, 2, 'six sizes in two rows')
+      assert.equal(tiles.some(t => t.spill), false, 'label overflow')
       // Typing a figure selects its size and prices it.
       await exact.fill('134')
       assert.equal(await tile('121 m²+').isChecked(), true)

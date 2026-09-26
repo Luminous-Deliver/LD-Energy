@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, type RefObject } from 'react'
+import { useEffect, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { usePathname } from 'next/navigation'
 import { Controller, useForm, type FieldErrors } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -38,20 +38,22 @@ interface ChoiceProps {
   gridClassName?: string
   /** Centred tiles for short, scannable values such as floor-area bands. */
   tiles?: boolean
+  /** Extra controls inside the fieldset, after the options. */
+  footer?: ReactNode
 }
 
 /**
  * Native radio group drawn as cards. The radio covers its card invisibly, so keyboard,
  * screen-reader and click behaviour stay native while the dot itself is not drawn.
  */
-function Choices({ name, legend, value, onChange, options, error, hint, inputRef, gridClassName, tiles }: ChoiceProps) {
+function Choices({ name, legend, value, onChange, options, error, hint, inputRef, gridClassName, tiles, footer }: ChoiceProps) {
   const hintId = hint ? `${name}-hint` : ''
   const errorId = error ? `${name}-error` : ''
   return (
     <fieldset className="min-w-0" aria-invalid={!!error} aria-describedby={[hintId, errorId].filter(Boolean).join(' ') || undefined}>
       <legend className="font-serif text-lg font-semibold leading-snug text-secondary-900">{legend}</legend>
       {hint && <p id={hintId} className="mt-0.5 text-sm text-secondary-600">{hint}</p>}
-      <div className={cn('mt-2.5 grid gap-2.5 sm:grid-cols-2', gridClassName)}>
+      <div className={cn('mt-2.5 grid gap-2.5 sm:grid-cols-2', tiles && 'gap-2', gridClassName)}>
         {options.map((option, index) => {
           const selected = value === option.value
           const inline = tiles && option.fullRow
@@ -59,7 +61,7 @@ function Choices({ name, legend, value, onChange, options, error, hint, inputRef
             <label key={option.value} className={cn(
               'relative flex min-h-[48px] min-w-0 cursor-pointer flex-col justify-center rounded-lg border px-3.5 py-2.5',
               'has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary-700',
-              tiles && 'items-center px-2 text-center',
+              tiles && 'items-center px-1 py-2 text-center',
               inline && 'sm:flex-row sm:flex-wrap sm:gap-x-2',
               option.fullRow && 'col-span-full',
               selected ? 'border-primary-700 bg-primary-50 ring-1 ring-primary-700' : 'border-secondary-300 bg-white lg:transition-colors lg:hover:border-primary-500',
@@ -70,7 +72,7 @@ function Choices({ name, legend, value, onChange, options, error, hint, inputRef
                 aria-label={option.label} aria-describedby={[hintId, option.description ? `${name}-description-${index}` : '', errorId].filter(Boolean).join(' ') || undefined}
                 className="absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-lg opacity-0" />
               {selected && <Check aria-hidden="true" strokeWidth={3} className="pointer-events-none absolute right-1.5 top-1.5 h-3.5 w-3.5 text-primary-700" />}
-              <span className={cn('flex flex-wrap items-center gap-x-2 gap-y-1 text-[15px] font-semibold leading-snug text-secondary-900', tiles ? 'justify-center' : 'pr-4')}>
+              <span className={cn('flex flex-wrap items-center gap-x-2 gap-y-1 font-semibold leading-snug text-secondary-900', tiles ? 'justify-center whitespace-nowrap text-[13px] min-[360px]:text-[15px]' : 'pr-4 text-[15px]')}>
                 {option.label}
                 {option.badge && <span className={cn('rounded px-1.5 py-1 text-[11px] font-bold uppercase leading-none tracking-wide text-white', badgeClass[option.badgeTone || 'green'])}>{option.badge}</span>}
               </span>
@@ -79,6 +81,7 @@ function Choices({ name, legend, value, onChange, options, error, hint, inputRef
           )
         })}
       </div>
+      {footer}
       {error && <p id={errorId} className="mt-2 text-sm text-red-700" role="alert">{error}</p>}
     </fieldset>
   )
@@ -409,42 +412,54 @@ export function ContactForm({ areaPage, sourcePage }: { areaPage?: string; sourc
             rememberSelection(); conversionEvent('service_selection', quoteContextFromForm(getValues()))
           }} options={serviceChoices} />} />
 
-        {isBulk ? <p className="text-base text-secondary-700">A single floor area does not apply to a portfolio. We’ll ask for an approximate property count on the last step.</p> : <div>
-          <Controller control={control} name="areaBand" render={({ field }) => <Choices name="areaBand" legend="Internal floor area" tiles gridClassName="grid-cols-2 sm:grid-cols-3"
-            hint="Choose your internal floor area for a guide estimate."
-            value={field.value || ''} inputRef={field.ref} error={errors.areaBand?.message}
-            onChange={value => {
+        {isBulk ? <p className="text-base text-secondary-700">A single floor area does not apply to a portfolio. We’ll ask for an approximate property count on the last step.</p> :
+          <Controller control={control} name="areaBand" render={({ field }) => {
+            const choose = (value: string) => {
               revealEstimate.current = true; field.onChange(value)
               // A typed figure stays only while it agrees with the chosen size.
               const typed = getValues('floorArea'), exact = parseExactArea(typed)
               if (typed && (exact === undefined || bandForArea(exact) !== value)) { setValue('floorArea', ''); clearErrors('floorArea') }
               rememberSelection(); conversionEvent('estimator_use', quoteContextFromForm(getValues()))
-            }}
-            options={[...areaBands.map((band, index) => ({ value: band, label: pricing[index].areaLabel, description: pricing[index].label })), { value: 'unknown', label: 'Not sure of floor area', description: 'We will review the property details before quoting.', fullRow: true }]} />} />
-          {/* Preset sizes first; a known figure selects its own size so the estimate follows it. */}
-          <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5">
-            <label htmlFor="floorArea" className="text-[15px] font-semibold text-secondary-900">Know the exact floor area?</label>
-            <div className="relative w-32">
-              <Input id="floorArea" inputMode="decimal" autoComplete="off" maxLength={10} placeholder="e.g. 134"
-                aria-invalid={!!errors.floorArea} aria-describedby={errors.floorArea ? 'floorArea-error' : 'floorArea-hint'} hasError={!!errors.floorArea} className="pr-11"
-                {...register('floorArea', {
-                  onChange: event => {
-                    const exact = parseExactArea(event.target.value)
-                    if (exact !== undefined && getValues('areaBand') !== bandForArea(exact)) {
-                      setValue('areaBand', bandForArea(exact), { shouldValidate: !!errors.areaBand }); rememberSelection()
-                    }
-                    if (errors.floorArea) void trigger('floorArea')
-                  },
-                  onBlur: () => { if (parseExactArea(getValues('floorArea')) !== undefined) conversionEvent('estimator_use', quoteContextFromForm(getValues())) },
-                })} />
-              <span aria-hidden="true" className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-base text-secondary-600">m²</span>
-            </div>
-          </div>
-          {errors.floorArea ? <p id="floorArea-error" role="alert" className="mt-1.5 text-sm text-red-700">{errors.floorArea.message}</p>
-            : <p id="floorArea-hint" className="mt-1.5 text-sm text-secondary-600">{(parseExactArea(floorArea) ?? 0) > 300
-              ? 'That is a very large home. If your figure is in square feet, divide it by 10.76 to get m².'
-              : 'Optional. It is on a previous EPC or floor plan. We will pick the matching size.'}</p>}
-        </div>}
+            }
+            const unsure = field.value === 'unknown'
+            const note = errors.floorArea?.message || ((parseExactArea(floorArea) ?? 0) > 300 ? 'That is a very large home. If your figure is in square feet, divide it by 10.76 to get m².' : '')
+            return <Choices name="areaBand" legend="Internal floor area" tiles gridClassName="grid-cols-3 sm:grid-cols-3"
+              hint="Choose your internal floor area for a guide estimate."
+              value={field.value || ''} inputRef={field.ref} error={errors.areaBand?.message} onChange={choose}
+              options={areaBands.map((band, index) => ({ value: band, label: pricing[index].areaLabel, description: pricing[index].label.replace(' bedroom', ' bed') }))}
+              footer={<>
+                {/* The two ways out of picking a size sit together: a known figure, or none at all. */}
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <label htmlFor="floorArea" className="text-[15px] font-semibold text-secondary-900">Exact size</label>
+                  <div className="relative w-28">
+                    <Input id="floorArea" inputMode="decimal" autoComplete="off" maxLength={10} placeholder="e.g. 134"
+                      aria-invalid={!!errors.floorArea} aria-describedby={note ? 'floorArea-note' : undefined} hasError={!!errors.floorArea} className="pr-10"
+                      {...register('floorArea', {
+                        onChange: event => {
+                          const exact = parseExactArea(event.target.value)
+                          if (exact !== undefined && getValues('areaBand') !== bandForArea(exact)) {
+                            setValue('areaBand', bandForArea(exact), { shouldValidate: !!errors.areaBand }); rememberSelection()
+                          }
+                          if (errors.floorArea) void trigger('floorArea')
+                        },
+                        onBlur: () => { if (parseExactArea(getValues('floorArea')) !== undefined) conversionEvent('estimator_use', quoteContextFromForm(getValues())) },
+                      })} />
+                    <span aria-hidden="true" className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-base text-secondary-600">m²</span>
+                  </div>
+                  <label className={cn(
+                    'relative flex min-h-[48px] min-[360px]:ml-auto cursor-pointer items-center gap-1.5 rounded-lg border px-3.5 text-[15px] font-semibold text-secondary-900',
+                    'has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary-700',
+                    unsure ? 'border-primary-700 bg-primary-50 ring-1 ring-primary-700' : 'border-secondary-300 bg-white lg:transition-colors lg:hover:border-primary-500',
+                  )}>
+                    <input type="radio" name="areaBand" value="unknown" checked={unsure} onChange={() => choose('unknown')} required aria-label="Not sure of floor area"
+                      className="absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-lg opacity-0" />
+                    Not sure
+                    {unsure && <Check aria-hidden="true" strokeWidth={3} className="pointer-events-none h-3.5 w-3.5 text-primary-700" />}
+                  </label>
+                </div>
+                {note && <p id="floorArea-note" role={errors.floorArea ? 'alert' : undefined} className={cn('mt-1.5 text-sm', errors.floorArea ? 'text-red-700' : 'text-secondary-600')}>{note}</p>}
+              </>} />
+          }} />}
 
         {estimatePanel}
 
