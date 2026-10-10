@@ -9,7 +9,7 @@ import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { PageHero } from '@/components/sections/PageHero'
 import { Pricing } from '@/components/sections/Pricing'
 import { CtaStrip } from '@/components/sections/CtaStrip'
-import { site, pricing, EXPRESS_SURCHARGE } from '@/lib/site'
+import { site, pricing, EXPRESS_SURCHARGE, defaultOgImage } from '@/lib/site'
 import { areaServedLondon } from '@/lib/boroughs'
 import type { FaqItem } from '@/lib/faq'
 
@@ -19,12 +19,14 @@ export const metadata: Metadata = {
     'Reliable EPC and floor plan partner for London estate and letting agents. Fast turnaround on new instructions, volume rates, direct line to your assessor. Taking on new agencies now.',
   alternates: { canonical: `${site.url}/estate-agents` },
   openGraph: {
+    images: [defaultOgImage],
     title: 'EPC Provider for Estate & Letting Agents London | L&D Energy',
     description:
       'Reliable EPC and floor plan partner for London estate and letting agents. Fast turnaround on new instructions, volume rates, direct line to your assessor.',
     url: `${site.url}/estate-agents`,
   },
   twitter: {
+    images: [defaultOgImage.url],
     title: 'EPC Provider for Estate & Letting Agents London',
     description:
       'Fast EPCs and floor plans for London agents. Volume rates, quick turnaround on new instructions. Taking on new agencies now.',

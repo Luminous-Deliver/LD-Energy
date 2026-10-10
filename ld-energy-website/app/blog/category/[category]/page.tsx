@@ -8,7 +8,7 @@ import { CtaStrip } from '@/components/sections/CtaStrip'
 import { PostCard } from '@/components/blog/PostCard'
 import { categories, getCategory } from '@/lib/blog-categories'
 import { getPostsByCategory } from '@/lib/blog'
-import { site, priceFrom } from '@/lib/site'
+import { site, priceFrom, defaultOgImage } from '@/lib/site'
 
 interface PageProps {
   params: Promise<{ category: string }>
@@ -31,11 +31,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     // Don't index a category page until it actually has posts.
     robots: posts.length === 0 ? { index: false, follow: true } : undefined,
     openGraph: {
+      images: [defaultOgImage],
       title: `${cat.name}, EPC Guides | L&D Energy`,
       description: cat.description,
       url,
     },
     twitter: {
+      images: [defaultOgImage.url],
       title: `${cat.name}, EPC Guides`,
       description: cat.description,
     },
@@ -100,11 +102,14 @@ export default async function BlogCategoryPage({ params }: PageProps) {
         {posts.length === 0 ? (
           <p className="text-secondary-700">No posts in this category yet, check back soon.</p>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {posts.map((p) => (
-              <PostCard key={p.slug} post={p} />
-            ))}
-          </div>
+          <>
+            <h2 className="mb-6 text-2xl md:text-3xl font-bold tracking-tight text-secondary-900">All {cat.name} guides</h2>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {posts.map((p) => (
+                <PostCard key={p.slug} post={p} />
+              ))}
+            </div>
+          </>
         )}
       </Section>
 

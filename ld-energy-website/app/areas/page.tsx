@@ -6,7 +6,7 @@ import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { PageHero } from '@/components/sections/PageHero'
 import { CtaStrip } from '@/components/sections/CtaStrip'
 import { boroughList } from '@/lib/boroughs'
-import { site, priceFrom } from '@/lib/site'
+import { site, priceFrom, defaultOgImage } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'Areas We Cover | EPC Assessor Across London',
@@ -14,12 +14,14 @@ export const metadata: Metadata = {
     `Domestic EPC certificates across all 32 London boroughs. Elmhurst accredited, guide prices from £${priceFrom.epc}, lodged within 72 hours. Find your borough.`,
   alternates: { canonical: `${site.url}/areas` },
   openGraph: {
+    images: [defaultOgImage],
     title: 'EPC London, All Areas Covered | L&D Energy',
     description:
       `Domestic EPC certificates across all London boroughs and surrounding areas. Elmhurst accredited, guide prices from £${priceFrom.epc}, lodged within 72 hours.`,
     url: `${site.url}/areas`,
   },
   twitter: {
+    images: [defaultOgImage.url],
     title: 'EPC London, All Areas Covered',
     description:
       `Domestic EPC certificates across all London boroughs. Elmhurst accredited, guide prices from £${priceFrom.epc}.`,

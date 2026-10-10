@@ -8,7 +8,7 @@ import { CtaStrip } from '@/components/sections/CtaStrip'
 import { PostCard } from '@/components/blog/PostCard'
 import { getAllPosts, getFeaturedPosts } from '@/lib/blog'
 import { categories } from '@/lib/blog-categories'
-import { site, priceFrom } from '@/lib/site'
+import { site, priceFrom, defaultOgImage } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'EPC Guides for London Homeowners & Landlords',
@@ -16,12 +16,14 @@ export const metadata: Metadata = {
     'Expert guidance on Energy Performance Certificates, MEES compliance, and improving your EPC rating, written by an Elmhurst-accredited London DEA.',
   alternates: { canonical: `${site.url}/blog` },
   openGraph: {
+    images: [defaultOgImage],
     title: 'EPC Insights & Guides | L&D Energy Blog',
     description:
       'Expert EPC guidance for London homeowners, landlords, and estate agents. Written by a working Elmhurst-accredited DEA.',
     url: `${site.url}/blog`,
   },
   twitter: {
+    images: [defaultOgImage.url],
     title: 'EPC Insights & Guides',
     description:
       'Expert EPC guidance for London homeowners, landlords, and estate agents.',

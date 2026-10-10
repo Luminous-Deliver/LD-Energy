@@ -7,15 +7,13 @@ import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { PageHero } from '@/components/sections/PageHero'
 import { CtaStrip } from '@/components/sections/CtaStrip'
 import { Accordion } from '@/components/ui/Accordion'
-import {
-  pricing,
+import { pricing,
   site,
   formatPrice,
   bundleSaving,
   maxBundleSaving,
   priceFrom,
-  EXPRESS_SURCHARGE,
-} from '@/lib/site'
+  EXPRESS_SURCHARGE, defaultOgImage } from '@/lib/site'
 import type { FaqItem } from '@/lib/faq'
 
 export const metadata: Metadata = {
@@ -23,11 +21,13 @@ export const metadata: Metadata = {
   description: `Guide prices for EPC and floor plan services in London, from £${priceFrom.epc}. Priced mainly on internal floor area (m²). Your exact quote is confirmed before booking.`,
   alternates: { canonical: `${site.url}/pricing` },
   openGraph: {
+    images: [defaultOgImage],
     title: `EPC Prices London | From £${priceFrom.epc} | Transparent Guide Pricing | L&D Energy`,
     description: `Guide prices for EPC and floor plan services in London, from £${priceFrom.epc}. Priced mainly on internal floor area (m²). Exact quote confirmed before booking.`,
     url: `${site.url}/pricing`,
   },
   twitter: {
+    images: [defaultOgImage.url],
     title: `EPC Prices London | From £${priceFrom.epc} | Transparent Guide Pricing`,
     description: `Guide prices from £${priceFrom.epc}, based mainly on internal floor area (m²). Exact quote confirmed before booking.`,
   },
@@ -156,7 +156,7 @@ export default function PricingPage() {
         eyebrow="Pricing"
         heading="EPC and Floor Plan Pricing"
         subheading="Every figure here is a starting guide, not a fixed quote. Your final cost depends mainly on internal floor area (m²), plus any extensions, loft conversions, layout and condition. We confirm the exact price before you book — never after."
-        primaryCta={{ label: 'Request a Quote', href: quoteHref({ sourcePage: 'pricing', ctaId: 'hero' }) }}
+        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ sourcePage: 'pricing', ctaId: 'hero' }) }}
       />
 
       {/* Full pricing table */}
@@ -193,7 +193,56 @@ export default function PricingPage() {
           </div>
         </div>
 
-        <div className="mt-8 overflow-hidden rounded-2xl border border-secondary-200 shadow-premium">
+        {/* Phones: one block per band so every price is visible without sideways scrolling. */}
+        <div className="mt-8 overflow-hidden rounded-2xl border border-secondary-200 shadow-premium sm:hidden">
+          <ul className="divide-y divide-secondary-100">
+            {pricing.map((row) => (
+              <li key={row.type} className="bg-white px-4 py-4">
+                <p className="flex items-center gap-1.5 text-base font-bold text-secondary-900">
+                  <Ruler className="w-3.5 h-3.5 shrink-0 text-secondary-500" aria-hidden="true" />
+                  {row.areaLabel}
+                </p>
+                <p className="mt-0.5 text-xs text-secondary-600">{row.typicalLabel}</p>
+                <dl className="mt-3 grid grid-cols-2 gap-2 text-sm">
+                  <div>
+                    <dt className="text-xs font-medium text-secondary-600">EPC</dt>
+                    <dd>
+                      <span className="text-xs font-medium text-secondary-600">From</span>{' '}
+                      <span className="text-base font-bold text-secondary-900">{`£${formatPrice(row.epc)}`}</span>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs font-medium text-secondary-600">Floor plan</dt>
+                    <dd>
+                      <span className="text-xs font-medium text-secondary-600">From</span>{' '}
+                      <span className="text-base font-bold text-secondary-900">{`£${formatPrice(row.floorPlan)}`}</span>
+                    </dd>
+                  </div>
+                  <div className="col-span-2 flex flex-wrap items-baseline justify-between gap-x-3 rounded-lg bg-primary-50 px-3 py-2">
+                    <dt className="text-xs font-semibold text-primary-800">EPC + floor plan</dt>
+                    <dd className="text-right">
+                      <span className="text-base font-bold text-primary-800">
+                        {row.areaMax === null && (
+                          <span className="text-xs font-medium text-primary-700">From </span>
+                        )}
+                        {`£${formatPrice(row.bundle)}`}
+                      </span>{' '}
+                      <span className="text-xs font-semibold text-primary-700">
+                        Save {`£${formatPrice(bundleSaving(row))}`}
+                      </span>
+                    </dd>
+                  </div>
+                </dl>
+              </li>
+            ))}
+          </ul>
+          <p className="bg-secondary-50 border-t border-secondary-200 px-4 py-3 text-xs text-secondary-500 leading-relaxed">
+            All figures are guide estimates and act as starting prices. Internal floor area (m²) is the single biggest factor in the final price, alongside extensions, loft conversions, layout and condition. Savings shown are the difference between the two services booked separately and booked together.{' '}
+            <a href={quoteHref({ sourcePage: 'pricing', ctaId: 'inline' })} className="font-medium text-primary-700 underline">Request an exact quote</a>.
+          </p>
+        </div>
+
+        <div className="mt-8 hidden overflow-hidden rounded-2xl border border-secondary-200 shadow-premium sm:block">
           <div className="overflow-x-auto overscroll-x-contain [scrollbar-width:thin]">
             <table className="w-full text-sm min-w-[720px]">
               <thead>
@@ -256,9 +305,6 @@ export default function PricingPage() {
               </tfoot>
             </table>
           </div>
-          <p className="bg-secondary-50 px-5 pb-3 text-xs font-medium text-secondary-600 sm:hidden" aria-hidden="true">
-            Swipe sideways to see every column
-          </p>
         </div>
 
         <div className="mt-6 rounded-xl bg-primary-50 border border-primary-200 p-6 flex items-start gap-4">
@@ -351,7 +397,7 @@ export default function PricingPage() {
       <CtaStrip
         heading="Get a Personalised Quote"
         body="Send us the address and property size, and we'll confirm your exact price before anything is booked."
-        primaryCta={{ label: 'Request a Quote', href: quoteHref({ sourcePage: 'pricing', ctaId: 'bottom' }) }}
+        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ sourcePage: 'pricing', ctaId: 'bottom' }) }}
       />
     </>
   )

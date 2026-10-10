@@ -7,7 +7,7 @@ import { PageHero } from '@/components/sections/PageHero'
 import { Accordion } from '@/components/ui/Accordion'
 import { CtaStrip } from '@/components/sections/CtaStrip'
 import { fullFaq } from '@/lib/faq'
-import { site } from '@/lib/site'
+import { site, defaultOgImage } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'EPC FAQ | Common Questions in London',
@@ -15,12 +15,14 @@ export const metadata: Metadata = {
     'Common questions about Energy Performance Certificates: validity, legal rules, the assessment process, pricing and improvements. Answered by a DEA.',
   alternates: { canonical: `${site.url}/faq` },
   openGraph: {
+    images: [defaultOgImage],
     title: 'EPC FAQ | Common Questions About EPCs in London | L&D Energy',
     description:
       'Frequently asked questions about Energy Performance Certificates: validity, legal requirements, the assessment process, pricing, and improvements.',
     url: `${site.url}/faq`,
   },
   twitter: {
+    images: [defaultOgImage.url],
     title: 'EPC FAQ | Common Questions About EPCs in London',
     description:
       'Frequently asked questions about Energy Performance Certificates, answered by an Elmhurst-accredited DEA.',

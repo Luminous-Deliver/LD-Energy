@@ -6,7 +6,7 @@ import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { ContactForm } from '@/components/forms/ContactForm'
 import { QuoteSummaryPanel, QuoteSummaryProvider } from '@/components/forms/QuoteSummary'
 import { AssessorCard } from '@/components/ui/AssessorCard'
-import { site } from '@/lib/site'
+import { site, defaultOgImage } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'Contact | Book Your London EPC',
@@ -14,12 +14,14 @@ export const metadata: Metadata = {
     'Book your London EPC certificate. Call, WhatsApp, email or use our booking form. We reply during our opening hours, Mon–Sun 8am–8pm.',
   alternates: { canonical: `${site.url}/contact` },
   openGraph: {
+    images: [defaultOgImage],
     title: 'Contact L&D Energy | Book Your London EPC | 07492 575 396',
     description:
       'Book your London EPC certificate. Call, WhatsApp, email or use our booking form. We reply during our opening hours, Mon–Sun 8am–8pm.',
     url: `${site.url}/contact`,
   },
   twitter: {
+    images: [defaultOgImage.url],
     title: 'Contact L&D Energy | Book Your London EPC',
     description:
       'Book your London EPC certificate. Call, WhatsApp, email or use our booking form. Fast response.',
@@ -102,7 +104,18 @@ export default function ContactPage() {
                   </span>
                   <div className="min-w-0 flex-1 [overflow-wrap:anywhere]">
                     <h2 className="text-base font-semibold text-secondary-900">{m.title}</h2>
-                    <p className="mt-0.5 text-secondary-800 [overflow-wrap:anywhere]">{m.value}</p>
+                    {/* Email breaks after "@" first; mid-word breaks only if the domain alone can't fit. */}
+                    <p className="mt-0.5 text-secondary-800 [overflow-wrap:break-word]">
+                      {m.value.includes('@') ? (
+                        <>
+                          {m.value.slice(0, m.value.indexOf('@') + 1)}
+                          <wbr />
+                          {m.value.slice(m.value.indexOf('@') + 1)}
+                        </>
+                      ) : (
+                        m.value
+                      )}
+                    </p>
                     <p className="text-sm text-secondary-500">{m.detail}</p>
                     <a
                       href={m.href}

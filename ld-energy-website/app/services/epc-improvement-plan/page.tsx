@@ -8,7 +8,7 @@ import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { PageHero } from '@/components/sections/PageHero'
 import { CtaStrip } from '@/components/sections/CtaStrip'
 import { AssessorCard } from '@/components/ui/AssessorCard'
-import { site } from '@/lib/site'
+import { site, defaultOgImage } from '@/lib/site'
 import { areaServedLondon } from '@/lib/boroughs'
 
 const PLAN_PRICE = `£${site.addOns.improvementPlan}`
@@ -19,12 +19,14 @@ export const metadata: Metadata = {
     `Abdul's personalised plan explaining what is holding your EPC rating back and which improvements to consider first, supported by the full Elmhurst Energy Report. ${PLAN_PRICE} extra.`,
   alternates: { canonical: `${site.url}/services/epc-improvement-plan` },
   openGraph: {
+    images: [defaultOgImage],
     title: `EPC Improvement Plan London | ${PLAN_PRICE} | L&D Energy`,
     description:
       `A personalised written plan and the full Elmhurst Energy Report for ${PLAN_PRICE} extra. Standard EPC recommendations are included either way.`,
     url: `${site.url}/services/epc-improvement-plan`,
   },
   twitter: {
+    images: [defaultOgImage.url],
     title: `EPC Improvement Plan London | ${PLAN_PRICE}`,
     description: `Personalised EPC improvement priorities supported by the full Elmhurst Energy Report. ${PLAN_PRICE} extra, with no guaranteed rating or savings.`,
   },

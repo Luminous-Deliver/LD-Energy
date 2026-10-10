@@ -10,7 +10,7 @@ import { ImportantToKnow } from '@/components/sections/ImportantToKnow'
 import { CustomerBriefing } from '@/components/sections/CustomerBriefing'
 import { OnThisPage, type PageAnchor } from '@/components/ui/OnThisPage'
 import { Container } from '@/components/ui/Container'
-import { site, govUk } from '@/lib/site'
+import { site, govUk, defaultOgImage } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'Preparing for Your EPC Assessment | Access, Documents and Evidence',
@@ -18,9 +18,10 @@ export const metadata: Metadata = {
     'What to have ready for your EPC assessment: access, supporting documents and evidence. Plus how your quote works, why the rating is calculated rather than chosen, and why EPCs differ between similar homes.',
   alternates: { canonical: `${site.url}/preparing-for-your-epc` },
   openGraph: {
+    images: [defaultOgImage],
     title: 'Preparing for Your EPC Assessment | L&D Energy',
     description:
-      'A short checklist of what the assessor needs access to, so your EPC survey takes 45–60 minutes and does not need a second visit.',
+      'A short checklist of what the assessor needs access to, so your EPC survey runs to time and does not need a second visit. Most take 45–60 minutes; a large 5+ bedroom home takes around 2 hours.',
     url: `${site.url}/preparing-for-your-epc`,
   },
 }
@@ -71,7 +72,7 @@ export default function PreparingPage() {
       <PageHero
         eyebrow="Before the visit"
         heading="Preparing for your EPC assessment"
-        subheading="A short checklist so the survey takes 45–60 minutes and nothing needs a second visit. Nothing here is difficult — it is mostly about access."
+        subheading="A short checklist so the survey runs to time and nothing needs a second visit. Most take 45–60 minutes; a large 5+ bedroom home takes around 2 hours. Nothing here is difficult — it is mostly about access."
         primaryCta={{ label: 'Get my exact quote', href: quoteHref({ sourcePage: 'preparation', ctaId: 'hero' }) }}
       />
       <CustomerBriefing />

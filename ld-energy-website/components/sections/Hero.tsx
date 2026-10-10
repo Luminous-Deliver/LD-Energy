@@ -13,7 +13,7 @@ export function Hero() {
       style={{ background: 'linear-gradient(160deg, #0D1B33 0%, #142644 45%, #091324 100%)' }}
     >
       {/* Bold dark treatment — reuses the exact navy gradient + sage glow
-          already established for HowItWorks/Footer elsewhere on this site,
+          already established for the Footer elsewhere on this site,
           rather than a new colour scheme, so the homepage's first impression
           reads as confident/premium and still ties to the rest of the page.
           The negative top margin deliberately overdraws the tallest header

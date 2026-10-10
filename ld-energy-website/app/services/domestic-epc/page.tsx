@@ -10,7 +10,7 @@ import { PageHero } from '@/components/sections/PageHero'
 import { Pricing } from '@/components/sections/Pricing'
 import { CtaStrip } from '@/components/sections/CtaStrip'
 import { Faq } from '@/components/sections/Faq'
-import { site, pricing, priceFrom, EXPRESS_SURCHARGE } from '@/lib/site'
+import { site, pricing, priceFrom, EXPRESS_SURCHARGE, defaultOgImage } from '@/lib/site'
 import { areaServedLondon } from '@/lib/boroughs'
 import type { FaqItem } from '@/lib/faq'
 import { Accordion } from '@/components/ui/Accordion'
@@ -20,11 +20,13 @@ export const metadata: Metadata = {
   description: `Domestic EPC certificate in London from £${priceFrom.epc}. Elmhurst-accredited assessor, property visit and lodged certificate. Exact quote and timing confirmed before booking.`,
   alternates: { canonical: `${site.url}/services/domestic-epc` },
   openGraph: {
+    images: [defaultOgImage],
     title: `Domestic EPC Certificate London | From £${priceFrom.epc} | L&D Energy`,
     description: `Get your domestic EPC certificate in London from £${priceFrom.epc}. Elmhurst-accredited assessor, property visit and lodged certificate. Exact quote before booking.`,
     url: `${site.url}/services/domestic-epc`,
   },
   twitter: {
+    images: [defaultOgImage.url],
     title: `Domestic EPC Certificate London | From £${priceFrom.epc}`,
     description:
       'Elmhurst-accredited assessor, property visit and lodged certificate. Exact quote before booking.',

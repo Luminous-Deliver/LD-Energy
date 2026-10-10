@@ -9,7 +9,7 @@ import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { PageHero } from '@/components/sections/PageHero'
 import { Pricing } from '@/components/sections/Pricing'
 import { CtaStrip } from '@/components/sections/CtaStrip'
-import { site, pricing, priceFrom } from '@/lib/site'
+import { site, pricing, priceFrom, defaultOgImage } from '@/lib/site'
 import { areaServedLondon } from '@/lib/boroughs'
 import type { FaqItem } from '@/lib/faq'
 
@@ -18,11 +18,13 @@ export const metadata: Metadata = {
   description: `Domestic EPC assessments for London landlords. See where your rental stands against the current band E requirement. Guide prices from £${priceFrom.epc}, exact quote before booking.`,
   alternates: { canonical: `${site.url}/landlords` },
   openGraph: {
+    images: [defaultOgImage],
     title: 'EPC for Landlords London | Domestic MEES Compliance | L&D Energy',
     description: `Domestic EPC assessments for London landlords. Check where your rental stands against the current band E requirement. Guide prices from £${priceFrom.epc}, portfolio rates available.`,
     url: `${site.url}/landlords`,
   },
   twitter: {
+    images: [defaultOgImage.url],
     title: 'EPC for Landlords London | Domestic MEES Compliance',
     description:
       'Domestic EPC assessments for London landlords. Check where your rental stands against the current band E requirement.',

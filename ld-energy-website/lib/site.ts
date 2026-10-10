@@ -250,6 +250,18 @@ export const priceFrom = {
   bundle: Math.min(...pricing.map((p) => p.bundle)),
 }
 
+/**
+ * Brand share card from app/opengraph-image.tsx. A page that sets its own
+ * openGraph/twitter replaces the layout's whole object, image included, so
+ * every such page must pass this explicitly.
+ */
+export const defaultOgImage = {
+  url: `${site.url}/opengraph-image`,
+  width: 1200,
+  height: 630,
+  alt: `L&D Energy, Domestic EPC London from £${priceFrom.epc}`,
+}
+
 export const boroughs = [
   'stratford', 'hackney', 'tower-hamlets', 'newham', 'greenwich',
   'islington', 'southwark', 'lewisham', 'barking-dagenham',

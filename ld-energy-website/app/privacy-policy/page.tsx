@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { LegalPage } from '@/components/ui/LegalPage'
-import { site } from '@/lib/site'
+import { site, defaultOgImage } from '@/lib/site'
 import { AnalyticsChoices } from '@/components/layout/AnalyticsChoices'
 
 export const metadata: Metadata = {
@@ -10,12 +10,14 @@ export const metadata: Metadata = {
   alternates: { canonical: `${site.url}/privacy-policy` },
   robots: { index: true, follow: true },
   openGraph: {
+    images: [defaultOgImage],
     title: 'Privacy Policy | L&D Energy',
     description:
       'How L&D Energy uses enquiry and assessment information, keeps records and provides privacy and analytics choices.',
     url: `${site.url}/privacy-policy`,
   },
   twitter: {
+    images: [defaultOgImage.url],
     title: 'Privacy Policy | L&D Energy',
     description: 'How L&D Energy uses your information and provides privacy and analytics choices.',
   },

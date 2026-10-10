@@ -6,7 +6,7 @@ import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { StepList } from '@/components/ui/StepList'
 import { PageHero } from '@/components/sections/PageHero'
 import { CtaStrip } from '@/components/sections/CtaStrip'
-import { pricing, formatPrice, bundleSaving, maxBundleSaving, priceFrom } from '@/lib/site'
+import { pricing, formatPrice, bundleSaving, maxBundleSaving, priceFrom, defaultOgImage } from '@/lib/site'
 import { site } from '@/lib/site'
 import { areaServedLondon } from '@/lib/boroughs'
 
@@ -15,11 +15,13 @@ export const metadata: Metadata = {
   description: `Professional property floor plans across London. Laser-measured, high-resolution files for estate agents. Guide prices from £${priceFrom.floorPlan}, better value when booked alongside an EPC.`,
   alternates: { canonical: `${site.url}/services/floor-plans` },
   openGraph: {
+    images: [defaultOgImage],
     title: `Property Floor Plans London | From £${priceFrom.floorPlan} | L&D Energy`,
     description: `Professional property floor plans across London. Laser-measured, high-resolution files for estate agents and property marketing. Better value when booked alongside an EPC.`,
     url: `${site.url}/services/floor-plans`,
   },
   twitter: {
+    images: [defaultOgImage.url],
     title: `Property Floor Plans London | From £${priceFrom.floorPlan}`,
     description:
       'Professional property floor plans across London. High-resolution files for estate agents. Better value bundled with an EPC.',

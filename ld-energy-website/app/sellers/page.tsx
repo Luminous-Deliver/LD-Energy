@@ -17,7 +17,7 @@ import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { PageHero } from '@/components/sections/PageHero'
 import { Pricing } from '@/components/sections/Pricing'
 import { CtaStrip } from '@/components/sections/CtaStrip'
-import { site, pricing, priceFrom, EXPRESS_SURCHARGE } from '@/lib/site'
+import { site, pricing, priceFrom, EXPRESS_SURCHARGE, defaultOgImage } from '@/lib/site'
 import { areaServedLondon } from '@/lib/boroughs'
 import type { FaqItem } from '@/lib/faq'
 
@@ -27,12 +27,14 @@ export const metadata: Metadata = {
     `EPC certificates for selling your London home. Generally commissioned before marketing; exemptions apply. Lodged within 72 hours, next-day available. Guide prices from £${priceFrom.epc}.`,
   alternates: { canonical: `${site.url}/sellers` },
   openGraph: {
+    images: [defaultOgImage],
     title: `EPC for Selling Your Home London | From £${priceFrom.epc} | L&D Energy`,
     description:
       `EPC certificates for selling your London home. Generally commissioned before marketing; exemptions apply. Lodged within 72 hours, next-day available. Guide prices from £${priceFrom.epc}.`,
     url: `${site.url}/sellers`,
   },
   twitter: {
+    images: [defaultOgImage.url],
     title: `EPC for Selling Your Home London | From £${priceFrom.epc}`,
     description:
       'EPC certificates for selling your London home. Generally commissioned before marketing; exemptions apply. Book today.',

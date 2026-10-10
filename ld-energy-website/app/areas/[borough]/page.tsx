@@ -10,7 +10,7 @@ import { CtaStrip } from '@/components/sections/CtaStrip'
 import { Accordion } from '@/components/ui/Accordion'
 import { ContactSection } from '@/components/sections/ContactSection'
 import { boroughMeta, boroughIntent, type BoroughIntent } from '@/lib/boroughs'
-import { site, pricing, priceFrom, formatPrice, maxBundleSaving, EXPRESS_SURCHARGE } from '@/lib/site'
+import { site, pricing, priceFrom, formatPrice, maxBundleSaving, EXPRESS_SURCHARGE, defaultOgImage } from '@/lib/site'
 import type { FaqItem } from '@/lib/faq'
 
 interface PageProps {
@@ -38,11 +38,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     description: boroughDescription(data.name, intent),
     alternates: { canonical: `${site.url}/areas/${slug}` },
     openGraph: {
+      images: [defaultOgImage],
       title: `EPC in ${data.name} | Cost from £${priceFrom.epc} | L&D Energy`,
       description: `EPC cost in ${data.name}: guide prices from £${priceFrom.epc}, based on internal floor area. Exact quote confirmed before booking.`,
       url: `${site.url}/areas/${slug}`,
     },
     twitter: {
+      images: [defaultOgImage.url],
       title: `EPC in ${data.name} | From £${priceFrom.epc} | L&D Energy`,
       description: `Domestic EPC certificate in ${data.name} from £${priceFrom.epc}. Next-day service available.`,
     },

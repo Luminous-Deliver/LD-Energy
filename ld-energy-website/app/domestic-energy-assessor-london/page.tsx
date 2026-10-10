@@ -19,7 +19,7 @@ import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { PageHero } from '@/components/sections/PageHero'
 import { Pricing } from '@/components/sections/Pricing'
 import { CtaStrip } from '@/components/sections/CtaStrip'
-import { site, pricing, priceFrom, insurance, EXPRESS_SURCHARGE } from '@/lib/site'
+import { site, pricing, priceFrom, insurance, EXPRESS_SURCHARGE, defaultOgImage } from '@/lib/site'
 import { areaServedLondon } from '@/lib/boroughs'
 import type { FaqItem } from '@/lib/faq'
 
@@ -31,12 +31,14 @@ export const metadata: Metadata = {
     `Elmhurst-accredited domestic energy assessor in Stratford, covering all 32 London boroughs. Official EPC certificates from £${priceFrom.epc}, next-day available.`,
   alternates: { canonical: `${site.url}${PATH}` },
   openGraph: {
+    images: [defaultOgImage],
     title: 'Domestic Energy Assessor London | Elmhurst Accredited | L&D Energy',
     description:
       `Elmhurst-accredited domestic energy assessor covering all 32 London boroughs. Official EPC certificates from £${priceFrom.epc}, next-day service available.`,
     url: `${site.url}${PATH}`,
   },
   twitter: {
+    images: [defaultOgImage.url],
     title: 'Domestic Energy Assessor London | Elmhurst Accredited',
     description:
       `Elmhurst-accredited domestic energy assessor covering all 32 London boroughs. EPCs from £${priceFrom.epc}.`,

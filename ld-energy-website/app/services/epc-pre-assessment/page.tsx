@@ -8,7 +8,7 @@ import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { PageHero } from '@/components/sections/PageHero'
 import { CtaStrip } from '@/components/sections/CtaStrip'
 import { AssessorCard } from '@/components/ui/AssessorCard'
-import { site, priceFrom } from '@/lib/site'
+import { site, priceFrom, defaultOgImage } from '@/lib/site'
 import { areaServedLondon } from '@/lib/boroughs'
 
 const LODGE_LATER = `£${site.addOns.lodgeLater}`
@@ -20,12 +20,14 @@ export const metadata: Metadata = {
     `Find out what your London property would score before anything goes on the public register. A full survey by an accredited assessor, deliberately not lodged, with a written improvement plan included. From ${FROM_PRICE}.`,
   alternates: { canonical: `${site.url}/services/epc-pre-assessment` },
   openGraph: {
+    images: [defaultOgImage],
     title: `EPC Pre-Assessment London | From ${FROM_PRICE} | L&D Energy`,
     description:
       `A full survey deliberately not lodged as part of this service, so no certificate is published. Your score, what is holding it back, and a written plan to improve it. From ${FROM_PRICE}.`,
     url: `${site.url}/services/epc-pre-assessment`,
   },
   twitter: {
+    images: [defaultOgImage.url],
     title: `EPC Pre-Assessment London | From ${FROM_PRICE}`,
     description: `Know your rating before it becomes public. Nothing is lodged. From ${FROM_PRICE}.`,
   },

@@ -6,7 +6,7 @@ import { Section } from '@/components/ui/Section'
 import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { PageHero } from '@/components/sections/PageHero'
 import { CtaStrip } from '@/components/sections/CtaStrip'
-import { site, insurance } from '@/lib/site'
+import { site, insurance, defaultOgImage } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'Abdul Motaleb Taher | About Your EPC Assessor',
@@ -14,12 +14,14 @@ export const metadata: Metadata = {
     'Elmhurst-accredited Domestic Energy Assessor based in Stratford, East London. EPC certificates and floor plans across all 32 London boroughs.',
   alternates: { canonical: `${site.url}/about` },
   openGraph: {
+    images: [defaultOgImage],
     title: 'About L&D Energy | London EPC Assessor | Elmhurst Accredited',
     description:
       'L&D Energy, Elmhurst-accredited Domestic Energy Assessor based in Stratford, East London. Professional EPC certificates and floor plans across all London boroughs.',
     url: `${site.url}/about`,
   },
   twitter: {
+    images: [defaultOgImage.url],
     title: 'About L&D Energy | London EPC Assessor',
     description:
       'Elmhurst-accredited Domestic Energy Assessor based in Stratford, East London. EPC certificates across all London boroughs.',

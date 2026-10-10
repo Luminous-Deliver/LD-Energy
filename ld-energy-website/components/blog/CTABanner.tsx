@@ -21,11 +21,11 @@ export function CTABanner({
         isFinal ? 'my-12 bg-secondary-900 text-white' : 'my-12 bg-primary-600 text-white'
       }`}
     >
-      <h3 className="text-xl md:text-2xl font-bold mb-2">{heading}</h3>
+      <h3 className="text-xl md:text-2xl font-bold !text-white mb-2">{heading}</h3>
       <p className={`mb-5 ${isFinal ? 'text-secondary-200' : 'text-primary-50'}`}>{body}</p>
       <div className="flex flex-wrap gap-3">
         <Link
-          href={quoteHref({ sourcePage: 'blog', ctaId: 'inline' })}
+          href={quoteHref({ sourcePage: 'blog', ctaId: isFinal ? 'bottom' : 'inline' })}
           className="inline-flex items-center justify-center bg-white text-primary-700 hover:bg-primary-50 font-semibold px-5 py-2.5 rounded-md"
         >
           Get my exact quote

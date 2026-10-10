@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { LegalPage } from '@/components/ui/LegalPage'
-import { site, insurance, EXPRESS_SURCHARGE } from '@/lib/site'
+import { site, insurance, EXPRESS_SURCHARGE, defaultOgImage } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'Terms of Service',
@@ -9,12 +9,14 @@ export const metadata: Metadata = {
   alternates: { canonical: `${site.url}/terms` },
   robots: { index: true, follow: true },
   openGraph: {
+    images: [defaultOgImage],
     title: 'Terms of Service | L&D Energy',
     description:
       'Terms of service governing the supply of EPC certificates and floor plans by L&D Energy, a trading name of Luminous & Deliver.',
     url: `${site.url}/terms`,
   },
   twitter: {
+    images: [defaultOgImage.url],
     title: 'Terms of Service | L&D Energy',
     description:
       'Terms of service governing the supply of EPC certificates and floor plans by L&D Energy.',
