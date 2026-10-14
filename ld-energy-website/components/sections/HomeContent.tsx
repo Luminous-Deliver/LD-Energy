@@ -302,15 +302,12 @@ export function HomeContent() {
         </Container>
       </section>
 
-      {/* Close: the hero's London at dusk, fading into the footer's navy so the page ends as one scene. */}
+      {/* Close: the hero's Thames an hour later, at night, fading into the footer's navy so the page ends as one scene. */}
       <section id="contact" aria-labelledby="close-h" className="hc-close scroll-mt-28">
         <div className="hc-sky" aria-hidden="true" />
         <div className="hc-land" aria-hidden="true">
-          {/* eslint-disable @next/next/no-img-element -- next/image is unoptimised on Pages; same layers as the hero */}
-          <img className="hc-far" data-rate="0.3" src="/hero/london-far-2400.webp" width={2400} height={642} alt="" loading="lazy" decoding="async" />
-          <img className="hc-mid" data-rate="0.15" src="/hero/london-mid-2400.webp" width={2400} height={305} alt="" loading="lazy" decoding="async" />
-          <img className="hc-near" src="/hero/london-near-2400.webp" width={2400} height={272} alt="" loading="lazy" decoding="async" />
-          {/* eslint-enable @next/next/no-img-element */}
+          {/* eslint-disable-next-line @next/next/no-img-element -- next/image is unoptimised on Pages; the hero's photo, regraded to night */}
+          <img className="hc-night" data-rate="0.22" src="/hero/thames-night-2400.webp" srcSet="/hero/thames-night-1440.webp 1440w, /hero/thames-night-2400.webp 2400w" sizes="max(100vw, 1700px)" width={2400} height={625} alt="" loading="lazy" decoding="async" />
         </div>
         <div className="hc-fade" aria-hidden="true" />
         <Container className="hc-in">
@@ -335,8 +332,8 @@ export function HomeContent() {
             <p className="hc-who">{site.assessor.name}, your assessor</p>
           </div>
           <p className="hc-credit">
-            Hero photo: <a href="https://commons.wikimedia.org/wiki/File:London_from_Primrose_Hill_May_2013.jpg" target="_blank" rel="noopener noreferrer">&ldquo;London from Primrose Hill&rdquo;</a> by Duncan,{' '}
-            <a href="https://creativecommons.org/licenses/by/2.0/" target="_blank" rel="noopener noreferrer">CC BY 2.0</a>, cut into layers.
+            Photo: <a href="https://commons.wikimedia.org/wiki/File:London_Thames_Sunset_panorama_-_Feb_2008.jpg" target="_blank" rel="noopener noreferrer">&ldquo;London Thames Sunset panorama&rdquo;</a> by Diliff,{' '}
+            <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener noreferrer">CC BY 3.0</a>, cut into layers and regraded.
           </p>
         </Container>
         <CloseMotion />
