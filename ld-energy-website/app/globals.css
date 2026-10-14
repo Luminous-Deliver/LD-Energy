@@ -217,11 +217,12 @@
    ------------------------------------------------------------------------ */
 @layer components {
   /* hero */
-  .lh { position: relative; isolation: isolate; overflow: clip; background: #FAFBFC; color: #0D1B33; padding-bottom: 72px; --scene-w: max(100%, 1600px); }
-  /* evening: cool cream overhead, warming toward the city, whose own sky takes over */
-  .lh-sky { position: absolute; inset: 0 0 auto 0; height: 1000px; z-index: 0; background:
-      radial-gradient(50% 45% at 24% 70%, rgba(255,222,204,.6), transparent 70%),
-      linear-gradient(to bottom, #EEF0F0 0%, #F3EEE9 40%, #F3EAE3 70%, #FAFBFC 100%); }
+  .lh { position: relative; isolation: isolate; overflow: clip; background: #EEEFEB; color: #0D1B33; padding-bottom: 72px; }
+  .lh-sky { position: absolute; inset: 0; z-index: 0; background:
+      radial-gradient(34% 3.5% at 18% 20%, rgba(255,255,255,.34), transparent), radial-gradient(30% 3% at 74% 13%, rgba(255,255,255,.34), transparent),
+      radial-gradient(42% 2.8% at 46% 33%, rgba(255,255,255,.34), transparent),
+      radial-gradient(circle 62vmax at 66% 58%, rgba(255,250,241,.95) 0%, rgba(255,247,236,.5) 22%, transparent 100%),
+      linear-gradient(to bottom, #BCCAD6 0%, #D3DCE2 34%, #E6EAE8 56%, #F1ECE3 74%, #F3EEE6 100%); }
   .lh-words { position: relative; z-index: 6; display: flex; flex-direction: column; align-items: center; text-align: center; padding-top: 8.75rem; }
   .lh-pill { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; line-height: 1; padding: 9px 14px; border-radius: 999px; background: rgba(255,255,255,.62); box-shadow: 0 0 0 1px rgba(255,255,255,.55); backdrop-filter: blur(8px); }
   .lh-pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #386B59; }
@@ -231,30 +232,39 @@
   .lh-promise { margin-top: 22px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 22px; font-size: 14.5px; font-weight: 600; color: #0D1B33; }
   .lh-promise li { display: inline-flex; align-items: center; gap: 8px; }
   .lh-promise li > span { display: grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; background: #386B59; color: #fff; }
-  /* the city band: Tower Bridge's pinnacles sit just under the promises and the
-     card overlaps from the bridge's walkway down; its pale sky reaches up behind the words */
-  .lh-scene { position: relative; z-index: 1; height: 130px; margin-top: 14px; pointer-events: none; }
-  .lh-scene picture { display: contents; }
-  .lh-city { position: absolute; left: 50%; z-index: 1; width: var(--scene-w); max-width: none; height: auto; translate: -50%; will-change: transform;
-      top: calc(var(--scene-w) * -0.2867 + 14px); transform-origin: 50% calc(var(--scene-w) * 0.42); }
-  /* nightfall as the hero leaves: a navy wash, deepest at the water, opacity set on scroll */
-  .lh-dusk { position: absolute; z-index: 3; left: 0; right: 0; top: -140px; bottom: -330px; opacity: 0; will-change: opacity;
-      background: linear-gradient(to bottom, rgba(22,27,54,0), rgba(22,27,54,.32) 32%, rgba(14,20,42,.46) 58%, rgba(14,20,42,0) 100%); }
-  .lh-card { position: relative; z-index: 3; margin: 0 auto; max-width: 1040px; padding: 0 1rem; }
-  @keyframes lh-rise { from { opacity: 0; translate: 0 22px; } }
-  @keyframes lh-land { from { translate: -50% 46px; scale: 1.06; } }
-  .lh-rise { animation: lh-rise 1s cubic-bezier(.22,1,.36,1) calc(.15s + var(--n) * .1s) backwards; }
-  .lh-city { animation: lh-land 1.6s cubic-bezier(.22,1,.36,1) backwards; }
-  .lh-card { animation: lh-rise 1.3s cubic-bezier(.22,1,.36,1) .12s backwards; }
+  /* Primrose Hill in three planes (HeroMotion drives the rates): far skyline, mid trees,
+     the card, then the near hedge in front of the card's foot, rising over it on scroll */
+  .lh-land { position: absolute; inset: 0; pointer-events: none; }
+  .lh-land picture { display: contents; }
+  .lh-land img { position: absolute; left: 50%; max-width: none; height: auto; translate: -50%; will-change: transform; }
+  .lh-land__far { z-index: 1; width: max(100%, 1700px); bottom: 312px; }
+  .lh-land__mid { z-index: 2; width: max(100%, 2100px); bottom: 150px; filter: saturate(.8) brightness(1.02) contrast(.95); }
+  .lh-land__near { z-index: 4; width: max(100%, 1900px); bottom: -6px; filter: saturate(.75) brightness(.88) hue-rotate(6deg); }
+  .lh-floor { position: absolute; left: 0; right: 0; bottom: 0; z-index: 5; height: 110px; pointer-events: none; background: linear-gradient(to bottom, transparent, rgba(250,251,252,.85) 70%, #FAFBFC); }
+  .lh-card { position: relative; z-index: 3; margin: 52px auto 0; max-width: 1040px; padding: 0 1rem; }
+  /* entrance, OmniRated's measured numbers: sky brightens over 1.2s, the land and the
+     card rise 70px together over 1.3s (card .12s behind), words stagger 24px */
+  @keyframes lh-rise { from { opacity: 0; translate: 0 24px; } }
+  @keyframes lh-sky { from { opacity: .12; } }
+  @keyframes lh-land { from { translate: -50% 70px; } }
+  @keyframes lh-card { from { translate: 0 70px; } }
+  .lh-sky { animation: lh-sky 1.2s cubic-bezier(.22,1,.36,1) backwards; }
+  .lh-rise { animation: lh-rise 1s cubic-bezier(.22,1,.36,1) calc(.15s + var(--n) * .11s) backwards; }
+  .lh-land img { animation: lh-land 1.3s cubic-bezier(.22,1,.36,1) backwards; }
+  .lh-card { animation: lh-card 1.3s cubic-bezier(.22,1,.36,1) .12s backwards; }
   @media (max-width: 760px) {
     .lh { padding-bottom: 36px; }
     .lh-words { padding-top: 7.5rem; }
     .lh-line { font-size: 1rem; }
     .lh-actions > * { flex: 1 1 100%; }
     .lh-promise { flex-direction: column; align-items: flex-start; gap: 8px; padding: 14px 18px; border-radius: 18px; background: rgba(255,255,255,.72); backdrop-filter: blur(10px); box-shadow: 0 0 0 1px rgba(255,255,255,.6); color: #0D1B33; }
-    .lh { --scene-w: 1000px; }
-    .lh-scene { height: 150px; margin-top: 18px; }
-    .lh-card { z-index: 6; margin-top: -24px; padding: 0 12px; }
+    /* the land becomes a band between the words and the card, which sits in front */
+    .lh-land { position: relative; inset: auto; height: 210px; margin-top: 6px; }
+    .lh-land__far { width: 1100px; bottom: 40px; }
+    .lh-land__mid { width: 1200px; bottom: 0; }
+    .lh-land__near { width: 1300px; bottom: -40px; z-index: 3; }
+    .lh-floor { display: none; }
+    .lh-card { z-index: 6; margin-top: -70px; padding: 0 12px; }
   }
 
   /* quote card */
@@ -586,7 +596,7 @@
 @keyframes ld-intro-lift { to { translate: 0 -100%; } }
 @keyframes ld-intro-lift-quick { to { translate: 0 -100%; } }
 /* The hero's own entrance waits under the cover and plays as it lifts. */
-body:has(> .ld-intro:not(.is-released)) :is(.lh-rise, .lh-city, .lh-card) { animation-play-state: paused; }
+body:has(> .ld-intro:not(.is-released)) :is(.lh-sky, .lh-rise, .lh-land img, .lh-card) { animation-play-state: paused; }
 
 /* On the homepage the dusk close is the skyline and already carries the contact details,
    so the drawn skyline and the footer's contact column step aside. Unlayered on purpose:
@@ -598,6 +608,6 @@ body:has(.hc-close) .cf-grid { border-top: 1px solid rgba(241, 244, 242, .12); }
 @media (max-width: 1023px) { body:has(.hc-close) .cf-proof { display: block; } }
 
 @media (prefers-reduced-motion: reduce) {
-  .lh-rise, .lh-city, .lh-card { animation: none; }
+  .lh-sky, .lh-rise, .lh-land img, .lh-card { animation: none; }
   .will-reveal { opacity: 1; transform: none; }
 }

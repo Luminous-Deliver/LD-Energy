@@ -9,28 +9,34 @@ import { HeroMotion } from '@/components/sections/home/HeroMotion'
 export const promises = ['Same working-day reply', 'No surprise charges', 'Free rearrange if we reschedule']
 
 /**
- * "London Thames Sunset panorama" by Diliff (CC BY 3.0, credited in the
- * closing section) as one plane: Tower Bridge and the City in a band between
- * the words and the quote card, the photo's sky paling up behind the words and
- * its water fading into the page under the card. It drifts at 0.31 of scroll,
- * so the card slides up over the river. Dusk falls on it as the hero leaves
- * (lh-dusk), so the closing scene, the same view at night, ends the same evening.
+ * Three depth planes cut from "London from Primrose Hill" by Duncan (CC BY 2.0,
+ * credited in the closing section). Back to front: far skyline, mid trees, then
+ * the quote card, then the near hedge, which covers the card's foot and rises
+ * with the page. Phones show the land as a band between the words and the card.
  */
-function Layer({ name, className, rate, h2400, priority }: { name: 'scene'; className: string; rate: number; h2400: number; priority?: boolean }) {
-  return (
+function Land() {
+  // Class names are written out in full so Tailwind keeps them.
+  const layer = (name: 'far' | 'mid' | 'near', cls: string, rate: number, h2400: number, priority?: boolean) => (
     <picture>
-      <source media="(max-width: 760px)" srcSet={`/hero/thames-${name}-1440.webp`} />
+      <source media="(max-width: 760px)" srcSet={`/hero/london-${name}-1440.webp`} />
       {/* eslint-disable-next-line @next/next/no-img-element -- next/image is unoptimised on Pages; layers need <picture> */}
       <img
-        className={className}
+        className={cls}
         data-rate={rate}
-        src={`/hero/thames-${name}-2400.webp`}
+        src={`/hero/london-${name}-2400.webp`}
         width={2400}
         height={h2400}
         alt=""
         {...(priority ? { fetchPriority: 'high' as const } : {})}
       />
     </picture>
+  )
+  return (
+    <div aria-hidden="true" className="lh-land">
+      {layer('far', 'lh-land__far', 0.31, 642, true)}
+      {layer('mid', 'lh-land__mid', 0.17, 305)}
+      {layer('near', 'lh-land__near', 0, 272)}
+    </div>
   )
 }
 
@@ -56,10 +62,8 @@ export function HomeHero() {
           ))}
         </ul>
       </Container>
-      <div aria-hidden="true" className="lh-scene">
-        <Layer name="scene" className="lh-city" rate={0.31} h2400={1311} priority />
-        <div className="lh-dusk" />
-      </div>
+      <Land />
+      <div aria-hidden="true" className="lh-floor" />
       <div id="pricing" className="lh-card scroll-mt-28">
         <HomeQuoteCard />
       </div>
