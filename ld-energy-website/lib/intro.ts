@@ -1,7 +1,8 @@
 /**
- * Homepage intro: the logo fills like a gauge, then the cover lifts (≈0.9s; the
- * lift starts at 0.36s). Pattern and easing measured on omnirated.co.uk,
- * 14/10/2026, shortened from their 1.8s. Inline in <body> so it runs before
+ * Homepage intro, 0.9s: the logo rises in while an EPC rating chart (bands A
+ * to G) draws beneath it, then the cover lifts from 0.52s. Abdul asked for
+ * more than the logo and a little longer (14/10/2026); the lift's easing is
+ * OmniRated's, measured the same day. Inline in <body> so it runs before
  * the hero paints. Only for a fresh arrival on "/" (or a reload); never for
  * in-site navigation, back/forward, a #hash or reduced motion. Any input skips it.
  * The hero's rise animations wait while `.ld-intro:not(.is-released)` exists.
@@ -20,7 +21,8 @@ if(d.referrer&&new URL(d.referrer).origin===location.origin)return;
 var root=d.createElement('div');
 root.className='ld-intro';
 root.setAttribute('aria-hidden','true');
-root.innerHTML='<div class="ld-intro__ground"></div><div class="ld-intro__mark"><img class="ld-intro__base" src="/logo.svg" alt="" width="552" height="240"><img class="ld-intro__fill" src="/logo.svg" alt="" width="552" height="240"></div>';
+var bars='';for(var i=0;i<7;i++)bars+='<i style="--i:'+i+'"><b>'+'ABCDEFG'.charAt(i)+'</b></i>';
+root.innerHTML='<div class="ld-intro__ground"></div><div class="ld-intro__mark"><img class="ld-intro__logo" src="/logo.svg" alt="" width="552" height="240"><div class="ld-intro__bands">'+bars+'</div></div>';
 var ground=root.firstChild,names=['pointerdown','keydown','wheel','touchstart'],swept=false,done=false;
 function listen(on){for(var i=0;i<names.length;i++){if(on)w.addEventListener(names[i],skip,{capture:true,passive:true});else w.removeEventListener(names[i],skip,{capture:true})}}
 function skip(){if(!swept)root.classList.add('ld-intro--skip');listen(false)}

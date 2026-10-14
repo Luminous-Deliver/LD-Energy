@@ -231,25 +231,20 @@
   .lh-promise { margin-top: 22px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 22px; font-size: 14.5px; font-weight: 600; color: #0D1B33; }
   .lh-promise li { display: inline-flex; align-items: center; gap: 8px; }
   .lh-promise li > span { display: grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; background: #386B59; color: #fff; }
-  /* the city band: the photo hangs so Tower Bridge's pinnacles touch its top
-     and the waterline meets the card; its pale sky reaches up behind the words */
-  .lh-scene { position: relative; z-index: 1; height: 236px; margin-top: 10px; pointer-events: none; }
+  /* the city band: Tower Bridge's pinnacles sit just under the promises and the
+     card overlaps from the bridge's walkway down; its pale sky reaches up behind the words */
+  .lh-scene { position: relative; z-index: 1; height: 130px; margin-top: 14px; pointer-events: none; }
   .lh-scene picture { display: contents; }
-  .lh-city, .lh-river { position: absolute; left: 50%; width: var(--scene-w); max-width: none; height: auto; translate: -50%; will-change: transform; }
-  /* fractions of the scene width: pinnacles at 0.287, river top at 0.398 */
-  .lh-city { top: calc(var(--scene-w) * -0.287 + 4px); z-index: 1; }
-  .lh-river { top: calc(var(--scene-w) * (0.398 - 0.287) + 4px); z-index: 2; }
-  /* both planes scale about the same point, the waterline, so they stay in register */
-  .lh-city { transform-origin: 50% calc(var(--scene-w) * 0.42); }
-  .lh-river { transform-origin: 50% calc(var(--scene-w) * 0.022); }
+  .lh-city { position: absolute; left: 50%; z-index: 1; width: var(--scene-w); max-width: none; height: auto; translate: -50%; will-change: transform;
+      top: calc(var(--scene-w) * -0.2867 + 14px); transform-origin: 50% calc(var(--scene-w) * 0.42); }
   /* nightfall as the hero leaves: a navy wash, deepest at the water, opacity set on scroll */
-  .lh-dusk { position: absolute; z-index: 3; left: 0; right: 0; top: -140px; bottom: -220px; opacity: 0; will-change: opacity;
+  .lh-dusk { position: absolute; z-index: 3; left: 0; right: 0; top: -140px; bottom: -330px; opacity: 0; will-change: opacity;
       background: linear-gradient(to bottom, rgba(22,27,54,0), rgba(22,27,54,.32) 32%, rgba(14,20,42,.46) 58%, rgba(14,20,42,0) 100%); }
   .lh-card { position: relative; z-index: 3; margin: 0 auto; max-width: 1040px; padding: 0 1rem; }
   @keyframes lh-rise { from { opacity: 0; translate: 0 22px; } }
   @keyframes lh-land { from { translate: -50% 46px; scale: 1.06; } }
   .lh-rise { animation: lh-rise 1s cubic-bezier(.22,1,.36,1) calc(.15s + var(--n) * .1s) backwards; }
-  .lh-city, .lh-river { animation: lh-land 1.6s cubic-bezier(.22,1,.36,1) backwards; }
+  .lh-city { animation: lh-land 1.6s cubic-bezier(.22,1,.36,1) backwards; }
   .lh-card { animation: lh-rise 1.3s cubic-bezier(.22,1,.36,1) .12s backwards; }
   @media (max-width: 760px) {
     .lh { padding-bottom: 36px; }
@@ -258,7 +253,7 @@
     .lh-actions > * { flex: 1 1 100%; }
     .lh-promise { flex-direction: column; align-items: flex-start; gap: 8px; padding: 14px 18px; border-radius: 18px; background: rgba(255,255,255,.72); backdrop-filter: blur(10px); box-shadow: 0 0 0 1px rgba(255,255,255,.6); color: #0D1B33; }
     .lh { --scene-w: 1000px; }
-    .lh-scene { height: 168px; margin-top: 18px; }
+    .lh-scene { height: 150px; margin-top: 18px; }
     .lh-card { z-index: 6; margin-top: -24px; padding: 0 12px; }
   }
 
@@ -295,14 +290,27 @@
   }
   .qc__calc { padding: 28px 28px 110px; }
   .qc__calc-top { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 16px 32px; }
-  .qc__tabs { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; border-radius: 14px; background: #F1F3F6; }
-  .qc__tabs button { display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 0 14px; border-radius: 10px; font-size: 14px; font-weight: 600; color: #4B5A6C; transition: background-color .15s, color .15s; }
-  .qc__tabs button[aria-pressed="true"] { background: #fff; color: #0D1B33; box-shadow: 0 1px 3px rgba(13,27,51,.12); }
+  /* service picker: the same choose-one grammar as the size tiles, with a radio dot */
+  .qc__tabs-label { margin-bottom: 8px; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #5E6B78; }
+  .qc__tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+  .qc__tabs button { display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 16px 0 14px; border-radius: 999px; border: 1px solid rgba(13,27,51,.18); background: #fff; font-size: 14.5px; font-weight: 600; color: #0D1B33; cursor: pointer; transition: border-color .16s, background-color .16s, box-shadow .16s, transform .12s; }
+  .qc__tabs button:hover { border-color: #386B59; box-shadow: 0 4px 12px -6px rgba(13,27,51,.25); }
+  .qc__tabs button:active { transform: scale(.98); }
+  .qc__tabs button[aria-pressed="true"] { border-color: #386B59; background: #F1F6F3; box-shadow: inset 0 0 0 1px #386B59; }
+  .qc__radio { position: relative; width: 18px; height: 18px; flex: none; border-radius: 50%; box-shadow: inset 0 0 0 1.5px rgba(13,27,51,.35); transition: box-shadow .16s; }
+  .qc__radio::after { content: ""; position: absolute; inset: 4px; border-radius: 50%; background: #386B59; scale: 0; transition: scale .18s cubic-bezier(.22,1,.36,1); }
+  .qc__tabs button:hover .qc__radio { box-shadow: inset 0 0 0 1.5px #386B59; }
+  .qc__tabs button[aria-pressed="true"] .qc__radio { box-shadow: inset 0 0 0 1.5px #386B59; }
+  .qc__tabs button[aria-pressed="true"] .qc__radio::after { scale: 1; }
+  /* "not sure" is a full option tile under the sizes, not a link to miss */
+  .qc__notsure { grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 12px 15px; text-align: left; border-radius: 14px; border: 1.5px dashed rgba(56,107,89,.55); background: #F7FAF8; color: #2F5749; cursor: pointer; transition: border-color .16s, background-color .16s; }
+  .qc__notsure .qc__size-sub { display: block; margin-top: 2px; }
+  .qc__notsure b { display: block; font-size: 15px; font-weight: 600; color: #0D1B33; }
+  .qc__notsure:hover { border-color: #386B59; background: #F1F6F3; }
+  .qc__notsure[aria-pressed="true"] { border-style: solid; border-color: #386B59; background: #F1F6F3; box-shadow: inset 0 0 0 1px #386B59; }
   .qc__save { font-size: 10.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; padding: 4px 7px; border-radius: 6px; background: #DDEBE4; color: #2F5749; }
   .qc__calc-body { margin-top: 24px; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 24px; align-items: start; }
   .qc__legend { font-family: var(--font-serif); font-size: 1.2rem; font-weight: 500; }
-  .qc__notsure { min-height: 40px; font-size: 14px; font-weight: 600; color: #386B59; text-decoration: underline; text-underline-offset: 3px; }
-  .qc__notsure[aria-pressed="true"] { color: #0D1B33; }
   .qc__sub { margin-top: 2px; font-size: 13.5px; color: #5E6B78; }
   .qc__sizes { margin-top: 14px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   .qc__size { display: flex; flex-direction: column; gap: 4px; min-height: 76px; padding: 13px 15px; text-align: left; border-radius: 14px; border: 1px solid rgba(13,27,51,.14); background: #fff; color: #0D1B33; transition: border-color .16s, background-color .16s; }
@@ -339,7 +347,7 @@
     .qc__arrow { top: 50%; right: 12px; translate: 0 -50%; }
     .qc__calc { padding: 18px 14px 22px; }
     .qc__tabs { display: grid; width: 100%; grid-template-columns: 1fr; }
-    .qc__tabs button { justify-content: space-between; }
+    .qc__tabs .qc__save { margin-left: auto; }
     .qc__calc-body { grid-template-columns: minmax(0, 1fr); }
     .qc__bar { padding: 10px 14px; }
     .qc__who { margin-left: 0; font-size: 13px; }
@@ -559,21 +567,26 @@
 /* Homepage intro (lib/intro.ts). Easing from omnirated.co.uk, timings shortened:
    fill .02-.30s, mark out .30s, cover lifts .36-.86s. */
 .ld-intro { position: fixed; inset: 0; z-index: 200; pointer-events: none; }
-.ld-intro__ground { position: absolute; inset: 0; background: #EEF1F4; pointer-events: auto; animation: ld-intro-lift .5s cubic-bezier(.65, 0, .3, 1) .36s both; }
-.ld-intro__ground::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: #0D1B33; animation: ld-intro-in 80ms linear .28s both; }
-.ld-intro__mark { position: absolute; top: 50%; left: 50%; translate: -50% -50%; width: clamp(150px, 24vmin, 230px); animation: ld-intro-out .12s cubic-bezier(.4, 0, 1, 1) .3s both; }
-.ld-intro__mark img { display: block; width: 100%; height: auto; }
-.ld-intro__base { opacity: .14; filter: grayscale(1); }
-.ld-intro__fill { position: absolute; inset: 0; animation: ld-intro-fill .28s cubic-bezier(.45, 0, .25, 1) .02s both; }
+.ld-intro__ground { position: absolute; inset: 0; background: #F3EEE9; pointer-events: auto; animation: ld-intro-lift .38s cubic-bezier(.65, 0, .3, 1) .52s both; }
+.ld-intro__mark { position: absolute; top: 50%; left: 50%; translate: -50% -50%; display: grid; justify-items: center; gap: 20px; width: clamp(190px, 28vmin, 250px); animation: ld-intro-out .14s cubic-bezier(.4, 0, 1, 1) .48s both; }
+.ld-intro__logo { display: block; width: 100%; height: auto; animation: ld-intro-up .3s cubic-bezier(.22, 1, .36, 1) both; }
+/* the EPC rating chart: seven bands, each longer than the last, drawn top to bottom */
+.ld-intro__bands { display: grid; gap: 4px; width: 100%; }
+.ld-intro__bands i { display: flex; align-items: center; height: 9px; width: calc(40% + var(--i) * 10%); border-radius: 0 3px 3px 0; transform-origin: left; animation: ld-intro-band .22s cubic-bezier(.22, 1, .36, 1) calc(.06s + var(--i) * .035s) both; }
+.ld-intro__bands b { padding-left: 4px; font: 700 8px/1 system-ui, sans-serif; color: #fff; }
+.ld-intro__bands i:nth-child(1) { background: #008054; } .ld-intro__bands i:nth-child(2) { background: #19B459; }
+.ld-intro__bands i:nth-child(3) { background: #8DCE46; } .ld-intro__bands i:nth-child(4) { background: #FFD500; }
+.ld-intro__bands i:nth-child(5) { background: #FCAA65; } .ld-intro__bands i:nth-child(6) { background: #EF8023; }
+.ld-intro__bands i:nth-child(7) { background: #E9153B; }
 .ld-intro--skip .ld-intro__mark { opacity: 0; transition: opacity .14s ease-out; animation: none; }
 .ld-intro--skip .ld-intro__ground { animation: ld-intro-lift-quick .42s cubic-bezier(.65, 0, .3, 1) .1s both; }
-@keyframes ld-intro-fill { from { clip-path: inset(100% 0 0); } to { clip-path: inset(0 0 0); } }
-@keyframes ld-intro-out { to { opacity: 0; scale: .96; } }
-@keyframes ld-intro-in { from { opacity: 0; } }
+@keyframes ld-intro-up { from { opacity: 0; translate: 0 10px; } }
+@keyframes ld-intro-band { from { scale: 0 1; } }
+@keyframes ld-intro-out { to { opacity: 0; translate: 0 -10px; } }
 @keyframes ld-intro-lift { to { translate: 0 -100%; } }
 @keyframes ld-intro-lift-quick { to { translate: 0 -100%; } }
 /* The hero's own entrance waits under the cover and plays as it lifts. */
-body:has(> .ld-intro:not(.is-released)) :is(.lh-rise, .lh-city, .lh-river, .lh-card) { animation-play-state: paused; }
+body:has(> .ld-intro:not(.is-released)) :is(.lh-rise, .lh-city, .lh-card) { animation-play-state: paused; }
 
 /* On the homepage the dusk close is the skyline and already carries the contact details,
    so the drawn skyline and the footer's contact column step aside. Unlayered on purpose:
@@ -585,6 +598,6 @@ body:has(.hc-close) .cf-grid { border-top: 1px solid rgba(241, 244, 242, .12); }
 @media (max-width: 1023px) { body:has(.hc-close) .cf-proof { display: block; } }
 
 @media (prefers-reduced-motion: reduce) {
-  .lh-rise, .lh-city, .lh-river, .lh-card { animation: none; }
+  .lh-rise, .lh-city, .lh-card { animation: none; }
   .will-reveal { opacity: 1; transform: none; }
 }

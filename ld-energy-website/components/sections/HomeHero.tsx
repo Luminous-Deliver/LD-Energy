@@ -9,18 +9,14 @@ import { HeroMotion } from '@/components/sections/home/HeroMotion'
 export const promises = ['Same working-day reply', 'No surprise charges', 'Free rearrange if we reschedule']
 
 /**
- * Two depth planes cut from "London Thames Sunset panorama" by Diliff (CC BY
- * 3.0, credited in the closing section).
- * - The city (Tower Bridge and the City) sits in a band between the words and
- *   the quote card. It keeps the photo's own sky, which pales upward into the
- *   CSS sky, and drifts at 0.31 of scroll.
- * - The river is the same photo from just above the waterline, laid exactly
- *   over the city's own water. It moves with the page, so the city sinks
- *   behind it as you scroll; its foot dissolves into the page under the card.
- * - Dusk falls as the hero scrolls away (lh-dusk), so the page's closing scene,
- *   the same view at night, reads as the end of the same evening.
+ * "London Thames Sunset panorama" by Diliff (CC BY 3.0, credited in the
+ * closing section) as one plane: Tower Bridge and the City in a band between
+ * the words and the quote card, the photo's sky paling up behind the words and
+ * its water fading into the page under the card. It drifts at 0.31 of scroll,
+ * so the card slides up over the river. Dusk falls on it as the hero leaves
+ * (lh-dusk), so the closing scene, the same view at night, ends the same evening.
  */
-function Layer({ name, className, rate, h2400, priority }: { name: 'city' | 'river'; className: string; rate: number; h2400: number; priority?: boolean }) {
+function Layer({ name, className, rate, h2400, priority }: { name: 'scene'; className: string; rate: number; h2400: number; priority?: boolean }) {
   return (
     <picture>
       <source media="(max-width: 760px)" srcSet={`/hero/thames-${name}-1440.webp`} />
@@ -61,8 +57,7 @@ export function HomeHero() {
         </ul>
       </Container>
       <div aria-hidden="true" className="lh-scene">
-        <Layer name="city" className="lh-city" rate={0.31} h2400={1114} priority />
-        <Layer name="river" className="lh-river" rate={0} h2400={357} />
+        <Layer name="scene" className="lh-city" rate={0.31} h2400={1311} priority />
         <div className="lh-dusk" />
       </div>
       <div id="pricing" className="lh-card scroll-mt-28">

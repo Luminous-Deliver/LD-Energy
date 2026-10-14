@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, ArrowRight, Building2, Check, House, KeyRound, Signpost, Star, type LucideIcon } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Building2, Check, HelpCircle, House, KeyRound, Signpost, Star, type LucideIcon } from 'lucide-react'
 import { areaBands, type AreaChoice } from '@/lib/floor-area'
 import { EXPRESS_SURCHARGE, bundleSaving, formatPrice, maxBundleSaving, priceFrom, pricing, site } from '@/lib/site'
 import { guideEstimate } from '@/lib/pricing-estimate'
@@ -104,22 +104,23 @@ export function HomeQuoteCard() {
                 <h2 ref={headingRef} tabIndex={-1} className="qc__h">Your guide price</h2>
                 <p className="qc__hint">Tailored by service and floor area. Exact price confirmed before you book.</p>
               </div>
-              <div role="group" aria-label="Service" className="qc__tabs">
-                {tabs.map((t) => (
-                  <button key={t.service} type="button" data-svc={t.service} aria-pressed={service === t.service} onClick={() => setService(t.service)}>
-                    {t.label}
-                    {t.service === 'bundle' && <span className="qc__save">Save up to £{maxBundleSaving}</span>}
-                  </button>
-                ))}
+              <div>
+                <p id="qc-svc" className="qc__tabs-label">Choose a service</p>
+                <div role="group" aria-labelledby="qc-svc" className="qc__tabs">
+                  {tabs.map((t) => (
+                    <button key={t.service} type="button" data-svc={t.service} aria-pressed={service === t.service} onClick={() => setService(t.service)}>
+                      <span aria-hidden="true" className="qc__radio" />
+                      {t.label}
+                      {t.service === 'bundle' && <span className="qc__save">Save up to £{maxBundleSaving}</span>}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
             <div className="qc__calc-body">
               <div>
-                <div className="flex items-baseline justify-between gap-4">
-                  <p id="qc-size" className="qc__legend">How big is the home?</p>
-                  <button type="button" data-band="unknown" aria-pressed={area === 'unknown'} onClick={() => setArea('unknown')} className="qc__notsure">Not sure?</button>
-                </div>
+                <p id="qc-size" className="qc__legend">How big is the home?</p>
                 <p className="qc__sub">Internal floor area. Bedrooms are only a rough guide.</p>
                 <div role="group" aria-labelledby="qc-size" className="qc__sizes">
                   {areaBands.map((b, i) => (
@@ -128,6 +129,10 @@ export function HomeQuoteCard() {
                       <span className="qc__size-sub">{pricing[i].typicalLabel}</span>
                     </button>
                   ))}
+                  <button type="button" data-band="unknown" aria-pressed={area === 'unknown'} onClick={() => setArea('unknown')} className="qc__notsure">
+                    <HelpCircle aria-hidden="true" className="h-5 w-5 shrink-0" />
+                    <span><b>Not sure of the size?</b><span className="qc__size-sub">Send your property details and we&rsquo;ll confirm the exact price.</span></span>
+                  </button>
                 </div>
                 {route && <div className="qc__note"><RouteHint route={route} /></div>}
               </div>
