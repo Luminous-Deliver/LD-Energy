@@ -2,7 +2,8 @@ import type { Metadata } from 'next'
 import { HomeHero } from '@/components/sections/HomeHero'
 import { HomeServices } from '@/components/sections/HomeServices'
 import { HomeContent } from '@/components/sections/HomeContent'
-import { site, priceFrom } from '@/lib/site'
+import { site, priceFrom, defaultOgImage } from '@/lib/site'
+import { HomeQuoteProvider } from '@/components/sections/home/HomeQuoteContext'
 import { homeBookingFaqs } from '@/lib/homepage-content'
 
 export const metadata: Metadata = {
@@ -22,10 +23,12 @@ export const metadata: Metadata = {
     title: `Domestic EPC London | From £${priceFrom.epc} | Elmhurst Accredited | L&D Energy`,
     description: `Domestic EPCs across London from an Elmhurst-accredited assessor. Guide prices from £${priceFrom.epc}, based on floor area. Exact quote before booking.`,
     url: site.url,
+    images: [defaultOgImage],
   },
   twitter: {
     title: `Domestic EPC London | From £${priceFrom.epc} | Elmhurst Accredited`,
     description: `Official EPC certificates across all London boroughs. Guide prices from £${priceFrom.epc}, exact quote confirmed before booking.`,
+    images: [defaultOgImage.url],
   },
 }
 
@@ -59,8 +62,11 @@ export default function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify([websiteSchema, faqSchema]) }}
       />
-      <HomeHero />
-      <HomeServices />
+      {/* Hero card and service cards share one service/size state: one calculator, no second price list. */}
+      <HomeQuoteProvider>
+        <HomeHero />
+        <HomeServices />
+      </HomeQuoteProvider>
       <HomeContent />
     </>
   )

@@ -1,23 +1,31 @@
 import Link from 'next/link'
-import { BookOpen, Building2, Calculator, CalendarClock, ClipboardCheck, House, KeyRound, MapPin, MessageCircle, Phone, ReceiptText, Signpost, type LucideIcon } from 'lucide-react'
+import { BookOpen, Calculator, CalendarClock, ClipboardCheck, ExternalLink, MapPin, MessageCircle, Phone, ReceiptText, type LucideIcon } from 'lucide-react'
 import { Container } from '@/components/ui/Container'
 import { Button } from '@/components/ui/Button'
 import { Accordion } from '@/components/ui/Accordion'
-import { GoogleRating } from '@/components/ui/GoogleRating'
 import { site } from '@/lib/site'
 import { quoteHref } from '@/lib/quote-context'
 import { homeBookingFaqs } from '@/lib/homepage-content'
+import { promises } from '@/components/sections/HomeHero'
+import { StackMotion, WordReveal, RevealOnScroll } from '@/components/sections/home/HomeMotion'
 
-const steps = [
-  ['Send your property details', 'Choose your service and share what you know about the property.'],
-  ['Agree your quote and appointment', 'Abdul confirms the exact price, access and available timing.'],
-  ['Assessment and delivery', 'The visit takes place and your agreed documents are supplied.'],
+const steps: [string, string][] = [
+  ['Send your property details', 'Choose your service and share what you know about the property: size, access and any deadline.'],
+  ['Agree your quote and appointment', 'Abdul confirms the exact price, access and available timing. Nothing is booked until you agree.'],
+  ['The visit', 'Abdul assesses the property on site. With a floor plan, every room is laser-measured during the same visit.'],
+  ['Lodged and delivered', 'Your EPC is lodged on the GOV.UK register and the link sent once it is live. Floor plans arrive as JPEG and PDF.'],
 ]
-const audiences: [string, string, string, LucideIcon][] = [
-  ['Homeowners', 'For your home and future plans.', '/services/domestic-epc', House],
-  ['Sellers', 'Prepare your property for marketing.', '/sellers', Signpost],
-  ['Landlords', 'EPC requirements and tenant access.', '/landlords', KeyRound],
-  ['Agencies and portfolios', 'Repeat instructions and multiple properties.', '/estate-agents', Building2],
+const promiseDetail: Record<string, string> = {
+  'Same working-day reply': 'Message us on a working day and you’ll hear back that day.',
+  'No surprise charges': 'Any travel or urgent-service charge is confirmed before you agree to the visit.',
+  'Free rearrange if we reschedule': 'If we need to reschedule your appointment, we’ll arrange the next available slot at no extra cost.',
+}
+const creds: [string, string][] = [
+  ['Elmhurst accredited', site.assessor.accreditationNumber],
+  ['DBS checked', 'Background checked'],
+  ['£5m PI & PL insured', 'Through Elmhurst’s scheme'],
+  ['RdSAP 10', 'Current methodology since June 2025'],
+  ['Stratford E15', 'Visits across London'],
 ]
 const prep = [
   'Arrange access to rooms and the loft hatch, where present.',
@@ -25,7 +33,6 @@ const prep = [
   'Have evidence of relevant improvements ready, if available.',
   'Coordinate keys and access with occupants or tenants.',
 ]
-// From the former Good to know section: expectation-setting, no promises.
 const worthKnowing: { Icon: LucideIcon; title: string; body: string; href: string }[] = [
   { Icon: ReceiptText, title: 'Exact quote', body: 'Based on the property details you give us. Anything materially different is discussed and agreed before the assessment begins.', href: '/preparing-for-your-epc#quote-and-property-complexity' },
   { Icon: Calculator, title: 'Independent rating', body: 'We record the property; the score is calculated by the approved methodology. It cannot be manually adjusted.', href: '/preparing-for-your-epc#how-your-epc-rating-is-calculated' },
@@ -37,147 +44,229 @@ const guides = [
   ['Why EPC ratings can differ', 'why-is-my-epc-different'],
   ['EPC, floor plan or survey: what each provides', 'epc-vs-floor-plan-vs-survey'],
 ]
+// MEES facts: GOV.UK landlord guidance (E since 1 April 2020) and the 2026
+// government response on privately rented homes (C from 1 October 2030; a C
+// before 1 October 2029 counts until that EPC expires). Captured 14/10/2026,
+// and consistent with /blog/epc-c-by-2030. No rating or compliance promise.
+const rules: { band: string; colour: string; title: string; body: string }[] = [
+  { band: 'E', colour: '#FCAA65', title: 'Now', body: 'A rating of E or above is needed to let, unless a valid exemption is registered.' },
+  { band: 'C', colour: '#8DCE46', title: 'From 1 October 2030 (planned)', body: 'The government plans C as the minimum for private tenancies. The regulations are still to be made.' },
+  { band: '✓', colour: '#0D1B33', title: 'Head start', body: 'Under the plan, a home rated C or above before 1 October 2029 counts until that EPC expires or is replaced.' },
+]
+const route: [string, string, string][] = [
+  ['Pre-Assessment', 'Find out your score privately. Nothing is lodged.', '/services/epc-pre-assessment'],
+  ['Domestic EPC', 'Lodged on the GOV.UK register and valid for 10 years.', '/services/domestic-epc'],
+  ['Improvement Plan', 'Your priorities for the property, with the full Energy Report.', '/services/epc-improvement-plan'],
+]
+const ratingScale: [string, string, number][] = [['A', '#008054', 96], ['B', '#19B459', 116], ['C', '#8DCE46', 136], ['D', '#FFD500', 156], ['E', '#FCAA65', 176], ['F', '#EF8023', 196], ['G', '#E9153B', 216]]
 
-// Below lg every section renders the compact mobile layout; lg: classes and
-// hidden lg:* elements add the desktop composition only.
-const card = 'lg:rounded-2xl lg:bg-white lg:shadow-premium'
+function Examples() {
+  return (
+    <div className="hw-examples">
+      <figure>
+        <svg viewBox="0 0 320 200" role="img" aria-label="Example EPC rating C on the A to G scale">
+          {ratingScale.map(([letter, colour, w], i) => (
+            <g key={letter}>
+              <rect x="2" y={6 + i * 27} width={w} height="22" rx="4" fill={colour} stroke={letter === 'C' ? '#0D1B33' : undefined} strokeWidth={letter === 'C' ? 2.5 : undefined} />
+              <text x="12" y={22 + i * 27} fill={letter === 'D' ? '#0D1B33' : '#fff'} fontSize="13" fontWeight="700">{letter}</text>
+              {letter === 'C' && <text x="146" y="76" fill="#0D1B33" fontSize="13" fontWeight="700">← example</text>}
+            </g>
+          ))}
+        </svg>
+        <figcaption>Example rating</figcaption>
+      </figure>
+      <figure>
+        <svg viewBox="0 0 380 300" role="img" aria-label="Example floor plan of a made-up flat" className="hw-plan">
+          <defs><pattern id="plan-grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="rgba(13,27,51,.07)" /></pattern></defs>
+          <rect width="380" height="300" fill="url(#plan-grid)" />
+          <rect x="50" y="30" width="288" height="216" fill="#fff" />
+          <path d="M50 30 H338 V246 H50 Z" fill="none" stroke="#0D1B33" strokeWidth="6" />
+          <path d="M230 30 V150 M230 178 V246 M50 160 H150 M178 160 H230 M282 150 H338 M282 150 V246" fill="none" stroke="#0D1B33" strokeWidth="3" />
+          <path d="M150 160 A28 28 0 0 1 178 132 M230 150 A28 28 0 0 0 202 178" fill="none" stroke="#0D1B33" strokeWidth="1.4" />
+          <path d="M50 268 H230 M50 262 V274 M230 262 V274 M22 30 V160 M16 30 H28 M16 160 H28" stroke="#386B59" strokeWidth="1.4" />
+          <text x="98" y="98">Living and kitchen</text><text x="258" y="98">Bedroom</text><text x="92" y="208">Hall</text><text x="298" y="204">Bath</text>
+          <text x="124" y="288">5.2 m</text><text x="4" y="100" transform="rotate(-90 12 96)">4.1 m</text>
+        </svg>
+        <figcaption>Example floor plan, supplied as JPEG and PDF</figcaption>
+      </figure>
+    </div>
+  )
+}
 
 export function HomeContent() {
   return (
     <>
-      {/* Desktop shows the assessor in the hero card instead. */}
-      <section id="assessor" className="home-section lg:hidden">
-        <Container className="grid gap-5 lg:grid-cols-2 lg:gap-16">
-          <div>
-            <h2 className="home-heading">Your verified assessor</h2>
-            <p className="mt-3 text-base leading-6">Speak directly with the person assessing your property.</p>
-          </div>
-          <div className="border-l-2 border-[#47846E] pl-5">
-            <h3 className="text-2xl font-semibold">{site.assessor.name}</h3>
-            <p className="mt-1 text-base">Domestic Energy Assessor</p>
-            <p className="mt-2 text-sm leading-6">Elmhurst Accredited · {site.assessor.accreditationNumber}</p>
-            <a href={site.assessor.verifyUrl} target="_blank" rel="noopener noreferrer" className="home-link">Verify Abdul on GOV.UK ↗</a>
-            <div>
-              <GoogleRating className="home-link flex-wrap gap-y-1" />
-            </div>
-            <Link prefetch={false} href="/about" className="home-link">More about your assessor →</Link>
-          </div>
-        </Container>
-      </section>
+      <RevealOnScroll />
 
-      <section id="how-it-works" className="home-section border-y border-secondary-200 bg-white">
-        <Container className="lg:grid lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:gap-x-10">
-          <h2 className="home-heading">How it works</h2>
-          <ol className="mt-5 grid gap-5 lg:col-span-2 lg:row-start-2 lg:mt-10 lg:grid-cols-3 lg:gap-10">
+      <section id="how-it-works" aria-labelledby="how-h" className="hv-band hv-band--white">
+        <Container>
+          <div className="hv-top" data-reveal>
+            <div>
+              <p className="hv-pill">How it works</p>
+              <h2 id="how-h" className="hv-h2">Four steps, nothing booked until you agree</h2>
+            </div>
+            <Link prefetch={false} href={quoteHref({ sourcePage: 'home', ctaId: 'inline' })} className="home-link">Get my exact quote →</Link>
+          </div>
+          <ol id="how-steps" className="hw-steps">
             {steps.map(([title, copy], i) => (
-              <li key={title} className="flex gap-3 lg:relative lg:flex-col lg:gap-5 lg:after:absolute lg:after:-right-8 lg:after:left-14 lg:after:top-5 lg:after:h-px lg:after:bg-secondary-300 lg:after:content-[''] lg:last:after:hidden">
-                <span aria-hidden="true" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-100 text-base font-semibold text-primary-900 lg:h-10 lg:w-10 lg:bg-[#0D1B33] lg:font-serif lg:text-lg lg:text-white">{i + 1}</span>
-                <div>
-                  <h3 className="text-lg font-semibold lg:text-xl">{title}</h3>
-                  <p className="mt-1 text-base leading-6 text-secondary-700 lg:mt-2">{copy}</p>
+              <li key={title} className={i < steps.length - 1 ? 'hw-step hw-step--sticky' : 'hw-step'} style={{ ['--k' as string]: i }}>
+                <div data-inner className="hw-step__in">
+                  <span aria-hidden="true" className="hw-step__n">{i + 1}</span>
+                  <h3>{title}</h3>
+                  <p>{copy}</p>
+                  {i === steps.length - 1 && <Examples />}
                 </div>
               </li>
             ))}
           </ol>
-          <Link prefetch={false} href={quoteHref({ sourcePage: 'home', ctaId: 'inline' })} className="home-link mt-4 lg:col-start-2 lg:row-start-1 lg:mt-0">Get my exact quote →</Link>
+          <StackMotion targetId="how-steps" />
         </Container>
       </section>
 
-      <section id="before-the-visit" className="home-section bg-[#F1F6F3]">
-        <Container className="grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:items-center lg:gap-16">
-          <div>
-            <span aria-hidden="true" className="mb-5 hidden h-12 w-12 items-center justify-center rounded-2xl bg-white text-[#386B59] shadow-premium lg:flex">
-              <ClipboardCheck className="h-6 w-6" />
-            </span>
-            <h2 className="home-heading">Before your visit</h2>
-            <Link prefetch={false} href="/preparing-for-your-epc" className="home-link mt-2">Full preparation checklist →</Link>
+      <section id="why" aria-labelledby="why-h" className="hv-band">
+        <Container>
+          <div className="mx-auto max-w-[812px]">
+            <h2 id="why-h" className="hv-pill">Why L&amp;D Energy</h2>
+            <WordReveal className="hy-words" text="You deal with the assessor from the first message to the certificate. We record the property. The score is calculated by the approved methodology, and it cannot be manually adjusted." />
           </div>
-          <ul className="space-y-3 lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0">
-            {prep.map((item) => (
-              <li key={item} className={`flex gap-3 text-base leading-6 lg:p-5 ${card}`}>
-                <span aria-hidden="true" className="font-semibold text-primary-800 lg:flex lg:h-7 lg:w-7 lg:shrink-0 lg:items-center lg:justify-center lg:rounded-full lg:bg-[#47846E] lg:text-sm lg:text-white">✓</span>
-                {item}
-              </li>
-            ))}
+          <div className="hy-vow" data-reveal>
+            <h3>Book with confidence</h3>
+            <ul>
+              {promises.map((p) => <li key={p}><b>{p}</b><span>{promiseDetail[p]}</span></li>)}
+            </ul>
+          </div>
+          <ul className="hy-creds" data-reveal>
+            {creds.map(([b, s]) => <li key={b}><b>{b}</b><span>{s}</span></li>)}
           </ul>
         </Container>
       </section>
 
-      <section id="worth-knowing" className="home-section border-b border-secondary-200 bg-white">
+      <section id="reviews" aria-labelledby="rev-h" className="hv-band hv-band--white hv-band--tight">
         <Container>
-          <h2 className="home-heading">Three things worth knowing first</h2>
-          <ul className="mt-5 grid gap-3 md:grid-cols-3 lg:mt-8 lg:gap-6">
-            {worthKnowing.map(({ Icon, title, body, href }) => (
-              <li key={title} className="rounded-xl border border-secondary-200 bg-white p-4 lg:rounded-2xl lg:p-6 lg:shadow-premium">
-                <div className="flex items-center gap-3">
-                  <span aria-hidden="true" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary-50 text-primary-700 lg:h-11 lg:w-11">
-                    <Icon className="h-4 w-4 lg:h-5 lg:w-5" />
-                  </span>
-                  <h3 className="text-lg font-semibold">
-                    <Link prefetch={false} href={href} className="underline-offset-4 hover:underline">{title}</Link>
-                  </h3>
-                </div>
-                <p className="mt-2 text-base leading-6 text-secondary-700 lg:mt-3">{body}</p>
-              </li>
-            ))}
-          </ul>
-        </Container>
-      </section>
-
-      <section id="who-we-help" className="home-section">
-        <Container>
-          <h2 className="home-heading">An EPC for your next step</h2>
-          <div className="mt-4 grid gap-x-8 sm:grid-cols-2 lg:mt-8 lg:grid-cols-4 lg:gap-5">
-            {audiences.map(([title, copy, href, Icon]) => (
-              <div key={href} id={href === '/estate-agents' ? 'agency' : undefined} className={`border-b border-secondary-200 py-3 lg:relative lg:border lg:p-6 lg:transition-shadow lg:hover:shadow-premium-lg ${card}`}>
-                <span aria-hidden="true" className="mb-4 hidden h-11 w-11 items-center justify-center rounded-xl bg-[#F1F6F3] text-[#386B59] lg:flex">
-                  <Icon className="h-5 w-5" />
-                </span>
-                <Link prefetch={false} href={href} className="home-link text-lg lg:no-underline lg:after:absolute lg:after:inset-0 lg:after:rounded-2xl lg:after:content-['']">{title} →</Link>
-                <p className="text-base leading-6 text-secondary-700 lg:mt-1">{copy}</p>
+          <div className="hr-proof" data-reveal>
+            <div>
+              <h2 id="rev-h" className="sr-only">Reviews</h2>
+              <p className="hr-score tabular-nums">{site.reviews.ratingValue.toFixed(1)}</p>
+              <span aria-hidden="true" className="hr-stars">★★★★★</span>
+              <span className="hr-count">from {site.reviews.reviewCount} Google reviews</span>
+            </div>
+            <div>
+              <p>Speak directly with the person assessing your property. Check the accreditation number on the government register before you book.</p>
+              <div className="mt-3 flex flex-wrap gap-x-6">
+                <a href={site.reviews.profileUrl} target="_blank" rel="noopener noreferrer" className="home-link">Read the reviews <ExternalLink aria-hidden="true" className="h-4 w-4" /></a>
+                <a href={site.assessor.verifyUrl} target="_blank" rel="noopener noreferrer" className="home-link">Verify Abdul on GOV.UK <ExternalLink aria-hidden="true" className="h-4 w-4" /></a>
+                <Link prefetch={false} href="/about" className="home-link">More about your assessor →</Link>
               </div>
-            ))}
+            </div>
           </div>
         </Container>
       </section>
 
-      <section id="areas" className="home-section">
-        <Container className="grid gap-4 lg:grid-cols-2 lg:items-center lg:gap-16">
-          <div>
-            <h2 className="home-heading">Based in Stratford. Serving London.</h2>
-            <p className="mt-3 text-base leading-6">One Stratford E15 base, with visits across London. Check your area or include your postcode in your quote request.</p>
+      <section id="landlords" aria-labelledby="ll-h" className="hv-band">
+        <Container>
+          <div className="hv-top" data-reveal>
+            <div>
+              <p className="hv-pill">Landlords and agents</p>
+              <h2 id="ll-h" className="hv-h2">Know where your rental stands</h2>
+            </div>
+            <p className="hv-lede">An EPC tells you more than whether you can let. It shows where the property sits against today&rsquo;s rule and the one planned for 2030.</p>
           </div>
-          <div>
-            <nav aria-label="Featured London areas" className="flex flex-wrap gap-x-6 lg:gap-3">
+          <div className="hl-grid" data-reveal>
+            <div className="hl-rules">
+              <ol>
+                {rules.map((r) => (
+                  <li key={r.title}>
+                    <span aria-hidden="true" className={r.band === '✓' ? 'hl-band hl-band--dark' : 'hl-band'} style={{ background: r.colour }}>{r.band}</span>
+                    <div><b>{r.title}</b><p>{r.body}</p></div>
+                  </li>
+                ))}
+              </ol>
+              <div className="hl-links">
+                <Link prefetch={false} href="/blog/epc-c-by-2030" className="home-link">The 2030 rented home standard →</Link>
+                <Link prefetch={false} href="/blog/mees-timeline-2026-2030" className="home-link">MEES timeline, now to 2030 →</Link>
+              </div>
+            </div>
+            <div className="hl-path">
+              <p className="hl-path__t">Your route</p>
+              <ol>
+                {route.map(([t, d, href]) => (
+                  <li key={t}><Link prefetch={false} href={href}><b>{t}</b><span>{d}</span></Link></li>
+                ))}
+              </ol>
+              <Link prefetch={false} href="/landlords" className="hl-path__more">The landlord guide →</Link>
+            </div>
+          </div>
+          <div id="agency" className="hl-agent scroll-mt-28" data-reveal>
+            <div>
+              <p className="hl-agent__t">Letting, managing or estate agent?</p>
+              <p>Repeat instructions and multiple properties, with one accredited contact. Send the list and we&rsquo;ll quote the batch.</p>
+            </div>
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+              <Button href={quoteHref({ service: 'bulk', sourcePage: 'home', ctaId: 'inline' })} variant="accent" className="rounded-full">Start a portfolio enquiry</Button>
+              <Link prefetch={false} href="/estate-agents" className="home-link">For agencies →</Link>
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      <section id="before-the-visit" aria-labelledby="prep-h" className="hv-band hv-band--white">
+        <Container>
+          <div className="hp-panel" data-reveal>
+            <div>
+              <span aria-hidden="true" className="hp-ico"><ClipboardCheck className="h-6 w-6" /></span>
+              <h2 id="prep-h" className="hv-h2">Before your visit</h2>
+              <Link prefetch={false} href="/preparing-for-your-epc" className="home-link mt-2">Full preparation checklist →</Link>
+            </div>
+            <ul>
+              {prep.map((item) => <li key={item}>{item}</li>)}
+            </ul>
+          </div>
+          <h3 id="worth-knowing" className="hk-h scroll-mt-28" data-reveal>Three things worth knowing first</h3>
+          <ul className="hk-grid" data-reveal>
+            {worthKnowing.map(({ Icon, title, body, href }) => (
+              <li key={title}>
+                <span aria-hidden="true" className="hk-ico"><Icon className="h-5 w-5" /></span>
+                <h4><Link prefetch={false} href={href}>{title}</Link></h4>
+                <p>{body}</p>
+                <span aria-hidden="true" className="hk-more">Read more →</span>
+              </li>
+            ))}
+          </ul>
+        </Container>
+      </section>
+
+      <section id="areas" aria-labelledby="areas-h" className="hv-band hv-band--tight">
+        <Container className="ha-grid">
+          <div data-reveal>
+            <p className="hv-pill">Areas</p>
+            <h2 id="areas-h" className="hv-h2">Based in Stratford. Serving London.</h2>
+            <p className="hv-lede mt-4">One Stratford E15 base, with visits across London. Check your area or include your postcode in your quote request.</p>
+          </div>
+          <div data-reveal>
+            <nav aria-label="Featured London areas" className="flex flex-wrap gap-2.5">
               {areas.map(([name, slug]) => (
-                <Link prefetch={false} key={slug} href={'/areas/' + slug} className="home-link lg:min-h-12 lg:rounded-full lg:border lg:border-secondary-300 lg:bg-white lg:px-5 lg:no-underline lg:transition-colors lg:hover:border-[#47846E] lg:hover:bg-[#F1F6F3]">
-                  <MapPin aria-hidden="true" className="hidden h-4 w-4 text-[#386B59] lg:block" />
-                  EPC {name}
+                <Link prefetch={false} key={slug} href={'/areas/' + slug} className="hv-chip">
+                  <MapPin aria-hidden="true" className="h-4 w-4 text-[#386B59]" />EPC {name}
                 </Link>
               ))}
             </nav>
-            <Link prefetch={false} href="/areas" className="home-link mt-2 lg:mt-5">View all London service areas →</Link>
+            <Link prefetch={false} href="/areas" className="home-link mt-3">View all London service areas →</Link>
           </div>
         </Container>
       </section>
 
-      <section id="faq" className="home-section border-y border-secondary-200 bg-white">
-        <Container className="grid gap-5 lg:grid-cols-[1fr_1.65fr] lg:gap-16">
-          <div>
-            <h2 className="home-heading">Before you enquire</h2>
+      <section id="faq" aria-labelledby="faq-h" className="hv-band hv-band--white">
+        <Container className="hf-grid">
+          <div data-reveal>
+            <p className="hv-pill">Questions</p>
+            <h2 id="faq-h" className="hv-h2">Before you enquire</h2>
             <Link prefetch={false} href="/faq" className="home-link mt-2">All EPC questions →</Link>
-            <div className="mt-8 hidden rounded-2xl bg-[#F1F6F3] p-6 lg:block">
-              <p className="font-serif text-xl font-semibold text-secondary-900">Prefer to ask directly?</p>
-              <p className="mt-2 text-base leading-6 text-secondary-700">Call or WhatsApp Abdul with your question.</p>
-              <div className="mt-3 flex flex-wrap gap-x-6">
-                <a href={site.phoneHref} className="home-link">
-                  <Phone aria-hidden="true" className="h-4 w-4" />
-                  {site.phone}
-                </a>
-                <a href={site.whatsappHref} target="_blank" rel="noopener noreferrer" className="home-link">
-                  <MessageCircle aria-hidden="true" className="h-4 w-4" />
-                  WhatsApp
-                </a>
+            <div className="hf-ask">
+              <p className="hf-ask__t">Prefer to ask directly?</p>
+              <p>Call or WhatsApp Abdul with your question.</p>
+              <div className="flex flex-wrap gap-x-6">
+                <a href={site.phoneHref} className="home-link"><Phone aria-hidden="true" className="h-4 w-4" />{site.phone}</a>
+                <a href={site.whatsappHref} target="_blank" rel="noopener noreferrer" className="home-link"><MessageCircle aria-hidden="true" className="h-4 w-4" />WhatsApp</a>
               </div>
             </div>
           </div>
@@ -185,35 +274,41 @@ export function HomeContent() {
         </Container>
       </section>
 
-      <section id="what-is-epc" className="home-section">
-        <Container className="grid gap-4 lg:grid-cols-2 lg:items-center lg:gap-16">
-          <div>
-            <h2 className="home-heading">Understand your EPC</h2>
-            <p className="mt-3 text-base leading-6">An EPC describes your home&rsquo;s modelled energy performance. Your rating and recommendations depend on the assessed property; they do not predict your actual bills.</p>
+      <section id="what-is-epc" aria-labelledby="learn-h" className="hv-band">
+        <Container className="ha-grid">
+          <div data-reveal>
+            <p className="hv-pill">Guides</p>
+            <h2 id="learn-h" className="hv-h2">Understand your EPC</h2>
+            <p className="hv-lede mt-4">An EPC describes your home&rsquo;s modelled energy performance. Your rating and recommendations depend on the assessed property; they do not predict your actual bills.</p>
           </div>
-          <ul className="divide-y divide-secondary-200 lg:grid lg:gap-3 lg:divide-y-0">
+          <ul className="hg-list" data-reveal>
             {guides.map(([label, slug]) => (
               <li key={slug}>
-                <Link prefetch={false} href={'/blog/' + slug} className="home-link py-3 lg:flex lg:gap-3 lg:rounded-2xl lg:border lg:border-secondary-200 lg:bg-white lg:px-5 lg:py-4 lg:no-underline lg:transition-colors lg:hover:border-[#47846E]">
-                  <BookOpen aria-hidden="true" className="hidden h-5 w-5 shrink-0 text-[#386B59] lg:block" />
-                  {label} →
+                <Link prefetch={false} href={'/blog/' + slug} className="hg-link">
+                  <span aria-hidden="true" className="hk-ico"><BookOpen className="h-5 w-5" /></span>
+                  {label}
+                  <span aria-hidden="true" className="ml-auto text-[#386B59]">→</span>
                 </Link>
               </li>
             ))}
-            <li>
-              <Link prefetch={false} href="/blog" className="home-link py-3 lg:px-5">Browse all EPC guides →</Link>
-            </li>
+            <li><Link prefetch={false} href="/blog" className="home-link px-1">Browse all EPC guides →</Link></li>
           </ul>
         </Container>
       </section>
 
-      <section id="contact" className="home-section scroll-mt-28 bg-[#0D1B33] text-white">
-        <Container className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
-          <div>
-            <h2 className="home-heading text-white">Ready to arrange your EPC?</h2>
-            <p className="mt-3 text-base leading-6 text-[#D6E1F0]">Send your property details. Agree your exact quote before booking.</p>
+      <section id="contact" aria-labelledby="close-h" className="hc-close scroll-mt-28">
+        <Container className="hc-in">
+          <h2 id="close-h">Ready to arrange your EPC?</h2>
+          <p className="hc-lede">Exact quote confirmed before booking. Same working-day reply.</p>
+          <div className="flex flex-wrap justify-center gap-3">
+            <Button href={quoteHref({ sourcePage: 'home', ctaId: 'bottom' })} variant="accent" className="rounded-full px-7">Get my exact quote</Button>
+            <Button href={site.whatsappHref} target="_blank" rel="noopener noreferrer" variant="secondary" className="rounded-full px-7">WhatsApp Abdul</Button>
           </div>
-          <Button href={quoteHref({ sourcePage: 'home', ctaId: 'bottom' })} variant="accent">Get my exact quote</Button>
+          <p className="hc-who">{site.assessor.name}, your assessor</p>
+          <p className="hc-credit">
+            Hero photo: <a href="https://commons.wikimedia.org/wiki/File:London_from_Primrose_Hill_May_2013.jpg" target="_blank" rel="noopener noreferrer">&ldquo;London from Primrose Hill&rdquo;</a> by Duncan,{' '}
+            <a href="https://creativecommons.org/licenses/by/2.0/" target="_blank" rel="noopener noreferrer">CC BY 2.0</a>, cut into layers.
+          </p>
         </Container>
       </section>
     </>
