@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Mrs_Saint_Delafield } from 'next/font/google'
 import { BookOpen, Calculator, CalendarClock, ClipboardCheck, ExternalLink, MapPin, MessageCircle, Phone, ReceiptText, type LucideIcon } from 'lucide-react'
 import { Container } from '@/components/ui/Container'
 import { Button } from '@/components/ui/Button'
@@ -8,6 +9,9 @@ import { quoteHref } from '@/lib/quote-context'
 import { homeBookingFaqs } from '@/lib/homepage-content'
 import { promises } from '@/components/sections/HomeHero'
 import { StackMotion, WordReveal, RevealOnScroll } from '@/components/sections/home/HomeMotion'
+
+// Signature only, far below the fold: not preloaded so it never competes with the hero.
+const signature = Mrs_Saint_Delafield({ weight: '400', subsets: ['latin'], display: 'swap', preload: false })
 
 const steps: [string, string][] = [
   ['Send your property details', 'Choose your service and share what you know about the property: size, access and any deadline.'],
@@ -296,15 +300,33 @@ export function HomeContent() {
         </Container>
       </section>
 
+      {/* Close: the hero's London at dusk, fading into the footer's navy so the page ends as one scene. */}
       <section id="contact" aria-labelledby="close-h" className="hc-close scroll-mt-28">
+        <div className="hc-sky" aria-hidden="true" />
+        <div className="hc-land" aria-hidden="true">
+          {/* eslint-disable @next/next/no-img-element -- next/image is unoptimised on Pages; same layers as the hero */}
+          <img className="hc-far" src="/hero/london-far-2400.webp" width={2400} height={642} alt="" loading="lazy" decoding="async" />
+          <img className="hc-mid" src="/hero/london-mid-2400.webp" width={2400} height={305} alt="" loading="lazy" decoding="async" />
+          <img className="hc-near" src="/hero/london-near-2400.webp" width={2400} height={272} alt="" loading="lazy" decoding="async" />
+          {/* eslint-enable @next/next/no-img-element */}
+        </div>
+        <div className="hc-fade" aria-hidden="true" />
         <Container className="hc-in">
           <h2 id="close-h">Ready to arrange your EPC?</h2>
           <p className="hc-lede">Exact quote confirmed before booking. Same working-day reply.</p>
           <div className="flex flex-wrap justify-center gap-3">
-            <Button href={quoteHref({ sourcePage: 'home', ctaId: 'bottom' })} variant="accent" className="rounded-full px-7">Get my exact quote</Button>
-            <Button href={site.whatsappHref} target="_blank" rel="noopener noreferrer" variant="secondary" className="rounded-full px-7">WhatsApp Abdul</Button>
+            <Button href={quoteHref({ sourcePage: 'home', ctaId: 'bottom' })} variant="accent" className="hc-cta rounded-full px-7">Get my exact quote</Button>
+            <Button href={site.whatsappHref} target="_blank" rel="noopener noreferrer" variant="secondary" className="hc-ghost rounded-full px-7">WhatsApp Abdul</Button>
           </div>
-          <p className="hc-who">{site.assessor.name}, your assessor</p>
+          <div className="hc-contact">
+            <div><small>Phone</small><a className="tabular-nums" href={site.phoneHref}>{site.phone}</a></div>
+            <div><small>Email</small><a href={site.emailHref}>{site.email}</a></div>
+            <div><small>Hours</small><span>{site.hours}</span></div>
+          </div>
+          <div className="hc-sign">
+            <p className={`hc-sign__name ${signature.className}`} aria-hidden="true">Abdul</p>
+            <p className="hc-who">{site.assessor.name}, your assessor</p>
+          </div>
           <p className="hc-credit">
             Hero photo: <a href="https://commons.wikimedia.org/wiki/File:London_from_Primrose_Hill_May_2013.jpg" target="_blank" rel="noopener noreferrer">&ldquo;London from Primrose Hill&rdquo;</a> by Duncan,{' '}
             <a href="https://creativecommons.org/licenses/by/2.0/" target="_blank" rel="noopener noreferrer">CC BY 2.0</a>, cut into layers.

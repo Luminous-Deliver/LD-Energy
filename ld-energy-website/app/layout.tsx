@@ -175,7 +175,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
         </main>
         {/* Skyline transition, ivory canvas fades into forest dark */}
-        <LondonSkyline className="text-[#0D1B33] -mb-1" />
+        <LondonSkyline className="site-skyline text-[#0B1528] -mb-1" />
         <CompactFooter />
         <MobileQuoteBar />
         <WebAnalytics token={cfBeaconToken} />

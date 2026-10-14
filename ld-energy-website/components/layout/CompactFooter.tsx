@@ -43,7 +43,7 @@ function Links({ items, className }: { items: FooterLink[]; className?: string }
     <ul className={className}>
       {items.map(([label, href]) => (
         <li key={href}>
-          <Link prefetch={false} href={href} className="inline-flex min-h-11 items-center text-sm leading-6 text-[#D6E1F0] underline-offset-4 hover:text-white hover:underline lg:min-h-8">
+          <Link prefetch={false} href={href} className="inline-flex min-h-11 items-center text-sm leading-6 text-[#C5CFDC] underline-offset-4 transition-colors hover:text-white hover:underline lg:min-h-8">
             {label}
           </Link>
         </li>
@@ -54,44 +54,44 @@ function Links({ items, className }: { items: FooterLink[]; className?: string }
 
 export function CompactFooter() {
   return (
-    <footer className="bg-[#0D1B33] text-[#D6E1F0] [overflow-wrap:anywhere]">
-      <Container className="py-6 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-8 lg:pb-8 lg:pt-14">
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.5fr)] lg:gap-10 xl:gap-14">
-          <div>
+    <footer className="bg-[#0B1528] text-[#AEBBCB] [overflow-wrap:anywhere]">
+      <Container className="pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-8 lg:pb-8">
+        <div className="cf-grid grid gap-3 pt-6 lg:gap-10 lg:pt-12 xl:gap-14 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.5fr)]">
+          <div className="cf-brand">
             <Logo variant="light" size="sm" />
-            <p className="mt-3 text-sm leading-6">L&amp;D Energy · Stratford E15, London</p>
+            <p className="mt-3 text-sm leading-6 text-[#AEBBCB]">L&amp;D Energy · Stratford E15, London</p>
             <div className="flex flex-wrap gap-x-5">
               <a href={site.phoneHref} className="inline-flex min-h-11 items-center text-base font-semibold text-white">{site.phone}</a>
-              <a href={site.whatsappHref} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center text-base text-white underline underline-offset-4">WhatsApp</a>
+              <a href={site.whatsappHref} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center text-base text-white underline-offset-4 hover:underline">WhatsApp</a>
             </div>
-            <a href={site.emailHref} className="inline-flex min-h-11 items-center text-sm text-white underline underline-offset-4 lg:min-h-8">{site.email}</a>
+            <a href={site.emailHref} className="inline-flex min-h-11 items-center text-sm text-white underline-offset-4 hover:underline lg:min-h-8">{site.email}</a>
             <div className="mt-5 hidden space-y-4 lg:block">
-              <GoogleRating className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-[#D6E1F0] hover:text-white" />
+              <GoogleRating className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-[#C5CFDC] hover:text-white" />
               <Button href={quoteHref()} variant="accent">Get my exact quote</Button>
             </div>
           </div>
           {groups.map(({ heading, items, listClassName }) => (
             <div key={heading}>
-              <details className="border-y border-white/20 lg:hidden">
-                <summary className="cursor-pointer py-3 text-base font-semibold text-white">{heading}</summary>
+              <details className="border-b border-white/[.12] lg:hidden">
+                <summary className="cursor-pointer py-3 font-sans text-[11px] font-semibold uppercase tracking-[.1em] text-[#AEBBCB]">{heading}</summary>
                 <nav aria-label={`Footer ${heading}`}>
                   <Links items={items} />
                 </nav>
               </details>
               <nav aria-label={`Footer ${heading}`} className="hidden lg:block">
-                <h2 className="mb-2 text-lg font-semibold text-white">{heading}</h2>
+                <h2 className="mb-3 font-sans text-[11px] font-semibold uppercase leading-none tracking-[.1em] text-[#AEBBCB]">{heading}</h2>
                 <Links items={items} className={cn(listClassName)} />
               </nav>
             </div>
           ))}
         </div>
-        <div className="mt-4 border-t border-white/20 pt-3 lg:mt-10 lg:flex lg:flex-wrap lg:items-center lg:gap-x-8 lg:pt-6">
+        <div className="mt-4 border-t border-white/[.12] pt-3 text-[13.5px] lg:mt-12 lg:flex lg:flex-wrap lg:items-center lg:gap-x-8 lg:pt-6">
           <div className="flex flex-wrap gap-x-6 lg:order-2">
-            <a href="/privacy-policy#analytics-choices" className="inline-flex min-h-11 items-center text-sm text-white underline underline-offset-4">Privacy &amp; analytics choices</a>
-            <Link prefetch={false} href="/terms" className="inline-flex min-h-11 items-center text-sm text-white underline underline-offset-4">Terms of Service</Link>
+            <a href="/privacy-policy#analytics-choices" className="inline-flex min-h-11 items-center text-[#AEBBCB] underline-offset-4 hover:text-white hover:underline">Privacy &amp; analytics choices</a>
+            <Link prefetch={false} href="/terms" className="inline-flex min-h-11 items-center text-[#AEBBCB] underline-offset-4 hover:text-white hover:underline">Terms of Service</Link>
           </div>
-          <p className="mt-2 text-sm leading-6 lg:order-1 lg:mt-0">© {new Date().getFullYear()} {site.name}. Part of {site.parentBrand}.</p>
-          <a href="https://digital.luminousanddeliver.co.uk/" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center text-sm text-[#D6E1F0] underline underline-offset-4 lg:order-3 lg:ml-auto">Made by L&amp;D Digital</a>
+          <p className="mt-2 leading-6 lg:order-1 lg:mt-0">© {new Date().getFullYear()} {site.name}. Part of {site.parentBrand}.</p>
+          <a href="https://digital.luminousanddeliver.co.uk/" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center text-[#AEBBCB] underline-offset-4 hover:text-white hover:underline lg:order-3 lg:ml-auto">Made by L&amp;D Digital</a>
         </div>
       </Container>
     </footer>
