@@ -235,9 +235,9 @@
   .lh-land { position: absolute; inset: 0; pointer-events: none; }
   .lh-land picture { display: contents; }
   .lh-land img { position: absolute; left: 50%; max-width: none; height: auto; translate: -50%; will-change: transform; }
-  .lh-land__far { z-index: 1; width: max(100%, 1700px); bottom: 150px; }
-  .lh-land__mid { z-index: 2; width: max(100%, 1800px); bottom: 70px; filter: saturate(.7) brightness(1.04) contrast(.92); }
-  .lh-land__near { z-index: 4; width: max(100%, 1600px); bottom: -6px; filter: saturate(.55) brightness(.82) hue-rotate(8deg) blur(.6px); }
+  .lh-land__far { z-index: 1; width: max(100%, 1700px); bottom: 350px; }
+  .lh-land__mid { z-index: 2; width: max(100%, 2100px); bottom: 150px; filter: saturate(.7) brightness(1.04) contrast(.92); }
+  .lh-land__near { z-index: 4; width: max(100%, 1900px); bottom: -6px; filter: saturate(.55) brightness(.82) hue-rotate(8deg) blur(.6px); }
   .lh-floor { position: absolute; left: 0; right: 0; bottom: 0; z-index: 5; height: 110px; pointer-events: none; background: linear-gradient(to bottom, transparent, rgba(250,251,252,.85) 70%, #FAFBFC); }
   .lh-card { position: relative; z-index: 3; margin: 84px auto 0; max-width: 1040px; padding: 0 1rem; }
   @keyframes lh-rise { from { opacity: 0; translate: 0 22px; } }
@@ -534,7 +534,14 @@
   .hc-contact a, .hc-contact span { font-size: 17px; color: #F1F4F2; }
   .hc-contact a:hover { text-decoration: underline; text-underline-offset: 4px; }
   .hc-sign { margin-top: 64px; }
-  .hc-sign__name { font-size: clamp(44px, 6vw, 64px); line-height: 1; color: #E7EDEA; opacity: .9; }
+  .hc-sign__name { display: inline-block; padding-inline: .15em; font-size: clamp(44px, 6vw, 64px); line-height: 1; color: #E7EDEA; opacity: .9; }
+  /* Close motion (CloseMotion): typed heading, written signature. Only armed by JS. */
+  .hc-type.is-armed [data-l]:not(.is-on) { visibility: hidden; }
+  .hc-type [data-l] { position: relative; }
+  .hc-type [data-l].is-cursor::after { content: ""; position: absolute; top: .1em; right: -.07em; width: 2px; height: .82em; background: currentColor; }
+  .hc-sign__name.is-armed { mask-image: linear-gradient(125deg, #000 47.61%, transparent 52.39%); mask-size: 240% 100%; mask-position: 100% 0; mask-repeat: no-repeat; }
+  .hc-sign__name.is-writing { animation: hc-sig-write 1.6s linear forwards; }
+  @keyframes hc-sig-write { 0% { mask-position: 100% 0; } 6.25% { mask-position: 83.19% 0; } 12.5% { mask-position: 80.19% 0; } 18.75% { mask-position: 76.54% 0; } 25% { mask-position: 71.44% 0; } 31.25% { mask-position: 67.13% 0; } 37.5% { mask-position: 62.04% 0; } 43.75% { mask-position: 56.81% 0; } 50% { mask-position: 51.82% 0; } 56.25% { mask-position: 48.01% 0; } 62.5% { mask-position: 44.81% 0; } 68.75% { mask-position: 41.15% 0; } 75% { mask-position: 37.59% 0; } 81.25% { mask-position: 32.12% 0; } 87.5% { mask-position: 27.08% 0; } 93.75% { mask-position: 20.38% 0; } 100% { mask-position: 0 0; } }
   .hc-who { margin-top: 6px; font-size: 14px; color: #AEBBCB; }
   .hc-credit { margin-top: 10px; font-size: 12.5px; color: #93A1B3; }
   .hc-credit a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
@@ -548,15 +555,33 @@
   }
 }
 
+/* Homepage intro (lib/intro.ts). Easing from omnirated.co.uk, timings shortened:
+   fill .02-.30s, mark out .30s, cover lifts .36-.86s. */
+.ld-intro { position: fixed; inset: 0; z-index: 200; pointer-events: none; }
+.ld-intro__ground { position: absolute; inset: 0; background: #EEF1F4; pointer-events: auto; animation: ld-intro-lift .5s cubic-bezier(.65, 0, .3, 1) .36s both; }
+.ld-intro__ground::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: #0D1B33; animation: ld-intro-in 80ms linear .28s both; }
+.ld-intro__mark { position: absolute; top: 50%; left: 50%; translate: -50% -50%; width: clamp(150px, 24vmin, 230px); animation: ld-intro-out .12s cubic-bezier(.4, 0, 1, 1) .3s both; }
+.ld-intro__mark img { display: block; width: 100%; height: auto; }
+.ld-intro__base { opacity: .14; filter: grayscale(1); }
+.ld-intro__fill { position: absolute; inset: 0; animation: ld-intro-fill .28s cubic-bezier(.45, 0, .25, 1) .02s both; }
+.ld-intro--skip .ld-intro__mark { opacity: 0; transition: opacity .14s ease-out; animation: none; }
+.ld-intro--skip .ld-intro__ground { animation: ld-intro-lift-quick .42s cubic-bezier(.65, 0, .3, 1) .1s both; }
+@keyframes ld-intro-fill { from { clip-path: inset(100% 0 0); } to { clip-path: inset(0 0 0); } }
+@keyframes ld-intro-out { to { opacity: 0; scale: .96; } }
+@keyframes ld-intro-in { from { opacity: 0; } }
+@keyframes ld-intro-lift { to { translate: 0 -100%; } }
+@keyframes ld-intro-lift-quick { to { translate: 0 -100%; } }
+/* The hero's own entrance waits under the cover and plays as it lifts. */
+body:has(> .ld-intro:not(.is-released)) :is(.lh-rise, .lh-land img, .lh-card) { animation-play-state: paused; }
+
 /* On the homepage the dusk close is the skyline and already carries the contact details,
    so the drawn skyline and the footer's contact column step aside. Unlayered on purpose:
    it has to beat the footer's Tailwind utilities. */
 body:has(.hc-close) .site-skyline,
-body:has(.hc-close) .cf-brand { display: none; }
+body:has(.hc-close) .cf-contact { display: none; }
 body:has(.hc-close) .cf-grid { border-top: 1px solid rgba(241, 244, 242, .12); }
-@media (min-width: 1024px) {
-  body:has(.hc-close) .cf-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.5fr); }
-}
+/* Phones keep the logo and rating too (the rating is desktop-only on other pages). */
+@media (max-width: 1023px) { body:has(.hc-close) .cf-proof { display: block; } }
 
 @media (prefers-reduced-motion: reduce) {
   .lh-rise, .lh-land img, .lh-card { animation: none; }

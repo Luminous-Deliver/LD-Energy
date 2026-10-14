@@ -106,3 +106,78 @@ export function RevealOnScroll() {
   }, [])
   return null
 }
+
+/**
+ * The closing scene, as omnirated.co.uk closes (measured 14/10/2026):
+ * - the heading types itself, 55ms a letter with a cursor, once 60% is on screen;
+ * - the line, buttons and contact row rise in behind it, 80ms apart;
+ * - the signature is written by a sweeping mask over 1.6s once 70% is on screen;
+ * - the London layers settle into place as the scene reaches mid-screen.
+ * Nothing is hidden until this runs, and none of it runs under reduced motion.
+ */
+export function CloseMotion() {
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const sec = document.getElementById('contact')
+    const type = sec?.querySelector<HTMLElement>('[data-close-type]')
+    if (!sec || !type) return
+    const letters = [...type.querySelectorAll<HTMLElement>('[data-l]')]
+    const after = [...sec.querySelectorAll<HTMLElement>('[data-close-after]')]
+    const sig = sec.querySelector<HTMLElement>('[data-close-sig]')
+    const timers: number[] = []
+    type.classList.add('is-armed')
+    after.forEach((el) => el.classList.add('will-reveal'))
+
+    const typeIo = new IntersectionObserver((entries) => {
+      if (!entries.some((e) => e.isIntersecting)) return
+      typeIo.disconnect()
+      let i = 0
+      const next = () => {
+        if (i > 0) letters[i - 1].classList.remove('is-cursor')
+        if (i === letters.length) { type.classList.add('is-done'); return }
+        letters[i].classList.add('is-on', 'is-cursor')
+        i += 1
+        timers.push(window.setTimeout(next, i === letters.length ? 420 : 55))
+      }
+      next()
+      after.forEach((el, n) => timers.push(window.setTimeout(() => el.classList.add('is-in'), 450 + n * 80)))
+    }, { threshold: 0.6 })
+    typeIo.observe(type)
+
+    let sigIo: IntersectionObserver | undefined
+    if (sig && CSS.supports('mask-image', 'linear-gradient(#000, transparent)')) {
+      sig.classList.add('is-armed')
+      sigIo = new IntersectionObserver((entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return
+        sigIo?.disconnect()
+        sig.addEventListener('animationend', () => sig.classList.remove('is-armed', 'is-writing'), { once: true })
+        sig.classList.add('is-writing')
+      }, { threshold: 0.7 })
+      sigIo.observe(sig)
+    }
+    return () => { typeIo.disconnect(); sigIo?.disconnect(); timers.forEach(clearTimeout) }
+  }, [])
+
+  useScrollLoop(() => {
+    const land = document.querySelector<HTMLElement>('#contact .hc-land')
+    if (!land) return null
+    const layers = [...land.querySelectorAll<HTMLElement>('[data-rate]')].map((el) => ({ el, rate: Number(el.dataset.rate) }))
+    let a = 0
+    let on = false
+    let last = -1
+    return {
+      read() {
+        const r = land.getBoundingClientRect()
+        const vh = window.innerHeight
+        on = r.top < vh + 200 && r.bottom > -200
+        a = Math.max(0, r.top + r.height / 2 - vh / 2)
+      },
+      write() {
+        if (!on || a === last) return
+        last = a
+        for (const { el, rate } of layers) el.style.transform = `translate3d(0, ${(a * rate).toFixed(1)}px, 0)`
+      },
+    }
+  }, [])
+  return null
+}

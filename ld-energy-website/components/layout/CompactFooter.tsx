@@ -60,12 +60,12 @@ export function CompactFooter() {
           <div className="cf-brand">
             <Logo variant="light" size="sm" />
             <p className="mt-3 text-sm leading-6 text-[#AEBBCB]">L&amp;D Energy · Stratford E15, London</p>
-            <div className="flex flex-wrap gap-x-5">
+            <div className="cf-contact flex flex-wrap gap-x-5">
               <a href={site.phoneHref} className="inline-flex min-h-11 items-center text-base font-semibold text-white">{site.phone}</a>
               <a href={site.whatsappHref} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center text-base text-white underline-offset-4 hover:underline">WhatsApp</a>
             </div>
-            <a href={site.emailHref} className="inline-flex min-h-11 items-center text-sm text-white underline-offset-4 hover:underline lg:min-h-8">{site.email}</a>
-            <div className="mt-5 hidden space-y-4 lg:block">
+            <a href={site.emailHref} className="cf-contact inline-flex min-h-11 items-center text-sm text-white underline-offset-4 hover:underline lg:min-h-8">{site.email}</a>
+            <div className="cf-proof mt-5 hidden space-y-4 lg:block">
               <GoogleRating className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-[#C5CFDC] hover:text-white" />
               <Button href={quoteHref()} variant="accent">Get my exact quote</Button>
             </div>

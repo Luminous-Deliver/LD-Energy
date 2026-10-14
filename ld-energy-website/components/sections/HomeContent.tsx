@@ -8,7 +8,9 @@ import { site } from '@/lib/site'
 import { quoteHref } from '@/lib/quote-context'
 import { homeBookingFaqs } from '@/lib/homepage-content'
 import { promises } from '@/components/sections/HomeHero'
-import { StackMotion, WordReveal, RevealOnScroll } from '@/components/sections/home/HomeMotion'
+import { StackMotion, WordReveal, RevealOnScroll, CloseMotion } from '@/components/sections/home/HomeMotion'
+
+const closeHeading = 'Ready to arrange your EPC?'
 
 // Signature only, far below the fold: not preloaded so it never competes with the hero.
 const signature = Mrs_Saint_Delafield({ weight: '400', subsets: ['latin'], display: 'swap', preload: false })
@@ -305,26 +307,31 @@ export function HomeContent() {
         <div className="hc-sky" aria-hidden="true" />
         <div className="hc-land" aria-hidden="true">
           {/* eslint-disable @next/next/no-img-element -- next/image is unoptimised on Pages; same layers as the hero */}
-          <img className="hc-far" src="/hero/london-far-2400.webp" width={2400} height={642} alt="" loading="lazy" decoding="async" />
-          <img className="hc-mid" src="/hero/london-mid-2400.webp" width={2400} height={305} alt="" loading="lazy" decoding="async" />
+          <img className="hc-far" data-rate="0.3" src="/hero/london-far-2400.webp" width={2400} height={642} alt="" loading="lazy" decoding="async" />
+          <img className="hc-mid" data-rate="0.15" src="/hero/london-mid-2400.webp" width={2400} height={305} alt="" loading="lazy" decoding="async" />
           <img className="hc-near" src="/hero/london-near-2400.webp" width={2400} height={272} alt="" loading="lazy" decoding="async" />
           {/* eslint-enable @next/next/no-img-element */}
         </div>
         <div className="hc-fade" aria-hidden="true" />
         <Container className="hc-in">
-          <h2 id="close-h">Ready to arrange your EPC?</h2>
-          <p className="hc-lede">Exact quote confirmed before booking. Same working-day reply.</p>
-          <div className="flex flex-wrap justify-center gap-3">
+          <h2 id="close-h">
+            <span className="sr-only">{closeHeading}</span>
+            <span data-close-type className="hc-type" aria-hidden="true">
+              {[...closeHeading].map((ch, i) => <span key={i} data-l>{ch}</span>)}
+            </span>
+          </h2>
+          <p data-close-after className="hc-lede">Exact quote confirmed before booking. Same working-day reply.</p>
+          <div data-close-after className="flex flex-wrap justify-center gap-3">
             <Button href={quoteHref({ sourcePage: 'home', ctaId: 'bottom' })} variant="accent" className="hc-cta rounded-full px-7">Get my exact quote</Button>
             <Button href={site.whatsappHref} target="_blank" rel="noopener noreferrer" variant="secondary" className="hc-ghost rounded-full px-7">WhatsApp Abdul</Button>
           </div>
-          <div className="hc-contact">
+          <div data-reveal className="hc-contact">
             <div><small>Phone</small><a className="tabular-nums" href={site.phoneHref}>{site.phone}</a></div>
             <div><small>Email</small><a href={site.emailHref}>{site.email}</a></div>
             <div><small>Hours</small><span>{site.hours}</span></div>
           </div>
           <div className="hc-sign">
-            <p className={`hc-sign__name ${signature.className}`} aria-hidden="true">Abdul</p>
+            <p className="hc-sign__line" aria-hidden="true"><span data-close-sig className={`hc-sign__name ${signature.className}`}>Abdul</span></p>
             <p className="hc-who">{site.assessor.name}, your assessor</p>
           </div>
           <p className="hc-credit">
@@ -332,6 +339,7 @@ export function HomeContent() {
             <a href="https://creativecommons.org/licenses/by/2.0/" target="_blank" rel="noopener noreferrer">CC BY 2.0</a>, cut into layers.
           </p>
         </Container>
+        <CloseMotion />
       </section>
     </>
   )
