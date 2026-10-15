@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/Button'
 import { MobileNav } from './MobileNav'
 import { topNav, servicesMenu, site } from '@/lib/site'
 import { cn } from '@/lib/cn'
-import { useScrollDirection } from '@/lib/useScrollDirection'
+import { useScrollDirection, useScrolledPast } from '@/lib/useScrollDirection'
 
 function ServicesDropdown() {
   const [open, setOpen] = useState(false)
@@ -124,6 +124,9 @@ function ServicesDropdown() {
 export function Header() {
   const pathname = usePathname()
   const hidden = useScrollDirection()
+  // Desktop: past the first 120px the pill tightens (narrower, shorter, smaller
+  // logo), as in the approved Draft A. Phones keep hide-on-scroll-down instead.
+  const compact = useScrolledPast(120)
   return (
     // Floating island nav: a self-contained pill, not a full-width bar, so it
     // always reads clearly regardless of what's behind it (a photo, the brand
@@ -136,8 +139,17 @@ export function Header() {
     >
       <Container as="div">
         {/* Keep navigation disclosures and enlarged text outside the rounded background unclipped. */}
-        <div className="flex items-center justify-between gap-3 rounded-[2rem] bg-white/90 ring-1 ring-secondary-900/5 shadow-premium-lg backdrop-blur-md px-4 py-2.5 md:px-5">
-          <Logo size="sm" priority />
+        <div
+          data-compact={compact || undefined}
+          className={cn(
+            'mx-auto flex items-center justify-between gap-3 rounded-[2rem] bg-white/90 ring-1 ring-secondary-900/5 shadow-premium-lg backdrop-blur-md px-4 py-2.5 md:px-5',
+            'lg:max-w-[1280px] lg:transition-[max-width,padding,background-color] lg:duration-500 lg:ease-[cubic-bezier(.22,1,.36,1)] motion-reduce:transition-none',
+            compact && 'lg:max-w-[1040px] lg:py-1.5 lg:bg-white/95',
+          )}
+        >
+          <span className={cn('inline-flex origin-left transition-transform duration-500 ease-[cubic-bezier(.22,1,.36,1)] motion-reduce:transition-none', compact && 'lg:scale-[.86]')}>
+            <Logo size="sm" priority />
+          </span>
 
           <nav aria-label="Primary" className="hidden lg:flex items-center gap-6">
             <ServicesDropdown />

@@ -114,6 +114,18 @@ const footerLinks = [
       await page.goto(base + '/', { waitUntil: 'networkidle' })
       const [sw, vw] = await page.evaluate(() => [document.documentElement.scrollWidth, innerWidth])
       check(sw <= vw, `overflow at ${width}: ${sw} > ${vw}`)
+      if (width === 1440) {
+        // Draft A nav: the desktop pill tightens once the page scrolls (lost in the
+        // first port, restored 15/10/2026). Narrower and shorter, then back at the top.
+        const pill = () => page.evaluate(() => { const r = document.querySelector('header [data-compact], header > div > div').getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height)] })
+        const top = await pill()
+        await page.evaluate(() => scrollTo(0, 900)); await page.waitForTimeout(800)
+        const down = await pill()
+        await page.evaluate(() => scrollTo(0, 0)); await page.waitForTimeout(800)
+        const back = await pill()
+        check(down[0] < top[0] - 100 && down[1] < top[1], `nav compacts on scroll: ${top} -> ${down}`)
+        check(back[0] === top[0] && back[1] === top[1], `nav restores at top: ${back} vs ${top}`)
+      }
       if (width === 390) {
         await page.click('.svc__toggle >> nth=0')
         check(await page.isVisible('#svc-epc-list'), 'mobile checklist opens')
@@ -137,5 +149,5 @@ const footerLinks = [
     await browser.close()
   }
   if (fails.length) { console.error('FAIL\n' + fails.join('\n')); process.exit(1) }
-  console.log('home-v3: all checks passed (4 routes, 18 price cells + tiles, unknown band, 3 hand-offs, anchors, footer, schema, overflow x4, mobile toggle + bar, reduced motion)')
+  console.log('home-v3: all checks passed (4 routes, 18 price cells + tiles, unknown band, 3 hand-offs, anchors, footer, schema, overflow x4, compact nav, mobile toggle + bar, reduced motion)')
 })()

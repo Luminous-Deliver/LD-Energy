@@ -41,3 +41,32 @@ export function useScrollDirection(threshold = 80): boolean {
 
   return hidden
 }
+
+/**
+ * True once the page is scrolled past `offset` px. Drives the desktop nav's
+ * compact state (Draft A: the full bar tightens into a smaller pill on scroll).
+ * Hysteresis of 24px stops it flickering when the reader rests at the line.
+ */
+export function useScrolledPast(offset = 120): boolean {
+  const [past, setPast] = useState(false)
+
+  useEffect(() => {
+    let ticking = false
+    const update = () => {
+      const y = window.scrollY
+      setPast((was) => (was ? y > offset - 24 : y > offset))
+      ticking = false
+    }
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(update)
+        ticking = true
+      }
+    }
+    update()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [offset])
+
+  return past
+}
