@@ -115,16 +115,20 @@ const footerLinks = [
       const [sw, vw] = await page.evaluate(() => [document.documentElement.scrollWidth, innerWidth])
       check(sw <= vw, `overflow at ${width}: ${sw} > ${vw}`)
       if (width === 1440) {
-        // Draft A nav: the desktop pill tightens once the page scrolls (lost in the
-        // first port, restored 15/10/2026). Narrower and shorter, then back at the top.
-        const pill = () => page.evaluate(() => { const r = document.querySelector('header [data-compact], header > div > div').getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height)] })
-        const top = await pill()
-        await page.evaluate(() => scrollTo(0, 900)); await page.waitForTimeout(800)
-        const down = await pill()
+        // OmniRated nav (15/10/2026): a plain bar in the hero at the top, gone mid-scroll,
+        // a small frosted pill once the hero's buttons have left. Then back to the bar.
+        const nav = () => page.evaluate(() => { const h = document.querySelector('header[data-nav]'); const l = h.querySelector('[data-look]'); const r = l.getBoundingClientRect(); return { stage: h.dataset.nav, look: l.dataset.look, w: Math.round(r.width), h: Math.round(r.height), top: Math.round(r.top), bg: getComputedStyle(l).backgroundColor } })
+        const top = await nav()
+        await page.evaluate(() => scrollTo(0, 300)); await page.waitForTimeout(800)
+        const mid = await nav()
+        await page.evaluate(() => scrollTo(0, 1200)); await page.waitForTimeout(800)
+        const down = await nav()
         await page.evaluate(() => scrollTo(0, 0)); await page.waitForTimeout(800)
-        const back = await pill()
-        check(down[0] < top[0] - 100 && down[1] < top[1], `nav compacts on scroll: ${top} -> ${down}`)
-        check(back[0] === top[0] && back[1] === top[1], `nav restores at top: ${back} vs ${top}`)
+        const back = await nav()
+        check(top.stage === 'top' && top.look === 'bar' && top.bg === 'rgba(0, 0, 0, 0)', `nav bar blends into the hero at the top: ${JSON.stringify(top)}`)
+        check(mid.stage === 'away' && mid.top < 0, `nav out of sight mid-hero: ${JSON.stringify(mid)}`)
+        check(down.stage === 'pill' && down.w < 800 && down.h <= 48 && down.top >= 10 && down.top <= 18, `small pill once scrolled: ${JSON.stringify(down)}`)
+        check(back.stage === 'top' && back.look === 'bar', `bar again at the top: ${JSON.stringify(back)}`)
       }
       if (width === 390) {
         await page.click('.svc__toggle >> nth=0')

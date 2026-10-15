@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/Button'
 import { MobileNav } from './MobileNav'
 import { topNav, servicesMenu, site } from '@/lib/site'
 import { cn } from '@/lib/cn'
-import { useScrollDirection, useScrolledPast } from '@/lib/useScrollDirection'
+import { useNavStage } from '@/lib/useScrollDirection'
 
 function ServicesDropdown() {
   const [open, setOpen] = useState(false)
@@ -123,73 +123,81 @@ function ServicesDropdown() {
 
 export function Header() {
   const pathname = usePathname()
-  const hidden = useScrollDirection()
-  // Desktop: past the first 120px the pill tightens (narrower, shorter, smaller
-  // logo), as in the approved Draft A. Phones keep hide-on-scroll-down instead.
-  const compact = useScrolledPast(120)
+  const stage = useNavStage()
+  // The look only changes while the nav is out of sight, so the bar never
+  // morphs into the pill on screen: it leaves as a bar, returns as a pill.
+  const [look, setLook] = useState<'bar' | 'pill'>('bar')
+  useEffect(() => { if (stage !== 'away') setLook(stage === 'pill' ? 'pill' : 'bar') }, [stage])
+  const pill = look === 'pill'
   return (
-    // Floating island nav: a self-contained pill, not a full-width bar, so it
-    // always reads clearly regardless of what's behind it (a photo, the brand
-    // pattern, a dark hero) with no scroll-triggered colour flip needed.
-    <header
-      className={cn(
-        'sticky top-0 z-40 pt-3 md:pt-4 transition-transform duration-300 will-change-transform focus-within:translate-y-0',
-        hidden ? '-translate-y-[150%] lg:translate-y-0' : 'translate-y-0',
-      )}
-    >
-      <Container as="div">
-        {/* Keep navigation disclosures and enlarged text outside the rounded background unclipped. */}
-        <div
-          data-compact={compact || undefined}
-          className={cn(
-            'mx-auto flex items-center justify-between gap-3 rounded-[2rem] bg-white/90 ring-1 ring-secondary-900/5 shadow-premium-lg backdrop-blur-md px-4 py-2.5 md:px-5',
-            'lg:max-w-[1280px] lg:transition-[max-width,padding,background-color] lg:duration-500 lg:ease-[cubic-bezier(.22,1,.36,1)] motion-reduce:transition-none',
-            compact && 'lg:max-w-[1040px] lg:py-1.5 lg:bg-white/95',
-          )}
-        >
-          <span className={cn('inline-flex origin-left transition-transform duration-500 ease-[cubic-bezier(.22,1,.36,1)] motion-reduce:transition-none', compact && 'lg:scale-[.86]')}>
-            <Logo size="sm" priority />
-          </span>
+    // OmniRated's nav (measured 15/10/2026). At the top: a plain bar that sits
+    // in the hero, no box. Scrolling down, it leaves. Past the hero's buttons a
+    // small frosted pill drops in (14px down, 48px tall, transform .56s). The
+    // spacer keeps the header's old 80px in the flow for every page below it.
+    <div className="h-[76px] md:h-[80px]">
+      <header
+        data-nav={stage}
+        className={cn(
+          'fixed inset-x-0 top-0 z-40 transition-[transform,opacity] duration-[560ms] ease-[cubic-bezier(.23,1,.32,1)] motion-reduce:transition-none',
+          'focus-within:translate-y-0 focus-within:opacity-100',
+          stage === 'away' ? '-translate-y-[130%] opacity-0' : 'translate-y-0 opacity-100',
+        )}
+      >
+        <Container as="div">
+          {/* Keep navigation disclosures and enlarged text outside the rounded background unclipped. */}
+          <div
+            data-look={look}
+            className={cn(
+              'mx-auto flex items-center justify-between',
+              pill
+                ? 'mt-[14px] h-12 w-full gap-3 rounded-full bg-white/75 pl-4 pr-1.5 ring-1 ring-secondary-900/5 backdrop-blur-[16px] backdrop-saturate-[1.3] shadow-[inset_0_1px_0_rgba(255,255,255,.9),0_10px_30px_-12px_rgba(13,27,51,.28)] lg:w-fit lg:gap-6'
+                : 'gap-3 pt-3 pb-1 md:pt-4',
+            )}
+          >
+            <span className={cn('inline-flex origin-left', pill && 'scale-[.84]')}>
+              <Logo size="sm" priority />
+            </span>
 
-          <nav aria-label="Primary" className="hidden lg:flex items-center gap-6">
-            <ServicesDropdown />
-            {topNav.map((link) => (
-              <Link
-                prefetch={false}
-                key={link.href}
-                href={link.href}
-                className="inline-flex min-h-[44px] items-center text-sm font-medium text-secondary-700 hover:text-primary-700 transition-colors"
+            <nav aria-label="Primary" className={cn('hidden lg:flex items-center', pill ? 'gap-5' : 'gap-6')}>
+              <ServicesDropdown />
+              {topNav.map((link) => (
+                <Link
+                  prefetch={false}
+                  key={link.href}
+                  href={link.href}
+                  className={cn('inline-flex items-center font-medium text-secondary-700 hover:text-primary-700 transition-colors', pill ? 'min-h-[40px] text-[15px]' : 'min-h-[44px] text-sm')}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+
+            <div className="flex items-center gap-2 lg:gap-3">
+              {/* Phone + CTA appear at lg with the nav links. The pill keeps
+                  OmniRated's three-part shape, so the phone stays in the bar. */}
+              {!pill && (
+                <a
+                  href={site.phoneHref}
+                  className="hidden lg:inline-flex min-h-[44px] items-center gap-2 text-sm font-semibold text-secondary-800 hover:text-primary-700 transition-colors"
+                  aria-label={`Call ${site.phone}`}
+                >
+                  <Phone className="w-4 h-4" aria-hidden="true" />
+                  {site.phone}
+                </a>
+              )}
+              <Button
+                href={pathname === '/contact' ? '#booking-form' : quoteHref({ ...quoteContextForPath(pathname), ctaId: 'header' })}
+                variant="accent"
+                className={cn('hidden lg:inline-flex rounded-full min-h-0', pill ? 'px-4 py-2 text-[14px]' : 'px-5 py-2.5')}
+                size="md"
               >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-
-          <div className="flex items-center gap-2 lg:gap-3">
-            {/* Phone + CTA now appear at the same breakpoint as the nav
-                links (lg), not earlier (md) -- showing them together with
-                the hamburger trigger (which stays visible until lg) was
-                cramming four elements into one row with nothing giving way. */}
-            <a
-              href={site.phoneHref}
-              className="hidden lg:inline-flex min-h-[44px] items-center gap-2 text-sm font-semibold text-secondary-800 hover:text-primary-700 transition-colors"
-              aria-label={`Call ${site.phone}`}
-            >
-              <Phone className="w-4 h-4" aria-hidden="true" />
-              {site.phone}
-            </a>
-            <Button
-              href={pathname === '/contact' ? '#booking-form' : quoteHref({ ...quoteContextForPath(pathname), ctaId: 'header' })}
-              variant="accent"
-              className="hidden lg:inline-flex rounded-full px-5 py-2.5 min-h-0"
-              size="md"
-            >
-              Get my exact quote
-            </Button>
-            <MobileNav />
+                Get my exact quote
+              </Button>
+              <MobileNav />
+            </div>
           </div>
-        </div>
-      </Container>
-    </header>
+        </Container>
+      </header>
+    </div>
   )
 }

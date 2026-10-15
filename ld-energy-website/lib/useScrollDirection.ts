@@ -42,19 +42,26 @@ export function useScrollDirection(threshold = 80): boolean {
   return hidden
 }
 
+export type NavStage = 'top' | 'away' | 'pill'
+
 /**
- * True once the page is scrolled past `offset` px. Drives the desktop nav's
- * compact state (Draft A: the full bar tightens into a smaller pill on scroll).
- * Hysteresis of 24px stops it flickering when the reader rests at the line.
+ * OmniRated's nav, measured 15/10/2026: at the top a plain bar sits in the hero;
+ * it leaves as the page scrolls; once the hero's buttons are gone (~550px) a
+ * small frosted pill drops in. `pillAt` has 40px of hysteresis so it never
+ * flickers when the reader rests on the line.
  */
-export function useScrolledPast(offset = 120): boolean {
-  const [past, setPast] = useState(false)
+export function useNavStage(topUntil = 64, pillAt = 560): NavStage {
+  const [stage, setStage] = useState<NavStage>('top')
 
   useEffect(() => {
     let ticking = false
     const update = () => {
       const y = window.scrollY
-      setPast((was) => (was ? y > offset - 24 : y > offset))
+      setStage((was) => {
+        if (y < topUntil) return 'top'
+        if (y > pillAt || (was === 'pill' && y > pillAt - 40)) return 'pill'
+        return 'away'
+      })
       ticking = false
     }
     const onScroll = () => {
@@ -66,7 +73,7 @@ export function useScrolledPast(offset = 120): boolean {
     update()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
-  }, [offset])
+  }, [topUntil, pillAt])
 
-  return past
+  return stage
 }
