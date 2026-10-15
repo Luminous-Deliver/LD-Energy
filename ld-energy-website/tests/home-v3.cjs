@@ -118,11 +118,17 @@ const footerLinks = [
         // OmniRated nav (15/10/2026): a plain bar in the hero at the top, gone mid-scroll,
         // a small frosted pill once the hero's buttons have left. Then back to the bar.
         const nav = () => page.evaluate(() => { const h = document.querySelector('header[data-nav]'); const l = h.querySelector('[data-look]'); const r = l.getBoundingClientRect(); return { stage: h.dataset.nav, look: l.dataset.look, w: Math.round(r.width), h: Math.round(r.height), top: Math.round(r.top), bg: getComputedStyle(l).backgroundColor } })
+        // Draft A v3 reading line: fixed 3px at the very top, empty at the top, part-filled mid-page.
+        const line = () => page.evaluate(() => { const s = document.querySelector('[data-scroll-progress]'); const r = s.getBoundingClientRect(); return { top: Math.round(r.top), h: Math.round(r.height), w: Math.round(r.width), pos: getComputedStyle(s).position } })
         const top = await nav()
+        const line0 = await line()
         await page.evaluate(() => scrollTo(0, 300)); await page.waitForTimeout(800)
         const mid = await nav()
         await page.evaluate(() => scrollTo(0, 1200)); await page.waitForTimeout(800)
         const down = await nav()
+        const line1 = await line()
+        check(line0.pos === 'fixed' && line0.top === 0 && line0.h === 3 && line0.w === 0, `progress line empty at the top: ${JSON.stringify(line0)}`)
+        check(line1.top === 0 && line1.w > 0 && line1.w < 1440, `progress line part-filled once scrolled: ${JSON.stringify(line1)}`)
         await page.evaluate(() => scrollTo(0, 0)); await page.waitForTimeout(800)
         const back = await nav()
         check(top.stage === 'top' && top.look === 'bar' && top.bg === 'rgba(0, 0, 0, 0)', `nav bar blends into the hero at the top: ${JSON.stringify(top)}`)
@@ -153,5 +159,5 @@ const footerLinks = [
     await browser.close()
   }
   if (fails.length) { console.error('FAIL\n' + fails.join('\n')); process.exit(1) }
-  console.log('home-v3: all checks passed (4 routes, 18 price cells + tiles, unknown band, 3 hand-offs, anchors, footer, schema, overflow x4, compact nav, mobile toggle + bar, reduced motion)')
+  console.log('home-v3: all checks passed (4 routes, 18 price cells + tiles, unknown band, 3 hand-offs, anchors, footer, schema, overflow x4, compact nav, progress line, mobile toggle + bar, reduced motion)')
 })()

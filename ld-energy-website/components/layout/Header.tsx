@@ -121,6 +121,46 @@ function ServicesDropdown() {
   )
 }
 
+// Draft A v3's reading line: 3px of EPC bands, G to A, filling as the page
+// scrolls. It sits outside the header so it stays when the nav leaves.
+// Written straight to the style each frame, so scrolling never re-renders.
+function ScrollProgress() {
+  const ref = useRef<HTMLSpanElement>(null)
+  useEffect(() => {
+    let ticking = false
+    const update = () => {
+      const el = ref.current
+      if (el) {
+        const max = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1)
+        el.style.transform = `scaleX(${Math.min(Math.max(window.scrollY / max, 0), 1).toFixed(4)})`
+      }
+      ticking = false
+    }
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(update)
+        ticking = true
+      }
+    }
+    update()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+    }
+  }, [])
+  return (
+    <span
+      ref={ref}
+      data-scroll-progress
+      aria-hidden="true"
+      className="pointer-events-none fixed inset-x-0 top-0 z-50 h-[3px] origin-left scale-x-0 will-change-transform"
+      style={{ background: 'linear-gradient(90deg,#E9153B 0 14.28%,#EF8023 0 28.57%,#FCAA65 0 42.85%,#FFD500 0 57.14%,#8DCE46 0 71.42%,#19B459 0 85.71%,#008054 0)' }}
+    />
+  )
+}
+
 export function Header() {
   const pathname = usePathname()
   const stage = useNavStage()
@@ -135,6 +175,7 @@ export function Header() {
     // small frosted pill drops in (14px down, 48px tall, transform .56s). The
     // spacer keeps the header's old 80px in the flow for every page below it.
     <div className="h-[76px] md:h-[80px]">
+      <ScrollProgress />
       <header
         data-nav={stage}
         className={cn(
