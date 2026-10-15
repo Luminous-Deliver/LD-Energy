@@ -232,12 +232,13 @@
   .lh-promise { margin-top: 22px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 22px; font-size: 14.5px; font-weight: 600; color: #0D1B33; }
   .lh-promise li { display: inline-flex; align-items: center; gap: 8px; }
   .lh-promise li > span { display: grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; background: #386B59; color: #fff; }
-  /* Primrose Hill in three planes (HeroMotion drives the rates): far skyline, mid trees,
+  /* Blackheath in three planes (HeroMotion drives the rates): far Canary Wharf, mid hedge,
      the card, then the near hedge in front of the card's foot, rising over it on scroll */
   .lh-land { position: absolute; inset: 0; pointer-events: none; }
   .lh-land picture { display: contents; }
   .lh-land img { position: absolute; left: 50%; max-width: none; height: auto; translate: -50%; will-change: transform; }
-  .lh-land__far { z-index: 1; width: max(100%, 1700px); bottom: 312px; }
+  /* the far layer is 0.213 of its width tall; past 1700px it grows, so it drops to keep its top edge level under the promises */
+  .lh-land__far { z-index: 1; width: max(100%, 1700px); bottom: min(346px, calc(708px - 21.3vw)); }
   .lh-land__mid { z-index: 2; width: max(100%, 2100px); bottom: 150px; filter: saturate(.8) brightness(1.02) contrast(.95); }
   .lh-land__near { z-index: 4; width: max(100%, 1900px); bottom: -6px; filter: saturate(.75) brightness(.88) hue-rotate(6deg); }
   .lh-floor { position: absolute; left: 0; right: 0; bottom: 0; z-index: 5; height: 110px; pointer-events: none; background: linear-gradient(to bottom, transparent, rgba(250,251,252,.85) 70%, #FAFBFC); }

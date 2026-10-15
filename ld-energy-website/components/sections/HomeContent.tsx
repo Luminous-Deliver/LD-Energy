@@ -332,8 +332,8 @@ export function HomeContent() {
             <p className="hc-who">{site.assessor.name}, your assessor</p>
           </div>
           <p className="hc-credit">
-            Hero photo: <a href="https://commons.wikimedia.org/wiki/File:London_from_Primrose_Hill_May_2013.jpg" target="_blank" rel="noopener noreferrer">&ldquo;London from Primrose Hill&rdquo;</a> by Duncan,{' '}
-            <a href="https://creativecommons.org/licenses/by/2.0/" target="_blank" rel="noopener noreferrer">CC BY 2.0</a>, cut into layers. Closing photo:{' '}
+            Hero photo: <a href="https://commons.wikimedia.org/wiki/File:Canary_Wharf_from_Blackheath_(2)_-_2022-04-24.jpg" target="_blank" rel="noopener noreferrer">&ldquo;Canary Wharf from Blackheath (2)&rdquo;</a> by The wub,{' '}
+            <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a>, cut into layers, which are shared under the same licence. Closing photo:{' '}
             <a href="https://commons.wikimedia.org/wiki/File:London_Thames_Sunset_panorama_-_Feb_2008.jpg" target="_blank" rel="noopener noreferrer">&ldquo;London Thames Sunset panorama&rdquo;</a> by Diliff,{' '}
             <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener noreferrer">CC BY 3.0</a>, regraded to night.
           </p>

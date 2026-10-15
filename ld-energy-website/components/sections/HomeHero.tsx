@@ -9,21 +9,22 @@ import { HeroMotion } from '@/components/sections/home/HeroMotion'
 export const promises = ['Same working-day reply', 'No surprise charges', 'Free rearrange if we reschedule']
 
 /**
- * Three depth planes cut from "London from Primrose Hill" by Duncan (CC BY 2.0,
- * credited in the closing section). Back to front: far skyline, mid trees, then
- * the quote card, then the near hedge, which covers the card's foot and rises
- * with the page. Phones show the land as a band between the words and the card.
+ * Three depth planes cut from "Canary Wharf from Blackheath (2)" by The wub
+ * (CC BY-SA 4.0, credited in the closing section; picked by Abdul 15/10/2026).
+ * Back to front: Canary Wharf and the tree line, mid hedge, then the quote card,
+ * then the near hedge, which covers the card's foot and rises with the page.
+ * Phones show the land as a band between the words and the card.
  */
 function Land() {
   // Class names are written out in full so Tailwind keeps them.
   const layer = (name: 'far' | 'mid' | 'near', cls: string, rate: number, h2400: number, priority?: boolean) => (
     <picture>
-      <source media="(max-width: 760px)" srcSet={`/hero/london-${name}-1440.webp`} />
+      <source media="(max-width: 760px)" srcSet={`/hero/blackheath-${name}-1440.webp`} />
       {/* eslint-disable-next-line @next/next/no-img-element -- next/image is unoptimised on Pages; layers need <picture> */}
       <img
         className={cls}
         data-rate={rate}
-        src={`/hero/london-${name}-2400.webp`}
+        src={`/hero/blackheath-${name}-2400.webp`}
         width={2400}
         height={h2400}
         alt=""
@@ -33,7 +34,7 @@ function Land() {
   )
   return (
     <div aria-hidden="true" className="lh-land">
-      {layer('far', 'lh-land__far', 0.31, 642, true)}
+      {layer('far', 'lh-land__far', 0.31, 511, true)}
       {layer('mid', 'lh-land__mid', 0.17, 305)}
       {layer('near', 'lh-land__near', 0, 272)}
     </div>
