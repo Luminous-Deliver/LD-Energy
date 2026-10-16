@@ -713,3 +713,74 @@ body:has(.hc-close) .cf-grid { border-top: 1px solid rgba(241, 244, 242, .12); }
   .lh-sky, .lh-rise, .lh-land img, .lh-card { animation: none; }
   .will-reveal { opacity: 1; transform: none; }
 }
+
+/* Rebuilt area pages (Stratford first, 16/10/2026): price-first hero, the booking card, and the
+   EPC rating scale built from ONS and MHCLG statistics (components/sections/area/). */
+@layer components {
+  .ar-hero { margin-top: -6rem; padding: 8rem 0 clamp(40px, 6vw, 80px); background: linear-gradient(180deg, #F2F5FA 0%, #F7F8F6 55%, #fff 100%); }
+  .ar-h1 { margin-top: 18px; max-width: 16ch; font-size: clamp(2.5rem, 1.5rem + 3.8vw, 4.75rem); line-height: 1.02; font-weight: 500; letter-spacing: -0.03em; text-wrap: balance; }
+  .ar-lede { margin-top: 18px; max-width: 58ch; font-size: clamp(1.0625rem, 1rem + .3vw, 1.2rem); line-height: 1.6; color: #4B5A6C; text-wrap: pretty; }
+  .ar-facts { margin-top: 24px; display: flex; flex-wrap: wrap; max-width: 940px; border-block: 1px solid rgba(13,27,51,.11); }
+  .ar-facts li { padding: 13px 18px; font-size: 14.5px; font-weight: 500; line-height: 1.4; color: #0D1B33; }
+  .ar-facts li:first-child { padding-left: 0; }
+  .ar-facts li + li { border-left: 1px solid rgba(13,27,51,.11); }
+  .ar-card { margin-top: clamp(28px, 4vw, 44px); }
+  @media (max-width: 760px) {
+    .ar-facts { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .ar-facts li, .ar-facts li:first-child { padding: 12px 14px 12px 0; font-size: 14px; }
+    .ar-facts li + li { border-left: 0; }
+    .ar-facts li:nth-child(even) { padding-left: 14px; border-left: 1px solid rgba(13,27,51,.11); }
+    .ar-facts li:nth-child(n+3) { border-top: 1px solid rgba(13,27,51,.11); }
+  }
+
+  .ar-h2 { max-width: 26ch; }
+  .ar-h3 { font-size: clamp(1.3rem, 1.1rem + .8vw, 1.7rem); line-height: 1.2; font-weight: 500; letter-spacing: -0.01em; }
+
+  /* dot plot on the EPC scale: name | track | median | share C or above */
+  .ar-scale { margin-top: clamp(28px, 4vw, 44px); }
+  .ar-scale__head, .ar-row { display: grid; grid-template-columns: minmax(150px, 240px) minmax(0, 1fr) 104px 128px; column-gap: 20px; align-items: center; }
+  .ar-scale:not([data-pct]) .ar-scale__head, .ar-scale:not([data-pct]) .ar-row { grid-template-columns: minmax(120px, 160px) minmax(0, 1fr) 104px; }
+  .ar-scale__head { padding-bottom: 10px; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #4B5A6C; }
+  .ar-scale__bands { position: relative; height: 26px; }
+  .ar-band { position: absolute; top: 0; bottom: 0; display: grid; place-items: center; font-size: 12.5px; font-weight: 700; letter-spacing: 0; border-left: 2px solid #fff; }
+  .ar-band:first-child { border-left: 0; border-radius: 6px 0 0 6px; }
+  .ar-band:last-child { border-radius: 0 6px 6px 0; }
+  .ar-scale__rows { border-top: 1px solid rgba(13,27,51,.11); }
+  .ar-row { min-height: 52px; border-bottom: 1px solid rgba(13,27,51,.07); }
+  .ar-row:not([data-ref]) + .ar-row[data-ref] { border-top: 1px solid rgba(13,27,51,.28); }
+  .ar-scale__name { font-size: 15.5px; font-weight: 500; line-height: 1.35; color: #0D1B33; }
+  .ar-scale__head .ar-scale__name { font-size: 12px; font-weight: 600; color: #4B5A6C; }
+  .ar-row[data-ref] .ar-scale__name { font-weight: 400; color: #4B5A6C; }
+  .ar-scale__track { position: relative; height: 26px; }
+  .ar-scale__track::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: rgba(13,27,51,.13); }
+  .ar-rule { position: absolute; top: 3px; bottom: 3px; width: 1px; background: rgba(13,27,51,.1); }
+  .ar-dot { position: absolute; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; background: #0D1B33; box-shadow: 0 0 0 2px #fff; }
+  .ar-row[data-ref] .ar-dot { background: #fff; box-shadow: inset 0 0 0 2.5px #4B5A6C, 0 0 0 2px #fff; }
+  .ar-scale__num { display: inline-flex; align-items: center; justify-content: flex-end; gap: 8px; text-align: right; font-size: 15.5px; font-variant-numeric: tabular-nums; color: #0D1B33; }
+  .ar-row[data-ref] .ar-scale__num { color: #4B5A6C; }
+  .ar-chip { display: inline-grid; place-items: center; width: 24px; height: 20px; border-radius: 4px 10px 10px 4px; font-size: 12px; font-weight: 700; }
+  .ar-scale__cap { margin-top: 12px; max-width: 80ch; font-size: 13px; line-height: 1.55; color: #5E6B78; }
+  @media (max-width: 700px) {
+    .ar-scale__head, .ar-row, .ar-scale:not([data-pct]) .ar-scale__head, .ar-scale:not([data-pct]) .ar-row { grid-template-columns: minmax(0, 1fr) auto auto; column-gap: 14px; row-gap: 6px; }
+    .ar-scale__bands, .ar-scale__track { grid-column: 1 / -1; grid-row: 2; }
+    .ar-scale__head .ar-scale__num { font-size: 11px; max-width: 9ch; line-height: 1.25; }
+    .ar-row { padding: 10px 0 8px; min-height: 0; }
+    .ar-scale__name { font-size: 15px; }
+    .ar-scale__num { font-size: 15px; }
+  }
+
+  .ar-split { margin-top: clamp(44px, 6vw, 80px); display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 36px clamp(28px, 5vw, 72px); align-items: start; }
+  .ar-split .ar-scale { margin-top: 18px; }
+  .ar-notes p { margin-top: 14px; max-width: 60ch; line-height: 1.62; color: #4B5A6C; }
+  .ar-source { margin-top: clamp(36px, 4vw, 52px); padding-top: 16px; max-width: 120ch; border-top: 1px solid rgba(13,27,51,.11); font-size: 12.5px; line-height: 1.6; color: #5E6B78; }
+  .ar-source a { text-decoration: underline; text-underline-offset: 2px; }
+  .ar-source a:hover { color: #0D1B33; }
+  @media (max-width: 900px) { .ar-split { grid-template-columns: minmax(0, 1fr); } }
+}
+
+/* EPC band colours (data, never decoration). Outside @layer on purpose: the class names are built
+   at runtime (ar-band--${band}), so Tailwind's content scan can't see them and would purge them. */
+.ar-band--A { background: #008054; color: #fff; } .ar-band--B { background: #19B459; color: #0D1B33; }
+.ar-band--C { background: #8DCE46; color: #0D1B33; } .ar-band--D { background: #FFD500; color: #0D1B33; }
+.ar-band--E { background: #FCAA65; color: #0D1B33; } .ar-band--F { background: #EF8023; color: #0D1B33; }
+.ar-band--G { background: #E9153B; color: #fff; }

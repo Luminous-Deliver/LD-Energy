@@ -9,7 +9,9 @@ import { LocalPricingSummary } from '@/components/sections/LocalPricingSummary'
 import { CtaStrip } from '@/components/sections/CtaStrip'
 import { Accordion } from '@/components/ui/Accordion'
 import { ContactSection } from '@/components/sections/ContactSection'
-import { boroughMeta, boroughIntent, type BoroughIntent } from '@/lib/boroughs'
+import { AreaHero } from '@/components/sections/area/AreaHero'
+import { AreaEvidence } from '@/components/sections/area/AreaEvidence'
+import { boroughMeta, boroughIntent, rebuiltAreaSlugs, type BoroughIntent, type BoroughMeta } from '@/lib/boroughs'
 import { site, pricing, priceFrom, formatPrice, maxBundleSaving, EXPRESS_SURCHARGE, defaultOgImage } from '@/lib/site'
 import type { FaqItem } from '@/lib/faq'
 
@@ -105,6 +107,78 @@ function boroughFaq(name: string, postcodeFaq: { q: string; a: string }): FaqIte
       a: `Yes. We produce laser-measured floor plans for properties in ${name}, ideal for sales listings and lettings marketing. Floor plans have guide prices from £${priceFrom.floorPlan}, and save you up to £${maxBundleSaving} when booked together with an EPC in the same visit.`,
     },
   ]
+}
+
+/** Areas on the rebuilt layout (see rebuiltAreaSlugs); the others keep the original layout. */
+const REBUILT = new Set(rebuiltAreaSlugs)
+
+function FloorPlans({ name }: { name: string }) {
+  return (
+    <Section variant="default" id="floor-plans">
+      <div className="max-w-3xl">
+        <p className="text-xs uppercase tracking-wide font-semibold text-primary-700">Floor Plans</p>
+        <h2 className="mt-2 text-3xl md:text-4xl font-bold tracking-tight text-secondary-900">
+          Floor Plans in {name}
+        </h2>
+        <p className="mt-5 text-lg text-secondary-700 leading-relaxed">
+          Selling or letting in {name}? We also produce professional, accurately measured floor plans, the same high-resolution plans estate agents use in sales and lettings listings. Floor plans have guide prices from {`£${priceFrom.floorPlan}`}, and <strong className="font-semibold text-secondary-900">save you up to {`£${formatPrice(maxBundleSaving)}`} when booked with an EPC</strong> in the same visit, since we measure your property anyway during the assessment.
+        </p>
+        <Link
+          href="/services/floor-plans"
+          className="mt-6 inline-flex min-h-[44px] items-center gap-1.5 text-sm font-semibold text-primary-700 transition-colors hover:text-primary-800"
+        >
+          Learn more about our floor plans
+          <span aria-hidden="true">→</span>
+        </Link>
+      </div>
+    </Section>
+  )
+}
+
+function Nearby({ data, neighbours }: { data: BoroughMeta; neighbours: BoroughMeta[] }) {
+  return (
+    <Section variant="default" id="nearby-areas">
+      <div className="max-w-3xl">
+        <p className="text-xs uppercase tracking-wide font-semibold text-primary-700">Also Nearby</p>
+        <h2 className="mt-2 text-3xl md:text-4xl font-bold tracking-tight text-secondary-900">
+          Areas We Cover in {data.name}
+        </h2>
+        <p className="mt-5 text-secondary-700 leading-relaxed">{data.areasCovered}</p>
+        <p className="mt-4 text-secondary-700 leading-relaxed">
+          We cover {data.name} and the surrounding {data.kind === 'neighbourhood' ? 'area' : 'boroughs'} with the same transparent guide pricing and turnaround.
+        </p>
+      </div>
+      <ul className="mt-8 grid gap-3 sm:grid-cols-2 md:grid-cols-3">
+        {neighbours.map((n) => (
+          <li key={n.slug}>
+            <Link
+              href={`/areas/${n.slug}`}
+              className="group flex items-center gap-2 rounded-lg border border-secondary-200 bg-white px-4 py-3 text-sm font-medium text-secondary-800 transition-colors hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700"
+            >
+              <MapPin className="w-3.5 h-3.5 text-secondary-400 group-hover:text-primary-500" aria-hidden="true" />
+              EPC in {n.name}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </Section>
+  )
+}
+
+function LocalFaq({ data }: { data: BoroughMeta }) {
+  return (
+    <Section variant="muted" id="faq">
+      <div className="max-w-3xl">
+        <p className="text-xs uppercase tracking-wide font-semibold text-primary-700">Common Questions</p>
+        <h2 className="mt-2 text-3xl md:text-4xl font-bold tracking-tight text-secondary-900">
+          EPC Questions for {data.name}
+        </h2>
+        <div className="mt-8">
+          <Accordion items={boroughFaq(data.name, data.postcodeFaq)} />
+        </div>
+      </div>
+    </Section>
+  )
 }
 
 const sellingPoints = [
@@ -217,6 +291,52 @@ export default async function BoroughPage({ params }: PageProps) {
     },
   }
 
+  if (REBUILT.has(slug)) {
+    const place = parentBorough
+      ? `${data.name} ${postcodes.join(' and ')} · ${parentBorough.name}`
+      : `${data.name}, London`
+    return (
+      <>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify([breadcrumbSchema, faqSchema, boroughServiceSchema]) }}
+        />
+        <BreadcrumbNav items={breadcrumbs} />
+        <AreaHero slug={data.slug} name={data.name} place={place} />
+        <AreaEvidence localIssues={data.epcIssues} />
+        <LocalPricingSummary area={data.name} />
+
+        <Section variant="default" id="local-intro">
+          <div className="max-w-3xl">
+            <p className="text-xs uppercase tracking-wide font-semibold text-primary-700">{data.name}, London</p>
+            <h2 className="mt-2 text-3xl md:text-4xl font-bold tracking-tight text-secondary-900">Your property in {data.name}</h2>
+            <p className="mt-5 text-lg text-secondary-700 leading-relaxed">{data.blurb}</p>
+            {parentBorough && (
+              <p className="mt-4 text-secondary-700 leading-relaxed">
+                {data.name} is part of the London Borough of{' '}
+                <Link href={`/areas/${parentBorough.slug}`} className="text-primary-700 underline underline-offset-2 hover:text-primary-800">{parentBorough.name}</Link>
+                , and it is where we are based.
+              </p>
+            )}
+            <h3 className="mt-8 text-xl font-bold text-secondary-900">Property and housing stock in {data.name}</h3>
+            <p className="mt-3 text-secondary-700 leading-relaxed">{data.housingStock}</p>
+            <h3 className="mt-8 text-xl font-bold text-secondary-900">Getting to your {data.name} property</h3>
+            <p className="mt-3 text-secondary-700 leading-relaxed">{data.transport}</p>
+          </div>
+        </Section>
+
+        <FloorPlans name={data.name} />
+        <LocalFaq data={data} />
+        <Nearby data={data} neighbours={neighbours} />
+        <CtaStrip
+          heading={`Get an EPC quote in ${data.name}`}
+          body={`Guide prices from £${priceFrom.epc}, with your exact quote confirmed before booking. Appointments 7 days a week.`}
+          primaryCta={{ label: 'Get my exact quote', href: '#contact', ctaId: 'bottom' }}
+        />
+      </>
+    )
+  }
+
   return (
     <>
       <script
@@ -303,65 +423,11 @@ export default async function BoroughPage({ params }: PageProps) {
 
       <LocalPricingSummary area={data.name} />
 
-      {/* Floor plans cross-sell */}
-      <Section variant="default" id="floor-plans">
-        <div className="max-w-3xl">
-          <p className="text-xs uppercase tracking-wide font-semibold text-primary-700">Floor Plans</p>
-          <h2 className="mt-2 text-3xl md:text-4xl font-bold tracking-tight text-secondary-900">
-            Floor Plans in {data.name}
-          </h2>
-          <p className="mt-5 text-lg text-secondary-700 leading-relaxed">
-            Selling or letting in {data.name}? We also produce professional, accurately measured floor plans, the same high-resolution plans estate agents use in sales and lettings listings. Floor plans have guide prices from {`£${priceFrom.floorPlan}`}, and <strong className="font-semibold text-secondary-900">save you up to {`£${formatPrice(maxBundleSaving)}`} when booked with an EPC</strong> in the same visit, since we measure your property anyway during the assessment.
-          </p>
-          <Link
-            href="/services/floor-plans"
-            className="mt-6 inline-flex min-h-[44px] items-center gap-1.5 text-sm font-semibold text-primary-700 transition-colors hover:text-primary-800"
-          >
-            Learn more about our floor plans
-            <span aria-hidden="true">→</span>
-          </Link>
-        </div>
-      </Section>
+      <FloorPlans name={data.name} />
 
-      {/* Nearby areas */}
-      <Section variant="default" id="nearby-areas">
-        <div className="max-w-3xl">
-          <p className="text-xs uppercase tracking-wide font-semibold text-primary-700">Also Nearby</p>
-          <h2 className="mt-2 text-3xl md:text-4xl font-bold tracking-tight text-secondary-900">
-            Areas We Cover in {data.name}
-          </h2>
-          <p className="mt-5 text-secondary-700 leading-relaxed">{data.areasCovered}</p>
-          <p className="mt-4 text-secondary-700 leading-relaxed">
-            We cover {data.name} and the surrounding {data.kind === 'neighbourhood' ? 'area' : 'boroughs'} with the same transparent guide pricing and turnaround.
-          </p>
-        </div>
-        <ul className="mt-8 grid gap-3 sm:grid-cols-2 md:grid-cols-3">
-          {neighbours.map((n) => (
-            <li key={n.slug}>
-              <Link
-                href={`/areas/${n.slug}`}
-                className="group flex items-center gap-2 rounded-lg border border-secondary-200 bg-white px-4 py-3 text-sm font-medium text-secondary-800 transition-colors hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700"
-              >
-                <MapPin className="w-3.5 h-3.5 text-secondary-400 group-hover:text-primary-500" aria-hidden="true" />
-                EPC in {n.name}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </Section>
+      <Nearby data={data} neighbours={neighbours} />
 
-      {/* Local FAQ */}
-      <Section variant="muted" id="faq">
-        <div className="max-w-3xl">
-          <p className="text-xs uppercase tracking-wide font-semibold text-primary-700">Common Questions</p>
-          <h2 className="mt-2 text-3xl md:text-4xl font-bold tracking-tight text-secondary-900">
-            EPC Questions for {data.name}
-          </h2>
-          <div className="mt-8">
-            <Accordion items={boroughFaq(data.name, data.postcodeFaq)} />
-          </div>
-        </div>
-      </Section>
+      <LocalFaq data={data} />
 
       <ContactSection areaPage={data.slug} sourcePage="area" />
 

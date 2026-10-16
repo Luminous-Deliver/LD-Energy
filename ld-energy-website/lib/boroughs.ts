@@ -778,6 +778,12 @@ export const areaServedLondon = [
  *
  * Ordered by commercial priority, anchored on the Stratford E15 base.
  */
+/**
+ * Areas on the rebuilt layout (app/areas/[borough]/page.tsx): the booking form sits in the hero,
+ * so the hero has no "jump to the form" link. Stratford first, 16/10/2026, for Abdul's review.
+ */
+export const rebuiltAreaSlugs: readonly string[] = ['stratford']
+
 export const priorityBoroughSlugs = [
   'stratford',
   'newham',

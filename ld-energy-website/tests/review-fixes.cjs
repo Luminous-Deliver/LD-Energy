@@ -2,6 +2,7 @@ const { chromium } = require('playwright')
 const assert = require('node:assert/strict')
 const fs = require('node:fs')
 const path = require('node:path')
+const { rebuiltAreaSlugs } = require('../lib/boroughs.ts')
 const base = process.env.BOOKING_TEST_URL || 'http://localhost:3100'
 if (!['localhost', '127.0.0.1'].includes(new URL(base).hostname)) throw new Error('Local preview only')
 const out = path.resolve(process.env.BOOKING_EVIDENCE_DIR || '../../../audits/website-growth-audit/ld-energy-stage1-review-fix-2026-09-11')
@@ -93,14 +94,22 @@ const widths = [[320,568],[360,800],[375,812],[390,844],[412,915],[430,932],[768
         // Contradictory query context must not replace the server-known geographic landing page.
         await page.goto(`${base}/areas/${areaPage}?areaPage=unknown<script>&borough=hackney&source=evil`, { waitUntil: 'networkidle' })
         const ctas = []
-        for (const ctaId of ['hero','pricing','bottom']) {
-          const cta = page.locator(`main a[data-enquiry-cta="${ctaId}"]`)
-          assert.equal(await cta.count(), 1)
-          assert.equal(await cta.getAttribute('href'), '#contact')
-          await cta.click()
-          await page.waitForURL(url => url.pathname === `/areas/${areaPage}` && url.hash === '#contact')
-          assert.equal(new URL(page.url()).pathname, `/areas/${areaPage}`)
-          assert.equal(new URL(page.url()).hash, '#contact')
+        // Rebuilt areas carry the form in the hero: used directly, it sends the form's default CTA.
+        const rebuilt = rebuiltAreaSlugs.includes(areaPage)
+        for (const ctaId of rebuilt ? ['embedded','pricing','bottom'] : ['hero','pricing','bottom']) {
+          if (ctaId === 'embedded') {
+            assert.equal(await page.locator('main a[data-enquiry-cta="hero"]').count(), 0)
+            assert.equal(await page.locator('section[aria-labelledby="area-h1"] #contact form').count(), 1)
+            await page.locator('#contact').scrollIntoViewIfNeeded()
+          } else {
+            const cta = page.locator(`main a[data-enquiry-cta="${ctaId}"]`)
+            assert.equal(await cta.count(), 1)
+            assert.equal(await cta.getAttribute('href'), '#contact')
+            await cta.click()
+            await page.waitForURL(url => url.pathname === `/areas/${areaPage}` && url.hash === '#contact')
+            assert.equal(new URL(page.url()).pathname, `/areas/${areaPage}`)
+            assert.equal(new URL(page.url()).hash, '#contact')
+          }
           assert.equal(await page.locator('#contact form').count(), 1)
           await choose('Not sure of floor area')
           await choose('Homeowner')
