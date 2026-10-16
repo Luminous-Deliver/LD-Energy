@@ -5,12 +5,17 @@
  * OmniRated's, measured the same day. Inline in <body> so it runs before
  * the hero paints. Only for a fresh arrival on "/" (or a reload); never for
  * in-site navigation, back/forward, a #hash or reduced motion. Any input skips it.
+ * Also never on Data Saver or a 2G/3G connection (16/10/2026: Abdul's call, as
+ * the intro delays mobile LCP by 1-2s). Safari and Firefox don't expose
+ * navigator.connection, so they always get it, as do Chrome users on 4G.
  * The hero's rise animations wait while `.ld-intro:not(.is-released)` exists.
  */
 export const introScript = `(function(){
 var d=document,w=window;
 try{
 if(location.pathname!=='/'||w.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+var c=navigator.connection;
+if(c&&(c.saveData||/[23]g$/.test(c.effectiveType||'')))return;
 var nav=performance.getEntriesByType&&performance.getEntriesByType('navigation')[0];
 var type=nav?nav.type:'navigate';
 if(type!=='reload'){
