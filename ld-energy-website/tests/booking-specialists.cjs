@@ -30,7 +30,7 @@ const out = process.env.BOOKING_EVIDENCE_DIR || '../../../audits/website-growth-
       await page.getByRole('button', { name: 'Continue', exact: true }).click()
       assert.equal(await page.locator('input[name="speed"]').count(), 0)
       assert.equal(await page.locator('input[name="preferredDate"]').count(), service === 'bulk' ? 0 : 1)
-      await page.getByRole('button', { name: 'Continue', exact: true }).click()
+      await page.getByRole('button', { name: 'Continue to your details', exact: true }).click()
       if (service === 'bulk') {
         assert.equal(await page.locator('#postcode').count(), 0)
         assert.equal(await page.locator('#address').getAttribute('required'), null)

@@ -11,10 +11,19 @@ export function MobileQuoteBar() {
   const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
-    const target = document.querySelector('#home-quote, main section a[href*="booking-form"], main section a[href="#contact"]')
-    const observer = new IntersectionObserver((entries) => setHeroVisible(entries[0].isIntersecting), { rootMargin: '-96px 0px 0px 0px' })
-    if (target) observer.observe(target)
-    else setHeroVisible(false)
+    // Hidden while the hero's own quote action or any booking form is on screen: the visitor
+    // is already where the bar would take them, and the bar would sit over the form.
+    const targets = [
+      document.querySelector('#home-quote, main section a[href*="booking-form"], main section a[href="#contact"]'),
+      ...Array.from(document.querySelectorAll('.qc')),
+    ].filter((el): el is Element => !!el)
+    const inView = new Set<Element>()
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => (entry.isIntersecting ? inView.add(entry.target) : inView.delete(entry.target)))
+      setHeroVisible(inView.size > 0)
+    }, { rootMargin: '-96px 0px 0px 0px' })
+    targets.forEach((el) => observer.observe(el))
+    if (!targets.length) setHeroVisible(false)
 
     const menu = document.querySelector('[aria-controls="mobile-nav-panel"]')
     const syncMenu = () => setMenuOpen(menu?.getAttribute('aria-expanded') === 'true')
@@ -29,7 +38,8 @@ export function MobileQuoteBar() {
   }, [pathname])
 
   if (pathname === '/contact' || pathname === '/privacy-policy' || heroVisible || menuOpen) return null
-  const href = pathname.startsWith('/areas/') ? '#contact' : quoteHref({ ...quoteContextForPath(pathname), ctaId: 'mobile-bar' })
+  // The homepage form lives in the hero card, so the bar scrolls back to it instead of leaving the page.
+  const href = pathname === '/' ? '#pricing' : pathname.startsWith('/areas/') ? '#contact' : quoteHref({ ...quoteContextForPath(pathname), ctaId: 'mobile-bar' })
 
   return (
     <div data-mobile-quote className="fixed inset-x-0 bottom-0 z-40 border-t border-secondary-200 bg-white/95 px-4 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] shadow-lg backdrop-blur-sm md:hidden">

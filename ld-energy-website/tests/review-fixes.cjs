@@ -26,7 +26,7 @@ const widths = [[320,568],[360,800],[375,812],[390,844],[412,915],[430,932],[768
         return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, delivered: true }) })
       })
       const form = page.locator('form')
-      const next = () => form.getByRole('button', { name: 'Continue', exact: true }).click()
+      const next = () => form.getByRole('button', { name: /^Continue/ }).click()
       const back = () => form.getByRole('button', { name: 'Back', exact: true }).click()
       const choose = name => form.getByRole('radio', { name, exact: true }).check()
       const detailAndSubmit = async () => {
@@ -82,11 +82,11 @@ const widths = [[320,568],[360,800],[375,812],[390,844],[412,915],[430,932],[768
       await page.goForward({ waitUntil: 'networkidle' })
       assert.equal(await form.locator('input[value="38-52"]').isChecked(), true)
       await choose('Floor Plan')
-      assert.match(await form.locator('[data-estimate-summary]').innerText(), /£65/)
+      assert.match(await form.locator('[data-estimate-announcement]').innerText(), /£65/)
       await choose('Not sure of floor area')
-      assert.doesNotMatch(await form.locator('[data-estimate-summary]').innerText(), /£/)
+      assert.doesNotMatch(await form.locator('[data-estimate-announcement]').innerText(), /£/)
       await choose('Agency / portfolio enquiry')
-      assert.doesNotMatch(await form.locator('[data-estimate-summary]').innerText(), /£/)
+      assert.doesNotMatch(await form.locator('[data-estimate-announcement]').innerText(), /£/)
 
       const areas = []
       for (const areaPage of ['stratford','newham','croydon']) {

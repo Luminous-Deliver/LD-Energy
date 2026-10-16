@@ -21,13 +21,13 @@ fs.mkdirSync(out, { recursive: true })
       })
       await page.goto(`${base}/contact#booking-form`)
       const form = page.getByRole('form', { name: 'Exact quote enquiry' })
-      const exact = form.getByLabel('Exact size')
-      const tile = name => form.getByRole('radio', { name, exact: true })
-      const estimate = () => form.locator('[data-estimate-summary]').first().innerText()
+      const exact = form.getByLabel('Know the exact size?')
+      const tile = name => form.getByRole('radio', { name: new RegExp('^' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')) })
+      const estimate = () => form.locator('[data-estimate-announcement]').innerText()
 
-      // Three sizes across at every width, and no label spills out of its tile.
+      // Six sizes in an even grid (two or three across by width), and no label spills out of its tile.
       const tiles = await form.locator('fieldset', { hasText: 'Internal floor area' }).evaluate(fieldset => [...fieldset.querySelectorAll('label:has(input[value$="plus"]), label:has(input[value*="-"])')].map(label => ({ top: Math.round(label.getBoundingClientRect().top), spill: [...label.querySelectorAll('span')].some(span => span.scrollWidth > label.clientWidth) })))
-      assert.equal(new Set(tiles.map(t => t.top)).size, 2, 'six sizes in two rows')
+      assert.ok(tiles.length === 6 && [2, 3].includes(new Set(tiles.map(t => t.top)).size), 'six sizes in an even grid (2 or 3 rows)')
       assert.equal(tiles.some(t => t.spill), false, 'label overflow')
       // Typing a figure selects its size and prices it.
       await exact.fill('134')

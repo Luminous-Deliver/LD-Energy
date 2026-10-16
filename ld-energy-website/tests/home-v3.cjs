@@ -1,4 +1,4 @@
-// Homepage (14/10/2026): one guide-price calculator, routes, hand-offs, links, layout.
+// Homepage (16/10/2026): the hero card is the booking form (3 steps, in place), links, layout.
 // Run against a local production build: npx next start -p 3120, then
 //   node tests/home-v3.cjs            (BOOKING_TEST_URL overrides the base)
 const assert = require('node:assert/strict')
@@ -7,12 +7,14 @@ const { chromium } = require('playwright')
 // test can never agree with a copy of it.
 require('./register.cjs')
 const { pricing, EXPRESS_SURCHARGE } = require('../lib/site.ts')
+const { EXPRESS_SPEED } = require('../lib/validators.ts')
 
 const base = process.env.BOOKING_TEST_URL || 'http://localhost:3120'
 if (!['localhost', '127.0.0.1'].includes(new URL(base).hostname)) throw new Error('Local preview only')
 
 const bands = ['up-to-37', '38-52', '53-70', '71-95', '96-120', '121-plus']
 const key = { epc: 'epc', bundle: 'bundle', 'floor-plan': 'floorPlan' }
+const value = { epc: 'EPC Certificate', bundle: 'Both (Bundle)', 'floor-plan': 'Floor Plan' }
 const footerLinks = [
   '/services/domestic-epc', '/services/floor-plans', '/services/epc-pre-assessment', '/services/epc-improvement-plan',
   '/pricing', '/landlords', '/sellers', '/estate-agents', '/areas', '/about', '/domestic-energy-assessor-london',
@@ -25,77 +27,107 @@ const footerLinks = [
   const check = (ok, msg) => { if (!ok) fails.push(msg) }
   try {
     const context = await browser.newContext({ viewport: { width: 1440, height: 900 } })
-    await context.addInitScript(() => { try { localStorage.setItem('cookie-consent', 'declined') } catch {} })
+    await context.addInitScript(() => {
+      try { localStorage.setItem('cookie-consent', 'declined') } catch {}
+      // Security check stub: the real widget never loads in a local test.
+      window.turnstile = { render: (el, o) => { setTimeout(() => o.callback('test-token'), 20); return 'mock' }, reset: () => {}, remove: () => {}, getResponse: () => 'test-token' }
+    })
     const page = await context.newPage()
+    const submissions = []
+    await page.route('**/api/contact', async (route) => {
+      submissions.push(route.request().postDataJSON())
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, delivered: true, confirmationSent: true }) })
+    })
     const errors = []
     page.on('pageerror', (e) => errors.push(e.message))
     page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()) })
     await page.goto(base + '/', { waitUntil: 'networkidle' })
 
-    // Before any choice: no guide price anywhere on the page except add-on mentions.
+    const card = page.locator('#pricing')
+    const form = card.getByRole('form', { name: 'Exact quote enquiry' })
+    check(await form.count() === 1, 'the hero card is the booking form')
+    const pickService = (v) => card.locator(`label.bf-pill:has(input[name="services"][value="${v}"])`).click()
+    const pickSize = (i) => card.locator('label.bf-tile--size').nth(i).click()
+
+    // Before any choice: no guide price on the page outside the booking card.
     const strays = await page.evaluate(() => {
       const hits = []
       const walk = document.createTreeWalker(document.querySelector('main'), NodeFilter.SHOW_TEXT)
       while (walk.nextNode()) {
+        const el = walk.currentNode.parentElement
+        if (el.closest('script') || el.closest('#pricing')) continue
         const t = walk.currentNode.textContent
-        if (walk.currentNode.parentElement.closest('script')) continue
         // Add-ons and cover amounts are not guide prices.
         if (/£\d/.test(t) && !/£35 Improvement Plan|£5m|£15/.test(t)) hits.push(t.trim())
       }
       return hits
     })
-    check(strays.length === 0, 'prices outside the calculator: ' + JSON.stringify(strays))
+    check(strays.length === 0, 'prices outside the booking card: ' + JSON.stringify(strays))
+    check(await card.locator('[name="customerType"]:checked').count() === 0 && await card.locator('[name="areaBand"]:checked').count() === 0, 'nothing pre-selected but the service')
 
-    // Every route opens the calculator with the right service; Back returns.
-    for (const [route, service] of [['landlord', 'epc'], ['agent', 'epc'], ['seller', 'bundle'], ['home', 'epc']]) {
-      await page.click(`[data-route="${route}"]`)
-      check(await page.getAttribute(`[data-svc="${service}"]`, 'aria-pressed') === 'true', `route ${route} -> ${service}`)
-      check(await page.evaluate(() => document.activeElement?.textContent) === 'Your guide price', `route ${route}: focus on heading`)
-      await page.click('text=Change what you need')
-      check(await page.isVisible('[data-route="home"]'), `back from ${route}`)
-    }
+    // An estate agent who has not picked a service gets the EPC + floor plan bundle as a default.
+    await card.locator('label.bf-tile--who:has(input[value="Estate agent"])').click()
+    check(await card.locator('input[name="services"][value="Both (Bundle)"]').isChecked(), 'estate agent defaults to the bundle')
+    await card.locator('label.bf-tile--who:has(input[value="Landlord (tenanted)"])').click()
 
-    // Truth table: 3 services x 6 bands against lib/site.ts.
-    await page.click('[data-route="home"]')
+    // Truth table: 3 services x 6 bands against lib/site.ts, in the card itself.
     for (const service of ['epc', 'bundle', 'floor-plan']) {
-      await page.click(`[data-svc="${service}"]`)
+      await pickService(value[service])
       for (let i = 0; i < 6; i++) {
-        await page.click(`.qc [data-band="${bands[i]}"]`)
+        await pickSize(i)
         const band = pricing[i]
         const want = band[key[service]]
-        const got = await page.evaluate(() => ({
-          price: document.querySelector('[data-price]').textContent,
-          href: document.querySelector('[data-quote]').getAttribute('href'),
-          save: document.querySelector('[data-save] dd')?.textContent || null,
-          tile: [...document.querySelectorAll('.qc__size')].map((t) => t.querySelector('.qc__size-top span').textContent),
-          extra: document.querySelector('.qc__extra')?.textContent || null,
+        const got = await card.evaluate((c) => ({
+          price: c.querySelector('[data-price]').textContent,
+          tile: [...c.querySelectorAll('.bf-tile--size .bf-size__top span')].map((t) => t.textContent),
+          rows: c.querySelector('.bf__rows')?.textContent || '',
         }))
         check(got.price === `£${want}`, `${service} ${bands[i]}: price ${got.price} != £${want}`)
         check(got.tile.join() === pricing.map((p) => `£${p[key[service]]}`).join(), `${service}: tile prices ${got.tile}`)
-        check(got.href === `/contact?service=${service}&area=${bands[i]}&source=home&cta=estimator#booking-form`, `${service} ${bands[i]}: href ${got.href}`)
-        if (service === 'bundle') check(got.save === `−£${band.epc + band.floorPlan - band.bundle}`, `bundle ${bands[i]}: saving ${got.save}`)
-        else check(got.save === null, `${service}: saving shown`)
-        check(service === 'floor-plan' ? got.extra === null : got.extra === `Next-day lodgement +£${EXPRESS_SURCHARGE} when agreed`, `${service}: express note ${got.extra}`)
+        if (service === 'bundle') check(got.rows.includes(`Bundle saving−£${band.epc + band.floorPlan - band.bundle}`), `bundle ${bands[i]}: saving ${got.rows}`)
+        else check(!got.rows.includes('Bundle saving'), `${service}: saving shown`)
       }
     }
-    await page.click('.qc [data-band="unknown"]')
-    check(await page.textContent('[data-price]') === 'Quote', 'unknown band shows Quote')
-    check((await page.getAttribute('[data-quote]', 'href')).includes('area=unknown'), 'unknown band href')
+    await card.locator('label.bf-tile--unsure').click()
+    check(await card.locator('[data-price]').textContent() === 'Quote', 'unknown band shows Quote')
 
-    // Service-card buttons: switch service, keep the size, bring the card into view.
-    await page.click('.qc [data-band="96-120"]')
+    // Service-card buttons further down: switch service, keep the size, bring the card back into view.
+    await pickSize(4)
     for (const service of ['epc', 'bundle', 'floor-plan']) {
       await page.evaluate(() => document.getElementById('services').scrollIntoView())
       await page.click(`[data-pick="${service}"]`)
       await page.waitForTimeout(900)
-      const s = await page.evaluate(() => ({
-        svc: document.querySelector('[data-svc][aria-pressed="true"]').dataset.svc,
-        band: document.querySelector('.qc__size[aria-pressed="true"]')?.dataset.band,
-        top: Math.round(document.querySelector('.qc').getBoundingClientRect().top),
+      const s = await card.evaluate((c) => ({
+        svc: c.querySelector('input[name="services"]:checked')?.value,
+        band: c.querySelector('input[name="areaBand"]:checked')?.value,
+        top: Math.round(c.getBoundingClientRect().top),
       }))
-      check(s.svc === service && s.band === '96-120' && s.top >= 0 && s.top < 400, `pick ${service}: ${JSON.stringify(s)}`)
-      check(await page.textContent('[data-price]') === `£${pricing[4][key[service]]}`, `pick ${service}: price`)
+      check(s.svc === value[service] && s.band === bands[4] && s.top >= 0 && s.top < 400, `pick ${service}: ${JSON.stringify(s)}`)
+      check(await card.locator('[data-price]').textContent() === `£${pricing[4][key[service]]}`, `pick ${service}: price`)
     }
+
+    // The enquiry runs in place: three steps, the running total follows, the send stays on the homepage.
+    await pickService(value.epc)
+    await pickSize(2)
+    await card.locator('.bf__go').click()
+    check(await card.locator('.bf__h').textContent() === 'Timing and access', 'step 2 is timing and access')
+    check(await page.evaluate(() => document.activeElement?.textContent) === 'Timing and access', 'step 2: focus on heading')
+    await card.locator(`label.bf-tile:has(input[name="speed"][value="${EXPRESS_SPEED}"])`).click()
+    check((await card.locator('[data-estimate-summary]').textContent()).includes(`£${pricing[2].epc + EXPRESS_SURCHARGE}`), 'running total includes next-day lodgement')
+    await card.locator('.bf__go').click()
+    check(await card.locator('.bf__h').textContent() === 'Your details', 'step 3 is your details')
+    await page.fill('#name', 'Test Customer'); await page.fill('#phone', '07000 000000'); await page.fill('#email', 'test@example.com')
+    await page.fill('#address', '1 Test Street, London'); await page.fill('#postcode', 'E15 1AA'); await page.check('#consent')
+    await page.waitForFunction(() => !document.querySelector('#pricing button[type="submit"]').disabled)
+    await card.locator('button[type="submit"]').click()
+    await card.locator('#request-sent-heading').waitFor()
+    check(new URL(page.url()).pathname === '/', 'stayed on the homepage after sending')
+    const [sent] = submissions
+    check(submissions.length === 1, `one submission, got ${submissions.length}`)
+    check(sent && sent.sourcePage === 'home' && sent.ctaId === 'hero-form' && sent.customerType === 'Landlord (tenanted)'
+      && sent.services.join() === 'EPC Certificate' && sent.areaBand === bands[2] && sent.speed === EXPRESS_SPEED && sent.consent === true,
+      'submitted payload: ' + JSON.stringify(sent && { ...sent, turnstileToken: undefined }))
+    await page.goto(base + '/', { waitUntil: 'networkidle' })
 
     // Anchors resolve; footer keeps every link.
     const dead = await page.evaluate(() => [...document.querySelectorAll('a[href^="#"]')].map((a) => a.getAttribute('href')).filter((h) => h.length > 1 && !document.getElementById(h.slice(1))))
@@ -139,9 +171,10 @@ const footerLinks = [
       if (width === 390) {
         await page.click('.svc__toggle >> nth=0')
         check(await page.isVisible('#svc-epc-list'), 'mobile checklist opens')
-        await page.evaluate(() => scrollTo(0, 2600))
+        // The bar stays hidden while the booking card is on screen; scroll past the card.
+        await page.evaluate(() => scrollTo(0, document.querySelector('#pricing').getBoundingClientRect().bottom + scrollY + 200))
         await page.waitForTimeout(600)
-        const bar = await page.evaluate(() => { const a = document.querySelector('a[href*="cta=mobile-bar"]'); if (!a) return null; const r = a.getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0 })
+        const bar = await page.evaluate(() => { const a = document.querySelector('[data-mobile-quote] a[href="#pricing"]'); if (!a) return null; const r = a.getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0 })
         check(bar === true, 'mobile quote bar visible after scrolling')
       }
     }
@@ -159,5 +192,5 @@ const footerLinks = [
     await browser.close()
   }
   if (fails.length) { console.error('FAIL\n' + fails.join('\n')); process.exit(1) }
-  console.log('home-v3: all checks passed (4 routes, 18 price cells + tiles, unknown band, 3 hand-offs, anchors, footer, schema, overflow x4, compact nav, progress line, mobile toggle + bar, reduced motion)')
+  console.log('home-v3: all checks passed (card is the form, agent default, 18 price cells + tiles, unknown band, 3 hand-offs, 3 steps in place with running total and stubbed send, anchors, footer, schema, overflow x4, compact nav, progress line, mobile toggle + bar, reduced motion)')
 })()

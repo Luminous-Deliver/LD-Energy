@@ -26,7 +26,7 @@ const historyKey = 'ldEnergyQuoteForm'
     await page.route('**/api/contact', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, delivered: true }) }))
     const form = page.locator('form')
     const choose = name => form.getByRole('radio', { name, exact: true }).check()
-    const next = () => form.getByRole('button', { name: 'Continue', exact: true }).click()
+    const next = () => form.getByRole('button', { name: /^Continue/ }).click()
 
     for (const [width,height] of [[320,568],[390,844],[768,1024]]) {
       await page.setViewportSize({ width, height })
@@ -47,23 +47,15 @@ const historyKey = 'ldEnergyQuoteForm'
         await input.scrollIntoViewIfNeeded()
         const before = await page.evaluate(() => scrollY)
         await input.check()
-        await page.waitForFunction(() => {
-          const rect = document.querySelector('[data-estimate-summary]')?.getBoundingClientRect()
-          return rect && rect.top >= 0 && rect.bottom <= innerHeight
-        })
-        const summary = form.locator('[data-estimate-summary]')
-        assert.ok((await summary.innerText()).includes(expected))
-        if (value === 'unknown') assert.doesNotMatch(await summary.innerText(), /£/)
+        await page.waitForFunction(text => document.querySelector('[data-estimate-announcement]').textContent.includes(text), expected)
+        // The result is on screen where the visitor tapped: the tile carries its own price.
+        assert.ok(await page.evaluate(() => { const r = document.activeElement.closest('label').getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight }), 'chosen tile on screen')
+        const summary = form.locator('[data-estimate]')
+        assert.ok((await summary.innerText()).includes(expected.startsWith('£') ? expected : 'Quote'))
+        if (value === 'unknown') assert.doesNotMatch(await form.locator('[data-estimate-announcement]').innerText(), /£/)
         assert.equal(await page.evaluate(() => window.liveNode === document.querySelector('[data-estimate-announcement]')), true)
         assert.equal(await page.evaluate(() => document.activeElement.value), value)
         assert.ok(await page.evaluate(previous => scrollY >= previous, before), 'Result reveal never scrolls upward')
-        const order = await summary.evaluate(element => ({
-          top: element.getBoundingClientRect().top,
-          areaBottom: document.querySelector('input[name="areaBand"]').closest('fieldset').getBoundingClientRect().bottom,
-          customerTop: document.querySelector('input[name="customerType"]').closest('fieldset').getBoundingClientRect().top,
-          bottom: element.getBoundingClientRect().bottom,
-        }))
-        assert.ok(order.top >= order.areaBottom && order.bottom <= order.customerTop)
         await page.screenshot({ path: path.join(out, `estimate-${width}-${value}.png`) })
       }
       const announcements = await page.evaluate(() => window.announcements)
@@ -77,8 +69,8 @@ const historyKey = 'ldEnergyQuoteForm'
       assert.deepEqual(await page.evaluate(() => window.announcements), announcements)
       await form.getByRole('button', { name: 'Back', exact: true }).click()
       await choose('Agency / portfolio enquiry')
-      await page.waitForFunction(() => document.querySelector('[data-estimate-summary]').getBoundingClientRect().bottom <= innerHeight)
-      assert.equal(await form.locator('[data-estimate-summary]').innerText(), 'Your portfolio will be quoted individually.')
+      await page.waitForFunction(() => document.querySelector('[data-estimate-announcement]').textContent === 'Your portfolio will be quoted individually.')
+      assert.match(await form.locator('[data-estimate]').innerText(), /quoted individually/)
       assert.equal(await form.locator('input[name="areaBand"]').count(), 0)
       report.estimates.push({ width, noArea: true, known: true, unknown: true, bulk: true, stableLiveRegion: true, firstAnnouncement: announcements[0], visibleWithoutUpwardScroll: true })
       console.log(`PASS ${width}: inline estimate states, visible result, stable/non-noisy live region`)
@@ -103,6 +95,8 @@ const historyKey = 'ldEnergyQuoteForm'
       const entryUrl = page.url()
       // Next client navigation also unmounts the form; its router state must survive.
       // Any client-side link will do; the desktop footer lost its /pricing link on 16/09 (86869dd).
+      // The header slides away mid-page since 15/10 (OmniRated nav); at the top it is a plain bar.
+      await page.evaluate(() => scrollTo(0, 0)); await page.waitForTimeout(500)
       await page.locator('a[href="/pricing"]:visible').first().click()
       await page.waitForURL(base + '/pricing')
       assert.equal(await form.count(), 0)
@@ -119,6 +113,8 @@ const historyKey = 'ldEnergyQuoteForm'
       await page.goForward({ waitUntil: 'domcontentloaded' })
       await page.waitForURL(base + '/pricing', { waitUntil: 'domcontentloaded' })
       await page.goBack({ waitUntil: 'domcontentloaded' })
+      // Hydration can briefly re-render the browser-restored choice before history restores it.
+      await page.waitForLoadState('networkidle')
       await page.waitForFunction(value => document.querySelector(`input[name="customerType"][value="${value}"]`)?.checked, manual)
       assert.equal(await form.getByRole('radio', { name: manual, exact: true }).isChecked(), true)
       await page.reload({ waitUntil: 'networkidle' })

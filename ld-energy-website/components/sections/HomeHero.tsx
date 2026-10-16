@@ -1,7 +1,6 @@
 import { Check } from 'lucide-react'
 import { Container } from '@/components/ui/Container'
 import { Button } from '@/components/ui/Button'
-import { quoteHref } from '@/lib/quote-context'
 import { HomeQuoteCard } from '@/components/sections/home/HomeQuoteCard'
 import { HeroMotion } from '@/components/sections/home/HeroMotion'
 
@@ -53,7 +52,7 @@ export function HomeHero() {
         </p>
         <div className="lh-actions lh-rise" style={{ ['--n' as string]: 3 }}>
           <Button href="#services" variant="accent" className="rounded-full px-7">Explore our services</Button>
-          <Button id="home-quote" href={quoteHref({ sourcePage: 'home', ctaId: 'hero' })} variant="secondary" className="rounded-full border-[#0D1B33]/70 bg-transparent px-7 text-[#0D1B33] hover:bg-white/50">
+          <Button id="home-quote" href="#pricing" variant="secondary" className="rounded-full border-[#0D1B33]/70 bg-transparent px-7 text-[#0D1B33] hover:bg-white/50">
             Get my exact quote
           </Button>
         </div>

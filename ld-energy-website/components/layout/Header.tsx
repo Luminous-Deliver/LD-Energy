@@ -227,7 +227,7 @@ export function Header() {
                 </a>
               )}
               <Button
-                href={pathname === '/contact' ? '#booking-form' : quoteHref({ ...quoteContextForPath(pathname), ctaId: 'header' })}
+                href={pathname === '/contact' ? '#booking-form' : pathname === '/' ? '#pricing' : quoteHref({ ...quoteContextForPath(pathname), ctaId: 'header' })}
                 variant="accent"
                 className={cn('hidden lg:inline-flex rounded-full min-h-0', pill ? 'px-4 py-2 text-[14px]' : 'px-5 py-2.5')}
                 size="md"

@@ -79,7 +79,7 @@ function ServiceCard({ product }: { product: Product }) {
         ))}
       </div>
       <div className="svc__foot">
-        <button type="button" data-pick={product.service} onClick={() => openCalculator(product.service, null, true)} className="svc__cta">{product.cta}</button>
+        <button type="button" data-pick={product.service} onClick={() => openCalculator(product.service, true)} className="svc__cta">{product.cta}</button>
         <Link prefetch={false} href={product.detail} className="svc__more">{product.detailLabel} <span aria-hidden="true">→</span></Link>
       </div>
     </li>

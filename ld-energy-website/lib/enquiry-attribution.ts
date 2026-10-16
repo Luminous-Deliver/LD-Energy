@@ -2,7 +2,7 @@ import type { customerTypes } from '@/lib/booking-options'
 
 /** Operational categories only: never referrers, full URLs, identifiers or customer text. */
 export const sourcePages = ['home', 'contact', 'area', 'areas', 'landlords', 'sellers', 'estate-agents', 'domestic-epc', 'floor-plans', 'pre-assessment', 'improvement-plan', 'pricing', 'blog', 'about', 'faq', 'assessor', 'preparation', 'other'] as const
-export const ctaIds = ['hero', 'pricing', 'bottom', 'header', 'mobile-menu', 'mobile-bar', 'inline', 'estimator', 'embedded', 'direct'] as const
+export const ctaIds = ['hero', 'hero-form', 'pricing', 'bottom', 'header', 'mobile-menu', 'mobile-bar', 'inline', 'estimator', 'embedded', 'direct'] as const
 export type SourcePage = typeof sourcePages[number]
 export type CtaId = typeof ctaIds[number]
 export type CustomerType = typeof customerTypes[number]

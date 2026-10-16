@@ -16,7 +16,7 @@ const out = path.resolve(process.env.BOOKING_EVIDENCE_DIR || '../../../audits/we
       await page.setViewportSize({ width, height })
       await page.goto(base + '/contact', { waitUntil: 'networkidle' })
       await page.evaluate(() => document.fonts.ready)
-      const y = (await page.locator('form input[name="services"]').first().boundingBox()).y
+      const y = (await page.locator('form input[name="customerType"]').first().boundingBox()).y
       if (width === 390) assert.ok(y <= 450)
       if (width === 320) assert.ok(y < height)
       assert.equal(await page.locator('form [name="customerType"]:checked').count(), 0)
