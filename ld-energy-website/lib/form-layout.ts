@@ -6,7 +6,7 @@
  * price), then details: 2 steps. Draft B keeps timing as its own step: 3 steps.
  */
 export type FormLayout = 'two-step' | 'three-step'
-export const FORM_LAYOUT: FormLayout = 'two-step'
+export const FORM_LAYOUT: FormLayout = 'three-step'
 
 /**
  * Draft preview only: sending is stubbed and the security check is skipped, so a preview
