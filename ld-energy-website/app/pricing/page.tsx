@@ -43,13 +43,12 @@ const included = [
   'Official lodgement on the UK Government EPC Register',
   'Certificate link sent once lodged on the government register',
   'Standard software-generated EPC recommendation report, where applicable',
-  'No call-out or mileage charge within our normal service area',
+  'No travel or call-out charges',
 ]
 
 const notIncluded = [
   `Optional personalised EPC Improvement Plan and full Elmhurst Energy Report — £${site.addOns.improvementPlan} extra`,
   'Re-visits due to access issues, charged at £25 per visit',
-  'Properties outside our normal service area (contact for a quote)',
 ]
 
 /**
@@ -64,7 +63,6 @@ const additionalCharges: Array<{ label: string; guide: string }> = [
   { label: 'Lodging a held Pre-Assessment later', guide: `+£${site.addOns.lodgeLater}` },
   { label: 'Extensions, loft conversions or unusual layouts', guide: 'Exact quote' },
   { label: 'Multiple floors or additional measurement complexity', guide: 'Exact quote' },
-  { label: 'Travel outside the normal service area', guide: 'Exact quote' },
   { label: 'Large or unusually complex properties', guide: 'Exact quote' },
 ]
 
@@ -75,7 +73,7 @@ const pricingFaq: FaqItem[] = [
   },
   {
     q: 'Are there any hidden fees?',
-    a: 'No. The price we confirm before booking is the price you pay. Quotes are worked out from your property size and condition, so there are no surprise add-ons or call-out charges. Anything that could change the figure — extensions, unusual layouts, or travel outside our normal service area — is priced into the quote up front.',
+    a: 'No. The price we confirm before booking is the price you pay. Quotes are worked out from your property size and condition, so there are no surprise add-ons or call-out charges. Anything that could change the figure, like extensions or an unusual layout, is priced into the quote up front. There are no travel or call-out charges.',
   },
   {
     q: 'Does my EPC include improvement recommendations?',
@@ -87,7 +85,7 @@ const pricingFaq: FaqItem[] = [
   },
   {
     q: 'Do you charge for travel?',
-    a: 'There is no call-out or mileage charge within our normal service area across London. For properties outside it, travel time is included in the quote you receive before booking, so it is never added afterwards.',
+    a: 'No. There are no travel or call-out charges.',
   },
   {
     q: 'Can I get a discount for multiple properties?',

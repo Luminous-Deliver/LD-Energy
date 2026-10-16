@@ -50,7 +50,7 @@ quote is confirmed before the booking is accepted, never afterwards.
 
 Internal floor area (m²) is the main pricing factor. Bedroom counts are shown only as a familiar
 reference for customers who do not know their floor area. Extensions, loft conversions, unusual
-layouts, multiple floors and travel outside the normal service area can affect the final quote.
+layouts and multiple floors can affect the final quote. There are no travel or call-out charges.
 
 ${priceTable()}
 
@@ -60,7 +60,7 @@ ${priceTable()}
 - EPC Improvement Plan add-on: £${site.addOns.improvementPlan}. Abdul’s personalised written plan explaining what is holding the rating back and which improvements to consider first, supported by the full Elmhurst Energy Report. Prepared after the visit. Energy costs and savings use standard occupancy assumptions; they are not actual household bills or guaranteed outcomes.
 - Standard EPCs include the software-generated recommendation report at no extra charge, unless there is no reasonable potential for improvement. Legitimate omissions follow assessment rules, not the customer’s choice of add-on.
 - EPC Pre-Assessment: a full RdSAP survey that is deliberately NOT lodged, so no certificate is published on the GOV.UK register. Priced on the same floor-area bands as an EPC (from £${priceFrom.epc}) because it is the same visit and the same measuring; only the lodgement is saved. The Energy Report and the written Improvement Plan are included, not an extra. Lodging the same survey afterwards costs £${site.addOns.lodgeLater} with no second visit, provided nothing at the property has changed and the survey remains valid for lodgement under the applicable rules. It is NOT a substitute for an EPC where one is legally required — marketing a property for sale or rent, or MEES compliance.
-- There is no call-out or mileage charge within the normal service area.
+- There are no travel or call-out charges.
 
 Estate and letting agents: we act as an EPC and floor plan supplier for London agencies, with volume
 rates and fast turnaround on new instructions. We are currently taking on new agency clients.

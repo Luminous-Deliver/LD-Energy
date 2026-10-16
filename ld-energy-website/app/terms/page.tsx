@@ -76,7 +76,7 @@ export default function TermsPage() {
 
       <h2>2. Booking and pricing</h2>
       <p>
-        Prices shown on our pricing page are guide estimates based mainly on internal floor area (m²), not fixed quotes. We confirm your exact price before the booking is accepted, and that confirmed price is the price you pay, provided the property matches the details given to us at booking. There is no call-out or mileage charge within our normal service area; travel beyond it is included in the quote before booking. Express (next-day) service is available for {`£${EXPRESS_SURCHARGE}`} extra per EPC.
+        Prices shown on our pricing page are guide estimates based mainly on internal floor area (m²), not fixed quotes. We confirm your exact price before the booking is accepted, and that confirmed price is the price you pay, provided the property matches the details given to us at booking. There are no travel or call-out charges. Express (next-day) service is available for {`£${EXPRESS_SURCHARGE}`} extra per EPC.
       </p>
       <p>
         If the property turns out to be materially different from those details &mdash; for example a significantly larger floor area, a different property type, or an extension or loft conversion not mentioned at booking &mdash; we will tell you before starting the assessment and either agree a revised price with you or reschedule. We will not change an agreed price without speaking to you first, and you are free to decline and cancel at no charge at that point.

@@ -23,7 +23,7 @@ const steps: [string, string][] = [
 ]
 const promiseDetail: Record<string, string> = {
   'Same working-day reply': 'Message us on a working day and you’ll hear back that day.',
-  'No surprise charges': 'Any travel or urgent-service charge is confirmed before you agree to the visit.',
+  'No surprise charges': 'No travel or call-out charges. Any extra, like next-day lodgement, is agreed before you book.',
   'Free rearrange if we reschedule': 'If we need to reschedule your appointment, we’ll arrange the next available slot at no extra cost.',
 }
 const creds: [string, string][] = [

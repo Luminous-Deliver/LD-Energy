@@ -54,7 +54,7 @@ export const homepageFaq: FaqItem[] = [
   },
   {
     q: 'Can I get a same-day or next-day EPC in London?',
-    a: `Tell us your deadline in your enquiry. We confirm appointment availability and delivery timing before booking. Next-day lodgement costs £${EXPRESS_SURCHARGE} extra when agreed; it does not mean a next-day appointment is always available.`,
+    a: `Yes, next-day appointments are available. Tell us your deadline in your enquiry and we confirm the slot and delivery timing before booking. Next-day lodgement costs £${EXPRESS_SURCHARGE} extra when agreed.`,
   },
   {
     q: 'When is an EPC legally required?',
@@ -275,12 +275,12 @@ export const fullFaq: FaqCategory[] = [
       },
       {
         q: 'Are there hidden fees?',
-        a: 'No. The price we quote is the price you pay. Quotes are personalised based on property size and condition, so there are no surprise add-ons, call-out charges, or travel surcharges within our service area.',
+        a: 'No. The price we quote is the price you pay. Quotes are personalised based on property size and condition, so there are no surprise add-ons, call-out charges or travel charges.',
         links: [{ label: 'What the price includes', href: '/pricing#whats-included' }],
       },
       {
         q: 'Do you charge for travel?',
-        a: 'No. Travel is included in the standard price for all properties within our service area (all 32 London boroughs and the City of London, plus a 1.5-hour radius of Stratford). For properties outside this area, contact us for a tailored quote.',
+        a: 'No. There are no travel or call-out charges. We cover all 32 London boroughs and the City of London, plus areas within 1.5 hours of Stratford.',
         links: [{ label: 'London areas we cover', href: '/areas' }],
       },
       {

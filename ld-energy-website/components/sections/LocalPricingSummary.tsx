@@ -27,7 +27,7 @@ export function LocalPricingSummary({ area }: { area: string }) {
           <span>
             Pricing depends mainly on <strong className="font-semibold text-secondary-900">internal floor area (m²)</strong>,
             not the number of bedrooms. The same guide prices apply everywhere we cover, with no
-            call-out charge inside our normal service area.
+            travel or call-out charges.
           </span>
         </p>
       </div>

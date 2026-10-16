@@ -89,7 +89,7 @@ const agentFaq: FaqItem[] = [
   },
   {
     q: 'How quickly can you assess a new instruction?',
-    a: 'Tell us your listing deadline and access requirements. We confirm an available appointment and delivery timing before accepting the instruction. Standard lodgement is within 72 hours of the visit; the next-day option is agreed before booking and does not guarantee a next-day appointment.',
+    a: 'Tell us your listing deadline and access requirements. We confirm an available appointment and delivery timing before accepting the instruction. Next-day appointments are available. Standard lodgement is within 72 hours of the visit, and next-day lodgement is agreed before booking.',
   },
   {
     q: 'Can you deal with the vendor or tenant directly?',
@@ -101,7 +101,7 @@ const agentFaq: FaqItem[] = [
   },
   {
     q: 'Do you cover our whole patch?',
-    a: 'We cover all 32 London boroughs and the City of London from our base in Stratford, East London, with no travel charges within our core service area. If your branches span multiple boroughs, one supplier covers them all.',
+    a: 'We cover all 32 London boroughs and the City of London from our base in Stratford, East London, with no travel charges. If your branches span multiple boroughs, one supplier covers them all.',
   },
 ]
 

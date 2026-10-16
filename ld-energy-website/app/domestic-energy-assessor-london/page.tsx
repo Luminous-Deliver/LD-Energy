@@ -107,7 +107,7 @@ const deaFaq: FaqItem[] = [
   },
   {
     q: 'How much does a domestic energy assessor charge in London?',
-    a: `Guide prices start from £${pricing[0].epc} for properties up to 37 m² and rise with internal floor area, up to £${pricing[5].epc} for homes over 121 m². These are starting estimates — the final price depends on internal floor area (m²), extensions, layout and condition. There is no call-out or mileage charge within our normal service area, and travel beyond it is priced into the quote you receive before booking.`,
+    a: `Guide prices start from £${pricing[0].epc} for properties up to 37 m² and rise with internal floor area, up to £${pricing[5].epc} for homes over 121 m². These are starting estimates — the final price depends on internal floor area (m²), extensions, layout and condition. There are no travel or call-out charges.`,
   },
   {
     q: 'Do I need an accredited assessor for an EPC?',

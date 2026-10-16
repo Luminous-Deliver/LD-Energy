@@ -31,7 +31,7 @@ export function ExactQuoteStrip({ className, sourcePage }: { className?: string;
             </p>
             <p className="mt-1 text-sm leading-relaxed text-secondary-700">
               Guide prices are based mainly on internal floor area. Extensions, loft conversions,
-              unusual layouts, multiple floors and travel outside the normal service area can affect
+              unusual layouts and multiple floors can affect
               the final figure — so you get the real number first, in writing.
             </p>
           </div>
