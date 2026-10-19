@@ -1,7 +1,8 @@
 import { Check } from 'lucide-react'
 import { Container } from '@/components/ui/Container'
 import { Button } from '@/components/ui/Button'
-import { HomeQuoteCard } from '@/components/sections/home/HomeQuoteCard'
+import { HeroPriceCard } from '@/components/sections/HeroPriceCard'
+import { quoteHref } from '@/lib/quote-context'
 import { HeroMotion } from '@/components/sections/home/HeroMotion'
 
 /** Process promises Abdul controls (14/10/2026). Never a rating or outcome. */
@@ -10,7 +11,7 @@ export const promises = ['Same working-day reply', 'No surprise charges', 'Free 
 /**
  * Three depth planes cut from "Canary Wharf from Blackheath (2)" by The wub
  * (CC BY-SA 4.0, credited in the closing section; picked by Abdul 15/10/2026).
- * Back to front: Canary Wharf and the tree line, mid hedge, then the quote card,
+ * Back to front: Canary Wharf and the tree line, mid hedge, then the price card,
  * then the near hedge, which covers the card's foot and rises with the page.
  * Phones show the land as a band between the words and the card.
  */
@@ -52,7 +53,7 @@ export function HomeHero() {
         </p>
         <div className="lh-actions lh-rise" style={{ ['--n' as string]: 3 }}>
           <Button href="#services" variant="accent" className="rounded-full px-7">Explore our services</Button>
-          <Button id="home-quote" href="#pricing" variant="secondary" className="rounded-full border-[#0D1B33]/70 bg-transparent px-7 text-[#0D1B33] hover:bg-white/50">
+          <Button id="home-quote" href={quoteHref({ sourcePage: 'home', ctaId: 'hero' })} variant="secondary" className="rounded-full border-[#0D1B33]/70 bg-transparent px-7 text-[#0D1B33] hover:bg-white/50">
             Get my exact quote
           </Button>
         </div>
@@ -65,7 +66,7 @@ export function HomeHero() {
       <Land />
       <div aria-hidden="true" className="lh-floor" />
       <div id="pricing" className="lh-card scroll-mt-28">
-        <HomeQuoteCard />
+        <HeroPriceCard sourcePage="home" />
       </div>
       <HeroMotion />
     </section>

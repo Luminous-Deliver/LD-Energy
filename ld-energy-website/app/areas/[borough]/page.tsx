@@ -5,10 +5,11 @@ import { CheckCircle2, MapPin } from 'lucide-react'
 import { Section } from '@/components/ui/Section'
 import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { PageHero } from '@/components/sections/PageHero'
+import { HeroPriceCard } from '@/components/sections/HeroPriceCard'
+import { quoteHref, type AreaPage } from '@/lib/quote-context'
 import { LocalPricingSummary } from '@/components/sections/LocalPricingSummary'
 import { CtaStrip } from '@/components/sections/CtaStrip'
 import { Accordion } from '@/components/ui/Accordion'
-import { ContactSection } from '@/components/sections/ContactSection'
 import { boroughMeta, boroughIntent, type BoroughIntent } from '@/lib/boroughs'
 import { site, pricing, priceFrom, formatPrice, maxBundleSaving, EXPRESS_SURCHARGE, defaultOgImage } from '@/lib/site'
 import type { FaqItem } from '@/lib/faq'
@@ -232,8 +233,9 @@ export default async function BoroughPage({ params }: PageProps) {
         eyebrow={`EPC Certificates · ${data.name}`}
         heading={`EPC Certificates in ${data.name}`}
         subheading={`Elmhurst-accredited Domestic Energy Assessor based in Stratford E15 and serving ${data.name}. Guide prices from £${priceFrom.epc}, with your exact quote and available appointment confirmed before booking.`}
-        primaryCta={{ label: 'Get my exact quote', href: '#contact', ctaId: 'hero' }}
+        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', areaPage: data.slug as AreaPage, sourcePage: 'area', ctaId: 'hero' }), ctaId: 'hero' }}
         secondaryCta={{ label: `Call ${site.phone}`, href: site.phoneHref }}
+        card={<HeroPriceCard sourcePage="area" areaPage={data.slug as AreaPage} />}
       />
 
       {/* Local intro */}
@@ -301,7 +303,7 @@ export default async function BoroughPage({ params }: PageProps) {
         </ul>
       </Section>
 
-      <LocalPricingSummary area={data.name} />
+      <LocalPricingSummary area={data.name} areaPage={data.slug as AreaPage} />
 
       {/* Floor plans cross-sell */}
       <Section variant="default" id="floor-plans">
@@ -363,12 +365,10 @@ export default async function BoroughPage({ params }: PageProps) {
         </div>
       </Section>
 
-      <ContactSection areaPage={data.slug} sourcePage="area" />
-
       <CtaStrip
         heading={`Get an EPC quote in ${data.name}`}
         body={`Fast, transparent-priced EPC certificates in ${data.name}. Appointments 7 days a week.`}
-        primaryCta={{ label: 'Get my exact quote', href: '#contact', ctaId: 'bottom' }}
+        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', areaPage: data.slug as AreaPage, sourcePage: 'area', ctaId: 'bottom' }), ctaId: 'bottom' }}
       />
     </>
   )

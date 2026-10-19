@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Section } from '@/components/ui/Section'
 import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { PageHero } from '@/components/sections/PageHero'
+import { HeroPriceCard } from '@/components/sections/HeroPriceCard'
 import { Accordion } from '@/components/ui/Accordion'
 import { CtaStrip } from '@/components/sections/CtaStrip'
 import { fullFaq } from '@/lib/faq'
@@ -70,6 +71,7 @@ export default function FaqPage() {
         heading="EPC Questions, Answered"
         subheading="Everything we get asked about Energy Performance Certificates, what they are, the legal requirements, our process, pricing, and improvements."
         primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'faq', ctaId: 'hero' }) }}
+        card={<HeroPriceCard sourcePage="faq" />}
       />
 
       <Section variant="default" id="faq-jump">

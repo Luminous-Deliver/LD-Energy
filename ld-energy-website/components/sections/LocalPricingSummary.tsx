@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { ArrowRight, Ruler } from 'lucide-react'
 import { Section } from '@/components/ui/Section'
 import { priceFrom, maxBundleSaving, formatPrice, EXPRESS_SURCHARGE } from '@/lib/site'
+import { quoteHref, type AreaPage } from '@/lib/quote-context'
 
 /**
  * Compact pricing block for borough landing pages.
@@ -14,7 +15,7 @@ import { priceFrom, maxBundleSaving, formatPrice, EXPRESS_SURCHARGE } from '@/li
  * saving, exact-quote reassurance) at roughly a fifth of the length, and sends
  * pricing authority to /pricing instead of duplicating it.
  */
-export function LocalPricingSummary({ area }: { area: string }) {
+export function LocalPricingSummary({ area, areaPage }: { area: string; areaPage: AreaPage }) {
   return (
     <Section variant="muted" tier="compact" id="pricing" className="scroll-mt-20 md:scroll-mt-24">
       <div className="max-w-3xl">
@@ -79,7 +80,7 @@ export function LocalPricingSummary({ area }: { area: string }) {
       </p>
 
       <Link
-        href="#contact"
+        href={quoteHref({ service: 'epc', areaPage, sourcePage: 'area', ctaId: 'pricing' })}
         data-enquiry-cta="pricing"
         className="mt-5 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-accent-600 to-accent-700 px-5 py-3 text-sm font-bold text-white shadow-md transition-all hover:from-accent-700 hover:to-accent-800"
       >

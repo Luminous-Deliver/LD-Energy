@@ -79,7 +79,8 @@ const historyKey = 'ldEnergyQuoteForm'
     await page.setViewportSize({ width: 1440, height: 900 })
     const initialEntry = async route => {
       await page.goto(base + route, { waitUntil: 'networkidle' })
-      if (route !== '/') await page.locator('main a[href*="/contact"]').first().click()
+      // Every page, the homepage included, hands over to /contact; no page holds the form itself.
+      await page.locator('main a[href*="/contact"]').first().click()
       await form.waitFor()
     }
     for (const [route, initial, manual] of [['/landlords','Landlord (tenanted)','Homeowner'],['/estate-agents','Estate agent','Letting agent / firm'],['/','','Landlord (tenanted)']]) {
@@ -154,7 +155,8 @@ const historyKey = 'ldEnergyQuoteForm'
         assert.equal(url.searchParams.get('source'), source)
         assert.ok(['hero','bottom','inline'].includes(url.searchParams.get('cta')))
         assert.equal(url.hash, '#booking-form')
-        assert.ok([...url.searchParams.keys()].every(key => ['source','cta','service'].includes(key)))
+        // Controlled choices only; `area` is the hero price card's size band.
+        assert.ok([...url.searchParams.keys()].every(key => ['source','cta','service','area'].includes(key)))
         ctas.push(url.searchParams.get('cta'))
       }
       assert.ok(ctas.includes('hero') && ctas.includes('bottom'))

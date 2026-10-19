@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/Card'
 import { Accordion } from '@/components/ui/Accordion'
 import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { PageHero } from '@/components/sections/PageHero'
+import { HeroPriceCard } from '@/components/sections/HeroPriceCard'
 import { Pricing } from '@/components/sections/Pricing'
 import { CtaStrip } from '@/components/sections/CtaStrip'
 import { site, pricing, priceFrom, defaultOgImage } from '@/lib/site'
@@ -149,6 +150,7 @@ export default function LandlordsPage() {
         heading="EPCs for London Landlords &amp; Domestic MEES Compliance"
         subheading="Accredited domestic EPC assessments across London, from our base in Stratford. Your certificate tells you exactly where the property stands against the current band E requirement — lodged within 72 hours, or next day if you need it urgently."
         primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'landlords', ctaId: 'hero' }) }}
+        card={<HeroPriceCard sourcePage="landlords" />}
       />
 
       {/* Opening: scope the service honestly before anything else. The SERP for

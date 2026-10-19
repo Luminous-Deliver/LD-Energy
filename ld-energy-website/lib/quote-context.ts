@@ -1,6 +1,7 @@
 import { areaChoices, type AreaChoice } from '@/lib/floor-area'
 import { BULK, PRE_ASSESSMENT, EXPRESS_SPEED } from '@/lib/booking-options'
 import type { ContactInput } from '@/lib/validators'
+import { boroughs } from '@/lib/site'
 import { sourcePages, ctaIds, sourcePageForPath, type EnquiryAttribution, type SourcePage, type CtaId } from '@/lib/enquiry-attribution'
 
 export const quoteServices = {
@@ -8,7 +9,10 @@ export const quoteServices = {
   'pre-assessment': PRE_ASSESSMENT, bulk: BULK,
 } as const
 export type QuoteService = keyof typeof quoteServices
-export interface QuoteContext extends EnquiryAttribution { service?: QuoteService; area?: AreaChoice; speed?: 'standard' | 'express'; plan?: boolean }
+/** The area landing page an enquiry started on. Slug list only: the borough content stays server-side. */
+export type AreaPage = (typeof boroughs)[number]
+const isAreaPage = (value: string | null | undefined): value is AreaPage => (boroughs as readonly string[]).includes(value ?? '')
+export interface QuoteContext extends EnquiryAttribution { service?: QuoteService; area?: AreaChoice; speed?: 'standard' | 'express'; plan?: boolean; areaPage?: AreaPage }
 
 export function parseQuoteContext(params: URLSearchParams): QuoteContext {
   const serviceValue = params.get('service')
@@ -22,6 +26,7 @@ export function parseQuoteContext(params: URLSearchParams): QuoteContext {
     area: areaChoices.includes(areaValue as AreaChoice) ? areaValue as AreaChoice : undefined,
     speed: lodged && params.get('speed') === 'express' ? 'express' : 'standard',
     plan: lodged && params.get('plan') === '1',
+    areaPage: isAreaPage(params.get('borough')) ? params.get('borough') as AreaPage : undefined,
   }
 }
 
@@ -35,12 +40,13 @@ export function quoteHref(context: QuoteContext = {}): string {
   if (lodged && context.plan) params.set('plan', '1')
   if (context.sourcePage && sourcePages.includes(context.sourcePage)) params.set('source', context.sourcePage)
   if (context.ctaId && ctaIds.includes(context.ctaId)) params.set('cta', context.ctaId)
+  if (isAreaPage(context.areaPage)) params.set('borough', context.areaPage)
   return `/contact${params.size ? `?${params}` : ''}#booking-form`
 }
 
-export function quoteContextFromForm(values: Pick<ContactInput, 'services' | 'areaBand' | 'speed' | 'improvementPlan' | 'sourcePage' | 'ctaId'>): QuoteContext {
+export function quoteContextFromForm(values: Pick<ContactInput, 'services' | 'areaBand' | 'speed' | 'improvementPlan' | 'sourcePage' | 'ctaId' | 'areaPage'>): QuoteContext {
   const service = (Object.entries(quoteServices).find(([, label]) => values.services.includes(label))?.[0] || 'epc') as QuoteService
-  return { service, area: values.areaBand || undefined, speed: values.speed === EXPRESS_SPEED ? 'express' : 'standard', plan: values.improvementPlan, sourcePage: values.sourcePage, ctaId: values.ctaId }
+  return { service, area: values.areaBand || undefined, speed: values.speed === EXPRESS_SPEED ? 'express' : 'standard', plan: values.improvementPlan, sourcePage: values.sourcePage, ctaId: values.ctaId, areaPage: isAreaPage(values.areaPage) ? values.areaPage : undefined }
 }
 
 /** Default intent for persistent/shared service-page quote actions. */
@@ -51,4 +57,10 @@ export function quoteContextForPath(path: string): QuoteContext {
   if (sourcePage === 'floor-plans') return { service: 'floor-plan', sourcePage }
   if (sourcePage === 'estate-agents') return { service: 'bulk', sourcePage }
   return { service: 'epc', sourcePage }
+}
+
+/** The area landing page a path belongs to, for header and bar actions. Only /areas/<slug>. */
+export function areaPageForPath(path: string): AreaPage | undefined {
+  const slug = path.match(/^\/areas\/([^/]+)\/?$/)?.[1]
+  return isAreaPage(slug) ? slug : undefined
 }

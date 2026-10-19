@@ -4,6 +4,7 @@ import { Section } from '@/components/ui/Section'
 import { BoroughFinder } from '@/components/sections/BoroughFinder'
 import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { PageHero } from '@/components/sections/PageHero'
+import { HeroPriceCard } from '@/components/sections/HeroPriceCard'
 import { CtaStrip } from '@/components/sections/CtaStrip'
 import { boroughList } from '@/lib/boroughs'
 import { site, priceFrom, defaultOgImage } from '@/lib/site'
@@ -57,6 +58,7 @@ export default function AreasPage() {
         heading="EPC Certificates Across London"
         subheading="Based in Stratford in the London Borough of Newham, we cover all 32 London boroughs and the City of London. The same guide pricing everywhere, 7-day availability, and your exact quote confirmed before booking."
         primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'areas', ctaId: 'hero' }) }}
+        card={<HeroPriceCard sourcePage="areas" />}
       />
 
       <Section variant="default" id="all-areas">

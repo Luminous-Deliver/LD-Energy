@@ -17,6 +17,7 @@ import { Section } from '@/components/ui/Section'
 import { Accordion } from '@/components/ui/Accordion'
 import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { PageHero } from '@/components/sections/PageHero'
+import { HeroPriceCard } from '@/components/sections/HeroPriceCard'
 import { Pricing } from '@/components/sections/Pricing'
 import { CtaStrip } from '@/components/sections/CtaStrip'
 import { site, pricing, priceFrom, insurance, EXPRESS_SURCHARGE, defaultOgImage } from '@/lib/site'
@@ -169,6 +170,7 @@ export default function DomesticEnergyAssessorPage() {
         heading="Your Local Domestic Energy Assessor in London"
         subheading={`L&D Energy is an Elmhurst-accredited Domestic Energy Assessor (DEA) based in Stratford, East London. We produce official EPC certificates for homes across all 32 London boroughs, with guide prices from £${priceFrom.epc} and next-day appointments available.`}
         primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'assessor', ctaId: 'hero' }) }}
+        card={<HeroPriceCard sourcePage="assessor" />}
       />
 
       {/* What is a DEA */}

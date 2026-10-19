@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/Card'
 import { Accordion } from '@/components/ui/Accordion'
 import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { PageHero } from '@/components/sections/PageHero'
+import { HeroPriceCard } from '@/components/sections/HeroPriceCard'
 import { Pricing } from '@/components/sections/Pricing'
 import { CtaStrip } from '@/components/sections/CtaStrip'
 import { site, pricing, EXPRESS_SURCHARGE, defaultOgImage } from '@/lib/site'
@@ -160,6 +161,7 @@ export default function EstateAgentsPage() {
         heading="Your EPC Partner for New Instructions"
         subheading="Elmhurst-accredited assessor covering all 32 London boroughs, available for new agency partnerships now. Fast, reliable EPCs and floor plans so your listings go live on time."
         primaryCta={{ label: 'Partner With Us', href: quoteHref({ service: 'bulk', sourcePage: 'estate-agents', ctaId: 'hero' }) }}
+        card={<HeroPriceCard sourcePage="estate-agents" />}
       />
 
       {/* Availability banner */}

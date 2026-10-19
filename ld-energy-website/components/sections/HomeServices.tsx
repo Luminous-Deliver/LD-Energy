@@ -6,13 +6,15 @@ import { Check, ChevronDown, FileText, Layers, LayoutPanelLeft, Plus, type Lucid
 import { Container } from '@/components/ui/Container'
 import { cn } from '@/lib/cn'
 import { site } from '@/lib/site'
-import { useHomeQuote, type HomeService } from '@/components/sections/home/HomeQuoteContext'
+import { quoteHref } from '@/lib/quote-context'
+
+type HomeService = 'epc' | 'bundle' | 'floor-plan'
 
 interface Group { label: string; items: string[]; optional?: boolean }
 interface Product { service: HomeService; title: string; bestFor: string; description: string; groups: Group[]; cta: string; detail: string; detailLabel: string; Icon: LucideIcon; flag?: string }
 
-// What each service delivers. No prices here: the one guide-price calculator is
-// the hero card, and "See my … price" hands over to it with the service picked.
+// What each service delivers. No prices here: the hero price card lists them, and
+// "See my … price" opens the booking form with the service already picked.
 const products: Product[] = [
   {
     service: 'epc', title: 'Domestic EPC', bestFor: 'For lettings, sales and your own home', Icon: FileText,
@@ -46,7 +48,6 @@ const products: Product[] = [
 ]
 
 function ServiceCard({ product }: { product: Product }) {
-  const { openCalculator } = useHomeQuote()
   const [open, setOpen] = useState(false)
   const feature = product.service === 'bundle'
   const listId = `svc-${product.service}-list`
@@ -79,7 +80,7 @@ function ServiceCard({ product }: { product: Product }) {
         ))}
       </div>
       <div className="svc__foot">
-        <button type="button" data-pick={product.service} onClick={() => openCalculator(product.service, true)} className="svc__cta">{product.cta}</button>
+        <Link prefetch={false} href={quoteHref({ service: product.service, sourcePage: 'home', ctaId: 'pricing' })} data-pick={product.service} className="svc__cta">{product.cta}</Link>
         <Link prefetch={false} href={product.detail} className="svc__more">{product.detailLabel} <span aria-hidden="true">→</span></Link>
       </div>
     </li>

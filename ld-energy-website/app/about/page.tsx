@@ -5,6 +5,7 @@ import { Award, MapPin, Clock, BadgeCheck, FileText, Users } from 'lucide-react'
 import { Section } from '@/components/ui/Section'
 import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { PageHero } from '@/components/sections/PageHero'
+import { HeroPriceCard } from '@/components/sections/HeroPriceCard'
 import { CtaStrip } from '@/components/sections/CtaStrip'
 import { site, insurance, defaultOgImage } from '@/lib/site'
 
@@ -98,6 +99,7 @@ export default function AboutPage() {
         heading="About L&D Energy"
         subheading="Elmhurst-accredited Domestic Energy Assessor based in Stratford, East London. We deliver fast, transparent-priced EPC certificates and floor plans across every London borough."
         primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'about', ctaId: 'hero' }) }}
+        card={<HeroPriceCard sourcePage="about" />}
       />
 
       {/* Who we are */}

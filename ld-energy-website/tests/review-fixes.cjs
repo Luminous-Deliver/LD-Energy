@@ -90,18 +90,19 @@ const widths = [[320,568],[360,800],[375,812],[390,844],[412,915],[430,932],[768
 
       const areas = []
       for (const areaPage of ['stratford','newham','croydon']) {
-        // Contradictory query context must not replace the server-known geographic landing page.
-        await page.goto(`${base}/areas/${areaPage}?areaPage=unknown<script>&borough=hackney&source=evil`, { waitUntil: 'networkidle' })
+        // Area pages hold no form (16/10/2026 evening): every CTA opens /contact carrying the
+        // server-rendered slug. Query text on the area URL must not change where it points.
         const ctas = []
         for (const ctaId of ['hero','pricing','bottom']) {
+          await page.goto(`${base}/areas/${areaPage}?areaPage=unknown<script>&borough=hackney&source=evil`, { waitUntil: 'networkidle' })
+          assert.equal(await page.locator('main form').count(), 0)
           const cta = page.locator(`main a[data-enquiry-cta="${ctaId}"]`)
           assert.equal(await cta.count(), 1)
-          assert.equal(await cta.getAttribute('href'), '#contact')
+          const href = await cta.getAttribute('href')
+          assert.equal(href, `/contact?service=epc&source=area&cta=${ctaId}&borough=${areaPage}#booking-form`)
           await cta.click()
-          await page.waitForURL(url => url.pathname === `/areas/${areaPage}` && url.hash === '#contact')
-          assert.equal(new URL(page.url()).pathname, `/areas/${areaPage}`)
-          assert.equal(new URL(page.url()).hash, '#contact')
-          assert.equal(await page.locator('#contact form').count(), 1)
+          await page.waitForURL(url => url.pathname === '/contact')
+          await form.waitFor()
           await choose('Not sure of floor area')
           await choose('Homeowner')
           await detailAndSubmit()
@@ -112,16 +113,25 @@ const widths = [[320,568],[360,800],[375,812],[390,844],[412,915],[430,932],[768
           assert.equal(payload.ctaId, ctaId)
           assert.equal(payload.customerType, 'Homeowner')
           assert.deepEqual(payload.services, ['EPC Certificate'])
-          await page.getByRole('button', { name: 'Send another request' }).click()
-          assert.equal(await form.locator('input[name="customerType"]:checked').count(), 0)
-          ctas.push({ ctaId, href: '#contact', payloadVerified: true })
+          ctas.push({ ctaId, href, payloadVerified: true })
         }
-        if (width === 390) await page.locator('#contact').screenshot({ path: path.join(out, `${areaPage}-embedded-form.png`) })
-        areas.push({ areaPage, ctas })
+        // A price in the hero card pre-chooses the size, and the enquiry still names the page.
+        await page.goto(`${base}/areas/${areaPage}`, { waitUntil: 'networkidle' })
+        await page.locator('.hpc a.hpc__price').nth(3).click() // row 2 (38-52 m²), bundle column
+        await page.waitForURL(url => url.pathname === '/contact')
+        await form.waitFor()
+        assert.equal(await form.locator('input[value="38-52"]').isChecked(), true)
+        assert.equal(await form.getByRole('radio', { name: 'EPC + Floor Plan', exact: true }).isChecked(), true)
+        await choose('Homeowner')
+        await detailAndSubmit()
+        assert.equal(payloads.at(-1).areaPage, areaPage)
+        assert.equal(payloads.at(-1).areaBand, '38-52')
+        if (width === 390) await page.goto(`${base}/areas/${areaPage}`, { waitUntil: 'networkidle' }).then(() => page.locator('.hpc').screenshot({ path: path.join(out, `${areaPage}-price-card.png`) }))
+        areas.push({ areaPage, ctas, priceCardPrefill: true })
       }
       assert.deepEqual(errors, [])
       report.push({ width, customers, areas, browserHistoryPreservesEdits: true, estimatesCorrect: true })
-      console.log(`PASS ${width}: audience defaults/edits, real-link Back/Forward, 9 area-CTA submissions, estimates`)
+      console.log(`PASS ${width}: audience defaults/edits, real-link Back/Forward, 12 area submissions via /contact, estimates`)
       await page.close()
     }
     fs.writeFileSync(path.join(out, 'review-fixes.json'), JSON.stringify(report, null, 2))

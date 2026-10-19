@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/Card'
 import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { StepList } from '@/components/ui/StepList'
 import { PageHero } from '@/components/sections/PageHero'
+import { HeroPriceCard } from '@/components/sections/HeroPriceCard'
 import { Pricing } from '@/components/sections/Pricing'
 import { CtaStrip } from '@/components/sections/CtaStrip'
 import { Faq } from '@/components/sections/Faq'
@@ -192,6 +193,7 @@ export default function DomesticEpcPage() {
         heading="Domestic EPC Certificates in London"
         subheading={`Official Energy Performance Certificates for selling or renting your home. Elmhurst accredited. Guide prices from £${priceFrom.epc}, with your exact quote confirmed before booking. Lodged on the official GOV.UK EPC Register.`}
         primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'domestic-epc', ctaId: 'hero' }) }}
+        card={<HeroPriceCard sourcePage="domestic-epc" />}
       />
 
       {/* What is a Domestic EPC */}

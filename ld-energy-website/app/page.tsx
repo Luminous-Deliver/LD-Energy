@@ -3,7 +3,6 @@ import { HomeHero } from '@/components/sections/HomeHero'
 import { HomeServices } from '@/components/sections/HomeServices'
 import { HomeContent } from '@/components/sections/HomeContent'
 import { site, priceFrom, defaultOgImage } from '@/lib/site'
-import { HomeQuoteProvider } from '@/components/sections/home/HomeQuoteContext'
 import { homeBookingFaqs } from '@/lib/homepage-content'
 
 export const metadata: Metadata = {
@@ -62,11 +61,8 @@ export default function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify([websiteSchema, faqSchema]) }}
       />
-      {/* Hero card and service cards share one service/size state: one calculator, no second price list. */}
-      <HomeQuoteProvider>
-        <HomeHero />
-        <HomeServices />
-      </HomeQuoteProvider>
+      <HomeHero />
+      <HomeServices />
       <HomeContent />
     </>
   )

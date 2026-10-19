@@ -6,6 +6,7 @@ import { Section } from '@/components/ui/Section'
 import { Card } from '@/components/ui/Card'
 import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { PageHero } from '@/components/sections/PageHero'
+import { HeroPriceCard } from '@/components/sections/HeroPriceCard'
 import { CtaStrip } from '@/components/sections/CtaStrip'
 import { AssessorCard } from '@/components/ui/AssessorCard'
 import { site, priceFrom, defaultOgImage } from '@/lib/site'
@@ -115,6 +116,7 @@ export default function EpcPreAssessmentPage() {
         heading="EPC Pre-Assessment"
         subheading="Find out what your property would score before anything goes on the public register. A full survey, deliberately not lodged — so there is no certificate, and nothing to undo."
         primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'pre-assessment', sourcePage: 'pre-assessment', ctaId: 'hero' }) }}
+        card={<HeroPriceCard sourcePage="pre-assessment" service="pre-assessment" />}
       />
 
       {/* What it is */}

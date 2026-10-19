@@ -19,11 +19,10 @@ import {
 } from '@/lib/booking-copy'
 import { parseQuoteContext, quoteContextFromForm, quoteHref, quoteServices } from '@/lib/quote-context'
 import { conversionEvent } from '@/lib/conversion-events'
-import { ctaIds, customerTypeForSource, sourcePageForPath, type SourcePage, type CtaId } from '@/lib/enquiry-attribution'
+import { customerTypeForSource, sourcePageForPath, type SourcePage, type CtaId } from '@/lib/enquiry-attribution'
 import { restoredCustomerType, rememberCustomerType } from '@/lib/customer-type-history'
 import { useTurnstile } from '@/lib/useTurnstile'
 import { usePublishQuote } from '@/components/forms/QuoteSummary'
-import { useOptionalHomeQuote } from '@/components/sections/home/HomeQuoteContext'
 import { contactSchema, BULK, PRE_ASSESSMENT, EXPRESS_SPEED, type ContactInput } from '@/lib/validators'
 import { FORM_DRAFT } from '@/lib/form-layout'
 
@@ -219,7 +218,6 @@ export type FormVariant = 'hero' | 'page' | 'area'
 export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPage?: string; sourcePage?: SourcePage; variant?: FormVariant }) {
   const pathname = usePathname()
   const dedicated = pathname === '/contact'
-  const home = useOptionalHomeQuote()
   const [step, setStep] = useState(1)
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [problem, setProblem] = useState<SendProblem | null>(null)
@@ -257,6 +255,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
       setValue('areaBand', context.area || '')
       setValue('speed', context.speed === 'express' ? EXPRESS_SPEED : 'Standard (72 hours)')
       setValue('improvementPlan', !!context.plan)
+      if (context.areaPage) setValue('areaPage', context.areaPage)
       initialSource = context.sourcePage || initialSource
       setValue('sourcePage', initialSource)
       setValue('ctaId', context.ctaId || 'direct')
@@ -267,27 +266,6 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
     if (dedicated && window.location.hash === '#booking-form') focusBookingElement(document.getElementById('booking-form'))
     // URL context seeds a new form only. Browser history must never overwrite edits.
   }, [dedicated, pathname, sourcePage, setValue, getValues])
-
-  // A "See my price" button further down the homepage picks a service in this card.
-  const request = home?.request
-  useEffect(() => {
-    if (!request || variant !== 'hero') return
-    serviceTouched.current = true
-    setValue('services', [quoteServices[request.service]])
-    if (request.service === 'floor-plan') { setValue('speed', 'Standard (72 hours)'); setValue('improvementPlan', false) }
-    if (status !== 'success') { moveFocus.current = true; setStep(1) }
-  }, [request, variant, setValue, status])
-
-  useEffect(() => {
-    if (dedicated) return
-    const captureCta = (event: MouseEvent) => {
-      const anchor = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>('a[data-enquiry-cta]') : null
-      const ctaId = anchor?.dataset.enquiryCta as CtaId
-      if (anchor?.getAttribute('href') === '#contact' && ctaIds.includes(ctaId)) setValue('ctaId', ctaId)
-    }
-    document.addEventListener('click', captureCta)
-    return () => document.removeEventListener('click', captureCta)
-  }, [dedicated, setValue])
 
   useEffect(() => {
     if (moveFocus.current) { focusBookingElement(headingRef.current); moveFocus.current = false }

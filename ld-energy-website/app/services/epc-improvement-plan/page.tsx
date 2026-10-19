@@ -6,6 +6,7 @@ import { Section } from '@/components/ui/Section'
 import { Card } from '@/components/ui/Card'
 import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { PageHero } from '@/components/sections/PageHero'
+import { HeroPriceCard } from '@/components/sections/HeroPriceCard'
 import { CtaStrip } from '@/components/sections/CtaStrip'
 import { AssessorCard } from '@/components/ui/AssessorCard'
 import { site, defaultOgImage } from '@/lib/site'
@@ -113,6 +114,7 @@ export default function EpcImprovementPlanPage() {
         heading="EPC Improvement Plan"
         subheading={`Abdul's personalised plan explains what is holding your rating back and which improvements to consider first. Written after your assessment, with the full Elmhurst Energy Report as supporting evidence. ${PLAN_PRICE} extra.`}
         primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', plan: true, sourcePage: 'improvement-plan', ctaId: 'hero' }) }}
+        card={<HeroPriceCard sourcePage="improvement-plan" plan />}
       />
 
       {/* What it is */}

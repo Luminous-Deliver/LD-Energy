@@ -1,19 +1,19 @@
-// Homepage (16/10/2026): the hero card is the booking form (3 steps, in place), links, layout.
-// Run against a local production build: npx next start -p 3120, then
+// Homepage (16/10/2026 evening): the hero card is a price card with no inputs; every price
+// opens /contact with the service and size chosen. Links, layout.
+// Run against a local production build (NEXT_PUBLIC_TURNSTILE_SITE_KEY=1x00000000000000000000AA npm run build,
+// Cloudflare's always-pass test key), served with npx next start -p 3120, then
 //   node tests/home-v3.cjs            (BOOKING_TEST_URL overrides the base)
 const assert = require('node:assert/strict')
 const { chromium } = require('playwright')
 // The real price table, loaded through the repo's TypeScript test loader, so the
 // test can never agree with a copy of it.
 require('./register.cjs')
-const { pricing, EXPRESS_SURCHARGE } = require('../lib/site.ts')
-const { EXPRESS_SPEED } = require('../lib/validators.ts')
+const { pricing } = require('../lib/site.ts')
 
 const base = process.env.BOOKING_TEST_URL || 'http://localhost:3120'
 if (!['localhost', '127.0.0.1'].includes(new URL(base).hostname)) throw new Error('Local preview only')
 
 const bands = ['up-to-37', '38-52', '53-70', '71-95', '96-120', '121-plus']
-const key = { epc: 'epc', bundle: 'bundle', 'floor-plan': 'floorPlan' }
 const value = { epc: 'EPC Certificate', bundle: 'Both (Bundle)', 'floor-plan': 'Floor Plan' }
 const footerLinks = [
   '/services/domestic-epc', '/services/floor-plans', '/services/epc-pre-assessment', '/services/epc-improvement-plan',
@@ -38,18 +38,19 @@ const footerLinks = [
       submissions.push(route.request().postDataJSON())
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, delivered: true, confirmationSent: true }) })
     })
+    const turnstileLoads = []
+    page.on('request', (r) => { if (r.url().includes('challenges.cloudflare.com')) turnstileLoads.push(r.url()) })
     const errors = []
     page.on('pageerror', (e) => errors.push(e.message))
     page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()) })
     await page.goto(base + '/', { waitUntil: 'networkidle' })
 
-    const card = page.locator('#pricing')
-    const form = card.getByRole('form', { name: 'Exact quote enquiry' })
-    check(await form.count() === 1, 'the hero card is the booking form')
-    const pickService = (v) => card.locator(`label.bf-pill:has(input[name="services"][value="${v}"])`).click()
-    const pickSize = (i) => card.locator('label.bf-tile--size').nth(i).click()
+    const card = page.locator('#pricing .hpc')
+    check(await card.count() === 1, 'the hero holds the price card')
+    check(await page.locator('main form').count() === 0, 'no form on the homepage')
+    check(turnstileLoads.length === 0, 'no security-check script on the homepage')
 
-    // Before any choice: no guide price on the page outside the booking card.
+    // Prices appear only in the card (service cards and copy stay price-free).
     const strays = await page.evaluate(() => {
       const hits = []
       const walk = document.createTreeWalker(document.querySelector('main'), NodeFilter.SHOW_TEXT)
@@ -62,71 +63,54 @@ const footerLinks = [
       }
       return hits
     })
-    check(strays.length === 0, 'prices outside the booking card: ' + JSON.stringify(strays))
-    check(await card.locator('[name="customerType"]:checked').count() === 0 && await card.locator('[name="areaBand"]:checked').count() === 0, 'nothing pre-selected but the service')
+    check(strays.length === 0, 'prices outside the price card: ' + JSON.stringify(strays))
 
-    // An estate agent who has not picked a service gets the EPC + floor plan bundle as a default.
-    await card.locator('label.bf-tile--who:has(input[value="Estate agent"])').click()
-    check(await card.locator('input[name="services"][value="Both (Bundle)"]').isChecked(), 'estate agent defaults to the bundle')
-    await card.locator('label.bf-tile--who:has(input[value="Landlord (tenanted)"])').click()
+    // Truth table: 6 bands x (EPC, bundle) against lib/site.ts, each a link carrying its choice.
+    const cells = await card.evaluate((c) => [...c.querySelectorAll('tbody tr')].map((tr) =>
+      [...tr.querySelectorAll('a.hpc__price')].map((a) => ({ text: a.textContent, href: a.getAttribute('href') }))))
+    check(cells.length === 6, `six size rows, got ${cells.length}`)
+    cells.forEach((row, i) => {
+      const [epc, bundle] = row
+      check(epc && epc.text.endsWith(`£${pricing[i].epc}`), `${bands[i]} EPC: ${epc && epc.text}`)
+      check(bundle && bundle.text.endsWith(`£${pricing[i].bundle}`), `${bands[i]} bundle: ${bundle && bundle.text}`)
+      check(epc && epc.href === `/contact?service=epc&area=${bands[i]}&source=home&cta=hero#booking-form`, `${bands[i]} EPC href ${epc && epc.href}`)
+      check(bundle && bundle.href === `/contact?service=bundle&area=${bands[i]}&source=home&cta=hero#booking-form`, `${bands[i]} bundle href ${bundle && bundle.href}`)
+    })
+    check(await card.locator('a.hpc__unsure').getAttribute('href') === '/contact?service=epc&area=unknown&source=home&cta=hero#booking-form', 'unsure row asks for the address')
 
-    // Truth table: 3 services x 6 bands against lib/site.ts, in the card itself.
-    for (const service of ['epc', 'bundle', 'floor-plan']) {
-      await pickService(value[service])
-      for (let i = 0; i < 6; i++) {
-        await pickSize(i)
-        const band = pricing[i]
-        const want = band[key[service]]
-        const got = await card.evaluate((c) => ({
-          price: c.querySelector('[data-price]').textContent,
-          tile: [...c.querySelectorAll('.bf-tile--size .bf-size__top span')].map((t) => t.textContent),
-          rows: c.querySelector('.bf__rows')?.textContent || '',
-        }))
-        check(got.price === `£${want}`, `${service} ${bands[i]}: price ${got.price} != £${want}`)
-        check(got.tile.join() === pricing.map((p) => `£${p[key[service]]}`).join(), `${service}: tile prices ${got.tile}`)
-        if (service === 'bundle') check(got.rows.includes(`Bundle saving−£${band.epc + band.floorPlan - band.bundle}`), `bundle ${bands[i]}: saving ${got.rows}`)
-        else check(!got.rows.includes('Bundle saving'), `${service}: saving shown`)
-      }
-    }
-    await card.locator('label.bf-tile--unsure').click()
-    check(await card.locator('[data-price]').textContent() === 'Quote', 'unknown band shows Quote')
-
-    // Service-card buttons further down: switch service, keep the size, bring the card back into view.
-    await pickSize(4)
-    for (const service of ['epc', 'bundle', 'floor-plan']) {
-      await page.evaluate(() => document.getElementById('services').scrollIntoView())
-      await page.click(`[data-pick="${service}"]`)
-      await page.waitForTimeout(900)
-      const s = await card.evaluate((c) => ({
-        svc: c.querySelector('input[name="services"]:checked')?.value,
-        band: c.querySelector('input[name="areaBand"]:checked')?.value,
-        top: Math.round(c.getBoundingClientRect().top),
-      }))
-      check(s.svc === value[service] && s.band === bands[4] && s.top >= 0 && s.top < 400, `pick ${service}: ${JSON.stringify(s)}`)
-      check(await card.locator('[data-price]').textContent() === `£${pricing[4][key[service]]}`, `pick ${service}: price`)
-    }
-
-    // The enquiry runs in place: three steps, the running total follows, the send stays on the homepage.
-    await pickService(value.epc)
-    await pickSize(2)
-    await card.locator('.bf__go').click()
-    check(await card.locator('.bf__h').textContent() === 'Timing and access', 'step 2 is timing and access')
-    check(await page.evaluate(() => document.activeElement?.textContent) === 'Timing and access', 'step 2: focus on heading')
-    await card.locator(`label.bf-tile:has(input[name="speed"][value="${EXPRESS_SPEED}"])`).click()
-    check((await card.locator('[data-estimate-summary]').textContent()).includes(`£${pricing[2].epc + EXPRESS_SURCHARGE}`), 'running total includes next-day lodgement')
-    await card.locator('.bf__go').click()
-    check(await card.locator('.bf__h').textContent() === 'Your details', 'step 3 is your details')
+    // A price hands over to /contact with service and size already chosen; nothing asked twice.
+    await card.locator('a.hpc__price').nth(5).click() // 53-70 m², bundle
+    await page.waitForURL((u) => u.pathname === '/contact')
+    const form = page.getByRole('form', { name: 'Exact quote enquiry' })
+    await form.waitFor()
+    check(await form.locator(`input[name="services"][value="${value.bundle}"]`).isChecked(), 'bundle pre-chosen on /contact')
+    check(await form.locator(`input[name="areaBand"][value="${bands[2]}"]`).isChecked(), 'size pre-chosen on /contact')
+    check((await form.locator('[data-estimate-announcement]').textContent()).includes(`£${pricing[2].bundle}`), 'same guide price on /contact')
+    await form.locator('label.bf-tile--who:has(input[value="Landlord (tenanted)"])').click()
+    await form.locator('.bf__go').click()
+    await form.locator('.bf__go').click()
     await page.fill('#name', 'Test Customer'); await page.fill('#phone', '07000 000000'); await page.fill('#email', 'test@example.com')
     await page.fill('#address', '1 Test Street, London'); await page.fill('#postcode', 'E15 1AA'); await page.check('#consent')
-    await page.waitForFunction(() => !document.querySelector('#pricing button[type="submit"]').disabled)
-    await card.locator('button[type="submit"]').click()
-    await card.locator('#request-sent-heading').waitFor()
-    check(new URL(page.url()).pathname === '/', 'stayed on the homepage after sending')
+    await page.waitForFunction(() => !document.querySelector('#booking-form button[type="submit"], form button[type="submit"]').disabled)
+    await form.locator('button[type="submit"]').click()
+    await page.locator('#request-sent-heading').waitFor()
     const [sent] = submissions
     check(submissions.length === 1, `one submission, got ${submissions.length}`)
-    check(sent && sent.sourcePage === 'home' && sent.ctaId === 'hero-form' && sent.customerType === 'Landlord (tenanted)'
-      && sent.services.join() === 'EPC Certificate' && sent.areaBand === bands[2] && sent.speed === EXPRESS_SPEED && sent.consent === true,
+    check(sent && sent.sourcePage === 'home' && sent.ctaId === 'hero' && sent.customerType === 'Landlord (tenanted)'
+      && sent.services.join() === value.bundle && sent.areaBand === bands[2] && sent.consent === true,
       'submitted payload: ' + JSON.stringify(sent && { ...sent, turnstileToken: undefined }))
+
+    // Service cards further down open /contact with their service picked.
+    await page.goto(base + '/', { waitUntil: 'networkidle' })
+    for (const service of ['epc', 'bundle', 'floor-plan']) {
+      const href = await page.getAttribute(`[data-pick="${service}"]`, 'href')
+      check(href === `/contact?service=${service}&source=home&cta=pricing#booking-form`, `pick ${service}: ${href}`)
+    }
+    await page.click('[data-pick="floor-plan"]')
+    await page.waitForURL((u) => u.pathname === '/contact')
+    await form.waitFor()
+    check(await form.locator(`input[name="services"][value="${value['floor-plan']}"]`).isChecked(), 'floor plan pre-chosen from the service card')
+    check(await form.locator('input[name="areaBand"]:checked').count() === 0, 'no size invented by the service card')
     await page.goto(base + '/', { waitUntil: 'networkidle' })
 
     // Anchors resolve; footer keeps every link.
@@ -171,10 +155,10 @@ const footerLinks = [
       if (width === 390) {
         await page.click('.svc__toggle >> nth=0')
         check(await page.isVisible('#svc-epc-list'), 'mobile checklist opens')
-        // The bar stays hidden while the booking card is on screen; scroll past the card.
+        // The bar stays hidden while the price card is on screen; scroll past the card.
         await page.evaluate(() => scrollTo(0, document.querySelector('#pricing').getBoundingClientRect().bottom + scrollY + 200))
         await page.waitForTimeout(600)
-        const bar = await page.evaluate(() => { const a = document.querySelector('[data-mobile-quote] a[href="#pricing"]'); if (!a) return null; const r = a.getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0 })
+        const bar = await page.evaluate(() => { const a = document.querySelector('[data-mobile-quote] a[href^="/contact"]'); if (!a) return null; const r = a.getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0 })
         check(bar === true, 'mobile quote bar visible after scrolling')
       }
     }
@@ -192,5 +176,5 @@ const footerLinks = [
     await browser.close()
   }
   if (fails.length) { console.error('FAIL\n' + fails.join('\n')); process.exit(1) }
-  console.log('home-v3: all checks passed (card is the form, agent default, 18 price cells + tiles, unknown band, 3 hand-offs, 3 steps in place with running total and stubbed send, anchors, footer, schema, overflow x4, compact nav, progress line, mobile toggle + bar, reduced motion)')
+  console.log('home-v3: all checks passed (price card, no form or Turnstile, 12 prices + hrefs vs lib/site.ts, unsure row, price -> /contact prefill + send, 3 service hand-offs, anchors, footer, schema, overflow x4, compact nav, progress line, mobile toggle + bar, reduced motion)')
 })()

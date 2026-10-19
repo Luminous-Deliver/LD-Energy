@@ -14,17 +14,20 @@ const out = path.resolve(process.env.BOOKING_EVIDENCE_DIR || '../../../audits/we
     const response = await fetch(`${base}/areas/${slug}`)
     assert.equal(response.status, 200)
     const html = await response.text()
-    const anchors = [...html.matchAll(/<a\b[^>]*>/g)].map(match => match[0])
+    const anchors = [...html.matchAll(/<a\b[^>]*>/g)].map(match => match[0].replaceAll('&amp;', '&'))
     for (const cta of ['hero','pricing','bottom']) {
       const found = anchors.filter(anchor => anchor.includes(`data-enquiry-cta="${cta}"`))
       assert.equal(found.length, 1, `${slug}: ${cta}`)
-      assert.match(found[0], /href="#contact"/)
+      assert.ok(found[0].includes(`href="/contact?service=epc&source=area&cta=${cta}&borough=${slug}#booking-form"`), `${slug}: ${cta} href`)
     }
-    assert.equal((html.match(/<form\b/g) || []).length, 1)
-    assert.match(html, /id="contact"/)
+    // No form on area pages: the hero price card links each size into /contact (16/10/2026 evening).
+    assert.equal((html.match(/<form\b/g) || []).length, 0)
+    const prices = anchors.filter(anchor => anchor.includes('class="hpc__price"'))
+    assert.equal(prices.length, 12, `${slug}: six sizes x EPC and bundle`)
+    for (const a of prices) assert.ok(a.includes(`borough=${slug}`) && /area=[0-9a-z-]+/.test(a), `${slug}: price link ${a}`)
     assert.match(html, new RegExp(`<link[^>]+rel="canonical"[^>]+href="https://epc.luminousanddeliver.co.uk/areas/${slug}"`))
-    report.push({ slug, hero: '#contact', pricing: '#contact', bottom: '#contact', sharedForm: true })
+    report.push({ slug, hero: 'contact', pricing: 'contact', bottom: 'contact', priceLinks: prices.length, form: false })
   }
   fs.writeFileSync(path.join(out, 'area-cta-survey.json'), JSON.stringify(report, null, 2))
-  console.log('PASS all 34 rendered area pages: explicit hero/pricing/bottom anchors, one form, original canonical')
+  console.log('PASS all 34 rendered area pages: hero/pricing/bottom anchors to /contact with the slug, 12 price links, no form, original canonical')
 })().catch(error => { console.error(error); process.exitCode = 1 })

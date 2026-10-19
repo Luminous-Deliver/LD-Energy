@@ -3,6 +3,7 @@ import { quoteHref } from '@/lib/quote-context'
 import { Section } from '@/components/ui/Section'
 import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { PageHero } from '@/components/sections/PageHero'
+import { HeroPriceCard } from '@/components/sections/HeroPriceCard'
 import { CtaStrip } from '@/components/sections/CtaStrip'
 import { WhatToHaveReady } from '@/components/sections/WhatToHaveReady'
 import { EvidenceGuide } from '@/components/sections/EvidenceGuide'
@@ -74,6 +75,7 @@ export default function PreparingPage() {
         heading="Preparing for your EPC assessment"
         subheading="A short checklist so the survey runs to time and nothing needs a second visit. Most take 45–60 minutes; a large 5+ bedroom home takes around 2 hours. Nothing here is difficult — it is mostly about access."
         primaryCta={{ label: 'Get my exact quote', href: quoteHref({ sourcePage: 'preparation', ctaId: 'hero' }) }}
+        card={<HeroPriceCard sourcePage="preparation" />}
       />
       <CustomerBriefing />
       <Container className="pt-8">

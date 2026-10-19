@@ -5,6 +5,7 @@ import { Section } from '@/components/ui/Section'
 import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { StepList } from '@/components/ui/StepList'
 import { PageHero } from '@/components/sections/PageHero'
+import { HeroPriceCard } from '@/components/sections/HeroPriceCard'
 import { CtaStrip } from '@/components/sections/CtaStrip'
 import { pricing, formatPrice, bundleSaving, maxBundleSaving, priceFrom, defaultOgImage } from '@/lib/site'
 import { site } from '@/lib/site'
@@ -112,6 +113,7 @@ export default function FloorPlansPage() {
         heading="Professional Property Floor Plans"
         subheading={`Laser-measured floor plans for property marketing. Guide prices from £${priceFrom.floorPlan} — save up to £${maxBundleSaving} when booked together with an EPC in the same visit.`}
         primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'floor-plan', sourcePage: 'floor-plans', ctaId: 'hero' }) }}
+        card={<HeroPriceCard sourcePage="floor-plans" service="floor-plan" />}
       />
 
       {/* Why Floor Plans */}

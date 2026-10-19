@@ -15,6 +15,7 @@ import { Card } from '@/components/ui/Card'
 import { Accordion } from '@/components/ui/Accordion'
 import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { PageHero } from '@/components/sections/PageHero'
+import { HeroPriceCard } from '@/components/sections/HeroPriceCard'
 import { Pricing } from '@/components/sections/Pricing'
 import { CtaStrip } from '@/components/sections/CtaStrip'
 import { site, pricing, priceFrom, EXPRESS_SURCHARGE, defaultOgImage } from '@/lib/site'
@@ -181,6 +182,7 @@ export default function SellersPage() {
         heading="EPCs for Selling Your London Home"
         subheading={`Generally, an EPC must be commissioned before your home is marketed for sale; exemptions apply. We provide fast, transparently priced certificates so your sale isn't held up — lodged within 72 hours as standard, or next day for £${EXPRESS_SURCHARGE} extra.`}
         primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'sellers', ctaId: 'hero' }) }}
+        card={<HeroPriceCard sourcePage="sellers" />}
       />
 
       {/* Why it matters */}
