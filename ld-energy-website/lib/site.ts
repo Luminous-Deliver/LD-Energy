@@ -103,11 +103,12 @@ export const site = {
    * it satisfies Google's real-world-name policy, is a manual review item.
    */
   reviews: {
-    // Visible Google Maps listing, checked 16/09/2026: 5.0 from 4 reviews. Update by hand
+    // Visible Google Maps listing, checked 19/10/2026: 5.0 from 6 reviews. Update by hand
     // when the count changes; it is shown as text only, never as review markup.
     ratingValue: 5,
-    reviewCount: 4,
-    profileUrl: 'https://share.google/ZopGGHvr6wBiGbT4A',
+    reviewCount: 6,
+    // Canonical place link (CID read from the listing 19/10/2026). Not yet wired into schema.
+    profileUrl: 'https://maps.google.com/?cid=14054711842511866215',
     writeUrl: 'https://g.page/r/CWdJZan0XQzDEAI/review',
   },
 } as const
