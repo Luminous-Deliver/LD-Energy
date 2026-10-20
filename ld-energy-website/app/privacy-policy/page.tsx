@@ -46,7 +46,7 @@ export default function PrivacyPolicyPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageSchema) }} />
       <LegalPage
       title="Privacy Policy"
-      lastUpdated="14 September 2026"
+      lastUpdated="20 October 2026"
       breadcrumbs={[
         { href: '/', label: 'Home' },
         { href: '/privacy-policy', label: 'Privacy Policy' },
@@ -125,6 +125,10 @@ export default function PrivacyPolicyPage() {
       </ul>
       <p>
         To exercise any of these rights, email <a href={site.emailHref}>{site.email}</a>.
+      </p>
+      <h3>Complaints about your data</h3>
+      <p>
+        If you&rsquo;re unhappy with how we&rsquo;ve handled your personal data, email <a href={site.emailHref}>{site.email}</a> with &ldquo;Data complaint&rdquo; in the subject line. We&rsquo;ll acknowledge your complaint within 30 days, look into it, keep you updated and tell you the outcome. If you&rsquo;re still unhappy after that, you can complain to the <a href="https://ico.org.uk/make-a-complaint/" rel="noopener noreferrer" target="_blank">Information Commissioner&rsquo;s Office</a>.
       </p>
 
       <h2>8. Security</h2>
