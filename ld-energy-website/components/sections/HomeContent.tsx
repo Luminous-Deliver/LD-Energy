@@ -39,10 +39,11 @@ const prep = [
   'Have evidence of relevant improvements ready, if available.',
   'Coordinate keys and access with occupants or tenants.',
 ]
-const worthKnowing: { Icon: LucideIcon; title: string; body: string; href: string }[] = [
-  { Icon: ReceiptText, title: 'Exact quote', body: 'Based on the property details you give us. Anything materially different is discussed and agreed before the assessment begins.', href: '/preparing-for-your-epc#quote-and-property-complexity' },
-  { Icon: Calculator, title: 'Independent rating', body: 'We record the property; the score is calculated by the approved methodology. It cannot be manually adjusted.', href: '/preparing-for-your-epc#how-your-epc-rating-is-calculated' },
-  { Icon: CalendarClock, title: 'RdSAP 10', body: 'Existing homes have used the updated methodology since June 2025, so an older EPC may not reproduce exactly.', href: '/preparing-for-your-epc#rdsap-10' },
+// `more` is the visible label and names the section it opens; the title link stays the accessible name.
+const worthKnowing: { Icon: LucideIcon; title: string; body: string; href: string; more: string }[] = [
+  { Icon: ReceiptText, title: 'Exact quote', body: 'Based on the property details you give us. Anything materially different is discussed and agreed before the assessment begins.', href: '/preparing-for-your-epc#quote-and-property-complexity', more: 'How your quote is set' },
+  { Icon: Calculator, title: 'Independent rating', body: 'We record the property; the score is calculated by the approved methodology. It cannot be manually adjusted.', href: '/preparing-for-your-epc#how-your-epc-rating-is-calculated', more: 'How ratings are calculated' },
+  { Icon: CalendarClock, title: 'RdSAP 10', body: 'Existing homes have used the updated methodology since June 2025, so an older EPC may not reproduce exactly.', href: '/preparing-for-your-epc#rdsap-10', more: 'What changed in June 2025' },
 ]
 const areas = [['Stratford', 'stratford'], ['Newham', 'newham'], ['Tower Hamlets', 'tower-hamlets'], ['Hackney', 'hackney'], ['Waltham Forest', 'waltham-forest'], ['Redbridge', 'redbridge']]
 const guides = [
@@ -229,12 +230,12 @@ export function HomeContent() {
           </div>
           <h3 id="worth-knowing" className="hk-h scroll-mt-28" data-reveal>Three things worth knowing first</h3>
           <ul className="hk-grid" data-reveal>
-            {worthKnowing.map(({ Icon, title, body, href }) => (
+            {worthKnowing.map(({ Icon, title, body, href, more }) => (
               <li key={title}>
                 <span aria-hidden="true" className="hk-ico"><Icon className="h-5 w-5" /></span>
                 <h4><Link prefetch={false} href={href}>{title}</Link></h4>
                 <p>{body}</p>
-                <span aria-hidden="true" className="hk-more">Read more →</span>
+                <span aria-hidden="true" className="hk-more">{more} →</span>
               </li>
             ))}
           </ul>

@@ -619,7 +619,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
         <h2 ref={headingRef} tabIndex={-1} className="bf__h">{TITLES[step - 1]}</h2>
         <p className="bf__count">Step {step} of {LAST}</p>
       </div>
-      <div aria-hidden="true" className="bf__progress"><div style={{ width: `${(step / LAST) * 100}%` }} /></div>
+      <div aria-hidden="true" className="bf__progress"><div style={{ transform: `translateX(${(step / LAST - 1) * 100}%)` }} /></div>
 
       {/* Keep this node mounted and empty before the first estimate. Only its text changes. */}
       <p data-estimate-announcement className="sr-only" aria-live="polite" aria-atomic="true">{estimateText}</p>

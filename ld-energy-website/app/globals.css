@@ -377,7 +377,9 @@
   .bf__h { font-family: var(--font-serif); font-size: 1.5rem; line-height: 1.2; font-weight: 500; letter-spacing: -0.012em; outline: none; }
   .bf__count { flex: none; font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #5E6B78; }
   .bf__progress { margin-top: 10px; height: 4px; border-radius: 999px; background: #EDF1EE; overflow: hidden; }
-  .bf__progress > div { height: 100%; border-radius: 999px; background: #386B59; transition: width .4s cubic-bezier(.22,1,.36,1); }
+  /* Full-width fill slid in with translateX: composite-only, and unlike scaleX it keeps the
+     leading edge's rounded end undistorted. The track's overflow clips the hidden part. */
+  .bf__progress > div { height: 100%; border-radius: 999px; background: #386B59; transition: transform .4s cubic-bezier(.22,1,.36,1); }
   .bf__body { margin-top: 20px; }
   .bf__quote, .bf__details { display: grid; gap: 24px; }
   .bf__legend { font-family: var(--font-serif); font-size: 1.15rem; font-weight: 500; line-height: 1.3; }
