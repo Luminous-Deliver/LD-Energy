@@ -1,6 +1,7 @@
-/* Shared parts: the header, the phone menu, the phone dock and the footer, ported from the approved homepage
+/* Shared parts: the header, the phone menu and the phone dock, ported from the approved homepage
    prototype v7.2 (projects/ld-energy-redesign-2026-10/scrollcraft/builds/home, Abdul 22/10/2026: "so far v7.2
-   looks fine"). Every page gets these; page bodies keep their own styles until their slice. Kept in its own file,
+   looks fine"). The footer keeps the live structure with these tokens
+   (components/layout/CompactFooter.tsx) until Abdul's footer brief. Every page gets these; page bodies keep their own styles until their slice. Kept in its own file,
    imported after globals.css, so the other redesign branches that append to globals.css merge cleanly.
 
    Tokens are the prototype's tokens.css. Contrast on the ground (#FCFBF8): ink 11.2:1, ink quiet 7.2:1, sage 700
@@ -9,7 +10,7 @@
 :root {
   --slate-500: #6D738D; --slate-600: #4F546B; --slate-700: #33384F; --slate-950: #0B1528;
   --sage-300: #B7CEC1; --sage-600: #4F7A64; --sage-700: #3A624E; --sage-800: #2C4A3B;
-  --stone-50: #FCFBF8; --stone-100: #F1EFE8; --stone-300: #CFCECA; --stone-400: #ACABA5;
+  --stone-50: #FCFBF8; --stone-100: #F1EFE8;
   --ground: var(--stone-50);
   --ink: var(--slate-700);
   --ink-quiet: var(--slate-600);
@@ -18,7 +19,6 @@
   --link-on-night: var(--sage-300);
   --hair: rgba(51, 56, 79, .16);          /* the only divider */
   --hair-strong: rgba(51, 56, 79, .42);   /* frames, and the edge over the dock */
-  --hair-night: rgba(241, 239, 232, .16);
   --r-sm: 6px;
   --ease-out: cubic-bezier(.22, 1, .36, 1);
   --head-h: 56px;
@@ -153,40 +153,6 @@ html { font-synthesis-weight: none; }
   .dock { transform: none; opacity: 0; transition: opacity .15s linear, visibility 0s linear .15s; }
   .dock[data-on="true"] { opacity: 1; transition: opacity .15s linear, visibility 0s; }
 }
-
-/* ------------------------------------------------------------------- footer -- */
-.ft { background: var(--night); color: var(--on-night); font-size: 15px; line-height: 1.5; overflow-wrap: anywhere; }
-.ft__in { padding-top: 64px; padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px)); }
-.ft__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 40px; }
-@media (min-width: 760px) { .ft__grid { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 32px 64px; } }
-.ft__brand { display: grid; gap: 16px; align-content: start; justify-items: start; }
-.ft__brand img { display: block; width: 150px; height: auto; }
-.ft__brand p { margin: 0; }
-.ft__quiet { color: var(--stone-400); }
-.ft__contact { display: grid; width: 100%; max-width: 340px; margin: 4px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--hair-night); }
-.ft__contact li { border-bottom: 1px solid var(--hair-night); }
-.ft__contact a { display: flex; align-items: center; gap: 12px; min-height: 48px; color: var(--on-night); text-decoration: none; font-size: 16px; }
-.ft__contact a:hover { color: var(--link-on-night); }
-.ft__rating { color: var(--on-night); font-size: 15px; min-height: 44px; }
-.ft__rating:hover { color: var(--link-on-night); }
-.ft__groups { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px 24px; }
-/* the area list spans the row under the two short groups, in columns */
-.ft__group--wide { grid-column: 1 / -1; }
-.ft__h { margin: 0 0 6px; font: 500 12px/1.4 var(--font-sans); letter-spacing: .14em; text-transform: uppercase; color: var(--stone-300); }
-.ft__links { margin: 0; padding: 0; list-style: none; }
-.ft__links--cols { columns: 2; column-gap: 24px; }
-@media (min-width: 1024px) { .ft__links--cols { columns: 3; } }
-.ft__links li { break-inside: avoid; }
-.ft__links a { display: inline-block; padding: 8px 0; color: var(--on-night); text-decoration: none; text-underline-offset: 3px; }
-.ft__links a:hover { color: var(--link-on-night); text-decoration: underline; }
-@media (max-width: 759px) { .ft__links a { padding: 12px 0; } }
-.ft__legal { margin-top: 56px; border-top: 1px solid var(--hair-night); padding-top: 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 28px; font-size: 14px; color: var(--stone-400); }
-.ft__legal p { margin: 0; }
-.ft__legal a { display: inline-flex; align-items: center; min-height: 44px; color: var(--stone-400); text-decoration: none; text-underline-offset: 3px; }
-.ft__legal a:hover { color: var(--on-night); text-decoration: underline; }
-.ft__legal .push { margin-left: auto; }
-@media (max-width: 759px) { .ft__legal { display: grid; gap: 0; } .ft__legal .push { margin-left: 0; } }
-.ft :focus-visible { outline: 2px solid var(--link-on-night); outline-offset: 3px; box-shadow: none; --tw-ring-shadow: 0 0 #0000; }
 
 @media (prefers-reduced-motion: reduce) {
   .sh, .mnav__scrim, .mnav__panel, .ld-btn { transition-duration: 0s; }
