@@ -775,12 +775,13 @@ export const areaServedLondon = [
  * Discovery of the full set is not affected: /areas server-renders all 34 as
  * real links, and every borough is in the sitemap.
  *
- * Ordered by Search Console impressions, highest first (the 12 area pages with
- * the most impressions in the 22/10/2026 content inventory, §4.1), not by hand
- * (plan PLAN-AREAS-GUIDES-2026-10-22 §2). Re-derive from fresh Search Console
- * data rather than editing by hand.
+ * Stratford first as the base (Abdul's choice, 23/10/2026), then the 11 area
+ * pages with the most Search Console impressions in the 22/10/2026 content
+ * inventory, §4.1, highest first (plan PLAN-AREAS-GUIDES-2026-10-22 §2).
+ * Re-derive the 11 from fresh Search Console data rather than editing by hand.
  */
 export const priorityBoroughSlugs = [
+  'stratford',
   'croydon',
   'wandsworth',
   'waltham-forest',
@@ -792,7 +793,6 @@ export const priorityBoroughSlugs = [
   'barking-dagenham',
   'newham',
   'ealing',
-  'lewisham',
 ] as const
 
 export const priorityBoroughs = priorityBoroughSlugs

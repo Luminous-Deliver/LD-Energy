@@ -12,7 +12,7 @@
 export const BOROUGH_DATA_PAGE = {
   href: '/epc-ratings-by-borough',
   label: 'EPC ratings by London borough',
-  live: false,
+  live: true,
 } as const
 
 export interface GuideGroup {
