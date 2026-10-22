@@ -1,0 +1,194 @@
+/* Shared parts: the header, the phone menu, the phone dock and the footer, ported from the approved homepage
+   prototype v7.2 (projects/ld-energy-redesign-2026-10/scrollcraft/builds/home, Abdul 22/10/2026: "so far v7.2
+   looks fine"). Every page gets these; page bodies keep their own styles until their slice. Kept in its own file,
+   imported after globals.css, so the other redesign branches that append to globals.css merge cleanly.
+
+   Tokens are the prototype's tokens.css. Contrast on the ground (#FCFBF8): ink 11.2:1, ink quiet 7.2:1, sage 700
+   6.7:1, white on sage 700 6.9:1, the outline button's slate 500 edge 4.5:1. On night (#0B1528): stone 100 15.8:1,
+   sage 300 11.0:1, stone 300 11.6:1, stone 400 7.9:1. */
+:root {
+  --slate-500: #6D738D; --slate-600: #4F546B; --slate-700: #33384F; --slate-950: #0B1528;
+  --sage-300: #B7CEC1; --sage-600: #4F7A64; --sage-700: #3A624E; --sage-800: #2C4A3B;
+  --stone-50: #FCFBF8; --stone-100: #F1EFE8; --stone-300: #CFCECA; --stone-400: #ACABA5;
+  --ground: var(--stone-50);
+  --ink: var(--slate-700);
+  --ink-quiet: var(--slate-600);
+  --night: var(--slate-950);
+  --on-night: var(--stone-100);
+  --link-on-night: var(--sage-300);
+  --hair: rgba(51, 56, 79, .16);          /* the only divider */
+  --hair-strong: rgba(51, 56, 79, .42);   /* frames, and the edge over the dock */
+  --hair-night: rgba(241, 239, 232, .16);
+  --r-sm: 6px;
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+  --head-h: 56px;
+  --dock-h: 68px;                          /* 48 px buttons + 10 px above and below */
+  /* homepage CSS still names the old sans variable */
+  --font-inter: var(--font-sans);
+}
+@media (min-width: 760px) { :root { --head-h: 64px; } }
+
+/* The serif ships at 400 only (opsz axis, no wght): the prototype sets every serif at 400. Without this the
+   browser would fake bold for the pages' old 500-700 headings. */
+html { font-synthesis-weight: none; }
+@media (max-width: 759px) {
+  /* keep focused controls and anchor targets clear of the dock (WCAG 2.4.11) */
+  html { scroll-padding-bottom: calc(var(--dock-h) + 20px + env(safe-area-inset-bottom, 0px)); }
+}
+
+/* ------------------------------------------------------------------ buttons -- */
+.ld-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 22px;
+  font: 500 17px/1 var(--font-sans); letter-spacing: .01em; white-space: nowrap; border-radius: var(--r-sm);
+  border: 1px solid transparent; text-decoration: none; cursor: pointer; color: var(--ink); background: none;
+  transition: transform 160ms var(--ease-out), background-color .2s var(--ease-out), border-color .2s var(--ease-out), color .2s var(--ease-out); }
+.ld-btn:active { transform: scale(.97); }
+.ld-btn--primary { background: var(--sage-700); color: #fff; }
+.ld-btn--primary:hover { background: var(--sage-800); }
+.ld-btn--line { border-color: var(--slate-500); }
+.ld-btn--line:hover { border-color: var(--ink); }
+.ld-btn--sm { min-height: 40px; padding: 0 16px; font-size: 15px; }
+@media (max-width: 759px) { .ld-btn--sm { min-height: 44px; } }
+.ld-btn .i { flex: none; }
+:is(.sh, .dock, .mnav) :focus-visible { outline: 2px solid var(--sage-700); outline-offset: 3px; box-shadow: none; --tw-ring-shadow: 0 0 #0000; }
+
+/* one label, two lengths: the outcome on wide screens, short where width is tight */
+.lbl-s { display: none; }
+@media (max-width: 1099px) { .lbl-l { display: none; } .lbl-s { display: inline; } }
+
+/* ------------------------------------------------------------------- header -- */
+/* L1: a flat bar, a hairline, no pill and no shadow. In the flow on phones, where it scrolls away and the dock is
+   the one sticky thing; sticky from 760 px. Transparent at the top, the paper ground and the hairline once the
+   page moves (design preferences, navbar pattern 1). */
+.sh { position: relative; z-index: 40; height: var(--head-h); padding-top: 1px; background: transparent;
+  border-bottom: 1px solid transparent; transition: background-color .3s var(--ease-out), border-color .3s var(--ease-out); }
+.sh[data-solid="true"] { background: var(--ground); border-bottom-color: var(--hair); }
+@media (min-width: 760px) { .sh { position: sticky; top: 0; } }
+.sh__in { height: 100%; display: flex; align-items: center; gap: 12px; }
+@media (min-width: 760px) { .sh__in { gap: 32px; } }
+.sh__nav { display: none; }
+.sh__quote { margin-left: auto; }
+@media (min-width: 760px) {
+  .sh__nav { display: block; margin-left: auto; }
+  .sh__nav ul { display: flex; gap: 32px; margin: 0; padding: 0; list-style: none; }
+  .sh__nav a { display: inline-flex; align-items: center; min-height: 44px; font-size: 15px; color: var(--ink); text-decoration: none; }
+  .sh__nav a:hover, .sh__nav a[aria-current="page"] { color: var(--sage-700); }
+  .sh__quote { margin-left: 8px; }
+}
+@media (min-width: 760px) and (max-width: 899px) { .sh__in { gap: 24px; } .sh__nav ul { gap: 22px; } }
+/* WhatsApp in the bar from 1200 px, where the number used to be (Abdul 22/10: the number was "too easily and early") */
+.sh__wa { display: none; }
+@media (min-width: 1200px) {
+  .sh__wa { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin-left: 8px; font-size: 15px; font-weight: 500;
+    color: var(--ink); text-decoration: none; white-space: nowrap; }
+  .sh__wa:hover { color: var(--sage-700); }
+}
+/* the menu button: phones only, where the bar has no links */
+.sh__menu { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 44px; height: 44px; margin-right: -8px;
+  border: 0; border-radius: var(--r-sm); background: none; color: var(--ink); cursor: pointer; }
+.sh__menu:hover { color: var(--sage-700); }
+@media (min-width: 760px) { .sh__menu { display: none; } }
+@media (max-width: 389px) {
+  .sh__in { gap: 10px; }
+  .sh .ld-btn--sm { padding: 0 11px; font-size: 14px; }
+}
+/* below 375 px the lockup, the button and the menu cannot share the bar; the menu and the dock carry the quote */
+@media (max-width: 374px) { .sh__quote { display: none; } .sh__menu { margin-left: auto; } }
+
+/* Logo A (BRIEF § v6.1, locked 21/10): the master lockup's two lines as live Jost beside the full-weight house,
+   his traced geometry untouched (public/brand/ld-energy-mark-full.svg). Name .07em, tagline .17em, 10 px to the
+   house: about 197 px on desktop, 174 px on phones. The two text lines share one measure. */
+.lg { display: inline-flex; align-items: center; flex: none; min-height: 44px; color: var(--ink); text-decoration: none; }
+.lg__mark { display: block; height: 34px; width: auto; flex: none; }
+.lg__words { display: grid; justify-items: start; gap: 7px; margin-left: 10px; }   /* 13 + 7 + 8 = 28: (34 - 28) / 2 is whole */
+.lg__name, .lg__tag { text-transform: uppercase; white-space: nowrap; }
+.lg__name { --t: .07em; font: 500 18px/13px var(--font-sans); letter-spacing: var(--t); margin-right: calc(-1 * var(--t)); color: var(--ink); }
+.lg__tag { --t: .17em; font: 500 10px/8px var(--font-sans); letter-spacing: var(--t); margin-right: calc(-1 * var(--t)); color: var(--sage-700); }
+@media (max-width: 759px) {
+  .lg__mark { height: 30px; }
+  .lg__words { gap: 5px; margin-left: 9px; }
+  .lg__name { font-size: 16px; line-height: 12px; }
+  .lg__tag { font-size: 9px; line-height: 7px; --t: .16em; }
+}
+
+/* --------------------------------------------------------------- phone menu -- */
+.mnav { position: fixed; inset: 0; z-index: 50; }
+.mnav[data-open="false"] { pointer-events: none; }
+.mnav__scrim { position: absolute; inset: 0; background: rgba(11, 21, 40, .5); opacity: 0; transition: opacity .2s var(--ease-out); }
+.mnav[data-open="true"] .mnav__scrim { opacity: 1; }
+.mnav__panel { position: absolute; top: 0; right: 0; height: 100%; width: 100%; max-width: 400px; overflow-y: auto; display: flex; flex-direction: column;
+  background: var(--ground); color: var(--ink); border-left: 1px solid var(--hair); transform: translateX(100%); transition: transform .26s var(--ease-out); }
+.mnav[data-open="true"] .mnav__panel { transform: none; }
+.mnav__top { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; justify-content: space-between; min-height: var(--head-h);
+  padding: 0 16px; background: var(--ground); border-bottom: 1px solid var(--hair); }
+.mnav__group { padding: 12px 16px 4px; }
+.mnav__group + .mnav__group { border-top: 1px solid var(--hair); }
+.mnav__h { margin: 8px 0 4px; font: 500 12px/1.4 var(--font-sans); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-quiet); }
+.mnav ul { margin: 0; padding: 0; list-style: none; }
+.mnav li a { display: flex; flex-direction: column; justify-content: center; min-height: 48px; padding: 6px 0; color: var(--ink); text-decoration: none; font-size: 17px; }
+.mnav li a span + span { font-size: 15px; color: var(--ink-quiet); }
+.mnav li a:hover { color: var(--sage-700); }
+.mnav__foot { margin-top: auto; display: grid; gap: 10px; padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--hair-strong); }
+.mnav__foot .ld-btn { width: 100%; }
+.mnav__foot .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* -------------------------------------------------------------- phone dock --- */
+/* WhatsApp and "Get my exact quote" at the bottom of phone screens (AZRated research §5, plan §15 row 7): shown
+   once the hero has gone, hidden over a booking form, the footer, a cookie banner and the open menu. Flat, the
+   paper ground with a hairline above, as the prototype's quote bar. */
+.dock { display: none; }
+@media (max-width: 759px) {
+  .dock { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); gap: 10px; position: fixed; z-index: 40; left: 0; right: 0; bottom: 0;
+    padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+    background: var(--ground); border-top: 1px solid var(--hair-strong);
+    transform: translateY(105%); visibility: hidden;
+    transition: transform .3s var(--ease-out), visibility 0s linear .3s; }
+  .dock[data-on="true"] { transform: none; visibility: visible; transition: transform .3s var(--ease-out), visibility 0s; }
+  .dock .ld-btn { width: 100%; padding: 0 12px; font-size: 16px; }
+  /* the dock never covers the end of a page: the last content clears it (the homepage close runs into the footer) */
+  main { padding-bottom: calc(var(--dock-h) + env(safe-area-inset-bottom, 0px)); }
+  body:has(.hc-close) main { padding-bottom: 0; }
+}
+@media (max-width: 759px) and (prefers-reduced-motion: reduce) {
+  /* no slide: a short fade, so the dock still arrives without moving */
+  .dock { transform: none; opacity: 0; transition: opacity .15s linear, visibility 0s linear .15s; }
+  .dock[data-on="true"] { opacity: 1; transition: opacity .15s linear, visibility 0s; }
+}
+
+/* ------------------------------------------------------------------- footer -- */
+.ft { background: var(--night); color: var(--on-night); font-size: 15px; line-height: 1.5; overflow-wrap: anywhere; }
+.ft__in { padding-top: 64px; padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px)); }
+.ft__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 40px; }
+@media (min-width: 760px) { .ft__grid { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 32px 64px; } }
+.ft__brand { display: grid; gap: 16px; align-content: start; justify-items: start; }
+.ft__brand img { display: block; width: 150px; height: auto; }
+.ft__brand p { margin: 0; }
+.ft__quiet { color: var(--stone-400); }
+.ft__contact { display: grid; width: 100%; max-width: 340px; margin: 4px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--hair-night); }
+.ft__contact li { border-bottom: 1px solid var(--hair-night); }
+.ft__contact a { display: flex; align-items: center; gap: 12px; min-height: 48px; color: var(--on-night); text-decoration: none; font-size: 16px; }
+.ft__contact a:hover { color: var(--link-on-night); }
+.ft__rating { color: var(--on-night); font-size: 15px; min-height: 44px; }
+.ft__rating:hover { color: var(--link-on-night); }
+.ft__groups { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px 24px; }
+/* the area list spans the row under the two short groups, in columns */
+.ft__group--wide { grid-column: 1 / -1; }
+.ft__h { margin: 0 0 6px; font: 500 12px/1.4 var(--font-sans); letter-spacing: .14em; text-transform: uppercase; color: var(--stone-300); }
+.ft__links { margin: 0; padding: 0; list-style: none; }
+.ft__links--cols { columns: 2; column-gap: 24px; }
+@media (min-width: 1024px) { .ft__links--cols { columns: 3; } }
+.ft__links li { break-inside: avoid; }
+.ft__links a { display: inline-block; padding: 8px 0; color: var(--on-night); text-decoration: none; text-underline-offset: 3px; }
+.ft__links a:hover { color: var(--link-on-night); text-decoration: underline; }
+@media (max-width: 759px) { .ft__links a { padding: 12px 0; } }
+.ft__legal { margin-top: 56px; border-top: 1px solid var(--hair-night); padding-top: 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 28px; font-size: 14px; color: var(--stone-400); }
+.ft__legal p { margin: 0; }
+.ft__legal a { display: inline-flex; align-items: center; min-height: 44px; color: var(--stone-400); text-decoration: none; text-underline-offset: 3px; }
+.ft__legal a:hover { color: var(--on-night); text-decoration: underline; }
+.ft__legal .push { margin-left: auto; }
+@media (max-width: 759px) { .ft__legal { display: grid; gap: 0; } .ft__legal .push { margin-left: 0; } }
+.ft :focus-visible { outline: 2px solid var(--link-on-night); outline-offset: 3px; box-shadow: none; --tw-ring-shadow: 0 0 #0000; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sh, .mnav__scrim, .mnav__panel, .ld-btn { transition-duration: 0s; }
+  .ld-btn:active { transform: none; }
+}

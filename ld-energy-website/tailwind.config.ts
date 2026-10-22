@@ -9,6 +9,18 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // Redesign tokens (prototype v7.2, scrollcraft/builds/home/tokens.css, approved 22/10/2026).
+        // The shared parts use these; page bodies keep primary/secondary/accent until their own slice.
+        slate: { 50: '#F5F6FC', 100: '#EBECF4', 200: '#D7DAE5', 300: '#B9BDCD', 400: '#9197AE', 500: '#6D738D', 600: '#4F546B', 700: '#33384F', 800: '#252834', 900: '#181A22', 950: '#0B1528' },
+        sage: { 50: '#F1F9F5', 100: '#E7F1EB', 200: '#D3E2DA', 300: '#B7CEC1', 400: '#94B4A2', 500: '#6E9781', 600: '#4F7A64', 700: '#3A624E', 800: '#2C4A3B', 900: '#1E3328' },
+        stone: { 50: '#FCFBF8', 100: '#F1EFE8', 200: '#E2E1DE', 300: '#CFCECA', 400: '#ACABA5', 500: '#88867E', 600: '#6B6961', 700: '#525049', 800: '#393833', 900: '#22221F' },
+        ground: '#FCFBF8',
+        band: '#F1EFE8',
+        ink: { DEFAULT: '#33384F', quiet: '#4F546B' },
+        rule: '#E2E1DE',
+        night: { DEFAULT: '#0B1528', ink: '#F1EFE8', link: '#B7CEC1' },
+        leaf: { DEFAULT: '#7FA182', light: '#9FBF98' },
+        epc: { a: '#008054', b: '#19B459', c: '#8DCE46', d: '#FFD500', e: '#FCAA65', f: '#EF8023', g: '#E9153B' },
         // Brand navy, derived from the logo wordmark (#182848)
         primary: {
           50: '#F2F5FA',
@@ -66,7 +78,8 @@ const config: Config = {
         warning: '#F59E0B',
         danger: '#EF4444',
         // Clean canvas — crisp near-white page, light grey for muted bands
-        canvas: '#FAFBFC',
+        // The page ground, now the redesign's stone 50 so the header and every page share one paper.
+        canvas: '#FCFBF8',
         sand: '#F1F3F6',
         // Dark brand band (footer, HowItWorks) — deep navy, was forest green
         forest: {
@@ -77,9 +90,29 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
-        display: ['var(--font-inter)', 'system-ui', 'sans-serif'],
-        serif: ['var(--font-serif)', 'Georgia', 'Cambria', 'serif'],
+        // Brand fonts, self-hosted from app/fonts by next/font/local (app/layout.tsx).
+        sans: ['var(--font-sans)', 'Futura', '"Century Gothic"', 'system-ui', 'sans-serif'],
+        display: ['var(--font-sans)', 'Futura', '"Century Gothic"', 'system-ui', 'sans-serif'],
+        serif: ['var(--font-serif)', 'Georgia', '"Times New Roman"', 'serif'],
+      },
+      // The prototype's type scale (tokens.css): serif 400 throughout, Jost for text and labels.
+      fontSize: {
+        display: ['64px', { lineHeight: '1.04', letterSpacing: '-0.015em' }],
+        heading: ['46px', { lineHeight: '1.08', letterSpacing: '-0.01em' }],
+        subheading: ['30px', { lineHeight: '1.18' }],
+        price: ['44px', { lineHeight: '1' }],
+        body: ['18px', { lineHeight: '1.6' }],
+        small: ['15px', { lineHeight: '1.5' }],
+        label: ['12px', { lineHeight: '1.4', letterSpacing: '0.16em' }],
+      },
+      spacing: {
+        head: 'var(--head-h)',
+        'section-sm': '64px',
+        section: '112px',
+      },
+      borderRadius: {
+        btn: '6px',
+        card: '12px',
       },
       maxWidth: {
         container: '80rem',

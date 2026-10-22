@@ -1,12 +1,10 @@
 import Link from 'next/link'
 import { Container } from '@/components/ui/Container'
-import { Logo } from '@/components/ui/Logo'
-import { Button } from '@/components/ui/Button'
 import { GoogleRating } from '@/components/ui/GoogleRating'
-import { cn } from '@/lib/cn'
+import { WhatsAppIcon, PhoneIcon, MailIcon } from '@/components/ui/BrandIcons'
 import { site } from '@/lib/site'
 import { priorityBoroughs } from '@/lib/boroughs'
-import { quoteHref } from '@/lib/quote-context'
+import { whatsappQuoteHref } from '@/lib/area-page'
 
 type FooterLink = [label: string, href: string]
 
@@ -38,60 +36,58 @@ const groups: { heading: string; items: FooterLink[]; listClassName?: string }[]
   { heading: 'Popular areas', items: popularAreas, listClassName: 'lg:grid lg:grid-cols-2 lg:gap-x-6' },
 ]
 
-function Links({ items, className }: { items: FooterLink[]; className?: string }) {
+function Links({ items, cols }: { items: FooterLink[]; cols?: boolean }) {
   return (
-    <ul className={className}>
+    <ul className={cols ? 'ft__links ft__links--cols' : 'ft__links'}>
       {items.map(([label, href]) => (
         <li key={href}>
-          <Link prefetch={false} href={href} className="inline-flex min-h-11 items-center text-sm leading-6 text-[#C5CFDC] underline-offset-4 transition-colors hover:text-white hover:underline lg:min-h-8">
-            {label}
-          </Link>
+          <Link prefetch={false} href={href}>{label}</Link>
         </li>
       ))}
     </ul>
   )
 }
 
+// The prototype v7.2 footer (night ground, the logo and one line, ruled contact rows, hairline legal row), holding
+// the live site's three link groups unchanged: their lists and order are data above, shared with the other branches.
 export function CompactFooter() {
   return (
-    <footer className="bg-[#0B1528] text-[#AEBBCB] [overflow-wrap:anywhere]">
-      <Container className="pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-8 lg:pb-8">
-        <div className="cf-grid grid gap-3 pt-6 lg:gap-10 lg:pt-12 xl:gap-14 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.5fr)]">
-          <div className="cf-brand">
-            <Logo variant="light" size="sm" />
-            <p className="mt-3 text-sm leading-6 text-[#AEBBCB]">L&amp;D Energy · Stratford E15, London</p>
-            <div className="cf-contact flex flex-wrap gap-x-5">
-              <a href={site.phoneHref} className="inline-flex min-h-11 items-center text-base font-semibold text-white">{site.phone}</a>
-              <a href={site.whatsappHref} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center text-base text-white underline-offset-4 hover:underline">WhatsApp</a>
+    <footer className="ft">
+      <Container className="ft__in">
+        <div className="cf-grid ft__grid">
+          <div className="cf-brand ft__brand">
+            <Link prefetch={false} href="/" className="inline-flex min-h-11 items-center">
+              {/* eslint-disable-next-line @next/next/no-img-element -- the master compact lockup, reversed; a vector */}
+              <img src="/brand/ld-energy-compact-reversed.svg" alt="L&amp;D Energy" width={150} height={25} loading="lazy" decoding="async" />
+            </Link>
+            <div>
+              <p>EPCs and floor plans across London.</p>
+              <p className="ft__quiet">{site.name} · Stratford E15, London</p>
             </div>
-            <a href={site.emailHref} className="cf-contact inline-flex min-h-11 items-center text-sm text-white underline-offset-4 hover:underline lg:min-h-8">{site.email}</a>
-            <div className="cf-proof mt-5 hidden space-y-4 lg:block">
-              <GoogleRating className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-[#C5CFDC] hover:text-white" />
-              <Button href={quoteHref()} variant="accent">Get my exact quote</Button>
+            {/* WhatsApp before the phone (Abdul 22/10); the number stays here and in the close */}
+            <ul className="cf-contact ft__contact">
+              <li><a href={whatsappQuoteHref()} target="_blank" rel="noopener noreferrer"><WhatsAppIcon />WhatsApp</a></li>
+              <li><a href={site.phoneHref}><PhoneIcon />{site.phone}</a></li>
+              <li><a href={site.emailHref}><MailIcon />{site.email}</a></li>
+            </ul>
+            <div className="cf-proof">
+              <GoogleRating className="ft__rating flex flex-wrap items-center gap-x-2 gap-y-1" starClassName="h-4 w-4 fill-[#B7CEC1] text-[#B7CEC1]" />
             </div>
           </div>
-          {groups.map(({ heading, items, listClassName }) => (
-            <div key={heading}>
-              <details className="border-b border-white/[.12] lg:hidden">
-                <summary className="cursor-pointer py-3 font-sans text-[11px] font-semibold uppercase tracking-[.1em] text-[#AEBBCB]">{heading}</summary>
-                <nav aria-label={`Footer ${heading}`}>
-                  <Links items={items} />
-                </nav>
-              </details>
-              <nav aria-label={`Footer ${heading}`} className="hidden lg:block">
-                <h2 className="mb-3 font-sans text-[11px] font-semibold uppercase leading-none tracking-[.1em] text-[#AEBBCB]">{heading}</h2>
-                <Links items={items} className={cn(listClassName)} />
+          <div className="ft__groups">
+            {groups.map(({ heading, items, listClassName }) => (
+              <nav key={heading} aria-label={`Footer ${heading}`} className={listClassName ? 'ft__group--wide' : undefined}>
+                <h2 className="ft__h">{heading}</h2>
+                <Links items={items} cols={!!listClassName} />
               </nav>
-            </div>
-          ))}
-        </div>
-        <div className="mt-4 border-t border-white/[.12] pt-3 text-[13.5px] lg:mt-12 lg:flex lg:flex-wrap lg:items-center lg:gap-x-8 lg:pt-6">
-          <div className="flex flex-wrap gap-x-6 lg:order-2">
-            <a href="/privacy-policy#analytics-choices" className="inline-flex min-h-11 items-center text-[#AEBBCB] underline-offset-4 hover:text-white hover:underline">Privacy &amp; analytics choices</a>
-            <Link prefetch={false} href="/terms" className="inline-flex min-h-11 items-center text-[#AEBBCB] underline-offset-4 hover:text-white hover:underline">Terms of Service</Link>
+            ))}
           </div>
-          <p className="mt-2 leading-6 lg:order-1 lg:mt-0">© {new Date().getFullYear()} {site.name}. Part of {site.parentBrand}.</p>
-          <a href="https://digital.luminousanddeliver.co.uk/" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center text-[#AEBBCB] underline-offset-4 hover:text-white hover:underline lg:order-3 lg:ml-auto">Made by L&amp;D Digital</a>
+        </div>
+        <div className="ft__legal">
+          <p>© {new Date().getFullYear()} {site.name}. Part of {site.parentBrand}.</p>
+          <a href="/privacy-policy#analytics-choices">Privacy &amp; analytics choices</a>
+          <Link prefetch={false} href="/terms">Terms of Service</Link>
+          <a href="https://digital.luminousanddeliver.co.uk/" target="_blank" rel="noopener noreferrer" className="push">Made by L&amp;D Digital</a>
         </div>
       </Container>
     </footer>

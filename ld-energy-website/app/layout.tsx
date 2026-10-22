@@ -1,28 +1,39 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter, Fraunces } from 'next/font/google'
+import localFont from 'next/font/local'
 import { Header } from '@/components/layout/Header'
 import { CompactFooter } from '@/components/layout/CompactFooter'
 import { introScript } from '@/lib/intro'
-import { MobileQuoteBar } from '@/components/layout/MobileQuoteBar'
+import { PhoneDock } from '@/components/layout/PhoneDock'
 import { WebAnalytics } from '@/components/layout/WebAnalytics'
 import { LondonSkyline } from '@/components/ui/LondonSkyline'
 import { site, pricing, priceFrom, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE } from '@/lib/site'
 import { areaServedLondon } from '@/lib/boroughs'
 import { assessorSchema } from '@/lib/assessor-schema'
+import { whatsappQuoteHref } from '@/lib/area-page'
 import './globals.css'
+import './shared-parts.css'
 
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
+// The brand fonts, self-hosted (no Google Fonts request: references/uk-web-compliance.md). Jost carries the
+// header, nav and body text; Source Serif 4 the headings, often a page's LCP text. Both are small latin subsets
+// (26 KB and 48 KB) and above the fold on every page, so both are preloaded. `swap` paints text at once in the
+// metric-matched fallback next/font generates (adjustFontFallback), so the swap moves almost nothing (CLS).
+const jost = localFont({
+  src: './fonts/jost-latin.woff2',
+  variable: '--font-sans',
+  weight: '100 900',
   display: 'swap',
+  preload: true,
+  fallback: ['Futura', 'Century Gothic', 'system-ui', 'sans-serif'],
 })
 
-// Editorial display serif for headlines, warm, optical, distinctly not-Inter.
-const fraunces = Fraunces({
-  subsets: ['latin'],
+// Source Serif 4 ships one weight with an optical-size axis: the prototype sets every serif at 400.
+const sourceSerif = localFont({
+  src: './fonts/source-serif-4-latin.woff2',
   variable: '--font-serif',
+  weight: '400',
   display: 'swap',
-  axes: ['opsz'],
+  preload: true,
+  fallback: ['Georgia', 'Times New Roman', 'serif'],
 })
 
 export const metadata: Metadata = {
@@ -162,8 +173,9 @@ const localBusinessSchema = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const cfBeaconToken = process.env.NEXT_PUBLIC_CF_BEACON_TOKEN
+  const waHref = whatsappQuoteHref()
   return (
-    <html lang="en-GB" className={`${inter.variable} ${fraunces.variable}`}>
+    <html lang="en-GB" className={`${jost.variable} ${sourceSerif.variable}`}>
       <head>
         <script
           type="application/ld+json"
@@ -175,18 +187,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: introScript }} />
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary-600 focus:text-white focus:rounded-md"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-sage-700 focus:text-white focus:rounded-btn"
         >
           Skip to main content
         </a>
-        <Header />
+        <Header waHref={waHref} />
         <main id="main" className="flex-1">
           {children}
         </main>
-        {/* Skyline transition, ivory canvas fades into forest dark */}
-        <LondonSkyline className="site-skyline text-[#0B1528] -mb-1" />
+        {/* The street drawing above the footer, in the night token: the paper ground runs into the footer */}
+        <LondonSkyline className="site-skyline text-night -mb-1" />
         <CompactFooter />
-        <MobileQuoteBar />
+        <PhoneDock waHref={waHref} />
         <WebAnalytics token={cfBeaconToken} />
       </body>
     </html>
