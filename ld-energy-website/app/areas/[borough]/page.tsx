@@ -12,6 +12,8 @@ import { ContactSection } from '@/components/sections/ContactSection'
 import { boroughMeta, boroughIntent, type BoroughIntent } from '@/lib/boroughs'
 import { site, topBand, pricing, priceFrom, formatPrice, maxBundleSaving, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE, defaultOgImage } from '@/lib/site'
 import type { FaqItem } from '@/lib/faq'
+import { usesAreaV2 } from '@/lib/area-page'
+import { AreaPageV2 } from '@/components/sections/area/AreaPageV2'
 
 interface PageProps {
   params: Promise<{ borough: string }>
@@ -119,6 +121,9 @@ export default async function BoroughPage({ params }: PageProps) {
   const data = boroughMeta[slug]
 
   if (!data) notFound()
+
+  // Rebuilt template (pilot: Stratford, Newham, Croydon). Title and H1 are unchanged until 14/12.
+  if (usesAreaV2(slug)) return <AreaPageV2 slug={slug} />
 
   const parentBorough = data.partOf ? boroughMeta[data.partOf] : undefined
 
