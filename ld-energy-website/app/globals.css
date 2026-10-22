@@ -725,3 +725,10 @@ body:has(.hc-close) .cf-grid { border-top: 1px solid rgba(241, 244, 242, .12); }
   .lh-sky, .lh-rise, .lh-land img, .lh-card { animation: none; }
   .will-reveal { opacity: 1; transform: none; }
 }
+
+/* Borough ratings data page (components/sections/ratings/BoroughExplorer.tsx): all 33 panels are in the HTML;
+   one shows. Without JavaScript the tile links target a panel; with it, the component styles the chosen one. */
+.bx-panel { display: none; }
+.bx:not(.bx-js) .bx-panels:not(:has(.bx-panel:target)) .bx-panel[data-default] { display: block; }
+.bx:not(.bx-js) .bx-panel:target { display: block; }
+.bx-panel { scroll-margin-top: 6rem; }
