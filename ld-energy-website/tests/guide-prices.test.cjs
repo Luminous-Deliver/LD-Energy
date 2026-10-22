@@ -27,7 +27,7 @@ const ALLOWED = {
   'epc-for-selling-house.mdx': ['£200'], // SI 2012/3118 reg 38 penalty
   'epc-improvements-by-budget.mdx': ['£500', '£2,000', '£5,000'], // budget tiers in the frozen title
   'epc-vs-floor-plan-vs-survey.mdx': ['£5,000', '£400', '£1,000'], // MEES penalty cap; survey range (group 5 to source)
-  'how-long-does-epc-last.mdx': ['£200', '£5,000', '£30,000', '£250,000', '£500'], // penalties; unsourced lender example (group 1 removes)
+  'how-long-does-epc-last.mdx': ['£200', '£5,000'], // SI 2012/3118 reg 38 penalty; MEES total fine limit
   'how-to-improve-epc-rating.mdx': ['£7,500'], // Boiler Upgrade Scheme grant (group 3 to re-check)
   'loft-insulation-epc-rating.mdx': ['£500', '£200', '£300', '£450', '£150', '£250', '£400', '£600', '£350', '£700', '£900'], // installer cost table (group 3)
   'mees-regulations-2026.mdx': ['£2,000', '£4,000', '£1,000', '£3,500', '£5,000', '£30,000', '£10,000'], // MEES penalties, caps
