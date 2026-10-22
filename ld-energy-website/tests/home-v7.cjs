@@ -18,11 +18,12 @@ const SECTIONS = ['top', 'how', 'services', 'prices', 'proof', 'faq', 'guides', 
 const TITLE = `EPC London from £${priceFrom.epc} | Elmhurst Accredited | L&D Energy`
 const DESCRIPTION = `Domestic EPCs across London from an Elmhurst and Quidos accredited assessor based in Stratford. Guide prices from £${priceFrom.epc}, based on floor area. Exact quote before booking.`
 const H1 = 'Domestic EPCs in London'
-// Every internal destination the previous homepage body linked to (HomeHero, HomeServices, HomeContent at 71203fa).
+// Every internal destination the previous homepage body linked to (HomeHero, HomeServices, HomeContent at 71203fa),
+// except /about, which the header and phone menu carry (Abdul 23/10: no link the prototype lacks in Proof).
 const KEEP = [
   '/services/domestic-epc', '/pricing', '/services/floor-plans', '/services/epc-pre-assessment', '/services/epc-improvement-plan',
   '/preparing-for-your-epc', '/preparing-for-your-epc#quote-and-property-complexity', '/preparing-for-your-epc#how-your-epc-rating-is-calculated',
-  '/preparing-for-your-epc#rdsap-10', '/about', '/blog/epc-c-by-2030', '/blog/mees-timeline-2026-2030', '/landlords', '/estate-agents',
+  '/preparing-for-your-epc#rdsap-10', '/blog/epc-c-by-2030', '/blog/mees-timeline-2026-2030', '/landlords', '/estate-agents',
   '/contact?service=bulk&source=home&cta=inline#booking-form', '/areas', '/faq', '/blog', '/blog/what-happens-during-epc-assessment',
   '/blog/why-is-my-epc-different', '/blog/epc-vs-floor-plan-vs-survey',
   ...['stratford', 'newham', 'tower-hamlets', 'hackney', 'waltham-forest', 'redbridge'].map((s) => `/areas/${s}`),
@@ -45,6 +46,10 @@ const KEEP = [
     ok(await page.locator('meta[name="description"]').getAttribute('content') === DESCRIPTION, 'meta description frozen')
     const h1s = await page.locator('h1').allTextContents()
     ok(h1s.length === 1 && h1s[0] === H1, `one H1, the live wording (${h1s})`)
+    // option C (23/10): the H1 is the small kicker; the big line is the prototype's headline and not a heading
+    const big = page.locator('#top .hero__title')
+    ok(await big.innerText() === 'Your EPC, ready within 72 hours' && await big.evaluate((e) => e.tagName === 'P' && !e.closest('h1,h2,h3,h4,h5,h6') && e.previousElementSibling.tagName === 'H1'), 'big line is the prototype headline, a paragraph after the H1')
+    ok(await page.locator('#home-h1').evaluate((e) => parseFloat(getComputedStyle(e).fontSize) <= 13 && getComputedStyle(e).textTransform === 'uppercase'), 'the H1 is styled as the eyebrow')
 
     const ids = await page.evaluate(() => [...document.querySelectorAll('main section[id]')].map((s) => s.id))
     ok(JSON.stringify(ids) === JSON.stringify(SECTIONS), `sections in the prototype's order (${ids})`)
@@ -88,7 +93,7 @@ const KEEP = [
 
     // reviews: real, credited by first name and surname initial
     const credits = await page.locator('#proof .quote figcaption').allInnerTexts()
-    ok(credits.length === 2 && credits.every((c) => /^★★★★★\s+[A-Z][a-z]+ [A-Z]\., .+ · Google review$/.test(c.trim())), `reviewers as "First L." (${credits})`)
+    ok(credits.length === 2 && credits.every((c) => /^★★★★★\s+[A-Z]\. [A-Z]\., .+ · Google review$/.test(c.trim())), `reviewers by initials, as the prototype (${credits})`)
 
     // every internal destination the old homepage had
     const hrefs = new Set(await page.locator('.hp a[href^="/"]').evaluateAll((as) => as.map((a) => a.getAttribute('href'))))
@@ -149,5 +154,5 @@ const KEEP = [
   } finally {
     await browser.close()
   }
-  console.log(`PASS homepage v7.2: ${passed} checks (sections in order, frozen title/description/H1, prices from lib/site.ts, WhatsApp prefill, FAQ schema, reviewer names, kept links, climb pinned/in flow/reduced, form hand-over, 5 widths)`)
+  console.log(`PASS homepage v7.2: ${passed} checks (sections in order, frozen title/description/H1 + option C, prices from lib/site.ts, WhatsApp prefill, FAQ schema, reviewer names, kept links, climb pinned/in flow/reduced, form hand-over, 5 widths)`)
 })().catch((e) => { console.error(e); process.exit(1) })

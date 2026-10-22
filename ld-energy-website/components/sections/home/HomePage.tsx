@@ -8,6 +8,7 @@ import { HomeQuoteProvider } from './HomeQuoteContext'
 import { HomeQuoteCard } from './HomeQuoteCard'
 import { HomeV7Motion } from './HomeV7Motion'
 import { PickService } from './PickService'
+import { HomeQuoteBar } from './HomeQuoteBar'
 import { Ico } from './HomeIcon'
 import { HERO_PLAN_SVG, SECTION_ART_SVG } from './v7-assets'
 
@@ -68,7 +69,12 @@ function Hero() {
           </div>
           <span className="hero__scrim" aria-hidden="true" />
           <div className="hero__copy wrap">
-            <h1 id="home-h1">Domestic EPCs in London</h1>
+            {/* H1 option C (Abdul 23/10): the page's one H1 keeps the frozen live wording (references/local-seo.md, until
+                14/12) as the kicker; the big line is the prototype's headline, set as a paragraph, not a heading */}
+            <div className="hero__head">
+              <h1 id="home-h1" className="eyebrow">Domestic EPCs in London</h1>
+              <p className="hero__title">Your EPC, ready within 72&nbsp;hours</p>
+            </div>
             <p className="hero__sub">One accredited visit for London landlords and letting agents. Your exact price is confirmed before you book.</p>
             <div className="hero__cta">
               <a className="btn btn-primary" id="hero-quote" href="#prices">Get my exact quote</a>
@@ -315,10 +321,10 @@ function Prices() {
   )
 }
 
-/** Real Google reviews, word for word (references/reviews-2026-10-21), credited by first name and surname initial (decision 22/10/2026). */
+/** Real Google reviews, word for word (references/reviews-2026-10-21), credited by initials as the prototype does (Abdul 23/10: match the prototype). */
 const quotes = [
-  { who: 'Anum T.', what: 'floor plan for a property licence', paras: ['Excellent service from start to finish! I needed a floor plan for my flat that met the requirements for a property licence application. The whole process was smooth, efficient, and professional, with a very quick turnaround. The pricing was also very reasonable and offered great value for money. I’m really pleased with the service and would highly recommend L&D Energy to anyone needing a floor plan for their property. Thank you!'] },
-  { who: 'Abiola O.', what: 'EPC', paras: ['I was very pleased with the service provided by L&D Energy. My EPC was completed within a day, which was extremely impressive. The service was quick, efficient and professional, and the whole process was smooth and hassle-free.', 'I really appreciate the prompt turnaround and would happily recommend L&D Energy to anyone looking for a reliable EPC service.', 'Thank you for the excellent service!'] },
+  { who: 'A. T.', what: 'floor plan for a property licence', paras: ['Excellent service from start to finish! I needed a floor plan for my flat that met the requirements for a property licence application. The whole process was smooth, efficient, and professional, with a very quick turnaround. The pricing was also very reasonable and offered great value for money. I’m really pleased with the service and would highly recommend L&D Energy to anyone needing a floor plan for their property. Thank you!'] },
+  { who: 'A. O.', what: 'EPC', paras: ['I was very pleased with the service provided by L&D Energy. My EPC was completed within a day, which was extremely impressive. The service was quick, efficient and professional, and the whole process was smooth and hassle-free.', 'I really appreciate the prompt turnaround and would happily recommend L&D Energy to anyone looking for a reliable EPC service.', 'Thank you for the excellent service!'] },
 ]
 
 function Proof() {
@@ -343,10 +349,7 @@ function Proof() {
           <div>
             <h3>{site.assessor.name}</h3>
             <p>Domestic Energy Assessor with {elmhurst.scheme} (<span className="acc">{elmhurst.number}</span>) and {quidos.scheme} (<span className="acc">{quidos.number}</span>). DBS checked.</p>
-            <div className="links">
-              <a className="link arrow-link" href={site.assessor.verifyUrl} {...ext}>Check the GOV.UK register <Ico name="arrow-right" /></a>
-              <Link prefetch={false} className="link arrow-link" href="/about">More about your assessor <Ico name="arrow-right" /></Link>
-            </div>
+            <a className="link arrow-link" href={site.assessor.verifyUrl} {...ext}>Check the GOV.UK register <Ico name="arrow-right" /></a>
           </div>
           <div>
             <h3>£5m cover, twice over</h3>
@@ -459,6 +462,7 @@ export function HomePage() {
         <Close />
       </HomeQuoteProvider>
       <HomeV7Motion />
+      <HomeQuoteBar epcFrom={priceFrom.epc} />
     </div>
   )
 }
