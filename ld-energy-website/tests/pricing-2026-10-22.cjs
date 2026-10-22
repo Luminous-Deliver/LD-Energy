@@ -11,6 +11,8 @@ const out = path.resolve(process.env.BOOKING_EVIDENCE_DIR || '../../../audits/we
 fs.mkdirSync(out, { recursive: true })
 
 const bands = ['Up to 40 m²', 'Over 40–55 m²', 'Over 55–75 m²', 'Over 75–95 m²', 'Over 95–115 m²', 'Over 115 m²']
+// Abdul, 22/10/2026 (later): bedroom captions back under each band, kept muted and secondary to the m² label.
+const captions = ['Studios and compact flats', '1-bedroom flats', '2-bedroom flats and small homes', '2–3-bedroom homes', '3–4-bedroom houses', 'Large homes, 4+\u00a0bedrooms']
 const prices = {
   'Domestic EPC': ['£65', '£75', '£85', '£95', '£105', 'From £120'],
   'Floor Plan': ['£55', '£65', '£75', '£90', '£105', 'From £125'],
@@ -44,18 +46,24 @@ const escape = text => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
       const report = form.getByRole('checkbox', { name: /Include a separate energy report/ })
       const field = form.locator('#floorArea')
 
-      // §1 and §2: every band on every tab shows the configured price; only the top band reads "From"; no bedroom captions.
+      // §1 and §2: every band on every tab shows the configured price; only the top band reads "From"; each band has a muted bedroom caption.
       for (const [tab, expected] of Object.entries(prices)) {
         await service(tab).check()
         for (const [i, band] of bands.entries()) {
           const label = await size(band).getAttribute('aria-label')
-          eq(label, `${band}, ${expected[i]}`, `${tab} ${band}`)
+          eq(label, `${band}, ${captions[i]}, ${expected[i]}`, `${tab} ${band}`)
         }
         const sizesText = await form.locator('.bf__sizes').innerText()
-        ok(!/bedroom|studio|flats? and|homes/i.test(sizesText), `${tab}: no bedroom description in the rows`)
+        ok(captions.every(c => sizesText.includes(c)), `${tab}: every band shows its bedroom caption`)
         ok(/Price confirmed before booking/.test(sizesText) && /We’ll confirm the size and price from your property details\./.test(sizesText), `${tab}: the not-sure row`)
       }
-      ok(await form.getByText('Choose the approximate internal floor area. Not sure? We can confirm it from your property details.').isVisible(), 'size hint')
+      ok(await form.getByText('Choose the approximate internal floor area. Bedrooms are only a rough guide. Not sure? We can confirm it from your property details.').isVisible(), 'size hint')
+      // Subtle: the caption is smaller, lighter and greyer than the m² label it sits under.
+      const tone = await form.locator('.bf-tile--size').first().evaluate(tile => {
+        const read = el => { const cs = getComputedStyle(el); return { size: parseFloat(cs.fontSize), weight: +cs.fontWeight, color: cs.color } }
+        return { area: read(tile.querySelector('.bf-size__top b')), caption: read(tile.querySelector('.bf-tile__d')) }
+      })
+      ok(tone.caption.size < tone.area.size && tone.caption.weight < tone.area.weight && tone.caption.color !== tone.area.color, `caption is muted ${JSON.stringify(tone)}`)
 
       // §8A: starting prices before a size, with the paid plan added where it applies.
       await service('Domestic EPC').check()
@@ -154,7 +162,7 @@ const escape = text => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
       await page.close()
       console.log(`ok ${width}px`)
     }
-    // The pricing page: the same table, From on the top band only, no bedroom column, the guide-price sentence.
+    // The pricing page: the same table, From on the top band only, a muted caption under each band (no column), the guide-price sentence.
     const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' })
     await page.goto(`${base}/pricing`, { waitUntil: 'networkidle' })
     const table = page.locator('#pricing-table table').first()
@@ -162,7 +170,8 @@ const escape = text => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
     eq(rows.length, 6, 'six bands on /pricing')
     ok(rows[0].includes('Up to 40 m²') && rows[0].includes('£65') && rows[0].includes('£90') && !/From/.test(rows[0]), 'first row')
     ok(/Over 115 m²[\s\S]*From[\s\S]*£120[\s\S]*From[\s\S]*£125[\s\S]*From[\s\S]*£145[\s\S]*From[\s\S]*£210/.test(rows[5]) && !/Save/.test(rows[5]), 'top row')
-    ok(!/Typical property|bedroom/i.test(await table.innerText()), 'no bedroom column')
+    eq(await table.locator('thead th').count(), 5, 'no bedroom column')
+    ok(rows.every((row, i) => row.includes(captions[i])), 'each band row shows its caption')
     ok(await page.getByText('Larger or unusually complex properties are quoted individually.', { exact: false }).first().isVisible(), 'guide-price sentence')
     await page.locator('#pricing-table').screenshot({ path: path.join(out, 'pricing-table-1440.png') })
     console.log(`ok /pricing · ${checks + 5} checks`)

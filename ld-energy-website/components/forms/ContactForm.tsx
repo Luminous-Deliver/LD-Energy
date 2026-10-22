@@ -533,7 +533,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
           ) : (
             <fieldset className="min-w-0" aria-invalid={!!errors.areaBand} aria-describedby={['areaBand-hint', errors.areaBand ? 'areaBand-error' : ''].filter(Boolean).join(' ')}>
               <legend className="bf__legend">How big is the property?</legend>
-              <p id="areaBand-hint" className="bf__sub">Choose the approximate internal floor area. Not sure? We can confirm it from your property details.</p>
+              <p id="areaBand-hint" className="bf__sub">Choose the approximate internal floor area. Bedrooms are only a rough guide. Not sure? We can confirm it from your property details.</p>
               <div className="bf__sizes">
                 {areaBands.map((b, i) => {
                   const checked = values.areaBand === b
@@ -543,9 +543,10 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
                     <div key={b} className="contents">
                       <label className="bf-tile bf-tile--size" data-checked={checked || undefined}>
                         <input type="radio" name="areaBand" value={b} checked={checked} required className="bf-radio"
-                          aria-label={`${pricing[i].areaLabel}${price ? `, ${price}` : ''}`}
+                          aria-label={`${pricing[i].areaLabel}, ${pricing[i].typicalLabel}${price ? `, ${price}` : ''}`}
                           onChange={() => chooseArea(b)} />
                         <span className="bf-size__top"><b>{pricing[i].areaLabel}</b>{price && <span className="tabular-nums">{price}</span>}</span>
+                        <span className="bf-tile__d">{pricing[i].typicalLabel}</span>
                       </label>
                       {b === TOP_BAND && showArea && areaField}
                     </div>

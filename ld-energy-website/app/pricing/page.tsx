@@ -203,6 +203,7 @@ export default function PricingPage() {
                   <Ruler className="w-3.5 h-3.5 shrink-0 text-secondary-500" aria-hidden="true" />
                   {row.areaLabel}
                 </p>
+                <p className="mt-0.5 pl-5 text-xs text-secondary-600">{row.typicalLabel}</p>
                 <dl className="mt-3 grid grid-cols-2 gap-2 text-sm">
                   {([['EPC', row.epc], ['Floor plan', row.floorPlan], ['Pre-Assessment (not lodged)', row.preAssessment]] as const).map(([label, value]) => (
                     <div key={label}>
@@ -232,7 +233,7 @@ export default function PricingPage() {
             ))}
           </ul>
           <p className="bg-secondary-50 border-t border-secondary-200 px-4 py-3 text-xs text-secondary-500 leading-relaxed">
-            All figures are guide prices; the largest band shows starting prices. Internal floor area (m²) is the single biggest factor in the final price, alongside extensions, loft conversions, layout and condition. Savings shown are the difference between the two services booked separately and booked together.{' '}
+            All figures are guide prices; the largest band shows starting prices. Internal floor area (m²) is the single biggest factor in the final price, alongside extensions, loft conversions, layout and condition; bedrooms are shown only as a rough guide. Savings shown are the difference between the two services booked separately and booked together.{' '}
             <a href={quoteHref({ sourcePage: 'pricing', ctaId: 'inline' })} className="font-medium text-primary-700 underline">Request an exact quote</a>.
           </p>
         </div>
@@ -266,6 +267,7 @@ export default function PricingPage() {
                         <Ruler className="w-3.5 h-3.5 shrink-0 text-secondary-500" aria-hidden="true" />
                         {row.areaLabel}
                       </span>
+                      <span className="mt-0.5 block pl-5 text-xs font-normal text-secondary-600">{row.typicalLabel}</span>
                     </th>
                     {/* Standard bands are guide prices; the open-ended top band shows starting prices */}
                     {[row.epc, row.floorPlan, row.preAssessment].map((value, i) => (
@@ -293,7 +295,7 @@ export default function PricingPage() {
               <tfoot>
                 <tr className="bg-secondary-50 border-t border-secondary-200">
                   <td colSpan={5} className="px-5 py-3 text-xs text-secondary-500 leading-relaxed">
-                    All figures are guide prices; the largest band shows starting prices. Internal floor area (m²) is the single biggest factor in the final price, alongside extensions, loft conversions, layout and condition. Savings shown are the difference between the two services booked separately and booked together.{' '}
+                    All figures are guide prices; the largest band shows starting prices. Internal floor area (m²) is the single biggest factor in the final price, alongside extensions, loft conversions, layout and condition; bedrooms are shown only as a rough guide. Savings shown are the difference between the two services booked separately and booked together.{' '}
                     <a href={quoteHref({ sourcePage: 'pricing', ctaId: 'inline' })} className="font-medium text-primary-700 underline">Request an exact quote</a>.
                   </td>
                 </tr>

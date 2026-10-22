@@ -171,8 +171,11 @@ export const EXPRESS_SURCHARGE = 15
  * CANONICAL PRICING SOURCE.
  *
  * Every figure here is an explicit GUIDE price, not a fixed quote. Internal
- * floor area (m²) is the pricing driver. Bands carry no bedroom label: a room
- * count never sets the price (Abdul's pricing spec, 22/10/2026).
+ * floor area (m²) is the pricing driver. Each band carries a muted bedroom
+ * caption (`typicalLabel`) because customers recognise "2-bedroom flat" more
+ * readily than "55–75 m²", but a room count never sets the price: the caption
+ * is always secondary to the m² label and never appears on its own (Abdul,
+ * 22/10/2026: captions back, kept subtle).
  *
  * The four services share one set of bands. A band runs from just over the
  * previous band's ceiling up to and including its own `areaMax`, so 40 m² is
@@ -193,6 +196,8 @@ export interface PricingBand {
   id: string
   /** Primary pricing driver, e.g. 'Over 55–75 m²'. */
   areaLabel: string
+  /** Familiar reference shown as a muted caption under `areaLabel`. Never lead with this. */
+  typicalLabel: string
   /** Inclusive ceiling in m². null = open-ended top band. */
   areaMax: number | null
   epc: number
@@ -205,12 +210,12 @@ export interface PricingBand {
 }
 
 export const pricing: PricingBand[] = [
-  { id: 'up-to-40', areaLabel: 'Up to 40 m²',    areaMax: 40,   epc: 65,  floorPlan: 55,  bundle: 105, preAssessment: 90 },
-  { id: '40-55',    areaLabel: 'Over 40–55 m²',  areaMax: 55,   epc: 75,  floorPlan: 65,  bundle: 120, preAssessment: 100 },
-  { id: '55-75',    areaLabel: 'Over 55–75 m²',  areaMax: 75,   epc: 85,  floorPlan: 75,  bundle: 135, preAssessment: 110 },
-  { id: '75-95',    areaLabel: 'Over 75–95 m²',  areaMax: 95,   epc: 95,  floorPlan: 90,  bundle: 155, preAssessment: 120 },
-  { id: '95-115',   areaLabel: 'Over 95–115 m²', areaMax: 115,  epc: 105, floorPlan: 105, bundle: 175, preAssessment: 130 },
-  { id: 'over-115', areaLabel: 'Over 115 m²',    areaMax: null, epc: 120, floorPlan: 125, bundle: 210, preAssessment: 145, startingPrice: true },
+  { id: 'up-to-40', areaLabel: 'Up to 40 m²',    typicalLabel: 'Studios and compact flats',       areaMax: 40,   epc: 65,  floorPlan: 55,  bundle: 105, preAssessment: 90 },
+  { id: '40-55',    areaLabel: 'Over 40–55 m²',  typicalLabel: '1-bedroom flats',                 areaMax: 55,   epc: 75,  floorPlan: 65,  bundle: 120, preAssessment: 100 },
+  { id: '55-75',    areaLabel: 'Over 55–75 m²',  typicalLabel: '2-bedroom flats and small homes', areaMax: 75,   epc: 85,  floorPlan: 75,  bundle: 135, preAssessment: 110 },
+  { id: '75-95',    areaLabel: 'Over 75–95 m²',  typicalLabel: '2–3-bedroom homes',               areaMax: 95,   epc: 95,  floorPlan: 90,  bundle: 155, preAssessment: 120 },
+  { id: '95-115',   areaLabel: 'Over 95–115 m²', typicalLabel: '3–4-bedroom houses',              areaMax: 115,  epc: 105, floorPlan: 105, bundle: 175, preAssessment: 130 },
+  { id: 'over-115', areaLabel: 'Over 115 m²',    typicalLabel: 'Large homes, 4+\u00a0bedrooms',  areaMax: null, epc: 120, floorPlan: 125, bundle: 210, preAssessment: 145, startingPrice: true },
 ]
 
 /** The bands with fixed guide prices, i.e. every band except the open-ended top one. */

@@ -24,9 +24,9 @@ type BandId = PricingBand['id']
  * Floor-area guide estimator.
  *
  * The information hierarchy is the whole point: floor area is the real pricing
- * driver, so m² is the only label on a band. Bedroom captions led customers to
- * believe bedroom count *was* the pricing rule and the number was final, so the
- * bands carry none (Abdul's pricing spec, 22/10/2026).
+ * driver, so m² is the dominant element in every band and the bedroom
+ * description is a muted caption. Reversing those two is what led customers to
+ * believe bedroom count *was* the pricing rule and the number was final.
  *
  * A banded selector rather than a slider (which would imply precision guide
  * pricing doesn't have) or a six-column table (which cannot survive 390px).
@@ -64,7 +64,10 @@ function BandPicker({
                   : 'border-secondary-200 bg-white hover:border-secondary-300 hover:bg-secondary-50',
               )}
             >
+              {/* PRIMARY: floor area */}
               <span className="text-xl font-bold tracking-tight text-secondary-900">{p.areaLabel}</span>
+              {/* SECONDARY: familiar reference, deliberately muted */}
+              <span className="mt-0.5 text-sm text-secondary-600">{p.typicalLabel}</span>
             </button>
           )
         })}
@@ -105,6 +108,7 @@ function ResultPanel({ band, unknown, sourcePage }: { band?: PricingBand; unknow
     <div className="rounded-2xl border border-secondary-200 bg-white p-5 shadow-premium">
       <p className="text-xs font-semibold uppercase tracking-widest text-secondary-600">Guide estimate</p>
       <p className="mt-1 text-2xl font-bold tracking-tight text-secondary-900">{band.areaLabel}</p>
+      <p className="text-sm text-secondary-600">{band.typicalLabel}</p>
 
       <dl className="mt-4 divide-y divide-secondary-100 border-t border-secondary-100">
         <div className="flex items-baseline justify-between gap-3 py-2.5">
@@ -179,8 +183,8 @@ export function FloorAreaGuide({ sourcePage }: { sourcePage: SourcePage }) {
         <h3 className="text-lg font-bold text-secondary-900">Guide pricing by floor area</h3>
       </div>
       <p className="mt-2 max-w-2xl text-secondary-700">
-        Internal floor area (m²) is the main factor in our pricing. Select your floor area, or choose
-        “Not sure of floor area”.
+        Internal floor area (m²) is the main factor in our pricing. Bedroom count is shown only as a
+        rough reference. Select your floor area, or choose “Not sure of floor area”.
       </p>
 
       {/* Tablet and desktop: always visible */}

@@ -23,11 +23,11 @@ function priceTable(): string {
     // The open-ended top band carries starting prices and promises no specific bundle saving.
     const price = (value: number) => `${p.startingPrice ? 'From ' : ''}£${formatPrice(value)}`
     const bundle = p.startingPrice ? price(p.bundle) : `${price(p.bundle)} (saves £${formatPrice(bundleSaving(p))})`
-    return `| ${p.areaLabel.padEnd(19)} | ${price(p.epc)} | ${price(p.floorPlan)} | ${bundle} | ${price(p.preAssessment)} |`
+    return `| ${p.areaLabel.padEnd(19)} | ${p.typicalLabel.padEnd(31)} | ${price(p.epc)} | ${price(p.floorPlan)} | ${bundle} | ${price(p.preAssessment)} |`
   })
   return [
-    '| Internal floor area | EPC | Floor plan | EPC + floor plan | Pre-Assessment (not lodged) |',
-    '|---------------------|-----|------------|------------------|-----------------------------|',
+    '| Internal floor area | Typical property (rough guide)  | EPC | Floor plan | EPC + floor plan | Pre-Assessment (not lodged) |',
+    '|---------------------|---------------------------------|-----|------------|------------------|-----------------------------|',
     ...rows,
   ].join('\n')
 }
@@ -50,7 +50,8 @@ L&D Energy is the EPC trading brand of ${site.parentBrand}. We are an Elmhurst-a
 All figures below are GUIDE prices, not fixed quotes; the largest band shows starting prices. The
 exact quote is confirmed before the booking is accepted, never afterwards.
 
-Internal floor area (m²) is the main pricing factor; bedroom counts do not set the price. Extensions,
+Internal floor area (m²) is the main pricing factor; bedroom counts are shown only as a familiar
+reference for customers who do not know their floor area and do not set the price. Extensions,
 loft conversions, unusual layouts and multiple floors can affect the final quote. There are no travel
 or call-out charges.
 

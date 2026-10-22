@@ -203,6 +203,7 @@ export default function FloorPlansPage() {
                 <tr key={row.id} className="bg-white hover:bg-secondary-50">
                   <td className="px-4 py-3">
                     <span className="block font-bold text-secondary-900">{row.areaLabel}</span>
+                    <span className="mt-0.5 block text-xs text-secondary-600">{row.typicalLabel}</span>
                   </td>
                   <td className="px-4 py-3 text-right text-secondary-700 whitespace-nowrap">{row.startingPrice ? 'From ' : ''}{`£${row.epc}`}</td>
                   <td className="px-4 py-3 text-right text-secondary-700 whitespace-nowrap">{row.startingPrice ? 'From ' : ''}{`£${row.floorPlan}`}</td>
