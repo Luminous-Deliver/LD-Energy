@@ -11,9 +11,9 @@ import {
   bandEpcPrice, bandIndex, bandPhrase, fmt, london, oneIn, pct, statsSource, ukDate, whatsappQuoteHref,
 } from '@/lib/area-page'
 
-const OGL = 'https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/'
+export const OGL = 'https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/'
 
-const GROUPS: { key: RatingGroup; label: string; swatch: string }[] = [
+export const GROUPS: { key: RatingGroup; label: string; swatch: string }[] = [
   { key: 'AtoC', label: 'A to C', swatch: 'bg-[#19B459]' },
   { key: 'D', label: 'D', swatch: 'bg-[#FFD500]' },
   { key: 'E', label: 'E', swatch: 'bg-[#FCAA65]' },
@@ -28,12 +28,12 @@ function H2({ id, children }: { id: string; children: React.ReactNode }) {
   return <h2 id={id} className="mt-2 text-3xl md:text-4xl font-bold tracking-tight text-secondary-900 text-balance">{children}</h2>
 }
 
-function SourceLine({ children }: { children: React.ReactNode }) {
+export function SourceLine({ children }: { children: React.ReactNode }) {
   return <p className="mt-4 text-xs leading-relaxed text-secondary-600">{children}</p>
 }
 
-const period = `${ukDate(statsSource.from)} to ${ukDate(statsSource.to)}`
-const dataSource = (
+export const period = `${ukDate(statsSource.from)} to ${ukDate(statsSource.to)}`
+export const dataSource = (
   <>
     Source: MHCLG, <a href={statsSource.url} rel="noopener" className="underline underline-offset-2">Get energy performance of buildings data</a>,
     certificates for existing homes lodged {period} (file of {ukDate(statsSource.fileUpdated)}). {statsSource.attribution}
@@ -76,14 +76,19 @@ export function AreaHeroV2({ name, s }: { name: string; s: AreaSummary }) {
   )
 }
 
-function MixBar({ label, s }: { label: string; s: AreaSummary }) {
+/** The A–C/D/E/F–G bar. `marker` draws a tick at another area's A–C share (the London marker on the data page). */
+export function MixBar({ label, s, marker }: { label: string; s: AreaSummary; marker?: { label: string; atoC: number } }) {
   return (
     <div>
       <div className="flex items-baseline justify-between gap-3 text-sm">
         <span className="font-semibold text-secondary-900">{label}</span>
         <span className="text-secondary-600 tabular-nums">{fmt(s.ratings.n)} certificates</span>
       </div>
-      <div className="mt-2 flex h-7 w-full overflow-hidden rounded-md" aria-hidden="true">
+      <div className="relative mt-2">
+      {marker && (
+        <span className="absolute -top-1 -bottom-1 z-10 w-0.5 bg-secondary-900" style={{ left: `${marker.atoC}%` }} aria-hidden="true" />
+      )}
+      <div className="flex h-7 w-full overflow-hidden rounded-md" aria-hidden="true">
         {GROUPS.map((g) => (
           s.ratings.pct[g.key] > 0 && (
             <span key={g.key} className={`${g.swatch} flex items-center justify-center text-[11px] font-bold text-secondary-900`} style={{ width: `${s.ratings.pct[g.key]}%` }}>
@@ -92,6 +97,10 @@ function MixBar({ label, s }: { label: string; s: AreaSummary }) {
           )
         ))}
       </div>
+      </div>
+      {marker && (
+        <p className="mt-1.5 text-xs text-secondary-600">Black line: {marker.label}, {pct(marker.atoC)} rated A to C</p>
+      )}
     </div>
   )
 }

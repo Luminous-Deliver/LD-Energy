@@ -101,6 +101,7 @@ quote before booking.
 - For estate & letting agents: ${site.url}/estate-agents
 - Pricing: ${site.url}/pricing
 - London areas: ${site.url}/areas
+- EPC ratings by London borough (GOV.UK register figures): ${site.url}/epc-ratings-by-borough
 - Preparing for your EPC: ${site.url}/preparing-for-your-epc
 - FAQ: ${site.url}/faq
 - Blog and guides: ${site.url}/blog

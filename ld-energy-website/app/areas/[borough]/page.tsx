@@ -13,6 +13,7 @@ import { boroughMeta, boroughIntent, type BoroughIntent } from '@/lib/boroughs'
 import { site, topBand, pricing, priceFrom, formatPrice, maxBundleSaving, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE, defaultOgImage } from '@/lib/site'
 import type { FaqItem } from '@/lib/faq'
 import { usesAreaV2 } from '@/lib/area-page'
+import { DATA_PAGE_PATH } from '@/lib/borough-ratings'
 import { AreaPageV2 } from '@/components/sections/area/AreaPageV2'
 
 interface PageProps {
@@ -338,6 +339,10 @@ export default async function BoroughPage({ params }: PageProps) {
           <p className="mt-5 text-secondary-700 leading-relaxed">{data.areasCovered}</p>
           <p className="mt-4 text-secondary-700 leading-relaxed">
             We cover {data.name} and the surrounding {data.kind === 'neighbourhood' ? 'area' : 'boroughs'} with the same transparent guide pricing and turnaround.
+          </p>
+          <p className="mt-4 text-secondary-700 leading-relaxed">
+            See how {data.name} compares:{' '}
+            <Link href={DATA_PAGE_PATH} className="text-primary-700 underline underline-offset-2 hover:text-primary-800">EPC ratings in every London borough</Link>.
           </p>
         </div>
         <ul className="mt-8 grid gap-3 sm:grid-cols-2 md:grid-cols-3">
