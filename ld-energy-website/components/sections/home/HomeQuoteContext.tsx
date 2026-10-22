@@ -2,8 +2,8 @@
 
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react'
 
-/** The three services the homepage prices. Keys match `quoteServices`. */
-export type HomeService = 'epc' | 'bundle' | 'floor-plan'
+/** The services the homepage's cards and Pre-Assessment strip can pick. Keys match `quoteServices`. */
+export type HomeService = 'epc' | 'bundle' | 'floor-plan' | 'pre-assessment'
 
 interface HomeQuoteState {
   /** The latest "See my price" pick from further down the page; `n` changes on every click. */
