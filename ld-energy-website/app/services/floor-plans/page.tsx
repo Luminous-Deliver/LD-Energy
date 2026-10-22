@@ -184,7 +184,7 @@ export default function FloorPlansPage() {
             Floor Plan Pricing
           </h2>
           <p className="mt-5 text-lg text-secondary-700 leading-relaxed">
-            Guide prices only — your exact quote is confirmed before booking. Booking a floor plan alongside an EPC costs less than booking them separately, because we measure the property during the assessment anyway.
+            Guide prices only — your exact quote is confirmed before booking. Internal floor area sets the band; bedrooms are shown only as a rough guide. Booking a floor plan alongside an EPC costs less than booking them separately, because we measure the property during the assessment anyway.
           </p>
         </div>
 
