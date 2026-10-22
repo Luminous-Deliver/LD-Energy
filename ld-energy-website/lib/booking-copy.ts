@@ -1,5 +1,5 @@
 import type { ProductKind } from '@/lib/pricing-estimate'
-import { BULK, PRE_ASSESSMENT, SAME_DAY_LODGEMENT_SPEED, NEXT_DAY_VISIT_SPEED, type customerTypes } from '@/lib/booking-options'
+import { BULK, PRE_ASSESSMENT, SAME_DAY_LODGEMENT_SPEED, NEXT_DAY_VISIT_SPEED, londonYmd, PAST_DATE_ERROR, type customerTypes, type DwellingType } from '@/lib/booking-options'
 import { areaLabel } from '@/lib/floor-area'
 import { maxBundleSaving } from '@/lib/site'
 
@@ -44,6 +44,14 @@ export function customerTypeChoices(isBulk: boolean): { value: CustomerType; lab
   ]
 }
 
+/** Question 3 of step 1 (v7, approved 22/10/2026), each with its helper line. */
+export const dwellingChoices: { value: DwellingType; description: string }[] = [
+  { value: 'Flat', description: 'On one floor' },
+  { value: 'Maisonette', description: 'A flat on two floors or more' },
+  { value: 'House', description: 'Terraced, semi or detached' },
+  { value: 'Bungalow', description: 'A house on one floor' },
+]
+
 export const OPENING_HOURS = 'Mon–Sun, 8am–8pm'
 
 /**
@@ -61,17 +69,20 @@ export function nextSteps(kind: ProductKind, speed?: string, energyReport?: bool
     `Abdul checks your details and replies with your exact price and available times during opening hours (${OPENING_HOURS}).`,
     'You pick a time. Your visit is confirmed once you agree the price and time.',
   ]
+  // what to have ready, in the FAQ's wording (v7: the confirmation stopped at opening hours)
+  const prep = kind === 'floorPlan' ? 'Before the visit, make sure every room is easy to reach.'
+    : 'Before the visit, make sure every room, the loft hatch, the boiler and the meters are easy to reach.'
   switch (kind) {
     case 'epc':
-      return [...steps, `After the visit, your EPC is lodged on the GOV.UK register ${lodgedWhen} and we send you the certificate link.`]
+      return [...steps, prep, `After the visit, your EPC is lodged on the GOV.UK register ${lodgedWhen} and we send you the certificate link.`]
     case 'bundle':
-      return [...steps, `After the visit, your EPC is lodged on the GOV.UK register ${lodgedWhen} and we send you the certificate link. Your floor plans are sent as JPG and PDF within 72 hours.`]
+      return [...steps, prep, `After the visit, your EPC is lodged on the GOV.UK register ${lodgedWhen} and we send you the certificate link. Your floor plans are sent as JPG and PDF within 72 hours.`]
     case 'floorPlan':
-      return [...steps, 'After the visit, your floor plans are sent as JPG and PDF within 72 hours.']
+      return [...steps, prep, 'After the visit, your floor plans are sent as JPG and PDF within 72 hours.']
     case 'preAssessment':
-      return [...steps, `After the visit, your personalised written improvement plan${energyReport ? ' and your separate energy report are' : ' is'} sent within 72 hours. Nothing is lodged on the public register.`]
+      return [...steps, prep, `After the visit, your personalised written improvement plan${energyReport ? ' and your separate energy report are' : ' is'} sent within 72 hours. Nothing is lodged on the public register.`]
     case 'none':
-      return steps
+      return [...steps, prep]
     default:
       return assertNever(kind)
   }
@@ -102,7 +113,7 @@ export function formatPreferredDate(value?: string): string {
 
 export interface EnquirySummaryInput {
   name: string; phone: string; email: string; address: string; postcode: string
-  services: string[]; areaBand?: string; floorArea?: string; customerType: string; speed: string
+  services: string[]; areaBand?: string; floorArea?: string; customerType: string; speed: string; dwellingType?: string
   improvementPlan?: boolean; energyReport?: boolean; propertyCount?: string; preferredDate?: string; notes?: string
 }
 
@@ -116,6 +127,7 @@ export function enquirySummaryText(data: EnquirySummaryInput): string {
     'Hi, my quote request on your website did not go through, so I am sending it here.',
     '',
     `Service: ${data.services.map(serviceLabel).join(' + ')}`,
+    ...(isBulk ? [] : [`Property type: ${data.dwellingType || 'Not selected'}`]),
     isBulk ? `Properties: ${data.propertyCount || 'To confirm'}` : `Floor area: ${areaLabel(data.areaBand, data.floorArea)}`,
     `I am: ${data.customerType || 'Not selected'}`,
     ...(!isBulk && data.speed === SAME_DAY_LODGEMENT_SPEED ? ['Lodgement: same day as the visit'] : []),
@@ -215,4 +227,68 @@ export function contactStepIntro(kind: ProductKind): string {
     default:
       return assertNever(kind)
   }
+}
+
+/**
+ * "What you get", under the guide price in step 1 (v7): three lines from the service card, so the price is read with
+ * what it buys. A portfolio shows the first three of its included list.
+ */
+export function whatYouGet(kind: ProductKind): string[] {
+  switch (kind) {
+    case 'epc': return ['Your EPC, lodged on the official GOV.UK EPC Register', 'The standard recommendation report, where applicable', 'A certificate valid for 10 years']
+    case 'bundle': return ['Assessment, lodged EPC, certificate link and recommendation report', 'Laser-measured plan for Rightmove, Zoopla and OnTheMarket', 'Both surveys are completed during the same property visit']
+    case 'floorPlan': return ['Total floor area, as gross internal area', 'Approximate room dimensions and room labels', 'High-resolution JPEG and PDF files']
+    case 'preAssessment': return includedList('preAssessment')
+    case 'bulk': return includedList('bulk').slice(0, 3)
+    case 'none': return []
+    default: return assertNever(kind)
+  }
+}
+
+/**
+ * "What you receive", on the confirmation screen and in the confirmation email (v7, approved 22/10/2026): the
+ * service card's own list, plus the paid plan or the free energy report when chosen. Empty for a portfolio.
+ */
+export function deliveredList(kind: ProductKind, opts: { improvementPlan?: boolean; energyReport?: boolean } = {}): string[] {
+  const plan = opts.improvementPlan && (kind === 'epc' || kind === 'bundle') ? ['Personalised EPC Improvement Plan: your priorities, with the full Energy Report'] : []
+  switch (kind) {
+    case 'epc': return ['Your EPC, lodged on the official GOV.UK EPC Register', 'A certificate link once it is live on the register', 'The standard recommendation report, where applicable', 'A certificate valid for 10 years', ...plan]
+    case 'bundle': return ['Assessment, lodged EPC, certificate link and recommendation report', 'Laser-measured plan for Rightmove, Zoopla and OnTheMarket', 'Total floor area, approximate room dimensions and labels', 'High-resolution JPEG and PDF files', ...plan]
+    case 'floorPlan': return ['Total floor area, as gross internal area', 'Approximate room dimensions and room labels', 'High-resolution JPEG and PDF files', 'A plan suitable for Rightmove, Zoopla and OnTheMarket']
+    case 'preAssessment': return ['Property energy assessment', 'Personalised written improvement plan', ...(opts.energyReport ? ['Separate energy report'] : [])]
+    case 'bulk':
+    case 'none': return []
+    default: return assertNever(kind)
+  }
+}
+
+/**
+ * WhatsApp from the form (v7): the approved prefill (lib/area-page.ts whatsappQuoteText, Abdul 22/10/2026) first,
+ * then what the customer has chosen so far, so they only fill in what is left.
+ */
+export function whatsappFormText(base: string, data: { services: string[]; dwellingType?: string; areaLabel?: string; guide?: string }): string {
+  const isBulk = data.services.includes(BULK)
+  const lines = [base, `Service: ${data.services.map(serviceLabel).join(' + ')}`]
+  if (isBulk) lines.push('Roughly how many properties:')
+  else {
+    lines.push(`Property type: ${data.dwellingType || ''}`)
+    lines.push(`Floor area: ${data.areaLabel || ''}`)
+    if (data.guide) lines.push(`Guide price shown: ${data.guide}`)
+  }
+  lines.push('Preferred date:')
+  return lines.join('\n')
+}
+
+/**
+ * The note under the visit date (v7, approved 22/10/2026). Never in the past; today and tomorrow say what they
+ * depend on; a next-day visit means tomorrow. Only a past date blocks.
+ */
+export function visitDateNote(value: string | undefined, nextDayVisit: boolean, now: Date = new Date()): { text: string; blocking: boolean } {
+  if (!value) return { text: '', blocking: false }
+  const today = londonYmd(0, now), tomorrow = londonYmd(1, now)
+  if (value < today) return { text: PAST_DATE_ERROR, blocking: true }
+  if (nextDayVisit && value !== tomorrow) return { text: 'A next-day visit means tomorrow. Choose tomorrow’s date, or a different turnaround.', blocking: false }
+  if (value === today) return { text: 'A visit today depends on availability. We’ll confirm before you book.', blocking: false }
+  if (value === tomorrow) return { text: 'A visit tomorrow depends on availability. We’ll confirm the time before you book.', blocking: false }
+  return { text: '', blocking: false }
 }

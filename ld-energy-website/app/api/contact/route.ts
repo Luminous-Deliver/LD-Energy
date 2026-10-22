@@ -6,7 +6,7 @@ import { areaLabel, legacyArea, TOP_BAND } from '@/lib/floor-area'
 import { bookingPriceRows, guideEstimate, guideEstimateLine, guidePrice, PLAN_LABEL, ENERGY_REPORT_LABEL } from '@/lib/pricing-estimate'
 import { boroughMeta } from '@/lib/boroughs'
 import { SAME_DAY_LODGEMENT_SPEED, NEXT_DAY_VISIT_SPEED } from '@/lib/booking-options'
-import { formatPreferredDate, hasPrepChecklist, nextSteps, OPENING_HOURS, prepChecklist, PREP_PATH, serviceLabel, TENANT_NOTICE } from '@/lib/booking-copy'
+import { deliveredList, formatPreferredDate, hasPrepChecklist, nextSteps, OPENING_HOURS, prepChecklist, PREP_PATH, serviceLabel, TENANT_NOTICE } from '@/lib/booking-copy'
 import type { EnquiryAttribution } from '@/lib/enquiry-attribution'
 
 export const runtime = 'edge'
@@ -55,6 +55,8 @@ interface ParsedInput extends EnquiryAttribution {
   address: string
   postcode: string
   propertyType?: string
+  /** Flat, maisonette, house or bungalow (v7). Never set on a bulk enquiry. */
+  dwellingType?: string
   areaBand?: string
   /** Customer-typed m², already checked against the band. Never set on a bulk enquiry. */
   floorArea?: string
@@ -112,7 +114,7 @@ function buildEmail(data: ParsedInput) {
       : data.floorArea
         ? `${areaLabel(data.areaBand, data.floorArea)} (customer's figure) · ${areaLabel(data.areaBand)} band`
         : `${areaLabel(data.areaBand || legacyArea(data.propertyType))}${data.areaBand === TOP_BAND && data.floorAreaUnknown ? ' · customer does not know the floor area' : ''}`],
-    ...(estimate.isBulk ? [] : [['Area band id', data.areaBand || '—'] as [string, string]]),
+    ...(estimate.isBulk ? [] : [['Area band id', data.areaBand || '—'] as [string, string], ['Property type', data.dwellingType || '—'] as [string, string]]),
     ['Customer type', data.customerType],
     ['Service(s)', data.services.join(', ')],
     ...(data.sourcePage ? [['Source page', data.sourcePage] as [string, string]] : []),
@@ -168,6 +170,8 @@ function buildConfirmation(data: ParsedInput) {
   const steps = nextSteps(estimate.productKind, data.speed, estimate.energyReport)
   const showPrep = hasPrepChecklist(estimate.productKind)
   const tenanted = !isBulkEnquiry && data.customerType === 'Landlord (tenanted)'
+  // what the chosen service delivers (v7, approved 22/10/2026): the same list as the confirmation screen
+  const delivered = deliveredList(estimate.productKind, { improvementPlan: estimate.improvementPlan > 0, energyReport: estimate.energyReport })
   const prepUrl = `${SITE_URL}${PREP_PATH}`
 
   // Bulk has no single property and no agreed turnaround yet; an unlodged
@@ -180,6 +184,7 @@ function buildConfirmation(data: ParsedInput) {
     if (data.address) summary.push(['Addresses supplied', data.address])
     summary.push(['Turnaround', 'Agreed per property once quoted'])
   } else {
+    if (data.dwellingType) summary.push(['Property type', data.dwellingType])
     summary.push(['Floor area', areaLabel(data.areaBand || legacyArea(data.propertyType), data.floorArea)])
     summary.push(['Property', `${data.address}, ${data.postcode}`])
     summary.push(['Turnaround', estimate.isLodged
@@ -215,6 +220,7 @@ function buildConfirmation(data: ParsedInput) {
     `${intro}\n\n` +
     `Your request:\n` +
     summary.map(([k, v]) => `  ${k}: ${v}`).join('\n') +
+    (delivered.length ? `\n\nWhat you receive:\n${delivered.map(item => `  - ${item}`).join('\n')}` : '') +
     `\n\nWhat happens next:\n` +
     steps.map((step, i) => `  ${i + 1}. ${step}`).join('\n') +
     (showPrep ? `\n\nBefore your visit:\n${prepChecklist.map(item => `  - ${item}`).join('\n')}\n  Full checklist: ${prepUrl}` : '') +
@@ -306,6 +312,12 @@ function buildConfirmation(data: ParsedInput) {
                   <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${summaryRows}</table>
                 </td></tr>
               </table>
+
+              <!-- What you receive -->
+              ${delivered.length ? `${sectionLabel('What you receive')}
+              <ul style="margin:0 0 24px;padding:0 0 0 18px;font-size:14px;line-height:1.55;color:${INK}">
+                ${delivered.map(item => `<li style="margin:0 0 6px">${escapeHtml(item)}</li>`).join('')}
+              </ul>` : ''}
 
               <!-- Next steps -->
               ${sectionLabel('What happens next')}
@@ -443,6 +455,7 @@ export async function POST(req: Request) {
     address: parsed.data.address,
     postcode: parsed.data.postcode,
     propertyType: parsed.data.propertyType,
+    dwellingType: parsed.data.services.includes('Bulk / Agency Enquiry') ? undefined : parsed.data.dwellingType || undefined,
     areaBand: parsed.data.areaBand || legacyArea(parsed.data.propertyType),
     floorArea: parsed.data.services.includes('Bulk / Agency Enquiry') ? undefined : parsed.data.floorArea || undefined,
     floorAreaUnknown: parsed.data.floorAreaUnknown,

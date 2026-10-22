@@ -1,0 +1,32 @@
+/* The booking form's v7 parts (approved 22/10/2026): numbered questions, the property type, What you get, What's
+   included inside the price panel, the plan's pulse, the visit-date note, the reply line, the WhatsApp line and the
+   confirmation screen. Base styles for every page that uses the form; the homepage restyles them (app/home-v7.css). */
+.bf__qn { display: inline-block; min-width: 1.5em; margin-right: 6px; font-family: var(--font-serif); color: #3A624E; font-variant-numeric: lining-nums; }
+.bf__get-h { margin-top: 14px; }
+.bf__ticks { margin: 8px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.bf__ticks li { display: flex; gap: 8px; align-items: flex-start; font-size: 14.5px; line-height: 1.45; }
+.bf__ticks svg { margin-top: 3px; color: #3A624E; }
+.bf__incl { margin-top: 12px; border-top: 1px solid rgba(13, 27, 51, .09); border-bottom: 1px solid rgba(13, 27, 51, .09); }
+.bf__incl summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; font-weight: 500; font-size: 15px; }
+.bf__incl summary::-webkit-details-marker { display: none; }
+.bf__incl summary svg { color: #3A624E; transform: rotate(90deg); transition: transform .25s cubic-bezier(.22, 1, .36, 1); }
+.bf__incl[open] summary svg { transform: rotate(-90deg); }
+.bf__incl ul { margin: 0 0 12px; padding-left: 20px; list-style: disc; display: grid; gap: 4px; font-size: 14px; color: #4F546B; }
+.bf-check--offer.is-pulsing { animation: bf-offer-pulse 1.8s cubic-bezier(.22, 1, .36, 1) 3; }
+@keyframes bf-offer-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(58, 98, 78, 0); } 35% { box-shadow: 0 0 0 5px rgba(58, 98, 78, .16); } }
+@media (prefers-reduced-motion: reduce) { .bf-check--offer.is-pulsing { animation: none; } }
+.bf__date-note { margin-top: 6px; padding-left: 12px; border-left: 2px solid #FFD500; font-size: 14px; line-height: 1.45; color: #4F546B; }
+.bf__date-note.is-bad { color: #A83630; border-left-color: #A83630; }
+.bf__reply { margin-top: 12px; font-size: 15px; text-align: right; }
+.bf__reply b { font-weight: 600; }
+.bf__foot a { font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.bf__sent { display: grid; gap: 20px; }
+.bf__sent-h { font-family: var(--font-serif); font-size: 1.75rem; line-height: 1.15; }
+.bf__sent-copy { font-size: 16px; }
+.bf__sent-next { margin: 8px 0 0; padding: 0; list-style: none; counter-reset: s; display: grid; border-top: 1px solid rgba(13, 27, 51, .09); }
+.bf__sent-next li { counter-increment: s; display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 10px; padding: 12px 0; border-bottom: 1px solid rgba(13, 27, 51, .09); font-size: 16px; line-height: 1.5; }
+.bf__sent-next li::before { content: counter(s); font-family: var(--font-serif); font-size: 20px; line-height: 1.2; }
+.bf__sent-call { font-size: 16px; }
+.bf__sent-call a { font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.bf__again { min-height: 44px; padding: 0 4px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 759px) { .bf__reply { text-align: left; } }

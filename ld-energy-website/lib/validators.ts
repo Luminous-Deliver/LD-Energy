@@ -1,8 +1,8 @@
 import { z } from 'zod'
 import { sourcePages, ctaIds } from '@/lib/enquiry-attribution'
 import { submittedAreaChoices, bandForArea, legacyArea, parseExactArea, FLOOR_AREA_ERROR, TOP_BAND } from '@/lib/floor-area'
-import { propertyTypes, services, customerTypes, speeds, BULK, ukPostcodeRegex, LEGACY_EXPRESS_SPEED, SAME_DAY_LODGEMENT_SPEED } from '@/lib/booking-options'
-export { propertyTypes, services, customerTypes, speeds, BULK, PRE_ASSESSMENT, STANDARD_SPEED, SAME_DAY_LODGEMENT_SPEED, NEXT_DAY_VISIT_SPEED, LEGACY_EXPRESS_SPEED, ukPostcodeRegex } from '@/lib/booking-options'
+import { propertyTypes, dwellingTypes, services, customerTypes, speeds, BULK, ukPostcodeRegex, LEGACY_EXPRESS_SPEED, SAME_DAY_LODGEMENT_SPEED, isPastVisitDate, PAST_DATE_ERROR } from '@/lib/booking-options'
+export { propertyTypes, dwellingTypes, services, customerTypes, speeds, BULK, PRE_ASSESSMENT, STANDARD_SPEED, SAME_DAY_LODGEMENT_SPEED, NEXT_DAY_VISIT_SPEED, LEGACY_EXPRESS_SPEED, ukPostcodeRegex } from '@/lib/booking-options'
 
 export const contactSchema = z
   .object({
@@ -23,6 +23,8 @@ export const contactSchema = z
   /** Not asked for on a bulk enquiry — see the `superRefine` below. */
   postcode: z.string().trim().toUpperCase().max(12),
   propertyType: z.enum(propertyTypes).optional(),
+  /** Flat, maisonette, house or bungalow (v7, approved 22/10/2026). Required except on a portfolio: see below. */
+  dwellingType: z.union([z.enum(dwellingTypes), z.literal('')]).optional(),
   /** A current band, "unknown", or a band retired on 22/10/2026 that a cached page can still send. */
   areaBand: z.union([z.enum(submittedAreaChoices), z.literal('')]).optional(),
   /** Optional exact figure in m². The band stays the pricing input; this must fall inside it. */
@@ -77,6 +79,11 @@ export const contactSchema = z
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['areaBand'], message: 'Choose a floor area band or Not sure of floor area.' })
     }
 
+    // a visit date is optional, but never in the past (London's calendar)
+    if (!isBulk && isPastVisitDate(data.preferredDate)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['preferredDate'], message: PAST_DATE_ERROR })
+    }
+
     if (isBulk) {
       if (!data.propertyCount) {
         ctx.addIssue({
@@ -86,6 +93,10 @@ export const contactSchema = z
         })
       }
       return
+    }
+
+    if (!data.dwellingType) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['dwellingType'], message: 'Please tell us the property type' })
     }
 
     const exact = parseExactArea(data.floorArea)

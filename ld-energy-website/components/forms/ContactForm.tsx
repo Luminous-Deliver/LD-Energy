@@ -1,13 +1,10 @@
 'use client'
 
-import { useEffect, useRef, useState, type ReactNode, type RefObject } from 'react'
+import { useCallback, useEffect, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { usePathname } from 'next/navigation'
 import { Controller, useForm, type FieldErrors } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import {
-  ArrowLeft, ArrowRight, Building2, Check, ClipboardList, HelpCircle, House, KeyRound, Mail, MessageCircle,
-  Phone, ShieldAlert, Signpost, WifiOff, type LucideIcon,
-} from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, HelpCircle, Mail, MessageCircle, Phone, ShieldAlert, WifiOff } from 'lucide-react'
 import { Field, Input, Textarea } from '@/components/ui/Input'
 import { cn } from '@/lib/cn'
 import { pricing, site, maxBundleSaving, formatPrice, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE } from '@/lib/site'
@@ -15,8 +12,12 @@ import { areaBands, areaLabel, bandForArea, parseExactArea, TOP_BAND } from '@/l
 import { guideEstimate, guideEstimateRows, guidePrice, PLAN_LABEL, ENERGY_REPORT_LABEL } from '@/lib/pricing-estimate'
 import {
   turnaroundCopy, includedList, contactStepIntro, serviceChoices, serviceLabel, customerTypeChoices, nextSteps,
-  hasPrepChecklist, PREP_PATH, formatPreferredDate, enquirySummaryText, type BadgeTone,
+  formatPreferredDate, enquirySummaryText, dwellingChoices, whatYouGet, deliveredList, whatsappFormText, visitDateNote,
+  type BadgeTone,
 } from '@/lib/booking-copy'
+import { londonYmd } from '@/lib/booking-options'
+import { whatsappQuoteText } from '@/lib/area-page'
+import { Ico } from '@/components/sections/home/HomeIcon'
 import { parseQuoteContext, quoteContextFromForm, quoteHref, quoteServices } from '@/lib/quote-context'
 import { conversionEvent } from '@/lib/conversion-events'
 import { ctaIds, customerTypeForSource, sourcePageForPath, type SourcePage, type CtaId } from '@/lib/enquiry-attribution'
@@ -26,20 +27,36 @@ import { usePublishQuote } from '@/components/forms/QuoteSummary'
 import { useOptionalHomeQuote } from '@/components/sections/home/HomeQuoteContext'
 import { contactSchema, BULK, PRE_ASSESSMENT, SAME_DAY_LODGEMENT_SPEED, NEXT_DAY_VISIT_SPEED, type ContactInput } from '@/lib/validators'
 import { FORM_DRAFT } from '@/lib/form-layout'
+import './booking-v7.css'
 
 /**
  * Which fields each step validates before moving on: the taps and price, then timing and
  * access. The final step (details) is validated by the whole schema on submit.
  */
-const QUOTE_FIELDS: (keyof ContactInput)[] = ['customerType', 'services', 'areaBand', 'floorArea', 'floorAreaUnknown', 'improvementPlan', 'energyReport']
+const QUOTE_FIELDS: (keyof ContactInput)[] = ['customerType', 'services', 'dwellingType', 'areaBand', 'floorArea', 'floorAreaUnknown', 'improvementPlan', 'energyReport']
 const TITLES = ['Your guide price', 'Timing and access', 'Your details']
 const GATES: (keyof ContactInput)[][] = [QUOTE_FIELDS, ['speed', 'preferredDate', 'notes']]
 const LAST = TITLES.length
 
 const controlClass = 'inline-flex min-h-[48px] items-center justify-center rounded-lg px-4 py-3 text-base font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-700 disabled:opacity-60'
 const badgeClass: Record<BadgeTone, string> = { green: 'bg-accent-600', navy: 'bg-primary-700' }
-const customerIcons: Record<string, LucideIcon> = {
-  'Homeowner': House, 'Landlord (tenanted)': KeyRound, 'Estate agent': Signpost, 'Letting agent / firm': Building2,
+// the design system's drawn icons, as the v7 prototype (house, key, document, flat)
+const customerIcons: Record<string, string> = {
+  'Homeowner': 'house', 'Landlord (tenanted)': 'key', 'Estate agent': 'document', 'Letting agent / firm': 'flat',
+}
+
+/** WhatsApp from the form: the approved prefill, then the choices made so far (v7, approved 22/10/2026). */
+function formWhatsappHref(values: Pick<ContactInput, 'services' | 'dwellingType' | 'areaBand' | 'floorArea'>, guide?: string): string {
+  const text = whatsappFormText(whatsappQuoteText(), {
+    services: values.services, dwellingType: values.dwellingType || '',
+    areaLabel: values.areaBand ? areaLabel(values.areaBand, values.floorArea) : '', guide,
+  })
+  return `${site.whatsappHref}?text=${encodeURIComponent(text)}`
+}
+
+/** Numbered questions on step 1 (v7, from the Stitch mock-up): a serif numeral beside each legend. */
+function Qn({ n }: { n: number }) {
+  return <span className="bf__qn" aria-hidden="true">{n}</span>
 }
 const serviceTabLabels: Record<string, string> = {
   'EPC Certificate': 'Domestic EPC', 'Both (Bundle)': 'EPC + Floor Plan', 'Floor Plan': 'Floor Plan',
@@ -67,7 +84,7 @@ function Choices({ name, legend, value, onChange, options, error, hint, inputRef
     <fieldset className="min-w-0" aria-invalid={!!error} aria-describedby={[hintId, errorId].filter(Boolean).join(' ') || undefined}>
       <legend className="bf__legend">{legend}</legend>
       {hint && <p id={hintId} className="bf__sub">{hint}</p>}
-      <div className="mt-2.5 grid gap-2.5 sm:grid-cols-2">
+      <div className="bf__choices mt-2.5 grid gap-2.5 sm:grid-cols-2">
         {options.map((option, index) => {
           const selected = value === option.value
           return (
@@ -136,72 +153,46 @@ function RequestSent({ data, confirmationSent, focusRef, onReset }: {
   const estimate = guideEstimate(data)
   const kind = estimate.productKind
   const firstName = data.name.trim().split(/\s+/)[0]
+  const guide = estimate.state === 'priced' && estimate.total !== null ? guidePrice(estimate, estimate.total) : undefined
+  // what the chosen service delivers (v7, approved 22/10/2026): the card's own list, as the confirmation email
+  const delivered = deliveredList(kind, { improvementPlan: estimate.improvementPlan > 0, energyReport: estimate.energyReport })
   const rows: [string, string][] = [
     ['Service', data.services.map(serviceLabel).join(' + ')],
-    estimate.isBulk ? ['Properties', data.propertyCount || 'To be confirmed'] : ['Floor area', areaLabel(data.areaBand, data.floorArea)],
+    ...(estimate.isBulk ? [['Properties', data.propertyCount || 'To be confirmed'] as [string, string]]
+      : [['Property type', data.dwellingType || 'Not selected'] as [string, string], ['Floor area', areaLabel(data.areaBand, data.floorArea)] as [string, string]]),
+    ...(estimate.isLodged && data.speed === SAME_DAY_LODGEMENT_SPEED ? [['Turnaround', 'Same-day lodgement'] as [string, string]] : []),
+    ...(estimate.isLodged && data.speed === NEXT_DAY_VISIT_SPEED ? [['Turnaround', 'Next-day visit and lodgement'] as [string, string]] : []),
     ...(estimate.improvementPlan ? [[PLAN_LABEL, `+£${estimate.improvementPlan}`] as [string, string]] : []),
     ...(estimate.energyReport ? [[ENERGY_REPORT_LABEL, 'Included at no extra charge'] as [string, string]] : []),
-    ['Guide estimate', estimate.state === 'priced' && estimate.total !== null ? guidePrice(estimate, estimate.total) : estimate.isBulk ? 'Quoted individually' : 'Price to be confirmed'],
-    ...(data.preferredDate ? [['Preferred date', formatPreferredDate(data.preferredDate)] as [string, string]] : []),
+    ['Guide estimate', guide ?? (estimate.isBulk ? 'Quoted individually' : 'Price to be confirmed')],
+    ...(data.preferredDate && !estimate.isBulk ? [['Preferred date', formatPreferredDate(data.preferredDate)] as [string, string]] : []),
   ]
   return (
     <div ref={focusRef} tabIndex={-1} aria-labelledby="request-sent-heading" className="bf__sent">
       {FORM_DRAFT && <p className="bf__draft">Draft preview: nothing was sent. On the live site this is where the customer lands.</p>}
-      <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent-600 text-white">
-          <Check aria-hidden="true" strokeWidth={3} className="h-5 w-5" />
-        </span>
-        <div className="min-w-0">
-          <h2 id="request-sent-heading" className="text-2xl font-bold leading-tight text-secondary-900">Request sent. Thanks, {firstName}.</h2>
-          {confirmationSent && <p className="mt-1.5 text-base text-secondary-700">We’ve emailed a copy to <strong className="font-semibold text-secondary-900">{data.email}</strong>.</p>}
-        </div>
+      <h2 id="request-sent-heading" className="bf__sent-h">Request sent. Thanks, {firstName}.</h2>
+      {confirmationSent && <p className="bf__sent-copy">We’ve emailed a copy to <strong>{data.email}</strong>.</p>}
+
+      <div>
+        <p className="bf__est-label">What happens next</p>
+        <ol className="bf__sent-next">
+          {nextSteps(kind, data.speed, estimate.energyReport).map((step) => <li key={step}>{step}</li>)}
+        </ol>
       </div>
 
-      <h3 className="mt-6 text-lg font-semibold">What happens next</h3>
-      <ol className="mt-3 space-y-3">
-        {nextSteps(kind, data.speed, estimate.energyReport).map((step, index) => (
-          <li key={step} className="flex gap-3 text-base leading-relaxed text-secondary-700">
-            <span aria-hidden="true" className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary-900 text-xs font-bold text-white">{index + 1}</span>
-            <span className="min-w-0">{step}</span>
-          </li>
-        ))}
-      </ol>
+      {delivered.length > 0 && (
+        <div>
+          <p className="bf__est-label">What you receive</p>
+          <ul className="bf__ticks">{delivered.map((item) => <li key={item}><Check aria-hidden="true" className="h-4 w-4 shrink-0" />{item}</li>)}</ul>
+        </div>
+      )}
 
-      <dl className="mt-6 divide-y divide-secondary-100 rounded-lg border border-secondary-200 px-4">
-        {rows.map(([label, value]) => (
-          <div key={label} className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5 py-2.5 text-sm">
-            <dt className="text-secondary-600">{label}</dt>
-            <dd className="text-right font-semibold text-secondary-900">{value}</dd>
-          </div>
-        ))}
+      <dl className="bf__rows">
+        {rows.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}
       </dl>
 
-      {hasPrepChecklist(kind) && (
-        <a href={PREP_PATH} className="group mt-4 flex items-center gap-3 rounded-lg border border-accent-200 bg-accent-50 p-4 text-secondary-900 hover:border-accent-400">
-          <ClipboardList aria-hidden="true" className="h-6 w-6 shrink-0 text-accent-700" />
-          <span className="min-w-0 flex-1">
-            <span className="block font-semibold">Before your visit</span>
-            <span className="block text-sm text-secondary-700">What to have ready, so nothing needs a second visit.</span>
-          </span>
-          <ArrowRight aria-hidden="true" className="h-5 w-5 shrink-0 text-accent-700 lg:transition-transform lg:group-hover:translate-x-0.5" />
-        </a>
-      )}
-      {!estimate.isBulk && data.customerType === 'Landlord (tenanted)' && (
-        <p className="mt-4 text-sm text-secondary-700"><strong className="font-semibold text-secondary-900">Tenanted property?</strong> Please let your tenants know about the visit.</p>
-      )}
-
-      <div className="mt-6 border-t border-secondary-200 pt-5">
-        <p className="text-sm font-semibold text-secondary-900">Need anything sooner?</p>
-        <div className="mt-2 flex flex-wrap gap-2">
-          <a href={site.phoneHref} className={`${controlClass} gap-2 border border-secondary-300 text-secondary-900`}>
-            <Phone aria-hidden="true" className="h-5 w-5 text-accent-700" />Call {site.phone}
-          </a>
-          <a href={site.whatsappHref} target="_blank" rel="noopener noreferrer" className={`${controlClass} gap-2 border border-secondary-300 text-secondary-900`}>
-            <MessageCircle aria-hidden="true" className="h-5 w-5 text-accent-700" />WhatsApp
-          </a>
-        </div>
-        <button type="button" className="mt-3 inline-flex min-h-[44px] items-center text-sm font-semibold text-primary-800 underline underline-offset-4" onClick={onReset}>Send another request</button>
-      </div>
+      <p className="bf__sent-call">Need it sooner? <a href={formWhatsappHref(data, guide)} target="_blank" rel="noopener noreferrer">Message us on WhatsApp</a></p>
+      <p><button type="button" className="bf__again" onClick={onReset}>Send another request</button></p>
     </div>
   )
 }
@@ -244,7 +235,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
     resolver: zodResolver(contactSchema),
     shouldFocusError: false,
     defaultValues: {
-      name: '', phone: '', email: '', address: '', postcode: '', services: ['EPC Certificate'],
+      name: '', phone: '', email: '', address: '', postcode: '', services: ['EPC Certificate'], dwellingType: '',
       areaBand: '', floorArea: '', floorAreaUnknown: false, customerType: '', improvementPlan: false, energyReport: false, speed: 'Standard (72 hours)',
       areaPage, sourcePage: sourcePage || sourcePageForPath(pathname), ctaId: defaultCta,
       propertyCount: '', preferredDate: '', notes: '', website: '', turnstileToken: FORM_DRAFT ? 'draft-preview' : '', consent: false,
@@ -309,6 +300,25 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
   })
   const values = watch()
   const estimate = guideEstimate(values)
+  // A portfolio has nothing to choose about timing, so it skips step 2 (v7, approved 22/10/2026): two steps, not three.
+  const portfolio = values.services.includes(BULK)
+  const stepCount = portfolio ? 2 : LAST
+  const stepAt = portfolio && step === LAST ? 2 : step
+  const dateNote = visitDateNote(values.preferredDate, values.speed === NEXT_DAY_VISIT_SPEED)
+
+  // The plan's box pulses three times as it comes into view (v7: "a little subtle blinking animation"); never under
+  // reduced motion, never once ticked.
+  const pulseObserver = useRef<IntersectionObserver | null>(null)
+  const planBox = useCallback((box: HTMLLabelElement | null) => {
+    pulseObserver.current?.disconnect()
+    if (!box || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    pulseObserver.current = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting || box.querySelector('input')?.checked) return
+      box.classList.add('is-pulsing')
+      pulseObserver.current?.disconnect()
+    }, { threshold: 0.6 })
+    pulseObserver.current.observe(box)
+  }, [])
   const publishQuote = usePublishQuote()
   const [selectedService] = values.services
   const { areaBand, floorArea, customerType, speed, improvementPlan, energyReport } = values
@@ -342,7 +352,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
     start()
     if (await trigger(GATES[step - 1])) {
       conversionEvent('form_step_complete', { ...quoteContextFromForm(getValues()), step })
-      moveFocus.current = true; setStep(step + 1)
+      moveFocus.current = true; setStep(step === 1 && getValues('services').includes(BULK) ? LAST : step + 1)
     } else {
       requestAnimationFrame(() => {
         const invalid = formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')
@@ -422,7 +432,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
   const showArea = areaOpen || onTopBand || !!floorArea
 
   const planChoice = canHavePlan && !planIncluded && (
-    <label className="bf-check bf-check--offer">
+    <label ref={planBox} className="bf-check bf-check--offer" onAnimationEnd={event => event.currentTarget.classList.remove('is-pulsing')}>
       <input type="checkbox" className="bf-check__box" {...register('improvementPlan', { onChange: rememberSelection })} />
       {/* Abdul's wording, 22/10/2026 pricing spec §7 */}
       <span className="min-w-0"><span className="bf-check__t">Add a personalised EPC Improvement Plan <span className="whitespace-nowrap">— £{site.addOns.improvementPlan}</span></span>
@@ -479,10 +489,10 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
     <div className="bf__quote">
       <Controller control={control} name="customerType" render={({ field }) => (
         <fieldset className="min-w-0" aria-invalid={!!errors.customerType} aria-describedby={errors.customerType ? 'customerType-error' : undefined}>
-          <legend className="bf__legend">Which best describes you?</legend>
+          <legend className="bf__legend"><Qn n={1} />Which best describes you?</legend>
           <div className="bf__who">
             {customerTypeChoices(isBulk).map((option, index) => {
-              const Icon = customerIcons[option.value] || House
+              const icon = customerIcons[option.value] || 'house'
               const checked = field.value === option.value
               return (
                 <label key={option.value} className="bf-tile bf-tile--who" data-checked={checked || undefined}>
@@ -494,7 +504,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
                       // An agent instructing on a sale usually needs the floor plan too; only a default.
                       if (!serviceTouched.current && option.value === 'Estate agent') chooseService('Both (Bundle)')
                     }} />
-                  <span aria-hidden="true" className="bf-tile__ico"><Icon className="h-5 w-5" /></span>
+                  <span aria-hidden="true" className="bf-tile__ico"><Ico name={icon} /></span>
                   <span className="min-w-0"><b>{option.label}</b><span id={`customerType-d-${index}`} className="bf-tile__d">{option.description}</span></span>
                   {checked && <Check aria-hidden="true" strokeWidth={3} className="bf-tile__check" />}
                 </label>
@@ -506,7 +516,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
       )} />
 
       <fieldset className="min-w-0" aria-invalid={!!errors.services} aria-describedby={errors.services ? 'services-error' : undefined}>
-        <legend className="bf__legend">Which service?</legend>
+        <legend className="bf__legend"><Qn n={2} />Which service?</legend>
         <div className="bf__tabs">
           {serviceChoices.map(option => {
             const checked = selectedService === option.value
@@ -526,13 +536,36 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
         {errors.services && <p id="services-error" role="alert" className="mt-2 text-sm text-red-700">{errors.services.message}</p>}
       </fieldset>
 
+      {/* v7, approved 22/10/2026: the kind of home (a maisonette on two floors changes the survey). Not on a portfolio. */}
+      {!isBulk && <Controller control={control} name="dwellingType" render={({ field }) => (
+        <fieldset className="min-w-0" aria-invalid={!!errors.dwellingType} aria-describedby={['dwellingType-hint', errors.dwellingType ? 'dwellingType-error' : ''].filter(Boolean).join(' ')}>
+          <legend className="bf__legend"><Qn n={3} />What type of property is it?</legend>
+          <p id="dwellingType-hint" className="bf__sub">It helps us confirm your exact price.</p>
+          <div className="bf__who bf__dwelling">
+            {dwellingChoices.map((option, index) => {
+              const checked = field.value === option.value
+              return (
+                <label key={option.value} className="bf-tile bf-tile--who bf-tile--dwelling" data-checked={checked || undefined}>
+                  <input type="radio" name="dwellingType" value={option.value} checked={checked} required className="bf-radio"
+                    ref={index === 0 ? field.ref : undefined} aria-label={option.value} aria-describedby={`dwellingType-d-${index}`}
+                    onChange={() => { field.onChange(option.value); rememberSelection() }} />
+                  <span className="min-w-0"><b>{option.value}</b><span id={`dwellingType-d-${index}`} className="bf-tile__d">{option.description}</span></span>
+                  {checked && <Check aria-hidden="true" strokeWidth={3} className="bf-tile__check" />}
+                </label>
+              )
+            })}
+          </div>
+          {errors.dwellingType && <p id="dwellingType-error" role="alert" className="mt-2 text-sm text-red-700">{errors.dwellingType.message}</p>}
+        </fieldset>
+      )} />}
+
       <div className="bf__calc">
         <div className="min-w-0">
           {isBulk ? (
             <p className="bf__note">A single floor area does not apply to several properties. We&rsquo;ll ask roughly how many on the next step, and quote them individually.</p>
           ) : (
             <fieldset className="min-w-0" aria-invalid={!!errors.areaBand} aria-describedby={['areaBand-hint', errors.areaBand ? 'areaBand-error' : ''].filter(Boolean).join(' ')}>
-              <legend className="bf__legend">How big is the property?</legend>
+              <legend className="bf__legend"><Qn n={4} />How big is the property?</legend>
               <p id="areaBand-hint" className="bf__sub">Choose the approximate internal floor area. Bedrooms are only a rough guide. Not sure? We can confirm it from your property details.</p>
               <div className="bf__sizes">
                 {areaBands.map((b, i) => {
@@ -592,6 +625,12 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
           ) : (
             <><p className="bf__price"><small>From</small><b data-price className="tabular-nums">£{formatPrice(estimate.fromTotal ?? 0)}</b></p><p className="bf__for">Pick a size for your guide price.</p></>
           )}
+          {whatYouGet(productKind).length > 0 && <>
+            <p className="bf__est-label bf__get-h">What you get</p>
+            <ul className="bf__ticks bf__get">{whatYouGet(productKind).map(item => <li key={item}><Check aria-hidden="true" className="h-4 w-4 shrink-0" />{item}</li>)}</ul>
+          </>}
+          <details className="bf__incl"><summary><span>What’s included in the price</span><ArrowRight aria-hidden="true" className="h-5 w-5" /></summary>
+            <ul>{includedList(productKind).map(item => <li key={item}>{item}</li>)}</ul></details>
           {(planChoice || reportChoice) && <div className="bf__extras">
             {planChoice}
             {reportChoice}
@@ -607,15 +646,22 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
 
   /* ------------------------------------------------------------- timing and details */
   const timingFields = <>
-    {isLodged ? <Controller control={control} name="speed" render={({ field }) => <Choices name="speed" legend="Lodgement speed"
-      value={field.value} inputRef={field.ref} error={errors.speed?.message} onChange={value => { field.onChange(value); rememberSelection() }} options={[
+    {isLodged ? <Controller control={control} name="speed" render={({ field }) => <Choices name="speed" legend="How quickly do you need the certificate?"
+      value={field.value} inputRef={field.ref} error={errors.speed?.message} onChange={value => {
+        field.onChange(value); rememberSelection()
+        // a next-day visit means tomorrow: it fills in tomorrow's date when none is set (v7)
+        if (value === NEXT_DAY_VISIT_SPEED && !getValues('preferredDate')) setValue('preferredDate', londonYmd(1))
+      }} options={[
         { value: 'Standard (72 hours)', label: 'Standard lodgement', description: 'Lodged on the GOV.UK register within 72 hours of the visit.' },
         { value: SAME_DAY_LODGEMENT_SPEED, label: `Same-day lodgement (+\u2060£${SAME_DAY_LODGEMENT_SURCHARGE})`, description: 'Lodged on the GOV.UK register on the day of the visit.' },
         { value: NEXT_DAY_VISIT_SPEED, label: `Next-day visit and lodgement (+\u2060£${NEXT_DAY_VISIT_SURCHARGE})`, description: 'We visit the next day and lodge your EPC that day. Availability confirmed before booking.' },
       ]} />} /> : <p className="text-base text-secondary-700">{turnaroundCopy(productKind)}</p>}
     <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">
-      {!isBulk && <Field label="Preferred visit date" htmlFor="preferredDate" hint="Optional. Next-day visits are available. A requested date is not a confirmed appointment." error={errors.preferredDate?.message}>
-        <Input id="preferredDate" type="date" {...register('preferredDate')} />
+      {!isBulk && <Field label="Preferred visit date" htmlFor="preferredDate" hint="Optional. A requested date is not a confirmed appointment." error={errors.preferredDate?.message}>
+        <Input id="preferredDate" type="date" min={londonYmd(0)} aria-describedby={dateNote.text && !errors.preferredDate ? 'preferredDate-note' : undefined}
+          {...register('preferredDate', { onChange: () => { if (errors.preferredDate) void trigger('preferredDate') } })} />
+        {/* never in the past; today and tomorrow say what they depend on; a next-day visit means tomorrow */}
+        {dateNote.text && !errors.preferredDate && <p id="preferredDate-note" role="status" className={cn('bf__date-note', dateNote.blocking && 'is-bad')}>{dateNote.text}</p>}
       </Field>}
       <Field label="Access notes or other instructions" htmlFor="notes" hint="Optional. Access, parking or anything about the property." error={errors.notes?.message} className={isBulk ? 'sm:col-span-2' : undefined}>
         <Textarea id="notes" rows={2} {...register('notes')} />
@@ -642,6 +688,10 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
         <Textarea id="address" rows={isBulk ? 5 : 2} autoComplete={isBulk ? 'off' : 'street-address'} {...register('address')} />
       </Field>
       {!isBulk && <Field label="Postcode" htmlFor="postcode" required error={errors.postcode?.message}><Input id="postcode" autoComplete="postal-code" {...register('postcode')} /></Field>}
+      {/* a portfolio skips step 2, so its notes come here */}
+      {isBulk && <Field label="Access notes or other instructions" htmlFor="notes" hint="Optional. Access, parking or anything about the properties." error={errors.notes?.message} className="sm:col-span-2">
+        <Textarea id="notes" rows={2} {...register('notes')} />
+      </Field>}
     </div>
   </>
 
@@ -675,15 +725,15 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
       }} className={shell} data-step={step}>
       <div className="bf__head">
         <h2 ref={headingRef} tabIndex={-1} className="bf__h">{TITLES[step - 1]}</h2>
-        <p className="bf__count">Step {step} of {LAST}</p>
+        <p className="bf__count">Step {stepAt} of {stepCount}</p>
       </div>
-      <div aria-hidden="true" className="bf__progress"><div style={{ transform: `translateX(${(step / LAST - 1) * 100}%)` }} /></div>
+      <div aria-hidden="true" className="bf__progress"><div style={{ transform: `translateX(${(stepAt / stepCount - 1) * 100}%)` }} /></div>
 
       {/* Keep this node mounted and empty before the first estimate. Only its text changes. */}
       <p data-estimate-announcement className="sr-only" aria-live="polite" aria-atomic="true">{estimateText}</p>
       {step > 1 && estimateText && <div data-estimate-summary className="bf__summary">
         <p><b>{estimateText}</b></p>
-        <p className="mt-0.5">{serviceLabel(selectedService)}{values.customerType ? ` · ${values.customerType}` : ''}{speed === SAME_DAY_LODGEMENT_SPEED ? ' · same-day lodgement' : speed === NEXT_DAY_VISIT_SPEED ? ' · next-day visit and lodgement' : ''}{estimate.improvementPlan ? ' · Improvement Plan' : ''}{estimate.energyReport ? ' · separate energy report' : ''}</p>
+        <p className="mt-0.5">{serviceLabel(selectedService)}{values.dwellingType && !isBulk ? ` · ${values.dwellingType}` : ''}{values.customerType ? ` · ${values.customerType}` : ''}{speed === SAME_DAY_LODGEMENT_SPEED ? ' · same-day lodgement' : speed === NEXT_DAY_VISIT_SPEED ? ' · next-day visit and lodgement' : ''}{estimate.improvementPlan ? ' · Improvement Plan' : ''}{estimate.energyReport ? ' · separate energy report' : ''}</p>
         <button type="button" className="bf__change" onClick={() => { moveFocus.current = true; setStep(1) }}>Change</button>
       </div>}
 
@@ -692,15 +742,16 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
       <div className="bf__body">{stepBody}</div>
 
       <div className="bf__nav">
-        {step > 1 && <button type="button" disabled={status === 'submitting'} className={`${controlClass} gap-1.5 border border-secondary-400 text-secondary-900`} onClick={() => { moveFocus.current = true; setStep(step - 1) }}><ArrowLeft aria-hidden="true" className="h-4 w-4" />Back</button>}
+        {step > 1 && <button type="button" disabled={status === 'submitting'} className={`${controlClass} gap-1.5 border border-secondary-400 text-secondary-900`} onClick={() => { moveFocus.current = true; setStep(step === LAST && isBulk ? 1 : step - 1) }}><ArrowLeft aria-hidden="true" className="h-4 w-4" />Back</button>}
         {/* Distinct keys: the Continue button must not be reused as the Send button, or the
             click that advances to the last step also counts as a submit of the empty details. */}
         {step < LAST ? <button key={`continue-${step}`} type="button" onClick={() => void next()} className="bf__go">{step === LAST - 1 ? 'Continue to your details' : 'Continue'}<ArrowRight aria-hidden="true" className="h-4 w-4" /></button> :
           <button key="send" type="submit" disabled={status === 'submitting' || (!FORM_DRAFT && !turnstileToken)} className="bf__go">{status === 'submitting' ? 'Sending…' : 'Send my quote request'}</button>}
       </div>
+      {/* who replies and how fast, under the send button (live wording) */}
+      {step === LAST && <p className="bf__reply"><b>Same working-day reply</b>, with your exact price and available times.</p>}
       <div className="bf__foot">
-        <details className="min-w-0"><summary className="cursor-pointer py-3 font-semibold">What’s included</summary><ul className="mb-2 list-disc space-y-2 pl-5">{includedList(productKind).map(item => <li key={item}>{item}</li>)}</ul></details>
-        <p>Need help? <a href={site.phoneHref} className="inline-flex min-h-[44px] items-center px-2 underline lg:px-0">Call</a> or <a href={site.whatsappHref} className="inline-flex min-h-[44px] items-center px-2 underline lg:px-0">WhatsApp</a>.</p>
+        <p>Questions first? <a href={formWhatsappHref(values, estimate.state === 'priced' && estimate.total !== null ? guidePrice(estimate, estimate.total) : undefined)} target="_blank" rel="noopener noreferrer">Message us on WhatsApp</a>, and what you’ve chosen so far comes with it.</p>
       </div>
     </form>
   )
