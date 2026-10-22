@@ -1,15 +1,18 @@
 import { quoteHref } from '@/lib/quote-context'
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { ArrowRight, MapPin } from 'lucide-react'
 import { Section } from '@/components/ui/Section'
 import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { PageHero } from '@/components/sections/PageHero'
 import { CtaStrip } from '@/components/sections/CtaStrip'
-import { PostCard } from '@/components/blog/PostCard'
-import { getAllPosts, getFeaturedPosts } from '@/lib/blog'
-import { categories } from '@/lib/blog-categories'
+import { getAllPosts, type Post } from '@/lib/blog'
+import { BOROUGH_DATA_PAGE, guideGroups } from '@/lib/guides'
+import { whatsappQuoteHref } from '@/lib/area-page'
 import { site, priceFrom, defaultOgImage } from '@/lib/site'
 
+// Title and H1 are frozen until the 14/12 review (references/local-seo.md); the body is the Guides hub
+// of plan PLAN-AREAS-GUIDES-2026-10-22 §8.1.
 export const metadata: Metadata = {
   title: 'EPC Guides for London Homeowners & Landlords',
   description:
@@ -32,7 +35,7 @@ export const metadata: Metadata = {
 
 const breadcrumbs = [
   { href: '/', label: 'Home' },
-  { href: '/blog', label: 'Blog' },
+  { href: '/blog', label: 'Guides' },
 ]
 
 const breadcrumbSchema = {
@@ -40,23 +43,24 @@ const breadcrumbSchema = {
   '@type': 'BreadcrumbList',
   itemListElement: [
     { '@type': 'ListItem', position: 1, name: 'Home', item: site.url },
-    { '@type': 'ListItem', position: 2, name: 'Blog', item: `${site.url}/blog` },
+    { '@type': 'ListItem', position: 2, name: 'Guides', item: `${site.url}/blog` },
   ],
 }
 
+const OPENING_ANSWER =
+  'An EPC rates a home from A to G using a modelled score, not your bills. You need a valid one, lodged no more than 10 years ago, before you sell or let, and rented homes covered by the minimum standard must be band E or above unless an exemption is registered. Approved software works out the rating from what the assessor records and the evidence you can show. Start with the group that fits where you are.'
+
 export default async function BlogIndexPage() {
   const allPosts = await getAllPosts()
-  const featured = await getFeaturedPosts(3)
-  const featuredSlugs = new Set(featured.map((p) => p.slug))
-  const recent = allPosts.filter((p) => !featuredSlugs.has(p.slug))
+  const bySlug = new Map<string, Post>(allPosts.map((p) => [p.slug, p]))
 
   const blogSchema = {
     '@context': 'https://schema.org',
     '@type': 'Blog',
     '@id': `${site.url}/blog`,
-    name: 'L&D Energy Blog',
+    name: 'L&D Energy Guides',
     description:
-      'Expert guidance on EPCs, MEES compliance, and improving energy efficiency from a working London DEA.',
+      'Guidance on EPCs, MEES compliance and improving energy efficiency from a working London DEA.',
     publisher: { '@id': `${site.url}/#business` },
     blogPost: allPosts.slice(0, 20).map((p) => ({
       '@type': 'BlogPosting',
@@ -75,87 +79,88 @@ export default async function BlogIndexPage() {
       <BreadcrumbNav items={breadcrumbs} />
 
       <PageHero
-        eyebrow="EPC Blog"
+        eyebrow="Guides"
         heading="EPC Insights & Guides for London Homeowners & Landlords"
-        subheading="Expert guidance on Energy Performance Certificates, MEES compliance, and improving your rating, written by a working London DEA."
+        subheading={OPENING_ANSWER}
         primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'blog', ctaId: 'hero' }) }}
+        secondaryCta={{ label: 'WhatsApp a quote request', href: whatsappQuoteHref() }}
       />
 
-      {allPosts.length === 0 ? (
-        <Section variant="default">
-          <div className="max-w-2xl">
-            <p className="text-lg text-secondary-700">
-              New posts are on the way. In the meantime, see our{' '}
-              <Link href="/services/domestic-epc" className="text-primary-700 underline">
-                Domestic EPC service
-              </Link>{' '}
-              or{' '}
-              <Link href={quoteHref({ sourcePage: 'blog', ctaId: 'inline' })} className="text-primary-700 underline">
-                request an assessment quote
-              </Link>
-              .
-            </p>
-          </div>
-        </Section>
-      ) : (
-        <>
-          {featured.length > 0 && (
-            <Section variant="default" id="featured">
-              <p className="text-xs uppercase tracking-wide font-semibold text-primary-700">
-                Featured
-              </p>
-              <h2 className="mt-2 text-3xl md:text-4xl font-bold tracking-tight text-secondary-900">
-                Editor&rsquo;s picks
-              </h2>
-              <div className="mt-8 grid gap-6 md:grid-cols-2">
-                {featured.map((post, i) => (
-                  <PostCard key={post.slug} post={post} featured={i === 0 && featured.length > 1} />
-                ))}
-              </div>
-            </Section>
-          )}
+      <Section variant="default" id="guides">
+        <nav aria-label="Guide groups" className="flex flex-wrap gap-2">
+          {guideGroups.map((g) => (
+            <a
+              key={g.id}
+              href={`#${g.id}`}
+              className="inline-flex min-h-11 items-center rounded-full border border-secondary-200 bg-white px-4 text-sm font-medium text-secondary-800 hover:border-primary-300 hover:bg-primary-50"
+            >
+              {g.heading}
+            </a>
+          ))}
+        </nav>
 
-          <Section variant="muted" id="categories">
-            <p className="text-xs uppercase tracking-wide font-semibold text-primary-700">
-              Browse by topic
-            </p>
-            <h2 className="mt-2 text-3xl md:text-4xl font-bold tracking-tight text-secondary-900">
-              Explore by category
-            </h2>
-            <ul className="mt-8 grid gap-3 sm:grid-cols-2 md:grid-cols-3">
-              {categories.map((cat) => (
-                <li key={cat.slug}>
-                  <Link
-                    href={`/blog/category/${cat.slug}`}
-                    className="block h-full rounded-lg border border-secondary-200 bg-white p-5 transition-colors hover:border-primary-300 hover:bg-primary-50"
-                  >
-                    <p className="font-semibold text-secondary-900 group-hover:text-primary-700">
-                      {cat.name}
-                    </p>
-                    <p className="mt-1 text-sm text-secondary-600">{cat.description}</p>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </Section>
-
-          {recent.length > 0 && (
-            <Section variant="default" id="recent">
-              <p className="text-xs uppercase tracking-wide font-semibold text-primary-700">
-                Recent posts
-              </p>
-              <h2 className="mt-2 text-3xl md:text-4xl font-bold tracking-tight text-secondary-900">
-                Latest guides
+        <div className="mt-10 space-y-14">
+          {guideGroups.map((group) => (
+            <section key={group.id} id={group.id} aria-labelledby={`${group.id}-heading`} className="scroll-mt-28">
+              <h2 id={`${group.id}-heading`} className="text-2xl md:text-3xl font-bold tracking-tight text-secondary-900">
+                {group.heading}
               </h2>
-              <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {recent.map((post) => (
-                  <PostCard key={post.slug} post={post} />
-                ))}
-              </div>
-            </Section>
+              <p className="mt-2 max-w-2xl text-secondary-700">{group.intro}</p>
+              <ul className="mt-6 grid gap-3 md:grid-cols-2">
+                {group.guides.map((g, i) => {
+                  const post = bySlug.get(g.slug)
+                  if (!post) return null
+                  const pillar = i === 0
+                  return (
+                    <li key={g.slug} className={pillar ? 'md:col-span-2' : undefined}>
+                      <Link
+                        href={`/blog/${g.slug}`}
+                        className={`group flex h-full flex-col rounded-lg border p-5 transition-colors hover:border-primary-300 hover:bg-primary-50 ${
+                          pillar ? 'border-primary-200 bg-primary-50/60' : 'border-secondary-200 bg-white'
+                        }`}
+                      >
+                        {pillar && (
+                          <span className="text-xs font-semibold uppercase tracking-wide text-primary-700">Start here</span>
+                        )}
+                        <span className={`font-semibold text-secondary-900 group-hover:text-primary-800 ${pillar ? 'mt-1 text-lg' : ''}`}>
+                          {post.title}
+                        </span>
+                        <span className="mt-1 text-sm text-secondary-700">{g.summary}</span>
+                      </Link>
+                    </li>
+                  )
+                })}
+              </ul>
+            </section>
+          ))}
+        </div>
+      </Section>
+
+      <Section variant="muted" id="local-figures">
+        <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-secondary-900">Local figures</h2>
+        <p className="mt-2 max-w-2xl text-secondary-700">
+          How homes in each London borough rate, from EPCs on the GOV.UK register, and what that means locally.
+        </p>
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+          <Link
+            href="/areas"
+            className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-secondary-200 bg-white px-5 py-3 font-semibold text-secondary-900 hover:border-primary-300 hover:bg-primary-50"
+          >
+            <MapPin className="h-4 w-4 text-primary-600" aria-hidden="true" />
+            Find your area
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
+          {BOROUGH_DATA_PAGE.live && (
+            <Link
+              href={BOROUGH_DATA_PAGE.href}
+              className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-secondary-200 bg-white px-5 py-3 font-semibold text-secondary-900 hover:border-primary-300 hover:bg-primary-50"
+            >
+              {BOROUGH_DATA_PAGE.label}
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
           )}
-        </>
-      )}
+        </div>
+      </Section>
 
       <CtaStrip
         heading="Need an EPC? Get your exact quote."
