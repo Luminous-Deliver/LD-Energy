@@ -89,9 +89,22 @@ export function bandEpcPrice(id: AreaBand): string {
   return band.startingPrice ? `from £${band.epc}` : `£${band.epc}`
 }
 
+/**
+ * The opening line names the service the customer chose (Abdul 23/10/2026). Keys are the form's service values
+ * (lib/booking-options.ts `services`). Before a service is chosen (header, hero, dock, area pages) it is the EPC.
+ */
+export const whatsappOpeningLines: Record<string, string> = {
+  'EPC Certificate': "Hi, I'd like a quote for an EPC.",
+  'Both (Bundle)': "Hi, I'd like a quote for an EPC and floor plan.",
+  'Floor Plan': "Hi, I'd like a quote for a floor plan.",
+  'EPC Pre-Assessment (not lodged)': "Hi, I'd like a quote for a pre-assessment.",
+  'Bulk / Agency Enquiry': "Hi, I'd like a quote for several properties.",
+}
+
 /** WhatsApp with a short quote request prefilled for the customer to complete (Abdul 22/10/2026). */
-export function whatsappQuoteText(): string {
-  return ["Hi, I'd like a quote for an EPC.", 'Full address:', 'Postcode:'].join('\n')
+export function whatsappQuoteText(service?: string): string {
+  const opening = (service && whatsappOpeningLines[service]) || whatsappOpeningLines['EPC Certificate']
+  return [opening, 'Full address:', 'Postcode:'].join('\n')
 }
 
 export function whatsappQuoteHref(): string {

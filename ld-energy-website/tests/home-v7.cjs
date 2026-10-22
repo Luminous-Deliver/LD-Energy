@@ -93,7 +93,7 @@ const KEEP = [
 
     // reviews: real, credited by first name and surname initial
     const credits = await page.locator('#proof .quote figcaption').allInnerTexts()
-    ok(credits.length === 2 && credits.every((c) => /^★★★★★\s+[A-Z]\. [A-Z]\., .+ · Google review$/.test(c.trim())), `reviewers by initials, as the prototype (${credits})`)
+    ok(credits.length === 2 && credits.every((c) => /^★★★★★\s+[A-Z][a-z]+ [A-Z]\., .+ · Google review$/.test(c.trim())), `reviewers as "First L." (${credits})`)
 
     // every internal destination the old homepage had
     const hrefs = new Set(await page.locator('.hp a[href^="/"]').evaluateAll((as) => as.map((a) => a.getAttribute('href'))))

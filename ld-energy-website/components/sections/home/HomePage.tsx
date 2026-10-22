@@ -321,10 +321,10 @@ function Prices() {
   )
 }
 
-/** Real Google reviews, word for word (references/reviews-2026-10-21), credited by initials as the prototype does (Abdul 23/10: match the prototype). */
+/** Real Google reviews, word for word (references/reviews-2026-10-21), credited by first name and surname initial (Abdul 23/10/2026: reads as a real person; Google shows the names publicly). */
 const quotes = [
-  { who: 'A. T.', what: 'floor plan for a property licence', paras: ['Excellent service from start to finish! I needed a floor plan for my flat that met the requirements for a property licence application. The whole process was smooth, efficient, and professional, with a very quick turnaround. The pricing was also very reasonable and offered great value for money. I’m really pleased with the service and would highly recommend L&D Energy to anyone needing a floor plan for their property. Thank you!'] },
-  { who: 'A. O.', what: 'EPC', paras: ['I was very pleased with the service provided by L&D Energy. My EPC was completed within a day, which was extremely impressive. The service was quick, efficient and professional, and the whole process was smooth and hassle-free.', 'I really appreciate the prompt turnaround and would happily recommend L&D Energy to anyone looking for a reliable EPC service.', 'Thank you for the excellent service!'] },
+  { who: 'Anum T.', what: 'floor plan for a property licence', paras: ['Excellent service from start to finish! I needed a floor plan for my flat that met the requirements for a property licence application. The whole process was smooth, efficient, and professional, with a very quick turnaround. The pricing was also very reasonable and offered great value for money. I’m really pleased with the service and would highly recommend L&D Energy to anyone needing a floor plan for their property. Thank you!'] },
+  { who: 'Abiola O.', what: 'EPC', paras: ['I was very pleased with the service provided by L&D Energy. My EPC was completed within a day, which was extremely impressive. The service was quick, efficient and professional, and the whole process was smooth and hassle-free.', 'I really appreciate the prompt turnaround and would happily recommend L&D Energy to anyone looking for a reliable EPC service.', 'Thank you for the excellent service!'] },
 ]
 
 function Proof() {
