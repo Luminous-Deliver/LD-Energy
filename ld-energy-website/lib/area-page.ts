@@ -89,21 +89,11 @@ export function bandEpcPrice(id: AreaBand): string {
   return band.startingPrice ? `from £${band.epc}` : `£${band.epc}`
 }
 
-/**
- * WhatsApp with the quote details prefilled for the customer to edit.
- * DRAFT wording, pending Abdul's approval (22/10/2026); the preview carries it so he can try it.
- */
-export function whatsappQuoteText(area: string): string {
-  return [
-    `Hi, I'd like an EPC quote in ${area}.`,
-    'Service: EPC / floor plan / both',
-    'Property type: flat, maisonette or house',
-    'Rough size (m² or bedrooms):',
-    'Postcode:',
-    'Preferred date:',
-  ].join('\n')
+/** WhatsApp with a short quote request prefilled for the customer to complete (Abdul 22/10/2026). */
+export function whatsappQuoteText(): string {
+  return ["Hi, I'd like a quote for an EPC.", 'Full address:', 'Postcode:'].join('\n')
 }
 
-export function whatsappQuoteHref(area: string): string {
-  return `${site.whatsappHref}?text=${encodeURIComponent(whatsappQuoteText(area))}`
+export function whatsappQuoteHref(): string {
+  return `${site.whatsappHref}?text=${encodeURIComponent(whatsappQuoteText())}`
 }

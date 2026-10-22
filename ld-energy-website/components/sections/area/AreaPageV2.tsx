@@ -16,10 +16,32 @@ import {
 } from './AreaBlocks'
 
 /**
- * Approved job notes, by area slug. Empty until Abdul approves a draft: a note is a real job
- * (month, home type, size, neighbourhood, rating, what drove it), never a name, street or number.
+ * Approved job notes, by area slug (Abdul 22/10/2026). A note is a real job matched to its lodged certificate
+ * (month, home type, size, postcode district, rating, what drove it), never a name, street or number.
  */
-const approvedJobNotes: Record<string, { heading: string; paragraphs: string[] }> = {}
+const approvedJobNotes: Record<string, { heading: string; paragraphs: string[] }> = {
+  stratford: {
+    heading: 'A recent job in Stratford',
+    paragraphs: [
+      'June 2026, Stratford E15. A three-bedroom mid-terrace house of 87 m², rated C (71). The certificate records the cavity walls as built, with no insulation, which is what the method uses when there is no evidence that the cavity was filled later. The loft was recorded as insulated, the windows as double glazed, and the heating as a gas boiler with a programmer, room thermostat and radiator valves.',
+      'The first recommendation was cavity wall insulation. With every recommendation carried out, the potential rating was C (78).',
+    ],
+  },
+  newham: {
+    heading: 'A recent job in Newham',
+    paragraphs: [
+      'July 2026, E16. A top-floor maisonette of 68 m², booked with a floor plan, rated D (67). The walls, roof and glazing were all recorded as insulated or double glazed. Heating and hot water come from a community scheme with flat-rate charging and radiator valves.',
+      'The only recommendation was hot water cylinder insulation, and with it carried out the potential rating was D (68).',
+    ],
+  },
+  croydon: {
+    heading: 'A recent job in Croydon',
+    paragraphs: [
+      'August 2026, Croydon CR0. A three-bedroom mid-terrace house of 90 m², rated D (67). The main walls are solid brick with no added insulation and an extension is timber-framed. The loft had 100 mm of insulation; a flat roof section had none recorded. Heating is a gas boiler with a programmer and radiator valves but no room thermostat.',
+      'The recommendations started with internal wall insulation, then floor insulation and a room thermostat. With all of them carried out, including solar panels, the potential rating was C (78).',
+    ],
+  },
+}
 
 /** Two short questions every area page answers the same way; the local ones come first. */
 function sharedFaqs(name: string): FaqItem[] {

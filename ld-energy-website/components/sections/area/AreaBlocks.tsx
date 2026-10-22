@@ -57,7 +57,7 @@ export function AreaHeroV2({ name, s }: { name: string; s: AreaSummary }) {
         </p>
         <div className="mt-8 flex flex-col sm:flex-row gap-3">
           <Button href="#contact" data-enquiry-cta="hero" variant="accent" size="lg">Get my exact quote</Button>
-          <Button href={whatsappQuoteHref(name)} variant="secondary" size="lg" target="_blank" rel="noopener noreferrer">
+          <Button href={whatsappQuoteHref()} variant="secondary" size="lg" target="_blank" rel="noopener noreferrer">
             <MessageCircle className="w-5 h-5" aria-hidden="true" />
             WhatsApp a quote request
           </Button>
@@ -409,7 +409,7 @@ export function AreaCtaBand({ name }: { name: string }) {
         </div>
         <div className="flex flex-col gap-3 sm:flex-row shrink-0">
           <Button href="#contact" data-enquiry-cta="bottom" variant="accent" size="lg">Get my exact quote</Button>
-          <Button href={whatsappQuoteHref(name)} variant="secondary" size="lg" target="_blank" rel="noopener noreferrer"
+          <Button href={whatsappQuoteHref()} variant="secondary" size="lg" target="_blank" rel="noopener noreferrer"
             className="bg-transparent border-white text-white hover:bg-primary-700 hover:border-primary-700">
             <MessageCircle className="w-5 h-5" aria-hidden="true" />
             WhatsApp
