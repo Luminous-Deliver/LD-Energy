@@ -47,7 +47,7 @@ const customerIcons: Record<string, string> = {
 
 /** WhatsApp from the form: the approved prefill, then the choices made so far (v7, approved 22/10/2026). */
 function formWhatsappHref(values: Pick<ContactInput, 'services' | 'dwellingType' | 'areaBand' | 'floorArea'>, guide?: string): string {
-  const text = whatsappFormText(whatsappQuoteText(), {
+  const text = whatsappFormText(whatsappQuoteText(values.services[0]), {
     services: values.services, dwellingType: values.dwellingType || '',
     areaLabel: values.areaBand ? areaLabel(values.areaBand, values.floorArea) : '', guide,
   })

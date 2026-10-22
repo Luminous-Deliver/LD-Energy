@@ -100,3 +100,22 @@ test('the API: property type required and carried into both emails, with What yo
     for (const [k, v] of [['TURNSTILE_SECRET_KEY', previous.turnstile], ['RESEND_API_KEY', previous.resend]]) { if (v === undefined) delete process.env[k]; else process.env[k] = v }
   }
 })
+
+test('WhatsApp opening line follows the chosen service; before a choice it is the EPC (Abdul 23/10/2026)', () => {
+  const { whatsappQuoteHref, whatsappOpeningLines } = require('../lib/area-page.ts')
+  const { services } = require('../lib/booking-options.ts')
+  const expected = {
+    'EPC Certificate': "Hi, I'd like a quote for an EPC.",
+    'Both (Bundle)': "Hi, I'd like a quote for an EPC and floor plan.",
+    'Floor Plan': "Hi, I'd like a quote for a floor plan.",
+    'EPC Pre-Assessment (not lodged)': "Hi, I'd like a quote for a pre-assessment.",
+    'Bulk / Agency Enquiry': "Hi, I'd like a quote for several properties.",
+  }
+  assert.deepEqual(Object.keys(whatsappOpeningLines).sort(), [...services].sort(), 'one line per service')
+  for (const [service, line] of Object.entries(expected)) assert.equal(whatsappQuoteText(service), `${line}\nFull address:\nPostcode:`)
+  assert.equal(whatsappQuoteText(), "Hi, I'd like a quote for an EPC.\nFull address:\nPostcode:")
+  assert.equal(whatsappQuoteText('unknown'), whatsappQuoteText())
+  assert.equal(decodeURIComponent(whatsappQuoteHref().split('?text=')[1]), whatsappQuoteText())
+  const bundle = whatsappFormText(whatsappQuoteText('Both (Bundle)'), { services: ['Both (Bundle)'], dwellingType: 'Flat', areaLabel: 'Up to 40 m²' })
+  assert.ok(bundle.startsWith("Hi, I'd like a quote for an EPC and floor plan.\nFull address:\nPostcode:\nService: EPC + Floor Plan"))
+})
