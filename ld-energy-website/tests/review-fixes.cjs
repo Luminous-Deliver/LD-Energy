@@ -53,7 +53,7 @@ const widths = [[320,568],[360,800],[375,812],[390,844],[412,915],[430,932],[768
         if (route !== 'estate-agents') {
           await next() // Validation must not change the manual customer selection.
           assert.equal(await form.getByRole('radio', { name: 'Letting agent / firm', exact: true }).isChecked(), true)
-          await choose('Not sure of floor area')
+          await choose('Not sure of floor area'); await choose('Flat')
         }
         await next()
         await form.locator('#notes').fill('Private access note')
@@ -68,6 +68,7 @@ const widths = [[320,568],[360,800],[375,812],[390,844],[412,915],[430,932],[768
       await page.locator('header a[href="#booking-form"]').first().evaluate(anchor => anchor.click())
       await choose('EPC + Floor Plan')
       await form.locator('input[value="40-55"]').check()
+      await choose('Flat')
       await choose('Letting agent / firm')
       await next()
       await form.locator('#notes').fill('Keep this history note')
@@ -83,7 +84,7 @@ const widths = [[320,568],[360,800],[375,812],[390,844],[412,915],[430,932],[768
       assert.equal(await form.locator('input[value="40-55"]').isChecked(), true)
       await choose('Floor Plan')
       assert.match(await form.locator('[data-estimate-announcement]').innerText(), /£65/)
-      await choose('Not sure of floor area')
+      await choose('Not sure of floor area'); await choose('Flat')
       assert.doesNotMatch(await form.locator('[data-estimate-announcement]').innerText(), /£/)
       await choose('Agency / portfolio enquiry')
       assert.doesNotMatch(await form.locator('[data-estimate-announcement]').innerText(), /£/)
@@ -102,7 +103,7 @@ const widths = [[320,568],[360,800],[375,812],[390,844],[412,915],[430,932],[768
           assert.equal(new URL(page.url()).pathname, `/areas/${areaPage}`)
           assert.equal(new URL(page.url()).hash, '#contact')
           assert.equal(await page.locator('#contact form').count(), 1)
-          await choose('Not sure of floor area')
+          await choose('Not sure of floor area'); await choose('Flat')
           await choose('Homeowner')
           await detailAndSubmit()
           const payload = payloads.at(-1)
