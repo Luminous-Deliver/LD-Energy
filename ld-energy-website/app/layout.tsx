@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from 'next'
 import localFont from 'next/font/local'
 import { Header } from '@/components/layout/Header'
 import { CompactFooter } from '@/components/layout/CompactFooter'
-import { introScript } from '@/lib/intro'
 import { PhoneDock } from '@/components/layout/PhoneDock'
 import { WebAnalytics } from '@/components/layout/WebAnalytics'
 import { LondonSkyline } from '@/components/ui/LondonSkyline'
@@ -183,8 +182,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="min-h-screen flex flex-col">
-        {/* Homepage-only intro; first in <body> so it covers the page before the hero paints. */}
-        <script dangerouslySetInnerHTML={{ __html: introScript }} />
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-sage-700 focus:text-white focus:rounded-btn"

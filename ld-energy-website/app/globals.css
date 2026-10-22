@@ -688,30 +688,6 @@
   }
 }
 
-/* Homepage intro (lib/intro.ts). Easing from omnirated.co.uk, timings shortened:
-   fill .02-.30s, mark out .30s, cover lifts .36-.86s. */
-.ld-intro { position: fixed; inset: 0; z-index: 200; pointer-events: none; }
-.ld-intro__ground { position: absolute; inset: 0; background: #F3EEE9; pointer-events: auto; animation: ld-intro-lift .38s cubic-bezier(.65, 0, .3, 1) .52s both; }
-.ld-intro__mark { position: absolute; top: 50%; left: 50%; translate: -50% -50%; display: grid; justify-items: center; gap: 20px; width: clamp(190px, 28vmin, 250px); animation: ld-intro-out .14s cubic-bezier(.4, 0, 1, 1) .48s both; }
-.ld-intro__logo { display: block; width: 100%; height: auto; animation: ld-intro-up .3s cubic-bezier(.22, 1, .36, 1) both; }
-/* the EPC rating chart: seven bands, each longer than the last, drawn top to bottom */
-.ld-intro__bands { display: grid; gap: 4px; width: 100%; }
-.ld-intro__bands i { display: flex; align-items: center; height: 9px; width: calc(40% + var(--i) * 10%); border-radius: 0 3px 3px 0; transform-origin: left; animation: ld-intro-band .22s cubic-bezier(.22, 1, .36, 1) calc(.06s + var(--i) * .035s) both; }
-.ld-intro__bands b { padding-left: 4px; font: 700 8px/1 system-ui, sans-serif; color: #fff; }
-.ld-intro__bands i:nth-child(1) { background: #008054; } .ld-intro__bands i:nth-child(2) { background: #19B459; }
-.ld-intro__bands i:nth-child(3) { background: #8DCE46; } .ld-intro__bands i:nth-child(4) { background: #FFD500; }
-.ld-intro__bands i:nth-child(5) { background: #FCAA65; } .ld-intro__bands i:nth-child(6) { background: #EF8023; }
-.ld-intro__bands i:nth-child(7) { background: #E9153B; }
-.ld-intro--skip .ld-intro__mark { opacity: 0; transition: opacity .14s ease-out; animation: none; }
-.ld-intro--skip .ld-intro__ground { animation: ld-intro-lift-quick .42s cubic-bezier(.65, 0, .3, 1) .1s both; }
-@keyframes ld-intro-up { from { opacity: 0; translate: 0 10px; } }
-@keyframes ld-intro-band { from { scale: 0 1; } }
-@keyframes ld-intro-out { to { opacity: 0; translate: 0 -10px; } }
-@keyframes ld-intro-lift { to { translate: 0 -100%; } }
-@keyframes ld-intro-lift-quick { to { translate: 0 -100%; } }
-/* The hero's own entrance waits under the cover and plays as it lifts. */
-body:has(> .ld-intro:not(.is-released)) :is(.lh-sky, .lh-rise, .lh-land img, .lh-card) { animation-play-state: paused; }
-
 /* On the homepage the dusk close is the skyline and already carries the contact details,
    so the drawn skyline and the footer's contact column step aside. Unlayered on purpose:
    it has to beat the footer's Tailwind utilities. */
