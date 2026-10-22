@@ -163,7 +163,8 @@ export function includedList(kind: ProductKind): string[] {
     case 'epc':
     case 'bundle':
       return [
-        'Elmhurst Lodgement Fee',
+        // Lodged through Elmhurst or Quidos (both schemes, 22/10/2026), so never name only one here.
+        'Lodgement Fee (Elmhurst or Quidos)',
         'Official Government Register Listing',
         'No Travel/Call-out Surcharges',
         'Certificate link sent once lodged',
