@@ -91,8 +91,9 @@ html { font-synthesis-weight: none; }
   .sh__in { gap: 10px; }
   .sh .ld-btn--sm { padding: 0 11px; font-size: 14px; }
 }
-/* below 375 px the lockup, the button and the menu cannot share the bar; the menu and the dock carry the quote */
-@media (max-width: 374px) { .sh__quote { display: none; } .sh__menu { margin-left: auto; } }
+/* phones: the logo and the menu only (Abdul 23/10/2026: the bar looked squished with the button in it). The hero,
+   the dock and the homepage's price bar carry the quote action. */
+@media (max-width: 759px) { .sh__quote { display: none; } .sh__menu { margin-left: auto; } }
 
 /* Logo A (BRIEF § v6.1, locked 21/10): the master lockup's two lines as live Jost beside the full-weight house,
    his traced geometry untouched (public/brand/ld-energy-mark-full.svg). Name .07em, tagline .17em, 10 px to the

@@ -60,6 +60,13 @@ const pages = ['/', '/pricing', '/areas/newham', '/blog/how-long-does-epc-last',
 
         await page.goto(base + '/pricing', { waitUntil: 'networkidle' })
         ok((await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)) <= 0, `${w}: no sideways scroll`)
+        // phones: the bar is the logo and the menu only (Abdul 23/10/2026); the quote action lives in the hero and the dock
+        if (reducedMotion === 'no-preference') {
+          ok(await page.locator('header .sh__quote').isHidden(), `${w}: no quote button in the phone header`)
+          ok(await page.locator('header .sh__menu').isVisible(), `${w}: the menu button is shown`)
+          const bar = await page.evaluate(() => { const l = document.querySelector('header .lg').getBoundingClientRect(), m = document.querySelector('header .sh__menu').getBoundingClientRect(); return { gap: m.left - l.right, right: innerWidth - m.right } })
+          ok(bar.gap >= 24 && bar.right >= 4 && bar.right <= 16, `${w}: logo and menu sit apart, menu at the edge (${JSON.stringify(bar)})`)
+        }
         let s = await state()
         ok(s.on === 'false' && !s.visible && s.inert, `${w}/${reducedMotion}: hidden while the hero is on screen`)
         ok(s.role === 'group' && s.label === 'Quick contact', `${w}: role="group" with a label`)
