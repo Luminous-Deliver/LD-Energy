@@ -10,6 +10,7 @@ import type { AreaSummary } from '@/lib/borough-stats-types'
 import type { FaqItem } from '@/lib/faq'
 import { site, pricing, priceFrom, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE } from '@/lib/site'
 import { london, statsSource, summaryFor } from '@/lib/area-page'
+import { DATA_PAGE_PATH } from '@/lib/borough-ratings'
 import {
   AboutFigures, AreaCtaBand, AreaHeroV2, CouncilRulesSection, CoverageSection, LettingSection, PriceLine,
   RatingMixSection, StockSection,
@@ -189,7 +190,13 @@ export async function AreaPageV2({ slug }: { slug: string }) {
               </li>
             ))}
             <li>
+              <Link href={DATA_PAGE_PATH} className="font-semibold text-primary-700 underline-offset-2 hover:underline">EPC ratings in every London borough</Link>
+            </li>
+            <li>
               <Link href="/areas" className="font-semibold text-primary-700 underline-offset-2 hover:underline">Every London area we cover</Link>
+            </li>
+            <li>
+              <Link href="/estate-agents" className="font-semibold text-primary-700 underline-offset-2 hover:underline">For estate and letting agents</Link>
             </li>
           </ul>
         </div>

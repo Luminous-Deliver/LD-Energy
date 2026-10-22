@@ -22,6 +22,7 @@ const services: FooterLink[] = [
 ]
 const useful: FooterLink[] = [
   ['London service areas', '/areas'],
+  ['EPC ratings by borough', '/epc-ratings-by-borough'],
   ['About Abdul', '/about'],
   ['Domestic Energy Assessor', '/domestic-energy-assessor-london'],
   ['Before your visit', '/preparing-for-your-epc'],
@@ -29,7 +30,7 @@ const useful: FooterLink[] = [
   ['Expert guides', '/blog'],
   ['Contact and exact quote', '/contact#booking-form'],
 ]
-// Site-wide links to the commercially prioritised area pages, as the pre-Stage 3 footer had.
+// Site-wide links to the area pages with the most search impressions (lib/boroughs.ts).
 const popularAreas: FooterLink[] = priorityBoroughs.map((b) => [b.name, `/areas/${b.slug}`])
 
 const groups: { heading: string; items: FooterLink[]; listClassName?: string }[] = [
