@@ -146,7 +146,8 @@ export const topNav = [
   { href: '/areas', label: 'Areas' },
   { href: '/pricing', label: 'Pricing' },
   { href: '/faq', label: 'FAQ' },
-  { href: '/blog', label: 'Blog' },
+  // The URL stays /blog for good; "Guides" is the label (plan PLAN-AREAS-GUIDES-2026-10-22 §8.1).
+  { href: '/blog', label: 'Guides' },
   { href: '/contact', label: 'Contact' },
 ] as const
 

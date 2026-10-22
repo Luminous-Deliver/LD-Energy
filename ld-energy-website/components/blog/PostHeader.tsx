@@ -6,6 +6,8 @@ import Link from 'next/link'
 interface PostHeaderProps {
   title: string
   description: string
+  /** The direct answer (plan §8.2). Shown in place of the description when a post has one. */
+  answer: string
   category: string
   author: string
   publishedAt: string
@@ -16,6 +18,7 @@ interface PostHeaderProps {
 export function PostHeader({
   title,
   description,
+  answer,
   category,
   author,
   publishedAt,
@@ -37,7 +40,13 @@ export function PostHeader({
         <h1 className="mt-3 text-3xl md:text-5xl font-extrabold tracking-tight text-secondary-900">
           {title}
         </h1>
-        <p className="mt-5 text-lg text-secondary-700 leading-relaxed">{description}</p>
+        {answer ? (
+          <p data-answer-first className="mt-5 max-w-3xl text-lg text-secondary-800 leading-relaxed">
+            {answer}
+          </p>
+        ) : (
+          <p className="mt-5 text-lg text-secondary-700 leading-relaxed">{description}</p>
+        )}
         <PostMeta
           author={author}
           publishedAt={publishedAt}
