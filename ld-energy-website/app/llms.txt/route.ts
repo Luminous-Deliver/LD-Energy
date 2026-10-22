@@ -1,4 +1,4 @@
-import { site, pricing, priceFrom, formatPrice, bundleSaving, maxBundleSaving, topBand, EXPRESS_SURCHARGE } from '@/lib/site'
+import { site, pricing, priceFrom, formatPrice, bundleSaving, maxBundleSaving, topBand, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE } from '@/lib/site'
 import { boroughMeta } from '@/lib/boroughs'
 
 export const runtime = 'edge'
@@ -36,7 +36,7 @@ function body(): string {
   return `# L&D Energy — EPC Certificates London
 
 ## What we do
-L&D Energy is the EPC trading brand of ${site.parentBrand}. We are an Elmhurst-accredited Domestic Energy Assessor (DEA) providing official Energy Performance Certificates (EPCs) and professional laser-measured floor plans for residential properties across all 32 London boroughs plus the City of London.
+L&D Energy is the EPC trading brand of ${site.parentBrand}. We are an Elmhurst and Quidos accredited Domestic Energy Assessor (DEA) providing official Energy Performance Certificates (EPCs) and professional laser-measured floor plans for residential properties across all 32 London boroughs plus the City of London.
 
 ## Key facts
 - Accreditation: ${site.assessor.scheme} (${site.assessor.accreditationNumber})
@@ -57,7 +57,8 @@ or call-out charges.
 
 ${priceTable()}
 
-- Next-day (express) service: add £${EXPRESS_SURCHARGE} to the EPC price above.
+- Same-day lodgement (the EPC is lodged on the day of the visit): add £${SAME_DAY_LODGEMENT_SURCHARGE} to the EPC price above.
+- Next-day visit and lodgement (we visit the next day and lodge the EPC that day): add £${NEXT_DAY_VISIT_SURCHARGE} to the EPC price above.
 - Booking an EPC and floor plan together saves up to £${formatPrice(maxBundleSaving)} against booking them separately, because both are completed in a single property visit.
 - Properties ${topBand.areaLabel.toLowerCase()} vary considerably; that band is a starting point and an exact quote is always required.
 - EPC Improvement Plan add-on: £${site.addOns.improvementPlan}. Abdul’s personalised written plan explaining what is holding the rating back and which improvements to consider first, supported by the full Elmhurst Energy Report. Prepared after the visit. Energy costs and savings use standard occupancy assumptions; they are not actual household bills or guaranteed outcomes.
@@ -71,7 +72,7 @@ Details: ${site.url}/estate-agents
 
 ## EPC delivery — important
 - Standard: lodged on the official GOV.UK EPC Register within 72 hours of the assessment.
-- Express (next-day): lodged within 24 hours of the assessment.
+- Same-day lodgement or a next-day visit: lodged on the day of the assessment.
 - We do NOT email the EPC certificate as a PDF. The certificate is lodged on the official GOV.UK EPC
   Register, and the customer is sent the link to their certificate on that register once it is live.
 - Floor plans ARE supplied as real files: high-resolution JPG and PDF. They are illustrative marketing plans with approximate dimensions, not architectural or legal plans. Their floor area may differ from EPC floor area because EPC conventions differ.

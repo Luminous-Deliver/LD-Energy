@@ -2,7 +2,7 @@ import { quoteHref } from '@/lib/quote-context'
 import { ShieldCheck, Clock, MapPin, Star, BadgePoundSterling } from 'lucide-react'
 import { Container } from '@/components/ui/Container'
 import { Button } from '@/components/ui/Button'
-import { site, priceFrom, EXPRESS_SURCHARGE } from '@/lib/site'
+import { site, priceFrom, SAME_DAY_LODGEMENT_SURCHARGE } from '@/lib/site'
 
 const GOOGLE_REVIEWS_URL = site.reviews.profileUrl
 
@@ -42,7 +42,7 @@ export function Hero() {
             style={{ background: 'rgba(71,132,110,0.14)', border: '1px solid rgba(71,132,110,0.32)', color: '#B9D6C8' }}
           >
             <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" />
-            Elmhurst Accredited · All London Boroughs
+            Elmhurst &amp; Quidos Accredited · All London Boroughs
           </p>
           <h1 className="mt-4 text-[2.1rem] leading-[1.07] sm:text-5xl md:text-6xl font-semibold tracking-tight text-white animate-fade-in-up animate-delay-100">
             Fast, <span className="text-gradient-brand-light">Reliable</span> &amp; Certified EPCs in London
@@ -145,7 +145,7 @@ export function Hero() {
                 <Clock className="mt-0.5 h-5 w-5 shrink-0 text-accent-600" aria-hidden="true" />
                 <span>
                   <span className="block text-sm font-bold text-secondary-900">
-                    72-hour standard, next day for {`£${EXPRESS_SURCHARGE}`}
+                    72-hour standard, same day for {`£${SAME_DAY_LODGEMENT_SURCHARGE}`}
                   </span>
                   <span className="block text-sm text-secondary-600">
                     Seven days a week, 8am&ndash;8pm, evenings included.

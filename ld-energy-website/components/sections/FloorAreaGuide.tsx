@@ -11,7 +11,7 @@ import { areaBands } from '@/lib/floor-area'
 import { quoteHref } from '@/lib/quote-context'
 import { conversionEvent } from '@/lib/conversion-events'
 import { guideEstimate } from '@/lib/pricing-estimate'
-import { EXPRESS_SPEED, PRE_ASSESSMENT } from '@/lib/booking-options'
+import { SAME_DAY_LODGEMENT_SPEED, NEXT_DAY_VISIT_SPEED, PRE_ASSESSMENT } from '@/lib/booking-options'
 import {
   pricing,
   formatPrice,
@@ -101,7 +101,8 @@ function ResultPanel({ band, unknown, sourcePage }: { band?: PricingBand; unknow
   const floorPlan = guideEstimate({ areaBand, services: ['Floor Plan'] })
   const bundle = guideEstimate({ areaBand, services: ['Both (Bundle)'] })
   const preAssessment = guideEstimate({ areaBand, services: [PRE_ASSESSMENT] })
-  const express = guideEstimate({ areaBand, services: ['EPC Certificate'], speed: EXPRESS_SPEED })
+  const sameDay = guideEstimate({ areaBand, services: ['EPC Certificate'], speed: SAME_DAY_LODGEMENT_SPEED })
+  const nextDay = guideEstimate({ areaBand, services: ['EPC Certificate'], speed: NEXT_DAY_VISIT_SPEED })
   // A standard band's figures are guide prices; only the open-ended top band reads "from".
   const from = band.startingPrice ? <span className="text-xs font-medium text-secondary-600">from </span> : null
   return (
@@ -146,15 +147,22 @@ function ResultPanel({ band, unknown, sourcePage }: { band?: PricingBand; unknow
         </div>
         <div className="flex items-baseline justify-between gap-3 py-2.5">
           <dt className="text-sm text-secondary-700">
-            Next-day service
+            Same-day lodgement
+            <span className="block text-xs text-secondary-600">Lodged on the day of the visit</span>
+          </dt>
+          <dd className="text-base font-bold text-secondary-900">+{`£${sameDay.express}`}</dd>
+        </div>
+        <div className="flex items-baseline justify-between gap-3 py-2.5">
+          <dt className="text-sm text-secondary-700">
+            Next-day visit and lodgement
             <span className="block text-xs text-secondary-600">Fixed addition to your quote</span>
           </dt>
-          <dd className="text-base font-bold text-secondary-900">+{`£${express.express}`}</dd>
+          <dd className="text-base font-bold text-secondary-900">+{`£${nextDay.express}`}</dd>
         </div>
       </dl>
 
       <p className="mt-3 text-xs text-secondary-600">
-        Next day {band.startingPrice ? 'starts from' : 'works out around'} {`£${express.total}`} for the EPC on this size of property.
+        A next-day visit and lodgement {band.startingPrice ? 'starts from' : 'works out around'} {`£${nextDay.total}`} for the EPC on this size of property.
       </p>
 
       <Link

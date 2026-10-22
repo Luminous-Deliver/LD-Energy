@@ -45,7 +45,7 @@ export function HomeHero() {
     <section id="home-hero" aria-labelledby="home-h1" className="lh -mt-24">
       <div aria-hidden="true" className="lh-sky" />
       <Container className="lh-words">
-        <p className="lh-pill lh-rise" style={{ ['--n' as string]: 0 }}>Elmhurst-accredited assessor · Stratford E15</p>
+        <p className="lh-pill lh-rise" style={{ ['--n' as string]: 0 }}>Elmhurst &amp; Quidos accredited · Stratford E15</p>
         <h1 id="home-h1" className="lh-rise" style={{ ['--n' as string]: 1 }}>Domestic EPCs in London</h1>
         <p className="lh-line lh-rise" style={{ ['--n' as string]: 2 }}>
           For landlords, agents and property professionals. Know where a property stands, plan the next step and book every assessment with one accredited assessor. Homeowners and sellers welcome too.

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { ArrowRight, Ruler } from 'lucide-react'
 import { Section } from '@/components/ui/Section'
-import { priceFrom, maxBundleSaving, formatPrice, EXPRESS_SURCHARGE } from '@/lib/site'
+import { priceFrom, maxBundleSaving, formatPrice, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE } from '@/lib/site'
 
 /**
  * Compact pricing block for borough landing pages.
@@ -67,7 +67,7 @@ export function LocalPricingSummary({ area }: { area: string }) {
 
       <p className="mt-4 max-w-3xl text-sm leading-relaxed text-secondary-700">
         These are starting guides, not fixed quotes — your exact price is confirmed before booking,
-        never after. Next-day lodgement adds {`£${EXPRESS_SURCHARGE}`}.{' '}
+        never after. Same-day lodgement adds {`£${SAME_DAY_LODGEMENT_SURCHARGE}`}; a next-day visit and lodgement adds {`£${NEXT_DAY_VISIT_SURCHARGE}`}.{' '}
         <Link href="/pricing" className="font-semibold text-primary-700 underline underline-offset-2 hover:text-primary-800">
           See guide prices for every floor-area band
         </Link>{' '}

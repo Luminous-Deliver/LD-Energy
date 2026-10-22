@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const url = `${site.url}/blog/category/${cat.slug}`
   return {
     title: `${cat.name}, EPC Guides`,
-    description: `${cat.description} Posts written by an Elmhurst-accredited London Domestic Energy Assessor.`,
+    description: `${cat.description} Posts written by an Elmhurst and Quidos accredited London Domestic Energy Assessor.`,
     alternates: { canonical: url },
     // Don't index a category page until it actually has posts.
     robots: posts.length === 0 ? { index: false, follow: true } : undefined,
@@ -115,7 +115,7 @@ export default async function BlogCategoryPage({ params }: PageProps) {
 
       <CtaStrip
         heading="Need an EPC? Get your exact quote."
-        body={`Elmhurst-accredited assessor. Guide prices from £${priceFrom.epc}. Lodged within 72 hours.`}
+        body={`Elmhurst and Quidos accredited assessor. Guide prices from £${priceFrom.epc}. Lodged within 72 hours.`}
         primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'blog', ctaId: 'bottom' }) }}
       />
     </>

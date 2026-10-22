@@ -10,26 +10,26 @@ import { PageHero } from '@/components/sections/PageHero'
 import { Pricing } from '@/components/sections/Pricing'
 import { CtaStrip } from '@/components/sections/CtaStrip'
 import { Faq } from '@/components/sections/Faq'
-import { site, topBand, pricing, priceFrom, EXPRESS_SURCHARGE, defaultOgImage } from '@/lib/site'
+import { site, topBand, pricing, priceFrom, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE, defaultOgImage } from '@/lib/site'
 import { areaServedLondon } from '@/lib/boroughs'
 import type { FaqItem } from '@/lib/faq'
 import { Accordion } from '@/components/ui/Accordion'
 
 export const metadata: Metadata = {
   title: `Domestic EPC Certificates in London`,
-  description: `Domestic EPC certificate in London from £${priceFrom.epc}. Elmhurst-accredited assessor, property visit and lodged certificate. Exact quote and timing confirmed before booking.`,
+  description: `Domestic EPC certificate in London from £${priceFrom.epc}. Elmhurst and Quidos accredited assessor, property visit and lodged certificate. Exact quote and timing confirmed before booking.`,
   alternates: { canonical: `${site.url}/services/domestic-epc` },
   openGraph: {
     images: [defaultOgImage],
     title: `Domestic EPC Certificate London | From £${priceFrom.epc} | L&D Energy`,
-    description: `Get your domestic EPC certificate in London from £${priceFrom.epc}. Elmhurst-accredited assessor, property visit and lodged certificate. Exact quote before booking.`,
+    description: `Get your domestic EPC certificate in London from £${priceFrom.epc}. Elmhurst and Quidos accredited assessor, property visit and lodged certificate. Exact quote before booking.`,
     url: `${site.url}/services/domestic-epc`,
   },
   twitter: {
     images: [defaultOgImage.url],
     title: `Domestic EPC Certificate London | From £${priceFrom.epc}`,
     description:
-      'Elmhurst-accredited assessor, property visit and lodged certificate. Exact quote before booking.',
+      'Elmhurst and Quidos accredited assessor, property visit and lodged certificate. Exact quote before booking.',
   },
 }
 
@@ -90,7 +90,7 @@ const process = [
   },
   {
     title: 'Certificate delivered',
-    body: 'Lodged on the official GOV.UK EPC register within 72 hours (or next day if express), with your certificate link sent once it is live.',
+    body: 'Lodged on the official GOV.UK EPC register within 72 hours (or on the day of the visit with same-day lodgement), with your certificate link sent once it is live.',
   },
 ]
 
@@ -117,7 +117,7 @@ const serviceFaq: FaqItem[] = [
   },
   {
     q: 'Can I get a next-day EPC?',
-    a: `Yes. Add our next-day service for £${EXPRESS_SURCHARGE} and your certificate is lodged within 24 hours of the assessment rather than the standard 72. Appointment availability and delivery timing are confirmed before booking.`,
+    a: `Yes. A next-day visit and lodgement costs £${NEXT_DAY_VISIT_SURCHARGE} extra: we visit the next day and lodge your certificate that day. On any other visit, same-day lodgement puts it on the register on the day of the visit for £${SAME_DAY_LODGEMENT_SURCHARGE} extra. Appointment availability and delivery timing are confirmed before booking.`,
   },
   {
     q: 'How long does an EPC assessment take?',
@@ -190,7 +190,7 @@ export default function DomesticEpcPage() {
       <PageHero
         eyebrow="Domestic EPC Certificates"
         heading="Domestic EPC Certificates in London"
-        subheading={`Official Energy Performance Certificates for selling or renting your home. Elmhurst accredited. Guide prices from £${priceFrom.epc}, with your exact quote confirmed before booking. Lodged on the official GOV.UK EPC Register.`}
+        subheading={`Official Energy Performance Certificates for selling or renting your home. Elmhurst and Quidos accredited. Guide prices from £${priceFrom.epc}, with your exact quote confirmed before booking. Lodged on the official GOV.UK EPC Register.`}
         primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'domestic-epc', ctaId: 'hero' }) }}
       />
 

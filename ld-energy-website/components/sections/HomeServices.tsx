@@ -102,7 +102,7 @@ export function HomeServices() {
         </ul>
         <details id="good-to-know" className="hv-details scroll-mt-28" data-reveal>
           <summary>How guide pricing works</summary>
-          <p>Internal floor area is the main pricing factor. Layout, extensions and access inform the final quote. There are no travel charges, and any extra, like next-day lodgement, is agreed before you book. <Link prefetch={false} href="/pricing" className="home-link">See all six floor-area price bands →</Link></p>
+          <p>Internal floor area is the main pricing factor. Layout, extensions and access inform the final quote. There are no travel charges, and any extra, like same-day lodgement, is agreed before you book. <Link prefetch={false} href="/pricing" className="home-link">See all six floor-area price bands →</Link></p>
         </details>
       </Container>
     </section>

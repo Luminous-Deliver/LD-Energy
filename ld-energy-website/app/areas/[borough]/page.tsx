@@ -10,7 +10,7 @@ import { CtaStrip } from '@/components/sections/CtaStrip'
 import { Accordion } from '@/components/ui/Accordion'
 import { ContactSection } from '@/components/sections/ContactSection'
 import { boroughMeta, boroughIntent, type BoroughIntent } from '@/lib/boroughs'
-import { site, topBand, pricing, priceFrom, formatPrice, maxBundleSaving, EXPRESS_SURCHARGE, defaultOgImage } from '@/lib/site'
+import { site, topBand, pricing, priceFrom, formatPrice, maxBundleSaving, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE, defaultOgImage } from '@/lib/site'
 import type { FaqItem } from '@/lib/faq'
 
 interface PageProps {
@@ -46,7 +46,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     twitter: {
       images: [defaultOgImage.url],
       title: `EPC in ${data.name} | From £${priceFrom.epc} | L&D Energy`,
-      description: `Domestic EPC certificate in ${data.name} from £${priceFrom.epc}. Next-day service available.`,
+      description: `Domestic EPC certificate in ${data.name} from £${priceFrom.epc}. Next-day visits available.`,
     },
   }
 }
@@ -76,9 +76,9 @@ function boroughTitle(name: string, intent: BoroughIntent, fallback: string): st
 
 function boroughDescription(name: string, intent: BoroughIntent): string {
   if (intent === 'service') {
-    return `Elmhurst-accredited EPC assessor covering ${name}. Guide prices from £${priceFrom.epc}, set by internal floor area, with your exact quote confirmed before booking.`
+    return `Elmhurst and Quidos accredited EPC assessor covering ${name}. Guide prices from £${priceFrom.epc}, set by internal floor area, with your exact quote confirmed before booking.`
   }
-  return `EPC cost in ${name}: guide prices from £${priceFrom.epc}, set by internal floor area. Elmhurst-accredited assessor, exact quote before booking.`
+  return `EPC cost in ${name}: guide prices from £${priceFrom.epc}, set by internal floor area. Elmhurst and Quidos accredited assessor, exact quote before booking.`
 }
 
 function boroughFaq(name: string, postcodeFaq: { q: string; a: string }): FaqItem[] {
@@ -86,11 +86,11 @@ function boroughFaq(name: string, postcodeFaq: { q: string; a: string }): FaqIte
     { q: postcodeFaq.q, a: postcodeFaq.a },
     {
       q: `How much does an EPC cost in ${name}?`,
-      a: `Guide EPC prices in ${name} start from £${pricing[0].epc} for properties ${pricing[0].areaLabel.toLowerCase()} and rise with internal floor area; homes ${topBand.areaLabel.toLowerCase()} start from £${topBand.epc}. Internal floor area (m²) is the main factor, alongside extensions, layout and condition, and your exact quote is confirmed before booking. Next-day lodgement is available for £${EXPRESS_SURCHARGE} extra.`,
+      a: `Guide EPC prices in ${name} start from £${pricing[0].epc} for properties ${pricing[0].areaLabel.toLowerCase()} and rise with internal floor area; homes ${topBand.areaLabel.toLowerCase()} start from £${topBand.epc}. Internal floor area (m²) is the main factor, alongside extensions, layout and condition, and your exact quote is confirmed before booking. Same-day lodgement is £${SAME_DAY_LODGEMENT_SURCHARGE} extra, and a next-day visit with lodgement that day is £${NEXT_DAY_VISIT_SURCHARGE} extra.`,
     },
     {
       q: `How quickly can I get an EPC in ${name}?`,
-      a: `Standard lodgement is within 72 hours of the assessment. For urgent requirements, our next-day service lodges your certificate within 24 hours for an additional £${EXPRESS_SURCHARGE}. We offer appointments 7 days a week, including evenings.`,
+      a: `Standard lodgement is within 72 hours of the assessment. If you need it sooner, same-day lodgement puts your certificate on the register on the day of the visit for £${SAME_DAY_LODGEMENT_SURCHARGE} extra, and we can visit the next day and lodge that day for £${NEXT_DAY_VISIT_SURCHARGE} extra. We offer appointments 7 days a week, including evenings.`,
     },
     {
       q: `Do I need an EPC to let my property in ${name}?`,
@@ -111,7 +111,7 @@ const sellingPoints = [
   'Local assessor with rapid response times',
   'Appointments 7 days a week, including evenings',
   'Transparent guide pricing, with your exact quote confirmed before booking',
-  `Lodged within 72 hours, or next day for £${EXPRESS_SURCHARGE} extra`,
+  `Lodged within 72 hours, or the same day for £${SAME_DAY_LODGEMENT_SURCHARGE} extra`,
 ]
 
 export default async function BoroughPage({ params }: PageProps) {
@@ -174,7 +174,7 @@ export default async function BoroughPage({ params }: PageProps) {
     '@id': `${site.url}/areas/${slug}#service`,
     name: `Domestic EPC and floor plans in ${data.name}`,
     serviceType: 'Energy Performance Certificate',
-    description: `Elmhurst-accredited domestic EPC certificates and laser-measured floor plans in ${data.name}, London.`,
+    description: `Elmhurst and Quidos accredited domestic EPC certificates and laser-measured floor plans in ${data.name}, London.`,
     url: `${site.url}/areas/${slug}`,
     provider: { '@id': `${site.url}/#business` },
     areaServed: [
@@ -231,7 +231,7 @@ export default async function BoroughPage({ params }: PageProps) {
       <PageHero
         eyebrow={`EPC Certificates · ${data.name}`}
         heading={`EPC Certificates in ${data.name}`}
-        subheading={`Elmhurst-accredited Domestic Energy Assessor based in Stratford E15 and serving ${data.name}. Guide prices from £${priceFrom.epc}, with your exact quote and available appointment confirmed before booking.`}
+        subheading={`Elmhurst and Quidos accredited Domestic Energy Assessor based in Stratford E15 and serving ${data.name}. Guide prices from £${priceFrom.epc}, with your exact quote and available appointment confirmed before booking.`}
         primaryCta={{ label: 'Get my exact quote', href: '#contact', ctaId: 'hero' }}
         secondaryCta={{ label: `Call ${site.phone}`, href: site.phoneHref }}
       />
@@ -275,7 +275,7 @@ export default async function BoroughPage({ params }: PageProps) {
           <p className="mt-8 text-secondary-700 leading-relaxed">
             Whether you&rsquo;re selling a property in {data.name}, preparing for a new tenancy, or staying compliant with MEES regulations as a landlord, your{' '}
             <Link href="/services/domestic-epc" className="text-primary-700 underline underline-offset-2 hover:text-primary-800">domestic EPC</Link>{' '}
-            is lodged on the GOV.UK register within 72 hours, or next day if you need it urgently. Guide prices start at{' '}
+            is lodged on the GOV.UK register within 72 hours, or on the day of the visit if you need it urgently. Guide prices start at{' '}
             {`£${priceFrom.epc}`} and are based mainly on internal floor area — see the{' '}
             <Link href="/pricing" className="text-primary-700 underline underline-offset-2 hover:text-primary-800">full pricing table</Link>{' '}
             or send us the address for an exact quote.

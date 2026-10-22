@@ -8,7 +8,7 @@ import { homeBookingFaqs } from '@/lib/homepage-content'
 
 export const metadata: Metadata = {
   title: { absolute: `EPC London from £${priceFrom.epc} | Elmhurst Accredited | L&D Energy` },
-  description: `Domestic EPCs across London from an Elmhurst-accredited assessor based in Stratford. Guide prices from £${priceFrom.epc}, based on floor area. Exact quote before booking.`,
+  description: `Domestic EPCs across London from an Elmhurst and Quidos accredited assessor based in Stratford. Guide prices from £${priceFrom.epc}, based on floor area. Exact quote before booking.`,
   keywords: [
     'EPC London',
     'domestic EPC',
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   alternates: { canonical: '/' },
   openGraph: {
     title: `Domestic EPC London | From £${priceFrom.epc} | Elmhurst Accredited | L&D Energy`,
-    description: `Domestic EPCs across London from an Elmhurst-accredited assessor. Guide prices from £${priceFrom.epc}, based on floor area. Exact quote before booking.`,
+    description: `Domestic EPCs across London from an Elmhurst and Quidos accredited assessor. Guide prices from £${priceFrom.epc}, based on floor area. Exact quote before booking.`,
     url: site.url,
     images: [defaultOgImage],
   },

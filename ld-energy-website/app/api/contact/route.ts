@@ -5,7 +5,7 @@ import { site } from '@/lib/site'
 import { areaLabel, legacyArea, TOP_BAND } from '@/lib/floor-area'
 import { bookingPriceRows, guideEstimate, guideEstimateLine, guidePrice, PLAN_LABEL, ENERGY_REPORT_LABEL } from '@/lib/pricing-estimate'
 import { boroughMeta } from '@/lib/boroughs'
-import { EXPRESS_SPEED } from '@/lib/booking-options'
+import { SAME_DAY_LODGEMENT_SPEED, NEXT_DAY_VISIT_SPEED } from '@/lib/booking-options'
 import { formatPreferredDate, hasPrepChecklist, nextSteps, OPENING_HOURS, prepChecklist, PREP_PATH, serviceLabel, TENANT_NOTICE } from '@/lib/booking-copy'
 import type { EnquiryAttribution } from '@/lib/enquiry-attribution'
 
@@ -183,7 +183,7 @@ function buildConfirmation(data: ParsedInput) {
     summary.push(['Floor area', areaLabel(data.areaBand || legacyArea(data.propertyType), data.floorArea)])
     summary.push(['Property', `${data.address}, ${data.postcode}`])
     summary.push(['Turnaround', estimate.isLodged
-      ? data.speed === EXPRESS_SPEED ? 'Next-day lodgement, within 24 hours of the visit' : 'Standard lodgement, within 72 hours of the visit'
+      ? data.speed === NEXT_DAY_VISIT_SPEED ? 'Next-day visit, lodged on the day of the visit' : data.speed === SAME_DAY_LODGEMENT_SPEED ? 'Same-day lodgement, on the day of the visit' : 'Standard lodgement, within 72 hours of the visit'
       : 'Within 72 hours of the visit'])
   }
   summary.push(['Booking as', data.customerType])
@@ -220,7 +220,7 @@ function buildConfirmation(data: ParsedInput) {
     (showPrep ? `\n\nBefore your visit:\n${prepChecklist.map(item => `  - ${item}`).join('\n')}\n  Full checklist: ${prepUrl}` : '') +
     (tenanted ? `\n\nTenanted property? ${TENANT_NOTICE}` : '') +
     `\n\nNeed us sooner, or want to change something? Reply to this email, call or text ${PHONE}, or message us on WhatsApp.\n\n` +
-    `L&D Energy, Elmhurst-accredited Domestic Energy Assessor\n` +
+    `L&D Energy, Elmhurst and Quidos accredited Domestic Energy Assessor\n` +
     `Covering all 32 London boroughs · ${SITE_URL}\n\n` +
     legal
 
@@ -333,7 +333,7 @@ ${prepBlock}${tenantBlock}
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
             <tr><td style="background:${NAVY_DEEP};padding:22px 32px">
               <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:#ffffff">L&amp;D Energy</p>
-              <p style="margin:0 0 2px;font-size:12px;line-height:1.6;color:#9BB2D4">Elmhurst-accredited Domestic Energy Assessor · Stratford, East London</p>
+              <p style="margin:0 0 2px;font-size:12px;line-height:1.6;color:#9BB2D4">Elmhurst and Quidos accredited Domestic Energy Assessor · Stratford, East London</p>
               <p style="margin:0;font-size:12px;line-height:1.6;color:#9BB2D4">Covering all 32 London boroughs · <a href="${SITE_URL}" style="color:#95BFAD;text-decoration:none">epc.luminousanddeliver.co.uk</a></p>
             </td></tr>
           </table>

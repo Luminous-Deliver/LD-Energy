@@ -97,7 +97,7 @@ export default function PrivacyPolicyPage() {
       <p>We share your data only where required to deliver the service:</p>
       <ul>
         <li>The UK Government EPC Register (mandatory lodgement of EPC data)</li>
-        <li>Elmhurst Energy, our accreditation scheme</li>
+        <li>Elmhurst Energy and Quidos, our accreditation schemes</li>
         <li>Resend, our transactional email provider</li>
         <li>Cloudflare, for website hosting, security checks, email routing and website statistics</li>
         <li>Google, for the business email inbox used to handle correspondence</li>

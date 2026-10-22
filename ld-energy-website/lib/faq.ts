@@ -1,4 +1,4 @@
-import { pricing, priceFrom, topBand, site, EXPRESS_SURCHARGE } from '@/lib/site'
+import { pricing, priceFrom, topBand, site, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE } from '@/lib/site'
 
 export interface FaqItem {
   q: string
@@ -30,7 +30,7 @@ export const homepageFaq: FaqItem[] = [
   },
   {
     q: 'How much does an EPC cost in London?',
-    a: `Guide EPC prices in London start at £${pricing[0].epc} for properties ${pricing[0].areaLabel.toLowerCase()} and rise with internal floor area; homes ${topBand.areaLabel.toLowerCase()} start from £${topBand.epc}. Internal floor area (m²) is the main pricing factor — bedroom count is only a familiar reference. Next-day lodgement is available for £${EXPRESS_SURCHARGE} extra, and your exact quote is confirmed before booking.`,
+    a: `Guide EPC prices in London start at £${pricing[0].epc} for properties ${pricing[0].areaLabel.toLowerCase()} and rise with internal floor area; homes ${topBand.areaLabel.toLowerCase()} start from £${topBand.epc}. Internal floor area (m²) is the main pricing factor — bedroom count is only a familiar reference. Same-day lodgement is £${SAME_DAY_LODGEMENT_SURCHARGE} extra and a next-day visit and lodgement £${NEXT_DAY_VISIT_SURCHARGE} extra, and your exact quote is confirmed before booking.`,
   },
   {
     q: 'How long does an EPC assessment take?',
@@ -38,7 +38,7 @@ export const homepageFaq: FaqItem[] = [
   },
   {
     q: 'How quickly will I receive my EPC certificate?',
-    a: `Standard lodgement is within 72 hours of the assessment. Our next-day service lodges your certificate within 24 hours for an additional £${EXPRESS_SURCHARGE}.`,
+    a: `Standard lodgement is within 72 hours of the assessment. Same-day lodgement puts your certificate on the register on the day of the visit for an additional £${SAME_DAY_LODGEMENT_SURCHARGE}.`,
   },
   {
     q: 'What does the assessor check during an EPC?',
@@ -54,7 +54,7 @@ export const homepageFaq: FaqItem[] = [
   },
   {
     q: 'Can I get a same-day or next-day EPC in London?',
-    a: `Yes, next-day appointments are available. Tell us your deadline in your enquiry and we confirm the slot and delivery timing before booking. Next-day lodgement costs £${EXPRESS_SURCHARGE} extra when agreed.`,
+    a: `Yes. We can visit the next day and lodge your EPC that day for £${NEXT_DAY_VISIT_SURCHARGE} extra, or lodge on the day of any visit for £${SAME_DAY_LODGEMENT_SURCHARGE} extra. Tell us your deadline in your enquiry and we confirm the slot before booking.`,
   },
   {
     q: 'When is an EPC legally required?',
@@ -70,7 +70,7 @@ export const homepageFaq: FaqItem[] = [
   },
   {
     q: 'How do I check my assessor is genuinely accredited?',
-    a: 'Every UK domestic energy assessor appears on the official government register. Our assessor is Abdul Motaleb Taher, accreditation number EES/036265, accredited through Elmhurst Energy — you can look this up yourself on the government’s find-an-assessor service before you book.',
+    a: 'Every UK domestic energy assessor appears on the official government register. Our assessor is Abdul Motaleb Taher, accredited with Elmhurst Energy (EES/036265) and Quidos (QUID202220) — you can look both up yourself on the government’s find-an-assessor service before you book.',
   },
   {
     q: 'Which areas of London do you cover?',
@@ -192,7 +192,7 @@ export const fullFaq: FaqCategory[] = [
       },
       {
         q: 'Who can issue an EPC?',
-        a: 'Only an accredited Domestic Energy Assessor (DEA) registered with a government-approved scheme can issue a domestic EPC. We are accredited with Elmhurst Energy, the UK’s largest energy assessor scheme. Every EPC we produce is lodged on the official UK Government EPC Register.',
+        a: 'Only an accredited Domestic Energy Assessor (DEA) registered with a government-approved scheme can issue a domestic EPC. We are accredited with two government-approved schemes, Elmhurst Energy and Quidos. Every EPC we produce is lodged on the official UK Government EPC Register.',
         links: [{ label: 'Your accredited assessor', href: '/about' }, { label: 'Domestic energy assessor in London', href: '/domestic-energy-assessor-london' }],
       },
       {
@@ -254,12 +254,12 @@ export const fullFaq: FaqCategory[] = [
       },
       {
         q: 'How quickly will I get my certificate?',
-        a: `Standard lodgement is within 72 hours of the assessment. Our next-day service lodges your certificate within 24 hours for an additional £${EXPRESS_SURCHARGE}.`,
+        a: `Standard lodgement is within 72 hours of the assessment. Same-day lodgement puts your certificate on the register on the day of the visit for an additional £${SAME_DAY_LODGEMENT_SURCHARGE}.`,
         links: [{ label: 'The Domestic EPC process', href: '/services/domestic-epc#epc-process' }],
       },
       {
         q: 'Can I see the assessor’s credentials?',
-        a: 'Yes. We’re happy to share our Elmhurst Energy accreditation details on request. You can also verify any Domestic Energy Assessor on the EPC Register at gov.uk.',
+        a: 'Yes. We’re happy to share our Elmhurst Energy and Quidos accreditation details on request. You can also verify any Domestic Energy Assessor on the EPC Register at gov.uk.',
         links: [{ label: 'Assessor credentials', href: '/about#credentials' }],
       },
     ],
@@ -270,7 +270,7 @@ export const fullFaq: FaqCategory[] = [
     items: [
       {
         q: 'How much does an EPC cost?',
-        a: `Guide EPC prices in London start at £${pricing[0].epc} for properties ${pricing[0].areaLabel.toLowerCase()} and rise with internal floor area; homes ${topBand.areaLabel.toLowerCase()} start from £${topBand.epc}. Internal floor area (m²) is the main pricing factor — bedroom count is only a familiar reference. Next-day lodgement is available for £${EXPRESS_SURCHARGE} extra, and your exact quote is confirmed before booking.`,
+        a: `Guide EPC prices in London start at £${pricing[0].epc} for properties ${pricing[0].areaLabel.toLowerCase()} and rise with internal floor area; homes ${topBand.areaLabel.toLowerCase()} start from £${topBand.epc}. Internal floor area (m²) is the main pricing factor — bedroom count is only a familiar reference. Same-day lodgement is £${SAME_DAY_LODGEMENT_SURCHARGE} extra and a next-day visit and lodgement £${NEXT_DAY_VISIT_SURCHARGE} extra, and your exact quote is confirmed before booking.`,
         links: [{ label: 'Guide prices by floor area', href: '/pricing#pricing-table' }],
       },
       {
@@ -289,8 +289,8 @@ export const fullFaq: FaqCategory[] = [
         links: [{ label: 'Agencies and portfolios', href: '/estate-agents' }],
       },
       {
-        q: 'What is the next-day service?',
-        a: `For £${EXPRESS_SURCHARGE} extra, your EPC certificate is lodged within 24 hours of the assessment rather than the standard 72. This applies to assessments completed during our standard hours. Appointment availability and the delivery deadline are confirmed before booking.`,
+        q: 'What are the faster options?',
+        a: `Same-day lodgement (£${SAME_DAY_LODGEMENT_SURCHARGE} extra) puts your EPC on the register on the day of the visit rather than within the standard 72 hours. A next-day visit and lodgement (£${NEXT_DAY_VISIT_SURCHARGE} extra) means we visit the next day and lodge the certificate that day. Both apply to visits in our standard hours, and availability is confirmed before booking.`,
         links: [{ label: 'Pricing questions', href: '/pricing#pricing-faq' }],
       },
     ],

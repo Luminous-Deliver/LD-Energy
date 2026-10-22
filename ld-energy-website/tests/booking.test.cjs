@@ -1,8 +1,8 @@
 const { test } = require('node:test')
 const assert = require('node:assert/strict')
-const { pricing, EXPRESS_SURCHARGE, site } = require('../lib/site.ts')
+const { pricing, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE, site } = require('../lib/site.ts')
 const { areaBands, legacyPropertyTypes } = require('../lib/floor-area.ts')
-const { contactSchema, PRE_ASSESSMENT, BULK, EXPRESS_SPEED } = require('../lib/validators.ts')
+const { contactSchema, PRE_ASSESSMENT, BULK, SAME_DAY_LODGEMENT_SPEED, NEXT_DAY_VISIT_SPEED, LEGACY_EXPRESS_SPEED } = require('../lib/validators.ts')
 const { guideEstimate, guideEstimateLine, guideEstimateRows } = require('../lib/pricing-estimate.ts')
 const { quoteHref, parseQuoteContext, quoteServices } = require('../lib/quote-context.ts')
 const { POST } = require('../app/api/contact/route.ts')
@@ -14,19 +14,20 @@ const sample = { name: 'Test Customer', email: 'test@example.invalid', phone: '0
 test('every service and band retains prices and eligible extras; unknown and absent area never have a total', () => {
   for (const [service, label] of Object.entries(quoteServices)) {
     for (const [index, areaBand] of areaBands.entries()) {
-      for (const express of [false, true]) for (const plan of [false, true]) {
-        const estimate = guideEstimate({ areaBand, services: [label], speed: express ? EXPRESS_SPEED : sample.speed, improvementPlan: plan })
+      const speedExtras = [[sample.speed, 0], [SAME_DAY_LODGEMENT_SPEED, SAME_DAY_LODGEMENT_SURCHARGE], [NEXT_DAY_VISIT_SPEED, NEXT_DAY_VISIT_SURCHARGE]]
+      for (const [speed, extra] of speedExtras) for (const plan of [false, true]) {
+        const estimate = guideEstimate({ areaBand, services: [label], speed, improvementPlan: plan })
         const lodged = service === 'epc' || service === 'bundle'
         const base = service === 'bulk' ? null : service === 'bundle' ? pricing[index].bundle : service === 'floor-plan' ? pricing[index].floorPlan
           : service === 'pre-assessment' ? pricing[index].preAssessment : pricing[index].epc
-        assert.equal(estimate.total, base === null ? null : base + (lodged && express ? EXPRESS_SURCHARGE : 0) + (lodged && plan ? site.addOns.improvementPlan : 0))
+        assert.equal(estimate.total, base === null ? null : base + (lodged ? extra : 0) + (lodged && plan ? site.addOns.improvementPlan : 0))
         assert.equal(estimate.isLodged, lodged)
         assert.equal(estimate.planIncluded, service === 'pre-assessment')
         assert.equal(estimate.isStartingPrice, service !== 'bulk' && !!pricing[index].startingPrice)
       }
     }
     for (const areaBand of ['', undefined, 'unknown']) {
-      const estimate = guideEstimate({ areaBand, services: [label], speed: EXPRESS_SPEED, improvementPlan: true })
+      const estimate = guideEstimate({ areaBand, services: [label], speed: NEXT_DAY_VISIT_SPEED, improvementPlan: true })
       assert.equal(estimate.total, null)
       // An unknown size never shows a figure for the service; a chosen extra may still be listed on its own.
       const rows = guideEstimateRows(estimate)
@@ -140,9 +141,10 @@ test('the 22/10/2026 pricing spec: example totals, statuses, savings, starting p
 
 test('quote links allow only safe selections, preserve intent and never contain customer data or prices', () => {
   for (const service of Object.keys(quoteServices)) {
-    const url = new URL(quoteHref({ service, area: 'unknown', speed: 'express', plan: true, name: 'secret', total: 123 }), site.url)
+    const url = new URL(quoteHref({ service, area: 'unknown', speed: 'next-day', plan: true, name: 'secret', total: 123 }), site.url)
     const context = parseQuoteContext(url.searchParams)
     assert.equal(context.service, service)
+    assert.equal(context.speed, ['epc', 'bundle'].includes(service) ? 'next-day' : 'standard')
     assert.equal(context.area, 'unknown')
     assert.equal(context.plan, ['epc', 'bundle'].includes(service))
     assert.equal(url.hash, '#booking-form')
@@ -239,7 +241,7 @@ test('contact API security, recalculation and both email representations with de
       }
     }
     messages = []
-    assert.equal((await request({ ...sample, services: ['Both (Bundle)'], speed: EXPRESS_SPEED, improvementPlan: true, total: 1 })).status, 200)
+    assert.equal((await request({ ...sample, services: ['Both (Bundle)'], speed: SAME_DAY_LODGEMENT_SPEED, improvementPlan: true, total: 1 })).status, 200)
     assert.match(messages[0].text, /£185 guide/)
     assert.match(messages[1].text, /£185 guide/)
 
@@ -270,7 +272,7 @@ test('contact API security, recalculation and both email representations with de
     assert.equal((await request({ ...sample, services: [BULK], propertyCount: '5', floorArea: '134' })).status, 200)
     assert.doesNotMatch(messages[0].text + messages[0].subject + messages[1].text, /134 m²/)
     messages = []
-    assert.equal((await request({ ...sample, services: ['Both (Bundle)'], speed: EXPRESS_SPEED, improvementPlan: true, total: 1 })).status, 200)
+    assert.equal((await request({ ...sample, services: ['Both (Bundle)'], speed: SAME_DAY_LODGEMENT_SPEED, improvementPlan: true, total: 1 })).status, 200)
 
     // Downstream scripts and /quote-reply match these subjects exactly.
     assert.match(messages[0].subject, /^EPC booking: /)
@@ -282,7 +284,7 @@ test('contact API security, recalculation and both email representations with de
     // Confirmation: next steps, the lodgement promise the customer chose, the prep checklist, no emoji or em dash in the body.
     for (const body of [messages[1].text, messages[1].html]) {
       assert.match(body, /What happens next/)
-      assert.match(body, /within 24 hours/)
+      assert.match(body, /on the day of the visit/)
       assert.match(body, /Before your visit/)
       assert.match(body, /preparing-for-your-epc#what-to-have-ready/)
       assert.match(body, /Booking as/)
@@ -379,7 +381,8 @@ test('customer types, next steps, dates and the fallback summary', () => {
     for (const step of steps) assert.doesNotMatch(step, /—|undefined|minutes/)
     assert.match(steps[0], /Mon–Sun, 8am–8pm/)
   }
-  assert.match(nextSteps('epc', EXPRESS_SPEED).at(-1), /within 24 hours/)
+  assert.match(nextSteps('epc', SAME_DAY_LODGEMENT_SPEED).at(-1), /on the day of the visit/)
+  assert.match(nextSteps('bundle', NEXT_DAY_VISIT_SPEED).at(-1), /lodged on the GOV\.UK register on the day of the visit/)
   assert.match(nextSteps('epc', 'Standard (72 hours)').at(-1), /within 72 hours/)
   assert.match(nextSteps('preAssessment').at(-1), /Nothing is lodged/)
   assert.deepEqual(['epc', 'bundle', 'preAssessment', 'floorPlan', 'bulk'].map(hasPrepChecklist), [true, true, true, false, false])
@@ -387,10 +390,21 @@ test('customer types, next steps, dates and the fallback summary', () => {
   assert.equal(formatPreferredDate('next Tuesday'), 'next Tuesday')
   assert.equal(formatPreferredDate(''), '')
   assert.equal(serviceLabel(BULK), 'Agency / portfolio enquiry')
-  const summary = enquirySummaryText({ ...sample, services: ['Both (Bundle)'], speed: EXPRESS_SPEED, improvementPlan: true, preferredDate: '2026-10-07', notes: 'Side gate' })
-  for (const expected of ['Service: EPC + Floor Plan', 'Floor area: Over 55–75 m²', 'I am: Homeowner', 'Lodgement: next day', 'Add-on: EPC Improvement Plan', 'Address: 1 Test Road, E15 1AA', 'Preferred date: 07/10/2026', 'Notes: Side gate', 'Name: Test Customer', 'Phone: 07000000000', 'Email: test@example.invalid']) assert.ok(summary.includes(expected), expected)
+  assert.ok(enquirySummaryText({ ...sample, speed: NEXT_DAY_VISIT_SPEED }).includes('Visit and lodgement: next day'))
+  const summary = enquirySummaryText({ ...sample, services: ['Both (Bundle)'], speed: SAME_DAY_LODGEMENT_SPEED, improvementPlan: true, preferredDate: '2026-10-07', notes: 'Side gate' })
+  for (const expected of ['Service: EPC + Floor Plan', 'Floor area: Over 55–75 m²', 'I am: Homeowner', 'Lodgement: same day as the visit', 'Add-on: EPC Improvement Plan', 'Address: 1 Test Road, E15 1AA', 'Preferred date: 07/10/2026', 'Notes: Side gate', 'Name: Test Customer', 'Phone: 07000000000', 'Email: test@example.invalid']) assert.ok(summary.includes(expected), expected)
   const bulk = enquirySummaryText({ ...sample, services: [BULK], customerType: 'Estate agent', propertyCount: '20+', address: 'A\nB', postcode: '' })
   assert.match(bulk, /Properties: 20\+/)
   assert.match(bulk, /Properties and postcodes: A\nB/)
   assert.doesNotMatch(bulk, /Floor area|Address:/)
+})
+
+test('a form loaded before 22/10/2026 still books: the old next-day value becomes same-day lodgement', () => {
+  const parsed = contactSchema.safeParse({ ...sample, speed: LEGACY_EXPRESS_SPEED })
+  assert.ok(parsed.success, JSON.stringify(parsed.error?.issues))
+  assert.equal(parsed.data.speed, SAME_DAY_LODGEMENT_SPEED)
+  assert.equal(parseQuoteContext(new URLSearchParams('service=epc&speed=express')).speed, 'same-day')
+  assert.equal(parseQuoteContext(new URLSearchParams('service=floor-plan&speed=next-day')).speed, 'standard')
+  assert.equal(guideEstimate({ areaBand: '55-75', services: ['EPC Certificate'], speed: NEXT_DAY_VISIT_SPEED }).total, pricing[2].epc + NEXT_DAY_VISIT_SURCHARGE)
+  assert.equal(guideEstimate({ areaBand: '55-75', services: ['Floor Plan'], speed: NEXT_DAY_VISIT_SPEED }).express, 0)
 })

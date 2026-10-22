@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { Section } from '@/components/ui/Section'
 import { SectionHeader } from '@/components/ui/SectionHeader'
 import { ArrowRight, Award, BadgePoundSterling, Zap, MapPin } from 'lucide-react'
-import { EXPRESS_SURCHARGE } from '@/lib/site'
+import { SAME_DAY_LODGEMENT_SURCHARGE } from '@/lib/site'
 
 /**
  * Audience routing, with the four differentiators that previously lived in a
@@ -40,7 +40,7 @@ const audiences = [
 const reasons = [
   {
     Icon: Award,
-    title: 'Elmhurst accredited',
+    title: 'Elmhurst and Quidos accredited',
     body: 'Lodged on the government register by a named, verifiable assessor.',
   },
   {
@@ -51,7 +51,7 @@ const reasons = [
   {
     Icon: Zap,
     title: 'Fast and flexible',
-    body: `72-hour standard, next day for £${EXPRESS_SURCHARGE}. Seven days a week.`,
+    body: `72-hour standard, same day for £${SAME_DAY_LODGEMENT_SURCHARGE}. Seven days a week.`,
   },
   {
     Icon: MapPin,

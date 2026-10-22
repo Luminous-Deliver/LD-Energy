@@ -16,7 +16,7 @@ import { pricing,
   priceFrom,
   standardBands,
   topBand,
-  EXPRESS_SURCHARGE, defaultOgImage } from '@/lib/site'
+  SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE, defaultOgImage } from '@/lib/site'
 import type { FaqItem } from '@/lib/faq'
 
 export const metadata: Metadata = {
@@ -42,7 +42,7 @@ const breadcrumbs = [
 ]
 
 const included = [
-  'On-site assessment by an Elmhurst-accredited DEA',
+  'On-site assessment by an Elmhurst and Quidos accredited DEA',
   'Official lodgement on the UK Government EPC Register',
   'Certificate link sent once lodged on the government register',
   'Standard software-generated EPC recommendation report, where applicable',
@@ -56,11 +56,12 @@ const notIncluded = [
 
 /**
  * Modifiers to a quote, not price bands — hence a separate, smaller table.
- * Only the express surcharge is a fixed figure, and it comes from the canonical
+ * Only the speed extras are fixed figures, and they come from the canonical
  * source so it can never drift from the estimator or the booking form.
  */
 const additionalCharges: Array<{ label: string; guide: string }> = [
-  { label: 'Next-day service', guide: `+£${EXPRESS_SURCHARGE}` },
+  { label: 'Same-day lodgement (lodged on the day of the visit)', guide: `+£${SAME_DAY_LODGEMENT_SURCHARGE}` },
+  { label: 'Next-day visit and lodgement', guide: `+£${NEXT_DAY_VISIT_SURCHARGE}` },
   { label: 'EPC Improvement Plan', guide: `+£${site.addOns.improvementPlan}` },
   { label: 'EPC Pre-Assessment (not lodged), improvement plan included', guide: `From £${priceFrom.preAssessment}` },
   { label: 'Lodging a held Pre-Assessment later', guide: `+£${site.addOns.lodgeLater}` },
@@ -95,8 +96,8 @@ const pricingFaq: FaqItem[] = [
     a: 'Yes. We offer portfolio rates for landlords and letting agents with multiple properties. Send us the postcodes and we will quote the whole set together.',
   },
   {
-    q: 'What is the next-day service?',
-    a: `For £${EXPRESS_SURCHARGE} extra per EPC, your certificate is lodged within 24 hours of the assessment rather than the standard 72. This applies to assessments completed during our standard hours (Mon–Sun, 8am–8pm). Appointment availability and the delivery deadline are confirmed before booking.`,
+    q: 'What are the faster options?',
+    a: `Same-day lodgement (£${SAME_DAY_LODGEMENT_SURCHARGE} extra per EPC) puts your certificate on the register on the day of the visit rather than within the standard 72 hours. A next-day visit and lodgement (£${NEXT_DAY_VISIT_SURCHARGE} extra per EPC) means we visit the next day and lodge the certificate that day. Both apply to visits in our standard hours (Mon–Sun, 8am–8pm), and availability is confirmed before booking.`,
   },
   {
     q: 'How much does a floor plan cost?',
@@ -168,7 +169,7 @@ export default function PricingPage() {
             Guide Pricing Table
           </h2>
           <p className="mt-5 text-lg text-secondary-700 leading-relaxed">
-            Every EPC includes the on-site assessment, official lodgement on the GOV.UK EPC Register, and your certificate link sent once it is live. Next-day lodgement is {`£${EXPRESS_SURCHARGE}`} extra.
+            Every EPC includes the on-site assessment, official lodgement on the GOV.UK EPC Register, and your certificate link sent once it is live. Same-day lodgement is {`£${SAME_DAY_LODGEMENT_SURCHARGE}`} extra, and a next-day visit and lodgement {`£${NEXT_DAY_VISIT_SURCHARGE}`} extra.
           </p>
         </div>
 

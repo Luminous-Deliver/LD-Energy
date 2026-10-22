@@ -44,7 +44,7 @@ export function Footer() {
           <div className="md:col-span-4">
             <Logo variant="light" />
             <p className="mt-4 text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.82)' }}>
-              Domestic EPCs across London. Elmhurst-accredited Domestic Energy Assessor based in
+              Domestic EPCs across London. Elmhurst and Quidos accredited Domestic Energy Assessor based in
               Stratford, East London. Covering all 32 London boroughs.
             </p>
 
@@ -55,7 +55,7 @@ export function Footer() {
             >
               <ShieldCheck className="w-4 h-4 shrink-0" style={{ color: '#95BFAD' }} aria-hidden="true" />
               <span style={{ color: 'rgba(255,255,255,0.9)' }}>
-                Elmhurst Accredited · {site.assessor.accreditationNumber}
+                Elmhurst {site.assessor.accreditations[0].number} · Quidos {site.assessor.accreditations[1].number}
               </span>
             </div>
 

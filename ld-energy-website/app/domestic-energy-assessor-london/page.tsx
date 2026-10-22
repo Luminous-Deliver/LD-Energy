@@ -19,7 +19,7 @@ import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { PageHero } from '@/components/sections/PageHero'
 import { Pricing } from '@/components/sections/Pricing'
 import { CtaStrip } from '@/components/sections/CtaStrip'
-import { site, topBand, pricing, priceFrom, insurance, EXPRESS_SURCHARGE, defaultOgImage } from '@/lib/site'
+import { site, topBand, pricing, priceFrom, insurance, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE, defaultOgImage } from '@/lib/site'
 import { areaServedLondon } from '@/lib/boroughs'
 import type { FaqItem } from '@/lib/faq'
 
@@ -28,20 +28,20 @@ const PATH = '/domestic-energy-assessor-london'
 export const metadata: Metadata = {
   title: 'Domestic Energy Assessor in London',
   description:
-    `Elmhurst-accredited domestic energy assessor in Stratford, covering all 32 London boroughs. Official EPC certificates from £${priceFrom.epc}, next-day available.`,
+    `Elmhurst and Quidos accredited domestic energy assessor in Stratford, covering all 32 London boroughs. Official EPC certificates from £${priceFrom.epc}, next-day visits available.`,
   alternates: { canonical: `${site.url}${PATH}` },
   openGraph: {
     images: [defaultOgImage],
     title: 'Domestic Energy Assessor London | Elmhurst Accredited | L&D Energy',
     description:
-      `Elmhurst-accredited domestic energy assessor covering all 32 London boroughs. Official EPC certificates from £${priceFrom.epc}, next-day service available.`,
+      `Elmhurst and Quidos accredited domestic energy assessor covering all 32 London boroughs. Official EPC certificates from £${priceFrom.epc}, next-day visits available.`,
     url: `${site.url}${PATH}`,
   },
   twitter: {
     images: [defaultOgImage.url],
     title: 'Domestic Energy Assessor London | Elmhurst Accredited',
     description:
-      `Elmhurst-accredited domestic energy assessor covering all 32 London boroughs. EPCs from £${priceFrom.epc}.`,
+      `Elmhurst and Quidos accredited domestic energy assessor covering all 32 London boroughs. EPCs from £${priceFrom.epc}.`,
   },
 }
 
@@ -87,7 +87,7 @@ const whyLocal = [
   {
     Icon: Clock,
     title: 'Fast and flexible',
-    body: `72-hour standard lodgement, or next-day for £${EXPRESS_SURCHARGE}. Appointments 7 days a week, including evenings and weekends.`,
+    body: `72-hour standard lodgement, same-day lodgement for £${SAME_DAY_LODGEMENT_SURCHARGE}, or a next-day visit and lodgement for £${NEXT_DAY_VISIT_SURCHARGE}. Appointments 7 days a week, including evenings and weekends.`,
   },
   {
     Icon: ShieldCheck,
@@ -99,11 +99,11 @@ const whyLocal = [
 const deaFaq: FaqItem[] = [
   {
     q: 'What is a domestic energy assessor?',
-    a: 'A domestic energy assessor (DEA) is a qualified, accredited professional licensed to assess the energy efficiency of residential properties and produce an Energy Performance Certificate (EPC). Only an accredited DEA registered with a government-approved scheme such as Elmhurst Energy can lodge a domestic EPC on the official UK Government EPC Register.',
+    a: 'A domestic energy assessor (DEA) is a qualified, accredited professional licensed to assess the energy efficiency of residential properties and produce an Energy Performance Certificate (EPC). Only an accredited DEA registered with a government-approved scheme such as Elmhurst Energy or Quidos can lodge a domestic EPC on the official UK Government EPC Register.',
   },
   {
     q: 'How do I find a domestic energy assessor in London?',
-    a: 'You can search the official Elmhurst or EPC Register find-an-assessor tools, or book directly with a local accredited DEA. L&D Energy is an Elmhurst-accredited domestic energy assessor based in Stratford, East London, covering all 32 London boroughs and surrounding areas within a 1.5-hour radius. Call 07492 575 396 or book online.',
+    a: 'You can search the official GOV.UK find-an-assessor tool, or book directly with a local accredited DEA. L&D Energy is an Elmhurst and Quidos accredited domestic energy assessor based in Stratford, East London, covering all 32 London boroughs and surrounding areas within a 1.5-hour radius. Call 07492 575 396 or book online.',
   },
   {
     q: 'How much does a domestic energy assessor charge in London?',
@@ -111,11 +111,11 @@ const deaFaq: FaqItem[] = [
   },
   {
     q: 'Do I need an accredited assessor for an EPC?',
-    a: 'Yes. A domestic EPC is only legally valid if it is produced by an accredited domestic energy assessor and lodged on the UK Government EPC Register. An EPC from an unaccredited person cannot be used to sell or rent a property. Always check your assessor’s accreditation number, ours is EES/036265 with Elmhurst Energy.',
+    a: 'Yes. A domestic EPC is only legally valid if it is produced by an accredited domestic energy assessor and lodged on the UK Government EPC Register. An EPC from an unaccredited person cannot be used to sell or rent a property. Always check your assessor’s accreditation number, ours are EES/036265 with Elmhurst Energy and QUID202220 with Quidos.',
   },
   {
     q: 'How long does a domestic energy assessment take?',
-    a: 'The on-site assessment usually takes 45 minutes to 2 hours depending on the size of the property. Your certificate is then lodged on the GOV.UK EPC Register within 72 hours as standard, or within 24 hours if you choose our next-day service, and we send you the link once it is live.',
+    a: 'The on-site assessment usually takes 45 minutes to 2 hours depending on the size of the property. Your certificate is then lodged on the GOV.UK EPC Register within 72 hours as standard, or on the day of the visit if you choose same-day lodgement, and we send you the link once it is live.',
   },
   {
     q: 'Is a domestic energy assessor the same as a commercial energy assessor?',
@@ -148,7 +148,7 @@ const serviceSchema = {
   serviceType: 'Domestic Energy Assessment',
   name: 'Domestic Energy Assessor in London',
   description:
-    'Elmhurst-accredited domestic energy assessor producing official EPC certificates for residential properties across all 32 London boroughs.',
+    'Elmhurst and Quidos accredited domestic energy assessor producing official EPC certificates for residential properties across all 32 London boroughs.',
   areaServed: areaServedLondon,
   provider: { '@id': `${site.url}/#business` },
   url: `${site.url}${PATH}`,
@@ -167,7 +167,7 @@ export default function DomesticEnergyAssessorPage() {
       <PageHero
         eyebrow="Domestic Energy Assessor"
         heading="Your Local Domestic Energy Assessor in London"
-        subheading={`L&D Energy is an Elmhurst-accredited Domestic Energy Assessor (DEA) based in Stratford, East London. We produce official EPC certificates for homes across all 32 London boroughs, with guide prices from £${priceFrom.epc} and next-day appointments available.`}
+        subheading={`L&D Energy is an Elmhurst and Quidos accredited Domestic Energy Assessor (DEA) based in Stratford, East London. We produce official EPC certificates for homes across all 32 London boroughs, with guide prices from £${priceFrom.epc} and next-day appointments available.`}
         primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'assessor', ctaId: 'hero' }) }}
       />
 
@@ -185,7 +185,7 @@ export default function DomesticEnergyAssessorPage() {
             A domestic energy assessor (DEA) is a qualified, accredited professional licensed to assess the energy efficiency of residential properties and produce an Energy Performance Certificate (EPC).
           </p>
           <p className="mt-4 text-secondary-700 leading-relaxed">
-            Only an accredited DEA, registered with a government-approved scheme such as Elmhurst Energy, can lodge a domestic EPC on the official{' '}
+            Only an accredited DEA, registered with a government-approved scheme such as Elmhurst Energy or Quidos, can lodge a domestic EPC on the official{' '}
             <span className="font-semibold text-secondary-900">UK Government EPC Register</span>. An EPC from an unaccredited person cannot legally be used to sell or rent a home. The assessment itself is non-invasive: your assessor surveys the property, records its construction and services, and the approved RdSAP software calculates the rating.
           </p>
           <p className="mt-4 text-secondary-700 leading-relaxed">
@@ -243,7 +243,7 @@ export default function DomesticEnergyAssessorPage() {
               An assessor you can verify
             </h2>
             <p className="mt-5 text-lg text-secondary-700 leading-relaxed">
-              Your EPC is only as trustworthy as the assessor behind it. L&D Energy is led by Abdul Motaleb Taher, an Elmhurst-accredited domestic energy assessor whose credentials you can check independently.
+              Your EPC is only as trustworthy as the assessor behind it. L&D Energy is led by Abdul Motaleb Taher, an Elmhurst and Quidos accredited domestic energy assessor whose credentials you can check independently.
             </p>
             <p className="mt-4 text-secondary-700 leading-relaxed">
               Read more about{' '}
@@ -345,7 +345,7 @@ export default function DomesticEnergyAssessorPage() {
 
       <CtaStrip
         heading="Get a quote from your London Domestic Energy Assessor"
-        body={`Elmhurst-accredited, all 32 boroughs, guide prices from £${priceFrom.epc}. Lodged in 72 hours, or next day for £${EXPRESS_SURCHARGE} extra.`}
+        body={`Elmhurst and Quidos accredited, all 32 boroughs, guide prices from £${priceFrom.epc}. Lodged in 72 hours, or the same day for £${SAME_DAY_LODGEMENT_SURCHARGE} extra.`}
         primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'assessor', ctaId: 'bottom' }) }}
       />
     </>

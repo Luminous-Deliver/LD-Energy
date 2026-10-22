@@ -35,7 +35,7 @@ export function Coverage() {
           Areas We Cover
         </h2>
         <p className="mt-4 text-lg text-secondary-700 leading-relaxed">
-          Based in Stratford (E15), we provide Elmhurst-accredited EPC assessments across East, North, South and West London, every one of the 32 boroughs, plus surrounding areas within a 1.5-hour radius.
+          Based in Stratford (E15), we provide Elmhurst and Quidos accredited EPC assessments across East, North, South and West London, every one of the 32 boroughs, plus surrounding areas within a 1.5-hour radius.
         </p>
       </div>
 

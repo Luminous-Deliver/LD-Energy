@@ -95,8 +95,8 @@ export default function PreparingPage() {
           </p>
           <p className="mt-3 leading-relaxed text-secondary-700">
             After the visit we send you a draft of your EPC to check. Once you are happy with it, we
-            lodge the certificate on the official GOV.UK EPC register within 72 hours, or the next
-            day if you chose express, and send you the link as soon as it is live. A lodged
+            lodge the certificate on the official GOV.UK EPC register within 72 hours, or on the day
+            of the visit if you chose a faster option, and send you the link as soon as it is live. A lodged
             certificate cannot be edited, so the draft is your opportunity to flag anything that
             looks wrong.
           </p>

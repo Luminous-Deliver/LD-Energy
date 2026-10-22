@@ -147,7 +147,7 @@ export default function LandlordsPage() {
       <PageHero
         eyebrow="For Landlords"
         heading="EPCs for London Landlords &amp; Domestic MEES Compliance"
-        subheading="Accredited domestic EPC assessments across London, from our base in Stratford. Your certificate tells you exactly where the property stands against the current band E requirement — lodged within 72 hours, or next day if you need it urgently."
+        subheading="Accredited domestic EPC assessments across London, from our base in Stratford. Your certificate tells you exactly where the property stands against the current band E requirement — lodged within 72 hours, or on the day of the visit if you need it urgently."
         primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'landlords', ctaId: 'hero' }) }}
       />
 

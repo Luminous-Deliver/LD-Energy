@@ -12,7 +12,7 @@ const points = [
   {
     Icon: CalendarClock,
     title: 'Built for launch dates',
-    body: 'Priority slots for agencies and express next-day turnaround when a listing can’t wait.',
+    body: 'Priority slots for agencies, with next-day visits and same-day lodgement when a listing can’t wait.',
   },
   {
     Icon: FileSpreadsheet,

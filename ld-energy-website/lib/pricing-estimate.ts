@@ -1,5 +1,5 @@
-import { pricing, priceFrom, site, EXPRESS_SURCHARGE, type PricingBand } from '@/lib/site'
-import { PRE_ASSESSMENT } from '@/lib/booking-options'
+import { pricing, priceFrom, site, type PricingBand } from '@/lib/site'
+import { PRE_ASSESSMENT, speedSurcharge, speedName } from '@/lib/booking-options'
 import { areaBands, isRetiredArea, legacyArea, type AreaBand } from '@/lib/floor-area'
 
 /**
@@ -51,7 +51,10 @@ export interface GuideEstimate {
   bundleDiscount: number
   /** The saving shown to the customer: the bundle discount on a standard band, else 0. */
   saving: number
+  /** Speed extra: same-day lodgement or a next-day visit and lodgement; 0 for standard. */
   express: number
+  /** Name of the paid speed choice, or null. */
+  speedName: string | null
   /** Not-lodged full survey on its own price column; includes the personalised plan. */
   preAssessment: number
   /** The selected service's price before any add-on, or null without a band. */
@@ -144,13 +147,14 @@ export function guideEstimate(opts: {
   total += preAssessment
   const baseGuide = band && !isBulk && total > 0 ? total : null
 
-  // Express is a LODGEMENT surcharge, not a general turnaround fee. Only an
+  // A speed extra is a LODGEMENT surcharge, not a general turnaround fee. Only an
   // EPC is lodged: a Pre-Assessment deliberately is not, and a floor plan
   // never was. Gating on `isLodged` rather than "not a Pre-Assessment" fixes
   // floor-plan-only too, which had the same defect before Pre-Assessment
   // existed and was missed when that case was handled.
   const isLodged = !isBulk && wantsEpc
-  const express = isLodged && opts.speed?.includes('Express') ? EXPRESS_SURCHARGE : 0
+  const express = isLodged ? speedSurcharge(opts.speed) : 0
+  const chosenSpeed = express ? speedName(opts.speed) : null
   total += express
 
   // Order matters: bulk wins over everything (it is quoted individually and
@@ -192,6 +196,7 @@ export function guideEstimate(opts: {
     bundleDiscount,
     saving: isStartingPrice ? 0 : bundleDiscount,
     express,
+    speedName: chosenSpeed,
     preAssessment,
     baseGuide,
     improvementPlan,
@@ -229,7 +234,7 @@ export function guideEstimateRows(e: GuideEstimate): Array<[string, string]> {
     return []
   }
 
-  if (e.express) rows.push(['Next-day lodgement', `+£${e.express}`])
+  if (e.express) rows.push([e.speedName ?? 'Faster lodgement', `+£${e.express}`])
   if (e.improvementPlan) rows.push([PLAN_LABEL, `+£${e.improvementPlan}`])
   if (e.planIncluded) rows.push(['Personalised improvement plan', 'Included'])
   if (e.energyReport) rows.push([ENERGY_REPORT_LABEL, 'Included at no extra charge'])
@@ -250,7 +255,7 @@ export function bookingPriceRows(e: GuideEstimate): Array<[string, string]> {
   if (e.isBulk) return [['Price status', 'Quoted individually']]
   const rows: Array<[string, string]> = [['Price status', priceStatusLabel(e)]]
   if (e.state === 'priced' && e.baseGuide !== null) rows.push(['Base guide price', guidePrice(e, e.baseGuide)])
-  if (e.express) rows.push(['Next-day lodgement', `+£${e.express}`])
+  if (e.express) rows.push([e.speedName ?? 'Faster lodgement', `+£${e.express}`])
   if (e.canHavePlan) rows.push(['Improvement plan', e.planIncluded ? 'Included in the Pre-Assessment' : e.improvementPlan ? `Added (+£${e.improvementPlan})` : 'Not added'])
   if (e.productKind === 'preAssessment') rows.push([ENERGY_REPORT_LABEL, e.energyReport ? 'Requested (no extra charge)' : 'Not requested'])
   if (e.saving && e.state === 'priced') rows.push(['Bundle saving shown', `£${e.saving}`])
@@ -275,7 +280,7 @@ export function guideEstimateLine(e: GuideEstimate): string {
     parts.push(`Floor Plan £${e.floorPlan}`)
   }
   if (e.preAssessment) parts.push(`Pre-Assessment (not lodged) £${e.preAssessment}, plan included`)
-  if (e.express) parts.push(`express +£${e.express}`)
+  if (e.express) parts.push(`${(e.speedName ?? 'faster lodgement').toLowerCase()} +£${e.express}`)
   if (e.improvementPlan) parts.push(`improvement plan +£${e.improvementPlan}`)
   if (e.energyReport) parts.push('separate energy report (free)')
   return e.isStartingPrice

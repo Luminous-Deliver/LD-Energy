@@ -9,7 +9,7 @@ import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { PageHero } from '@/components/sections/PageHero'
 import { Pricing } from '@/components/sections/Pricing'
 import { CtaStrip } from '@/components/sections/CtaStrip'
-import { site, pricing, EXPRESS_SURCHARGE, defaultOgImage } from '@/lib/site'
+import { site, pricing, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE, defaultOgImage } from '@/lib/site'
 import { areaServedLondon } from '@/lib/boroughs'
 import type { FaqItem } from '@/lib/faq'
 
@@ -42,7 +42,7 @@ const whyAgents = [
   {
     Icon: Zap,
     title: 'Fast turnaround on new instructions',
-    body: 'Appointments 7 days a week, 8am–8pm, with certificates lodged within 72 hours and next-day available.',
+    body: 'Appointments 7 days a week, 8am–8pm, with certificates lodged within 72 hours, with same-day lodgement and next-day visits available.',
   },
   {
     Icon: LayoutPanelTop,
@@ -75,7 +75,7 @@ const process = [
   { step: 'Send the instruction', detail: 'Address, property size, and the occupier’s contact details, by phone, WhatsApp, or email.' },
   { step: 'We arrange access', detail: 'We contact the vendor or tenant directly and confirm the appointment during our opening hours, Mon–Sun 8am–8pm.' },
   { step: 'Assessment done', detail: '45 minutes to 2 hours on-site, evenings and weekends included.' },
-  { step: 'Certificate lodged', detail: 'Lodged on the GOV.UK EPC register within 72 hours, or next day for urgent listings, with the certificate link sent to your branch once live.' },
+  { step: 'Certificate lodged', detail: 'Lodged on the GOV.UK EPC register within 72 hours, or the same day for urgent listings, with the certificate link sent to your branch once live.' },
 ]
 
 const agentFaq: FaqItem[] = [
@@ -89,7 +89,7 @@ const agentFaq: FaqItem[] = [
   },
   {
     q: 'How quickly can you assess a new instruction?',
-    a: 'Tell us your listing deadline and access requirements. We confirm an available appointment and delivery timing before accepting the instruction. Next-day appointments are available. Standard lodgement is within 72 hours of the visit, and next-day lodgement is agreed before booking.',
+    a: 'Tell us your listing deadline and access requirements. We confirm an available appointment and delivery timing before accepting the instruction. Next-day visits are available. Standard lodgement is within 72 hours of the visit; same-day lodgement and next-day visits are agreed before booking.',
   },
   {
     q: 'Can you deal with the vendor or tenant directly?',
@@ -158,7 +158,7 @@ export default function EstateAgentsPage() {
       <PageHero
         eyebrow="For Estate & Letting Agents"
         heading="Your EPC Partner for New Instructions"
-        subheading="Elmhurst-accredited assessor covering all 32 London boroughs, available for new agency partnerships now. Fast, reliable EPCs and floor plans so your listings go live on time."
+        subheading="Elmhurst and Quidos accredited assessor covering all 32 London boroughs, available for new agency partnerships now. Fast, reliable EPCs and floor plans so your listings go live on time."
         primaryCta={{ label: 'Partner With Us', href: quoteHref({ service: 'bulk', sourcePage: 'estate-agents', ctaId: 'hero' }) }}
       />
 
@@ -237,7 +237,7 @@ export default function EstateAgentsPage() {
                 'Official EPC lodged on the government register',
                 'Professional floor plan, discounted with an EPC',
                 'High-resolution files sized for Rightmove and Zoopla',
-                `Next-day option for urgent instructions (+£${EXPRESS_SURCHARGE})`,
+                `Same-day lodgement (+£${SAME_DAY_LODGEMENT_SURCHARGE}) or a next-day visit (+£${NEXT_DAY_VISIT_SURCHARGE}) for urgent instructions`,
                 'Evening and weekend access appointments',
                 'One supplier for all 32 boroughs, no travel charges',
               ].map((item) => (

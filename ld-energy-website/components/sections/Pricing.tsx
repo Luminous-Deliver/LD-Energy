@@ -37,7 +37,7 @@ export function Pricing({ sourcePage }: { sourcePage: SourcePage }) {
           positioning="A full on-site assessment, lodged on the official GOV.UK EPC Register and valid for ten years."
           inclusions={[
             'Carried out by an accredited Domestic Energy Assessor',
-            'Standard lodgement within 72 hours, next day available',
+            'Standard lodgement within 72 hours, same day available',
             'Certificate link sent as soon as it is live on the register',
             'Standard EPC recommendation report included, where applicable',
             `Optional personalised Improvement Plan with full Energy Report: £${site.addOns.improvementPlan}`,

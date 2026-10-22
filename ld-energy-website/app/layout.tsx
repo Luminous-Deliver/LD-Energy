@@ -6,7 +6,7 @@ import { introScript } from '@/lib/intro'
 import { MobileQuoteBar } from '@/components/layout/MobileQuoteBar'
 import { WebAnalytics } from '@/components/layout/WebAnalytics'
 import { LondonSkyline } from '@/components/ui/LondonSkyline'
-import { site, pricing, priceFrom, EXPRESS_SURCHARGE } from '@/lib/site'
+import { site, pricing, priceFrom, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE } from '@/lib/site'
 import { areaServedLondon } from '@/lib/boroughs'
 import { assessorSchema } from '@/lib/assessor-schema'
 import './globals.css'
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     siteName: site.name,
     title: `Domestic EPC London | From £${priceFrom.epc} | L&D Energy`,
     description:
-      `Elmhurst accredited domestic energy assessor. Guide prices from £${priceFrom.epc}, exact quote before booking. London-wide service from a Stratford E15 base.`,
+      `Elmhurst and Quidos accredited domestic energy assessor. Guide prices from £${priceFrom.epc}, exact quote before booking. London-wide service from a Stratford E15 base.`,
   },
   twitter: {
     card: 'summary_large_image',
@@ -121,8 +121,13 @@ const localBusinessSchema = {
       })),
       {
         '@type': 'Offer',
-        itemOffered: { '@type': 'Service', name: 'Next-Day EPC Service', description: 'Optional next-day lodgement, subject to confirmed availability before booking' },
-        priceSpecification: { '@type': 'PriceSpecification', price: EXPRESS_SURCHARGE, priceCurrency: 'GBP', description: 'Additional charge on top of the confirmed EPC price' },
+        itemOffered: { '@type': 'Service', name: 'Same-Day EPC Lodgement', description: 'Optional: the EPC is lodged on the day of the visit, subject to confirmed availability before booking' },
+        priceSpecification: { '@type': 'PriceSpecification', price: SAME_DAY_LODGEMENT_SURCHARGE, priceCurrency: 'GBP', description: 'Additional charge on top of the confirmed EPC price' },
+      },
+      {
+        '@type': 'Offer',
+        itemOffered: { '@type': 'Service', name: 'Next-Day EPC Visit and Lodgement', description: 'Optional: the visit is the next day and the EPC is lodged that day, subject to confirmed availability before booking' },
+        priceSpecification: { '@type': 'PriceSpecification', price: NEXT_DAY_VISIT_SURCHARGE, priceCurrency: 'GBP', description: 'Additional charge on top of the confirmed EPC price' },
       },
       ...pricing.map((p) => ({
         '@type': 'Offer',
@@ -151,6 +156,7 @@ const localBusinessSchema = {
     'MEES Compliance',
     'RdSAP Assessment',
     'Elmhurst Energy Accreditation',
+    'Quidos Accreditation',
   ],
 }
 

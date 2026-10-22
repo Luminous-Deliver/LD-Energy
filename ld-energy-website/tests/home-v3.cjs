@@ -6,8 +6,8 @@ const { chromium } = require('playwright')
 // The real price table, loaded through the repo's TypeScript test loader, so the
 // test can never agree with a copy of it.
 require('./register.cjs')
-const { pricing, EXPRESS_SURCHARGE } = require('../lib/site.ts')
-const { EXPRESS_SPEED } = require('../lib/validators.ts')
+const { pricing, NEXT_DAY_VISIT_SURCHARGE } = require('../lib/site.ts')
+const { NEXT_DAY_VISIT_SPEED } = require('../lib/validators.ts')
 
 const base = process.env.BOOKING_TEST_URL || 'http://localhost:3120'
 if (!['localhost', '127.0.0.1'].includes(new URL(base).hostname)) throw new Error('Local preview only')
@@ -114,8 +114,8 @@ const footerLinks = [
     await card.locator('.bf__go').click()
     check(await card.locator('.bf__h').textContent() === 'Timing and access', 'step 2 is timing and access')
     check(await page.evaluate(() => document.activeElement?.textContent) === 'Timing and access', 'step 2: focus on heading')
-    await card.locator(`label.bf-tile:has(input[name="speed"][value="${EXPRESS_SPEED}"])`).click()
-    check((await card.locator('[data-estimate-summary]').textContent()).includes(`£${pricing[2].epc + EXPRESS_SURCHARGE}`), 'running total includes next-day lodgement')
+    await card.locator(`label.bf-tile:has(input[name="speed"][value="${NEXT_DAY_VISIT_SPEED}"])`).click()
+    check((await card.locator('[data-estimate-summary]').textContent()).includes(`£${pricing[2].epc + NEXT_DAY_VISIT_SURCHARGE}`), 'running total includes the next-day visit')
     await card.locator('.bf__go').click()
     check(await card.locator('.bf__h').textContent() === 'Your details', 'step 3 is your details')
     await page.fill('#name', 'Test Customer'); await page.fill('#phone', '07000 000000'); await page.fill('#email', 'test@example.com')
@@ -127,7 +127,7 @@ const footerLinks = [
     const [sent] = submissions
     check(submissions.length === 1, `one submission, got ${submissions.length}`)
     check(sent && sent.sourcePage === 'home' && sent.ctaId === 'hero-form' && sent.customerType === 'Landlord (tenanted)'
-      && sent.services.join() === 'EPC Certificate' && sent.areaBand === bands[2] && sent.speed === EXPRESS_SPEED && sent.consent === true,
+      && sent.services.join() === 'EPC Certificate' && sent.areaBand === bands[2] && sent.speed === NEXT_DAY_VISIT_SPEED && sent.consent === true,
       'submitted payload: ' + JSON.stringify(sent && { ...sent, turnstileToken: undefined }))
     await page.goto(base + '/', { waitUntil: 'networkidle' })
 

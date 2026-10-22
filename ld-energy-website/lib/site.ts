@@ -37,7 +37,7 @@ export const site = {
   },
   url: 'https://epc.luminousanddeliver.co.uk',
   description:
-    'L&D Energy is an Elmhurst-accredited Domestic Energy Assessor providing official EPC certificates and laser-measured floor plans for residential properties across all 32 London boroughs. Transparent guide pricing, with your exact quote confirmed before booking.',
+    'L&D Energy is an Elmhurst and Quidos accredited Domestic Energy Assessor providing official EPC certificates and laser-measured floor plans for residential properties across all 32 London boroughs. Transparent guide pricing, with your exact quote confirmed before booking.',
   phone: '07492 575 396',
   phoneIntl: '+447492575396',
   phoneHref: 'tel:+447492575396',
@@ -56,13 +56,24 @@ export const site = {
     name: 'Abdul Motaleb Taher',
     accreditationNumber: 'EES/036265',
     scheme: 'Elmhurst Energy Systems Ltd',
+    /**
+     * Accredited with two schemes (Abdul, 22/10/2026; both on the GOV.UK register).
+     * Elmhurst stays first because the ID card, the software and the insurance
+     * statements on the site are Elmhurst's.
+     */
+    accreditations: [
+      { scheme: 'Elmhurst Energy Systems Ltd', short: 'Elmhurst', number: 'EES/036265', url: 'https://www.elmhurstenergy.co.uk' },
+      { scheme: 'Quidos Limited', short: 'Quidos', number: 'QUID202220', url: 'https://quidos.co.uk' },
+    ],
     qualification: 'Domestic Energy Assessor',
     // Official government register — the authoritative place to verify an assessor.
     // Parameterised so it lands on the record itself rather than a blank form.
-    // Last verified 2026-08-13. Fallback entry point if GOV.UK moves the path:
+    // Searching "Abdul Taher" lists both records (Elmhurst under Abdul Motaleb Taher,
+    // Quidos under Abdul Taher); the full name finds only the Elmhurst one.
+    // Last verified 2026-10-22. Fallback entry point if GOV.UK moves the path:
     // https://www.gov.uk/get-new-energy-certificate
     verifyUrl:
-      'https://getting-new-energy-certificate.service.gov.uk/find-an-assessor/search-by-name?name=Abdul+Motaleb+Taher',
+      'https://getting-new-energy-certificate.service.gov.uk/find-an-assessor/search-by-name?name=Abdul+Taher',
   },
   /**
    * Add-on services quoted alongside an EPC.
@@ -161,11 +172,16 @@ export const servicesMenu = [
 ] as const
 
 /**
- * Fixed surcharge for next-day (express) delivery. This is one of the few
- * genuinely fixed numbers on the site — it is added to the confirmed quote,
- * not to the guide estimate.
+ * Fixed speed extras, two of the few genuinely fixed numbers on the site. Each is
+ * added to the confirmed quote, not to the guide estimate, and applies only to a
+ * lodged EPC (on its own or in the bundle). Abdul, 22/10/2026:
+ * - same-day lodgement: the EPC is lodged on the day of the visit (this £15
+ *   option was "next-day lodgement" until then);
+ * - next-day visit and lodgement: the visit is the next day and the EPC is
+ *   lodged that day.
  */
-export const EXPRESS_SURCHARGE = 15
+export const SAME_DAY_LODGEMENT_SURCHARGE = 15
+export const NEXT_DAY_VISIT_SURCHARGE = 35
 
 /**
  * CANONICAL PRICING SOURCE.
@@ -189,7 +205,7 @@ export const EXPRESS_SURCHARGE = 15
  *
  * `startingPrice` marks the open-ended top band: its figures are starting
  * prices, always shown with "From", never a fixed total, and they promise no
- * bundle saving. `express` is optional per band and falls back to EXPRESS_SURCHARGE.
+ * bundle saving.
  */
 export interface PricingBand {
   /** Stable identifier, sent with an enquiry. See `areaBands` in lib/floor-area.ts. */
@@ -206,7 +222,6 @@ export interface PricingBand {
   /** Private, unlodged survey. Includes the personalised written improvement plan. */
   preAssessment: number
   startingPrice?: true
-  express?: number
 }
 
 export const pricing: PricingBand[] = [
@@ -228,16 +243,6 @@ export const standardBands = pricing.filter((p) => !p.startingPrice)
  * promises no specific saving.
  */
 export const maxBundleSaving = Math.max(...standardBands.map((p) => p.epc + p.floorPlan - p.bundle))
-
-/** Express fee for a band — per-band override, else the standard surcharge. */
-export function expressFee(band: PricingBand): number {
-  return band.express ?? EXPRESS_SURCHARGE
-}
-
-/** Guide price for an EPC delivered next day. Derived, never stored. */
-export function nextDayGuide(band: PricingBand): number {
-  return band.epc + expressFee(band)
-}
 
 /**
  * Genuine arithmetic difference between booking separately and as a bundle.

@@ -43,7 +43,7 @@ export default async function OpengraphImage() {
             <span>from {`£${priceFrom.epc}`}</span>
           </div>
           <div style={{ fontSize: 32, opacity: 0.9, fontWeight: 500 }}>
-            Elmhurst accredited · Next-day available · All London boroughs
+            Elmhurst &amp; Quidos accredited · Next-day visits · All London
           </div>
         </div>
 

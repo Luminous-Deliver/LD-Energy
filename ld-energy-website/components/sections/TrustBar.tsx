@@ -3,7 +3,7 @@ import { Container } from '@/components/ui/Container'
 import { insurance } from '@/lib/site'
 
 const items = [
-  { Icon: ShieldCheck, label: 'Elmhurst Accredited' },
+  { Icon: ShieldCheck, label: 'Elmhurst & Quidos Accredited' },
   { Icon: Landmark, label: 'Lodged on UK Gov Register' },
   { Icon: CalendarCheck, label: 'Valid for 10 years' },
   { Icon: MapPin, label: 'All 32 Boroughs Covered' },

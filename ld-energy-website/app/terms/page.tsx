@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { LegalPage } from '@/components/ui/LegalPage'
-import { site, insurance, EXPRESS_SURCHARGE, defaultOgImage } from '@/lib/site'
+import { site, insurance, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE, defaultOgImage } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'Terms of Service',
@@ -58,7 +58,7 @@ export default function TermsPage() {
 
       <h2>1. The service</h2>
       <p>
-        We provide Domestic Energy Performance Certificates (EPCs) and professional property floor plans for residential properties in our service area. EPCs are produced by an Elmhurst-accredited Domestic Energy Assessor (DEA) and lodged on the UK Government EPC Register.
+        We provide Domestic Energy Performance Certificates (EPCs) and professional property floor plans for residential properties in our service area. EPCs are produced by an Elmhurst and Quidos accredited Domestic Energy Assessor (DEA) and lodged on the UK Government EPC Register.
       </p>
       <p>
         We also provide two optional services. The <strong>EPC Improvement Plan</strong> adds Abdul&apos;s personalised written interpretation and prioritisation, supported by the full Elmhurst Energy Report, for {`£${site.addOns.improvementPlan}`}. It explains what is holding the rating back and which improvements to consider first. The <strong>EPC Pre-Assessment</strong> is a full survey that is deliberately <strong>not</strong> lodged, so no certificate is produced or published; it includes the Energy Report and the written plan. Section 5 sets out the terms specific to it.
@@ -76,7 +76,7 @@ export default function TermsPage() {
 
       <h2>2. Booking and pricing</h2>
       <p>
-        Prices shown on our pricing page are guide estimates based mainly on internal floor area (m²), not fixed quotes. We confirm your exact price before the booking is accepted, and that confirmed price is the price you pay, provided the property matches the details given to us at booking. There are no travel or call-out charges. Express (next-day) service is available for {`£${EXPRESS_SURCHARGE}`} extra per EPC.
+        Prices shown on our pricing page are guide estimates based mainly on internal floor area (m²), not fixed quotes. We confirm your exact price before the booking is accepted, and that confirmed price is the price you pay, provided the property matches the details given to us at booking. There are no travel or call-out charges. Same-day lodgement is available for {`£${SAME_DAY_LODGEMENT_SURCHARGE}`} extra per EPC, and a next-day visit and lodgement for {`£${NEXT_DAY_VISIT_SURCHARGE}`} extra per EPC.
       </p>
       <p>
         If the property turns out to be materially different from those details &mdash; for example a significantly larger floor area, a different property type, or an extension or loft conversion not mentioned at booking &mdash; we will tell you before starting the assessment and either agree a revised price with you or reschedule. We will not change an agreed price without speaking to you first, and you are free to decline and cancel at no charge at that point.
@@ -103,10 +103,10 @@ export default function TermsPage() {
 
       <h2>4. Delivery</h2>
       <p>
-        Standard EPC delivery is within 72 hours of the assessment. Next-day delivery (where booked) is within 24 hours of the assessment. We lodge your certificate on the official government EPC Register on your behalf and send you the link to your certificate once it is live.
+        Standard EPC delivery is within 72 hours of the assessment. With same-day lodgement or a next-day visit (where booked), the EPC is lodged on the day of the assessment. We lodge your certificate on the official government EPC Register on your behalf and send you the link to your certificate once it is live.
       </p>
       <p>
-        Improvement Plan documents are prepared after the visit and sent within 72 hours of the assessment. A Pre-Assessment is not lodged and produces no certificate, so no lodgement timescale and no next-day option apply to it; its Energy Report and written plan are sent within 72 hours of the visit.
+        Improvement Plan documents are prepared after the visit and sent within 72 hours of the assessment. A Pre-Assessment is not lodged and produces no certificate, so no lodgement timescale and no same-day or next-day option apply to it; its Energy Report and written plan are sent within 72 hours of the visit.
       </p>
 
       <h2>5. EPC Pre-Assessment</h2>
@@ -145,7 +145,7 @@ export default function TermsPage() {
 
       <h2>10. Complaints</h2>
       <p>
-        Concerns should be raised with us in the first instance at <a href={site.emailHref}>{site.email}</a>. Complaints relating to the EPC itself can also be escalated through Elmhurst Energy&rsquo;s formal complaints process.
+        Concerns should be raised with us in the first instance at <a href={site.emailHref}>{site.email}</a>. Complaints relating to the EPC itself can also be escalated through the formal complaints process of the accreditation scheme it was lodged under, Elmhurst Energy or Quidos.
       </p>
 
       <h2>11. Governing law</h2>

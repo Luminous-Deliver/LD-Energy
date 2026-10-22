@@ -1,8 +1,8 @@
 import { z } from 'zod'
 import { sourcePages, ctaIds } from '@/lib/enquiry-attribution'
 import { submittedAreaChoices, bandForArea, legacyArea, parseExactArea, FLOOR_AREA_ERROR, TOP_BAND } from '@/lib/floor-area'
-import { propertyTypes, services, customerTypes, speeds, BULK, ukPostcodeRegex } from '@/lib/booking-options'
-export { propertyTypes, services, customerTypes, speeds, BULK, PRE_ASSESSMENT, EXPRESS_SPEED, ukPostcodeRegex } from '@/lib/booking-options'
+import { propertyTypes, services, customerTypes, speeds, BULK, ukPostcodeRegex, LEGACY_EXPRESS_SPEED, SAME_DAY_LODGEMENT_SPEED } from '@/lib/booking-options'
+export { propertyTypes, services, customerTypes, speeds, BULK, PRE_ASSESSMENT, STANDARD_SPEED, SAME_DAY_LODGEMENT_SPEED, NEXT_DAY_VISIT_SPEED, LEGACY_EXPRESS_SPEED, ukPostcodeRegex } from '@/lib/booking-options'
 
 export const contactSchema = z
   .object({
@@ -42,7 +42,8 @@ export const contactSchema = z
   improvementPlan: z.boolean().optional().default(false),
   /** A Pre-Assessment's optional separate energy report, at no extra charge. Ignored on any other service. */
   energyReport: z.boolean().optional().default(false),
-  speed: z.enum(speeds, { required_error: 'Please choose a service speed' }),
+  // A form loaded before 22/10/2026 may still send the old next-day value; it becomes today's £15 option.
+  speed: z.preprocess((value) => (value === LEGACY_EXPRESS_SPEED ? SAME_DAY_LODGEMENT_SPEED : value), z.enum(speeds, { required_error: 'Please choose a service speed' })),
   preferredDate: z.string().trim().max(40).optional().or(z.literal('')),
   notes: z.string().trim().max(2000).optional().or(z.literal('')),
   /**

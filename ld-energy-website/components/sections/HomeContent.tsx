@@ -23,11 +23,12 @@ const steps: [string, string][] = [
 ]
 const promiseDetail: Record<string, string> = {
   'Same working-day reply': 'Message us on a working day and you’ll hear back that day.',
-  'No surprise charges': 'No travel or call-out charges. Any extra, like next-day lodgement, is agreed before you book.',
+  'No surprise charges': 'No travel or call-out charges. Any extra, like same-day lodgement, is agreed before you book.',
   'Free rearrange if we reschedule': 'If we need to reschedule your appointment, we’ll arrange the next available slot at no extra cost.',
 }
 const creds: [string, string][] = [
-  ['Elmhurst accredited', site.assessor.accreditationNumber],
+  ['Elmhurst accredited', site.assessor.accreditations[0].number],
+  ['Quidos accredited', site.assessor.accreditations[1].number],
   ['DBS checked', 'Background checked'],
   ['£5m PI & PL insured', 'Through Elmhurst’s scheme'],
   ['RdSAP 10', 'Current methodology since June 2025'],

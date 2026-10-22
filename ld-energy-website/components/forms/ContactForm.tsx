@@ -10,7 +10,7 @@ import {
 } from 'lucide-react'
 import { Field, Input, Textarea } from '@/components/ui/Input'
 import { cn } from '@/lib/cn'
-import { pricing, site, maxBundleSaving, formatPrice, EXPRESS_SURCHARGE } from '@/lib/site'
+import { pricing, site, maxBundleSaving, formatPrice, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE } from '@/lib/site'
 import { areaBands, areaLabel, bandForArea, parseExactArea, TOP_BAND } from '@/lib/floor-area'
 import { guideEstimate, guideEstimateRows, guidePrice, PLAN_LABEL, ENERGY_REPORT_LABEL } from '@/lib/pricing-estimate'
 import {
@@ -24,7 +24,7 @@ import { restoredCustomerType, rememberCustomerType } from '@/lib/customer-type-
 import { useTurnstile } from '@/lib/useTurnstile'
 import { usePublishQuote } from '@/components/forms/QuoteSummary'
 import { useOptionalHomeQuote } from '@/components/sections/home/HomeQuoteContext'
-import { contactSchema, BULK, PRE_ASSESSMENT, EXPRESS_SPEED, type ContactInput } from '@/lib/validators'
+import { contactSchema, BULK, PRE_ASSESSMENT, SAME_DAY_LODGEMENT_SPEED, NEXT_DAY_VISIT_SPEED, type ContactInput } from '@/lib/validators'
 import { FORM_DRAFT } from '@/lib/form-layout'
 
 /**
@@ -260,7 +260,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
       setValue('services', [quoteServices[context.service || 'epc']])
       if (context.service) serviceTouched.current = true
       setValue('areaBand', context.area || '')
-      setValue('speed', context.speed === 'express' ? EXPRESS_SPEED : 'Standard (72 hours)')
+      setValue('speed', context.speed === 'next-day' ? NEXT_DAY_VISIT_SPEED : context.speed === 'same-day' ? SAME_DAY_LODGEMENT_SPEED : 'Standard (72 hours)')
       setValue('improvementPlan', !!context.plan)
       initialSource = context.sourcePage || initialSource
       setValue('sourcePage', initialSource)
@@ -610,10 +610,11 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
     {isLodged ? <Controller control={control} name="speed" render={({ field }) => <Choices name="speed" legend="Lodgement speed"
       value={field.value} inputRef={field.ref} error={errors.speed?.message} onChange={value => { field.onChange(value); rememberSelection() }} options={[
         { value: 'Standard (72 hours)', label: 'Standard lodgement', description: 'Lodged on the GOV.UK register within 72 hours of the visit.' },
-        { value: EXPRESS_SPEED, label: `Next-day lodgement (+£${EXPRESS_SURCHARGE})`, description: 'Lodged within 24 hours of the visit.' },
+        { value: SAME_DAY_LODGEMENT_SPEED, label: `Same-day lodgement (+\u2060£${SAME_DAY_LODGEMENT_SURCHARGE})`, description: 'Lodged on the GOV.UK register on the day of the visit.' },
+        { value: NEXT_DAY_VISIT_SPEED, label: `Next-day visit and lodgement (+\u2060£${NEXT_DAY_VISIT_SURCHARGE})`, description: 'We visit the next day and lodge your EPC that day. Availability confirmed before booking.' },
       ]} />} /> : <p className="text-base text-secondary-700">{turnaroundCopy(productKind)}</p>}
     <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">
-      {!isBulk && <Field label="Preferred visit date" htmlFor="preferredDate" hint="Optional. Next-day appointments are available. A requested date is not a confirmed appointment." error={errors.preferredDate?.message}>
+      {!isBulk && <Field label="Preferred visit date" htmlFor="preferredDate" hint="Optional. Next-day visits are available. A requested date is not a confirmed appointment." error={errors.preferredDate?.message}>
         <Input id="preferredDate" type="date" {...register('preferredDate')} />
       </Field>}
       <Field label="Access notes or other instructions" htmlFor="notes" hint="Optional. Access, parking or anything about the property." error={errors.notes?.message} className={isBulk ? 'sm:col-span-2' : undefined}>
@@ -682,7 +683,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
       <p data-estimate-announcement className="sr-only" aria-live="polite" aria-atomic="true">{estimateText}</p>
       {step > 1 && estimateText && <div data-estimate-summary className="bf__summary">
         <p><b>{estimateText}</b></p>
-        <p className="mt-0.5">{serviceLabel(selectedService)}{values.customerType ? ` · ${values.customerType}` : ''}{speed === EXPRESS_SPEED ? ' · next-day lodgement' : ''}{estimate.improvementPlan ? ' · Improvement Plan' : ''}{estimate.energyReport ? ' · separate energy report' : ''}</p>
+        <p className="mt-0.5">{serviceLabel(selectedService)}{values.customerType ? ` · ${values.customerType}` : ''}{speed === SAME_DAY_LODGEMENT_SPEED ? ' · same-day lodgement' : speed === NEXT_DAY_VISIT_SPEED ? ' · next-day visit and lodgement' : ''}{estimate.improvementPlan ? ' · Improvement Plan' : ''}{estimate.energyReport ? ' · separate energy report' : ''}</p>
         <button type="button" className="bf__change" onClick={() => { moveFocus.current = true; setStep(1) }}>Change</button>
       </div>}
 

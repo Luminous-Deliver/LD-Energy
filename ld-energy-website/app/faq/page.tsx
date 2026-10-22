@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     images: [defaultOgImage.url],
     title: 'EPC FAQ | Common Questions About EPCs in London',
     description:
-      'Frequently asked questions about Energy Performance Certificates, answered by an Elmhurst-accredited DEA.',
+      'Frequently asked questions about Energy Performance Certificates, answered by an Elmhurst and Quidos accredited DEA.',
   },
 }
 

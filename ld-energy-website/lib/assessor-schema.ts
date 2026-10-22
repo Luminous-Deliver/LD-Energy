@@ -1,6 +1,6 @@
 import { site } from '@/lib/site'
 
-/** The credential belongs to Abdul; Elmhurst is its awarding organisation. */
+/** The credentials belong to Abdul; Elmhurst and Quidos are the awarding organisations. */
 export const assessorSchema = {
   '@context': 'https://schema.org',
   '@type': 'Person',
@@ -14,15 +14,11 @@ export const assessorSchema = {
     name: 'GOV.UK assessor verification',
     url: site.assessor.verifyUrl,
   },
-  hasCredential: {
+  hasCredential: site.assessor.accreditations.map((a) => ({
     '@type': 'EducationalOccupationalCredential',
     credentialCategory: 'Domestic Energy Assessor Accreditation',
-    identifier: site.assessor.accreditationNumber,
+    identifier: a.number,
     url: site.assessor.verifyUrl,
-    recognizedBy: {
-      '@type': 'Organization',
-      name: site.assessor.scheme,
-      url: 'https://www.elmhurstenergy.co.uk',
-    },
-  },
+    recognizedBy: { '@type': 'Organization', name: a.scheme, url: a.url },
+  })),
 }

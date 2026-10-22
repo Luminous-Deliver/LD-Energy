@@ -13,13 +13,13 @@ import { site, priceFrom, defaultOgImage } from '@/lib/site'
 export const metadata: Metadata = {
   title: 'EPC Guides for London Homeowners & Landlords',
   description:
-    'Expert guidance on Energy Performance Certificates, MEES compliance, and improving your EPC rating, written by an Elmhurst-accredited London DEA.',
+    'Expert guidance on Energy Performance Certificates, MEES compliance, and improving your EPC rating, written by an Elmhurst and Quidos accredited London DEA.',
   alternates: { canonical: `${site.url}/blog` },
   openGraph: {
     images: [defaultOgImage],
     title: 'EPC Insights & Guides | L&D Energy Blog',
     description:
-      'Expert EPC guidance for London homeowners, landlords, and estate agents. Written by a working Elmhurst-accredited DEA.',
+      'Expert EPC guidance for London homeowners, landlords, and estate agents. Written by a working Elmhurst and Quidos accredited DEA.',
     url: `${site.url}/blog`,
   },
   twitter: {
@@ -159,7 +159,7 @@ export default async function BlogIndexPage() {
 
       <CtaStrip
         heading="Need an EPC? Get your exact quote."
-        body={`Elmhurst-accredited assessor. Guide prices from £${priceFrom.epc}. Lodged within 72 hours.`}
+        body={`Elmhurst and Quidos accredited assessor. Guide prices from £${priceFrom.epc}. Lodged within 72 hours.`}
         primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'blog', ctaId: 'bottom' }) }}
       />
     </>

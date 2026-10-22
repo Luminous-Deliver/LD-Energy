@@ -7,7 +7,6 @@ import { site } from '@/lib/site'
 import { areaLabel } from '@/lib/floor-area'
 import { guideEstimate, guidePrice } from '@/lib/pricing-estimate'
 import { serviceChoices } from '@/lib/booking-copy'
-import { EXPRESS_SPEED } from '@/lib/booking-options'
 
 /** The form's current selections. Controlled values only; no customer details. */
 export interface QuoteSnapshot {
@@ -82,7 +81,7 @@ export function QuoteSummaryPanel() {
           <Row label="Service" value={serviceChoices.find((choice) => choice.value === service)?.label || notSelected} />
           <Row label="Floor area" value={area} muted={area === notSelected} />
           <Row label="Booking as" value={snapshot?.customerType || notSelected} muted={!snapshot?.customerType} />
-          {estimate.isLodged && <Row label="Lodgement" value={snapshot?.speed === EXPRESS_SPEED ? `Next-day (+£${estimate.express})` : 'Standard'} />}
+          {estimate.isLodged && <Row label="Lodgement" value={estimate.speedName ? `${estimate.speedName} (+£${estimate.express})` : 'Standard'} />}
           {estimate.canHavePlan && <Row label="Improvement Plan" value={plan} muted={plan === 'Not added'} />}
           {estimate.productKind === 'preAssessment' && <Row label="Separate energy report" value={estimate.energyReport ? 'Included at no extra charge' : 'Not added'} muted={!estimate.energyReport} />}
           {priced && estimate.saving > 0 && <Row label="Bundle saving" value={`£${estimate.saving} compared with booking separately`} />}
@@ -121,7 +120,7 @@ export function QuoteSummaryPanel() {
         <div className="mt-5 space-y-2 border-t border-secondary-200 pt-5 text-sm">
           <p className="flex items-center gap-2 text-secondary-700">
             <ShieldCheck aria-hidden="true" className="h-4 w-4 shrink-0 text-[#386B59]" />
-            Elmhurst accredited · {site.assessor.accreditationNumber}
+            Elmhurst {site.assessor.accreditations[0].number} · Quidos {site.assessor.accreditations[1].number}
             <a href={site.assessor.verifyUrl} target="_blank" rel="noopener noreferrer" className="ml-auto inline-flex min-h-8 items-center gap-1 font-semibold text-primary-800 underline underline-offset-4">
               Verify <ExternalLink aria-hidden="true" className="h-3.5 w-3.5" />
             </a>

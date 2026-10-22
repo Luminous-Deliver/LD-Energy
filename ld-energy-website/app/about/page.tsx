@@ -11,20 +11,20 @@ import { site, insurance, defaultOgImage } from '@/lib/site'
 export const metadata: Metadata = {
   title: 'Abdul Motaleb Taher | About Your EPC Assessor',
   description:
-    'Elmhurst-accredited Domestic Energy Assessor based in Stratford, East London. EPC certificates and floor plans across all 32 London boroughs.',
+    'Elmhurst and Quidos accredited Domestic Energy Assessor based in Stratford, East London. EPC certificates and floor plans across all 32 London boroughs.',
   alternates: { canonical: `${site.url}/about` },
   openGraph: {
     images: [defaultOgImage],
     title: 'About L&D Energy | London EPC Assessor | Elmhurst Accredited',
     description:
-      'L&D Energy, Elmhurst-accredited Domestic Energy Assessor based in Stratford, East London. Professional EPC certificates and floor plans across all London boroughs.',
+      'L&D Energy, Elmhurst and Quidos accredited Domestic Energy Assessor based in Stratford, East London. Professional EPC certificates and floor plans across all London boroughs.',
     url: `${site.url}/about`,
   },
   twitter: {
     images: [defaultOgImage.url],
     title: 'About L&D Energy | London EPC Assessor',
     description:
-      'Elmhurst-accredited Domestic Energy Assessor based in Stratford, East London. EPC certificates across all London boroughs.',
+      'Elmhurst and Quidos accredited Domestic Energy Assessor based in Stratford, East London. EPC certificates across all London boroughs.',
   },
 }
 
@@ -45,8 +45,8 @@ const breadcrumbSchema = {
 const credentials = [
   {
     Icon: BadgeCheck,
-    title: 'Elmhurst Energy Accreditation',
-    body: 'Accredited Domestic Energy Assessor (DEA) registered with Elmhurst Energy, the UK’s largest energy assessor accreditation scheme. Every certificate is lodged on the UK Government EPC Register.',
+    title: 'Elmhurst and Quidos Accreditation',
+    body: 'Accredited Domestic Energy Assessor (DEA) with two government-approved schemes: Elmhurst Energy (EES/036265) and Quidos (QUID202220). Every certificate is lodged on the UK Government EPC Register.',
   },
   {
     Icon: FileText,
@@ -74,7 +74,7 @@ const commitments = [
   {
     Icon: FileText,
     title: 'We deliver on schedule',
-    body: '72-hour standard lodgement, or 24-hour express if you’ve chosen the next-day service. We lodge directly on the GOV.UK EPC Register and send you the certificate link once it is live.',
+    body: '72-hour standard lodgement, or on the day of the visit if you choose same-day lodgement or a next-day visit. We lodge directly on the GOV.UK EPC Register and send you the certificate link once it is live.',
   },
   {
     Icon: Users,
@@ -96,7 +96,7 @@ export default function AboutPage() {
       <PageHero
         eyebrow="About Us"
         heading="About L&D Energy"
-        subheading="Elmhurst-accredited Domestic Energy Assessor based in Stratford, East London. We deliver fast, transparent-priced EPC certificates and floor plans across every London borough."
+        subheading="Elmhurst and Quidos accredited Domestic Energy Assessor based in Stratford, East London. We deliver fast, transparent-priced EPC certificates and floor plans across every London borough."
         primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'about', ctaId: 'hero' }) }}
       />
 
@@ -186,7 +186,7 @@ export default function AboutPage() {
               Meet Abdul
             </h2>
             <p className="mt-5 text-secondary-700 leading-relaxed">
-              L&amp;D Energy is led by Abdul M Taher, an Elmhurst-accredited Domestic Energy Assessor based in Stratford, East London. Abdul personally carries out assessments, you’re not handed off to a stranger after booking.
+              L&amp;D Energy is led by Abdul M Taher, an Elmhurst and Quidos accredited Domestic Energy Assessor based in Stratford, East London. Abdul personally carries out assessments, you’re not handed off to a stranger after booking.
             </p>
             <p className="mt-4 text-secondary-700 leading-relaxed">
               The service was set up because too many landlords and sellers told us the same story: unanswered phones, missed appointments, slow certificates, and surprise fees. We do the opposite, transparent pricing, clear timelines, and a real person who picks up.
@@ -208,21 +208,19 @@ export default function AboutPage() {
               <div className="flex-1">
                 <div className="flex items-center gap-2 text-primary-700">
                   <BadgeCheck className="w-5 h-5 shrink-0" aria-hidden="true" />
-                  <span className="text-xs font-bold uppercase tracking-wide">Elmhurst Energy Approved</span>
+                  <span className="text-xs font-bold uppercase tracking-wide">Elmhurst and Quidos accredited</span>
                 </div>
                 <dl className="mt-4 space-y-2.5 text-sm">
                   <div className="flex justify-between gap-4">
                     <dt className="text-secondary-500">Assessor</dt>
                     <dd className="font-semibold text-secondary-900 text-right">{site.assessor.name}</dd>
                   </div>
-                  <div className="flex justify-between gap-4">
-                    <dt className="text-secondary-500">EES Number</dt>
-                    <dd className="font-semibold text-secondary-900 text-right">{site.assessor.accreditationNumber}</dd>
-                  </div>
-                  <div className="flex justify-between gap-4">
-                    <dt className="text-secondary-500">Scheme</dt>
-                    <dd className="font-semibold text-secondary-900 text-right">{site.assessor.scheme}</dd>
-                  </div>
+                  {site.assessor.accreditations.map((a) => (
+                    <div key={a.number} className="flex justify-between gap-4">
+                      <dt className="text-secondary-500">{a.short}</dt>
+                      <dd className="font-semibold text-secondary-900 text-right">{a.number}</dd>
+                    </div>
+                  ))}
                 </dl>
                 <a
                   href={site.assessor.verifyUrl}

@@ -1,5 +1,5 @@
 import type { ProductKind } from '@/lib/pricing-estimate'
-import { BULK, PRE_ASSESSMENT, EXPRESS_SPEED, type customerTypes } from '@/lib/booking-options'
+import { BULK, PRE_ASSESSMENT, SAME_DAY_LODGEMENT_SPEED, NEXT_DAY_VISIT_SPEED, type customerTypes } from '@/lib/booking-options'
 import { areaLabel } from '@/lib/floor-area'
 import { maxBundleSaving } from '@/lib/site'
 
@@ -56,16 +56,16 @@ export function nextSteps(kind: ProductKind, speed?: string, energyReport?: bool
     `Abdul reviews your portfolio and replies with volume rates during opening hours (${OPENING_HOURS}).`,
     'Once you agree the rates, visits are arranged property by property, around your tenants.',
   ]
-  const hours = speed === EXPRESS_SPEED ? 24 : 72
+  const lodgedWhen = speed === SAME_DAY_LODGEMENT_SPEED || speed === NEXT_DAY_VISIT_SPEED ? 'on the day of the visit' : 'within 72 hours'
   const steps = [
     `Abdul checks your details and replies with your exact price and available times during opening hours (${OPENING_HOURS}).`,
     'You pick a time. Your visit is confirmed once you agree the price and time.',
   ]
   switch (kind) {
     case 'epc':
-      return [...steps, `After the visit, your EPC is lodged on the GOV.UK register within ${hours} hours and we send you the certificate link.`]
+      return [...steps, `After the visit, your EPC is lodged on the GOV.UK register ${lodgedWhen} and we send you the certificate link.`]
     case 'bundle':
-      return [...steps, `After the visit, your EPC is lodged on the GOV.UK register within ${hours} hours and we send you the certificate link. Your floor plans are sent as JPG and PDF within 72 hours.`]
+      return [...steps, `After the visit, your EPC is lodged on the GOV.UK register ${lodgedWhen} and we send you the certificate link. Your floor plans are sent as JPG and PDF within 72 hours.`]
     case 'floorPlan':
       return [...steps, 'After the visit, your floor plans are sent as JPG and PDF within 72 hours.']
     case 'preAssessment':
@@ -118,7 +118,8 @@ export function enquirySummaryText(data: EnquirySummaryInput): string {
     `Service: ${data.services.map(serviceLabel).join(' + ')}`,
     isBulk ? `Properties: ${data.propertyCount || 'To confirm'}` : `Floor area: ${areaLabel(data.areaBand, data.floorArea)}`,
     `I am: ${data.customerType || 'Not selected'}`,
-    ...(!isBulk && data.speed === EXPRESS_SPEED ? ['Lodgement: next day'] : []),
+    ...(!isBulk && data.speed === SAME_DAY_LODGEMENT_SPEED ? ['Lodgement: same day as the visit'] : []),
+    ...(!isBulk && data.speed === NEXT_DAY_VISIT_SPEED ? ['Visit and lodgement: next day'] : []),
     ...(data.improvementPlan && !data.services.includes(PRE_ASSESSMENT) ? ['Add-on: EPC Improvement Plan'] : []),
     ...(data.energyReport && data.services.includes(PRE_ASSESSMENT) ? ['Also: a separate energy report (no extra charge)'] : []),
     ...(isBulk ? (data.address ? [`Properties and postcodes: ${data.address}`] : []) : [`Address: ${[data.address, data.postcode].filter(Boolean).join(', ')}`]),
@@ -142,9 +143,9 @@ export function turnaroundCopy(kind: ProductKind): string {
     case 'bulk':
       return 'Turnaround and visit dates are agreed per property once we have quoted your volume rate, so there is nothing to choose here yet.'
     case 'preAssessment':
-      return 'Nothing is lodged on the government register, so there is no certificate to expedite and no next-day option. Your personalised written improvement plan is sent within 72 hours of the visit.'
+      return 'Nothing is lodged on the government register, so there is no certificate to expedite and no same-day or next-day option. Your personalised written improvement plan is sent within 72 hours of the visit.'
     case 'floorPlan':
-      return 'Floor plans are not lodged on the government register, so there is no next-day lodgement option. Your plans are supplied as JPG and PDF within 72 hours of the visit.'
+      return 'Floor plans are not lodged on the government register, so there is no same-day or next-day option. Your plans are supplied as JPG and PDF within 72 hours of the visit.'
     case 'none':
       return 'Choose a service on the previous step and we will show the turnaround options that apply to it.'
     case 'epc':

@@ -39,7 +39,7 @@ const breadcrumbs = [
 ]
 
 const included = [
-  'A full survey of the property by an Elmhurst-accredited assessor — the same visit and the same measuring as a real EPC',
+  'A full survey of the property by an Elmhurst and Quidos accredited assessor — the same visit and the same measuring as a real EPC',
   'The score calculated from the assessed property data',
   'A full breakdown of what is helping and what is holding the score back',
   'Abdul’s personalised written improvement plan: what to consider improving, in what order, and why',

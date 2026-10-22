@@ -20,7 +20,7 @@ export async function FromTheBlog() {
             Understand your EPC before you book
           </h2>
           <p className="mt-3 max-w-xl text-secondary-600">
-            Plain-English guides on ratings, MEES rules and improving your score, written by an Elmhurst-accredited London assessor.
+            Plain-English guides on ratings, MEES rules and improving your score, written by an Elmhurst and Quidos accredited London assessor.
           </p>
         </div>
         <Link

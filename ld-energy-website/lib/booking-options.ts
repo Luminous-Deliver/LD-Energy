@@ -1,4 +1,4 @@
-import { EXPRESS_SURCHARGE } from '@/lib/site'
+import { SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE } from '@/lib/site'
 import { legacyPropertyTypes } from '@/lib/floor-area'
 
 /**
@@ -37,12 +37,31 @@ export const customerTypes = [
 ] as const
 
 /**
- * Derived from the canonical surcharge so the stored enquiry value, the form
- * label and the pricing page can never disagree about the express price.
- * EXPRESS_SURCHARGE is a literal type, so this keeps a literal string type too.
+ * Speed choices, derived from the canonical surcharges so the stored enquiry
+ * value, the form label and the pricing page can never disagree about a price.
+ * The surcharges are literal types, so these keep literal string types too.
  */
-export const EXPRESS_SPEED = `Express (Next day, +£${EXPRESS_SURCHARGE})` as const
-export const speeds = ['Standard (72 hours)', EXPRESS_SPEED] as const
+export const STANDARD_SPEED = 'Standard (72 hours)' as const
+export const SAME_DAY_LODGEMENT_SPEED = `Same-day lodgement (+£${SAME_DAY_LODGEMENT_SURCHARGE})` as const
+export const NEXT_DAY_VISIT_SPEED = `Next-day visit and lodgement (+£${NEXT_DAY_VISIT_SURCHARGE})` as const
+export const speeds = [STANDARD_SPEED, SAME_DAY_LODGEMENT_SPEED, NEXT_DAY_VISIT_SPEED] as const
+
+/**
+ * The stored value of the old £15 next-day lodgement option. A form loaded before
+ * 22/10/2026 can still send it, so the schema maps it to today's £15 option,
+ * same-day lodgement, instead of rejecting the booking.
+ */
+export const LEGACY_EXPRESS_SPEED = 'Express (Next day, +£15)' as const
+
+/** Extra charged for a speed choice; 0 for standard or anything unrecognised. */
+export function speedSurcharge(speed?: string): number {
+  return speed === NEXT_DAY_VISIT_SPEED ? NEXT_DAY_VISIT_SURCHARGE : speed === SAME_DAY_LODGEMENT_SPEED ? SAME_DAY_LODGEMENT_SURCHARGE : 0
+}
+
+/** Name of a paid speed choice for price rows and summaries; null for standard. */
+export function speedName(speed?: string): string | null {
+  return speed === NEXT_DAY_VISIT_SPEED ? 'Next-day visit and lodgement' : speed === SAME_DAY_LODGEMENT_SPEED ? 'Same-day lodgement' : null
+}
 
 export const ukPostcodeRegex = /^[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}$/i
 

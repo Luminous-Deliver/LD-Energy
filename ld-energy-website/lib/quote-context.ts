@@ -1,5 +1,5 @@
 import { areaChoices, type AreaChoice } from '@/lib/floor-area'
-import { BULK, PRE_ASSESSMENT, EXPRESS_SPEED } from '@/lib/booking-options'
+import { BULK, PRE_ASSESSMENT, SAME_DAY_LODGEMENT_SPEED, NEXT_DAY_VISIT_SPEED } from '@/lib/booking-options'
 import type { ContactInput } from '@/lib/validators'
 import { sourcePages, ctaIds, sourcePageForPath, type EnquiryAttribution, type SourcePage, type CtaId } from '@/lib/enquiry-attribution'
 
@@ -8,7 +8,13 @@ export const quoteServices = {
   'pre-assessment': PRE_ASSESSMENT, bulk: BULK,
 } as const
 export type QuoteService = keyof typeof quoteServices
-export interface QuoteContext extends EnquiryAttribution { service?: QuoteService; area?: AreaChoice; speed?: 'standard' | 'express'; plan?: boolean }
+export type QuoteSpeed = 'standard' | 'same-day' | 'next-day'
+export interface QuoteContext extends EnquiryAttribution { service?: QuoteService; area?: AreaChoice; speed?: QuoteSpeed; plan?: boolean }
+
+/** `express` is the old next-day lodgement link (+£15, until 22/10/2026); it opens today's £15 option. */
+function parseSpeed(value: string | null): QuoteSpeed {
+  return value === 'next-day' ? 'next-day' : value === 'same-day' || value === 'express' ? 'same-day' : 'standard'
+}
 
 export function parseQuoteContext(params: URLSearchParams): QuoteContext {
   const serviceValue = params.get('service')
@@ -20,7 +26,7 @@ export function parseQuoteContext(params: URLSearchParams): QuoteContext {
     sourcePage: sourcePages.includes(params.get('source') as SourcePage) ? params.get('source') as SourcePage : undefined,
     ctaId: ctaIds.includes(params.get('cta') as CtaId) ? params.get('cta') as CtaId : undefined,
     area: areaChoices.includes(areaValue as AreaChoice) ? areaValue as AreaChoice : undefined,
-    speed: lodged && params.get('speed') === 'express' ? 'express' : 'standard',
+    speed: lodged ? parseSpeed(params.get('speed')) : 'standard',
     plan: lodged && params.get('plan') === '1',
   }
 }
@@ -31,7 +37,7 @@ export function quoteHref(context: QuoteContext = {}): string {
   if (context.service && Object.hasOwn(quoteServices, context.service)) params.set('service', context.service)
   if (context.area && areaChoices.includes(context.area)) params.set('area', context.area)
   const lodged = !context.service || context.service === 'epc' || context.service === 'bundle'
-  if (lodged && context.speed === 'express') params.set('speed', 'express')
+  if (lodged && (context.speed === 'same-day' || context.speed === 'next-day')) params.set('speed', context.speed)
   if (lodged && context.plan) params.set('plan', '1')
   if (context.sourcePage && sourcePages.includes(context.sourcePage)) params.set('source', context.sourcePage)
   if (context.ctaId && ctaIds.includes(context.ctaId)) params.set('cta', context.ctaId)
@@ -41,7 +47,7 @@ export function quoteHref(context: QuoteContext = {}): string {
 export function quoteContextFromForm(values: Pick<ContactInput, 'services' | 'areaBand' | 'speed' | 'improvementPlan' | 'sourcePage' | 'ctaId'>): QuoteContext {
   const service = (Object.entries(quoteServices).find(([, label]) => values.services.includes(label))?.[0] || 'epc') as QuoteService
   const area = areaChoices.includes(values.areaBand as AreaChoice) ? values.areaBand as AreaChoice : undefined
-  return { service, area, speed: values.speed === EXPRESS_SPEED ? 'express' : 'standard', plan: values.improvementPlan, sourcePage: values.sourcePage, ctaId: values.ctaId }
+  return { service, area, speed: values.speed === NEXT_DAY_VISIT_SPEED ? 'next-day' : values.speed === SAME_DAY_LODGEMENT_SPEED ? 'same-day' : 'standard', plan: values.improvementPlan, sourcePage: values.sourcePage, ctaId: values.ctaId }
 }
 
 /** Default intent for persistent/shared service-page quote actions. */

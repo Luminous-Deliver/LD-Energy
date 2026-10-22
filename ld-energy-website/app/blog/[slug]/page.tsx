@@ -152,7 +152,7 @@ export default async function BlogPostPage({ params }: PageProps) {
           <CTABanner
             variant="final"
             heading="Ready to get your EPC quote?"
-            body={`Elmhurst-accredited assessor. Guide prices from £${priceFrom.epc}. Exact price and available timing confirmed before booking.`}
+            body={`Elmhurst and Quidos accredited assessor. Guide prices from £${priceFrom.epc}. Exact price and available timing confirmed before booking.`}
           />
         </Container>
       </article>
