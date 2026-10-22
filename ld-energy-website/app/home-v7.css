@@ -172,7 +172,6 @@ html:has(.hp) { scroll-padding-top: calc(var(--head-h) + 24px); }
   .hp-hero .hero__scrim { display: block; }
   .hp-hero .hero__cta .link { color: var(--sage-800); }
 }
-@media (max-width: 759px) and (max-height: 700px) { .hp-hero .pl { bottom: calc(-1 * var(--strip-h) - 72px); } }
 @media (max-width: 1100px) and (min-width: 760px) {
   .hp-hero .report__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .hp-hero .report__plan { grid-row: span 2; }
@@ -181,7 +180,14 @@ html:has(.hp) { scroll-padding-top: calc(var(--head-h) + 24px); }
    scene with the two prices, then the report stacked. No pin: the rows land as each passes 70% of the screen */
 @media (max-width: 759px) {
   .hp-hero { --strip-h: 88px; }
-  .hp-hero .pl { width: max(100%, 56.25svh); aspect-ratio: 9 / 16; }
+  /* The image band is sized to its copy, not to the screen: the portrait planes are sized by the screen's width
+     (122vw, the srcset's size), so the roofline sits a fixed 91vw above the planes' bottom edge, which runs under the
+     strip. The copy's bottom padding puts that roofline about 24 px under the WhatsApp link on every phone, with the
+     mist just behind the link and clean sky behind the words. A taller copy block (narrow phones, large text) grows
+     the planes instead of leaving bare ground at the top. */
+  .hp-hero .scene-wrap { height: auto; min-height: 0; }
+  .hp-hero .hero__copy { padding-bottom: calc(91vw - var(--strip-h) + 24px); }
+  .hp-hero .pl { width: auto; height: max(216.9vw, calc(100% + var(--strip-h))); aspect-ratio: 9 / 16; }
   .hp-hero .pl--near { display: none; }
   .hp-hero .pl--glow { background: radial-gradient(60% 18% at 55% 54%, rgba(255, 206, 150, .5), rgba(255, 220, 180, .16) 55%, transparent 75%); }
   .hp-hero .pl--mist { background: linear-gradient(180deg, transparent 50%, rgba(250, 244, 235, .45) 56%, rgba(250, 244, 235, .2) 62%, transparent 70%); }
