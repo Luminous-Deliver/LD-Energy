@@ -4,6 +4,8 @@ import { MDXRemote } from 'next-mdx-remote/rsc'
 import remarkGfm from 'remark-gfm'
 import { CTABanner } from './CTABanner'
 import { EpcEffectNote } from './EpcEffectNote'
+import { Price } from './Price'
+import { LondonRatingShare } from './LondonRatingShare'
 
 type AnchorProps = React.AnchorHTMLAttributes<HTMLAnchorElement>
 type TableProps = React.TableHTMLAttributes<HTMLTableElement>
@@ -88,6 +90,8 @@ const components = {
   ),
   CTABanner,
   EpcEffectNote,
+  Price,
+  LondonRatingShare,
 }
 
 interface PostContentProps {

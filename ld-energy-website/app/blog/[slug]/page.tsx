@@ -10,6 +10,10 @@ import { CTABanner } from '@/components/blog/CTABanner'
 import { PostFaq } from '@/components/blog/PostFaq'
 import { AuthorBox } from '@/components/blog/AuthorBox'
 import { RelatedPosts } from '@/components/blog/RelatedPosts'
+import { PostSources } from '@/components/blog/PostSources'
+import { InYourArea } from '@/components/blog/InYourArea'
+import { WhatItCosts } from '@/components/blog/WhatItCosts'
+import { guideAreas } from '@/lib/guides'
 import { getAllSlugs, getPostBySlug, getRelatedPosts } from '@/lib/blog'
 import { getCategory } from '@/lib/blog-categories'
 import { getAuthor } from '@/lib/authors'
@@ -66,7 +70,7 @@ export default async function BlogPostPage({ params }: PageProps) {
 
   const breadcrumbs = [
     { href: '/', label: 'Home' },
-    { href: '/blog', label: 'Blog' },
+    { href: '/blog', label: 'Guides' },
     ...(category
       ? [{ href: `/blog/category/${category.slug}`, label: category.name }]
       : []),
@@ -108,6 +112,9 @@ export default async function BlogPostPage({ params }: PageProps) {
     mainEntityOfPage: { '@type': 'WebPage', '@id': url },
     keywords: post.keywords.join(', '),
     articleSection: category?.name,
+    ...(post.sources.length > 0
+      ? { citation: post.sources.map((s) => ({ '@type': 'CreativeWork', name: s.title, url: s.url, publisher: s.publisher })) }
+      : {}),
   }
 
   const faqSchema =
@@ -135,6 +142,7 @@ export default async function BlogPostPage({ params }: PageProps) {
       <PostHeader
         title={post.title}
         description={post.description}
+        answer={post.answer}
         category={post.category}
         author={post.author}
         publishedAt={post.publishedAt}
@@ -146,7 +154,10 @@ export default async function BlogPostPage({ params }: PageProps) {
           <KeyTakeaways takeaways={post.keyTakeaways} />
           <TableOfContents items={toc} />
           <PostContent source={post.content} />
+          <WhatItCosts />
           <PostFaq faqs={post.faqs} />
+          <InYourArea slugs={guideAreas(post.category, post.areas)} />
+          <PostSources sources={post.sources} />
           <AuthorBox author={post.author} />
           <RelatedPosts posts={related} />
           <CTABanner
