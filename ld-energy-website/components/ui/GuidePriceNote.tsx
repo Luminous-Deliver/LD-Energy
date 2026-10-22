@@ -33,10 +33,10 @@ export function GuidePriceNote({
     >
       <Info className="mt-0.5 h-5 w-5 shrink-0 text-primary-700" aria-hidden="true" />
       <p className="text-sm leading-relaxed text-secondary-800">
-        <strong className="font-semibold text-secondary-900">These are guide prices, not a quote.</strong>{' '}
-        Internal floor area (m²) is the main factor. Extensions, loft conversions, layout and access
-        can change the final figure — so we confirm your exact price before you book, including for
-        urgent jobs.
+        {/* Abdul's wording, 22/10/2026 pricing spec §11 */}
+        <strong className="font-semibold text-secondary-900">Guide prices for standard domestic properties.</strong>{' '}
+        Larger or unusually complex properties are quoted individually. Your exact price is confirmed
+        before booking.
       </p>
     </div>
   )

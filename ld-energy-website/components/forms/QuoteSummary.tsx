@@ -5,7 +5,7 @@ import { ExternalLink, Mail, MessageCircle, Phone, ReceiptText, ShieldCheck } fr
 import { GoogleRating } from '@/components/ui/GoogleRating'
 import { site } from '@/lib/site'
 import { areaLabel } from '@/lib/floor-area'
-import { guideEstimate } from '@/lib/pricing-estimate'
+import { guideEstimate, guidePrice } from '@/lib/pricing-estimate'
 import { serviceChoices } from '@/lib/booking-copy'
 import { EXPRESS_SPEED } from '@/lib/booking-options'
 
@@ -17,6 +17,7 @@ export interface QuoteSnapshot {
   customerType: string
   speed: string
   improvementPlan: boolean
+  energyReport: boolean
 }
 
 // Two contexts: the form only needs the stable setter, so publishing never re-renders it.
@@ -58,14 +59,15 @@ export function QuoteSummaryPanel() {
     areaBand: snapshot?.areaBand,
     speed: snapshot?.speed,
     improvementPlan: snapshot?.improvementPlan,
+    energyReport: snapshot?.energyReport,
   })
   const notSelected = 'Not selected yet'
   const area = estimate.isBulk ? 'Not needed for a portfolio' : snapshot?.areaBand ? areaLabel(snapshot.areaBand, snapshot.floorArea) : notSelected
-  const plan = estimate.planIncluded ? 'Included' : snapshot?.improvementPlan && estimate.canHavePlan ? `Added (+£${site.addOns.improvementPlan})` : 'Not added'
+  const plan = estimate.planIncluded ? 'Included' : estimate.improvementPlan ? `Added (+£${site.addOns.improvementPlan})` : 'Not added'
   const priced = estimate.state === 'priced' && estimate.total !== null
-  const total = priced
-    ? `£${estimate.total}`
-    : estimate.isBulk ? 'Quoted individually' : estimate.state === 'awaiting-area' ? 'Choose a floor area' : 'After review'
+  const total = priced && estimate.total !== null
+    ? guidePrice(estimate, estimate.total)
+    : estimate.isBulk ? 'Quoted individually' : estimate.state === 'awaiting-area' ? 'Choose a floor area' : 'Price to be confirmed'
 
   return (
     <aside aria-label="Your quote summary" className="overflow-hidden rounded-2xl border border-secondary-200 bg-white shadow-premium">
@@ -82,6 +84,8 @@ export function QuoteSummaryPanel() {
           <Row label="Booking as" value={snapshot?.customerType || notSelected} muted={!snapshot?.customerType} />
           {estimate.isLodged && <Row label="Lodgement" value={snapshot?.speed === EXPRESS_SPEED ? `Next-day (+£${estimate.express})` : 'Standard'} />}
           {estimate.canHavePlan && <Row label="Improvement Plan" value={plan} muted={plan === 'Not added'} />}
+          {estimate.productKind === 'preAssessment' && <Row label="Separate energy report" value={estimate.energyReport ? 'Included at no extra charge' : 'Not added'} muted={!estimate.energyReport} />}
+          {priced && estimate.saving > 0 && <Row label="Bundle saving" value={`£${estimate.saving} compared with booking separately`} />}
         </dl>
         <div className="mt-2 flex items-baseline justify-between gap-4 border-t border-secondary-200 pt-4">
           <p className="text-base font-semibold text-secondary-900">Guide estimate</p>

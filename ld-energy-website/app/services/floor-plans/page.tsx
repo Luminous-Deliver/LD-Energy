@@ -78,7 +78,7 @@ const serviceSchema = {
     name: 'Floor Plan Pricing',
     itemListElement: pricing.map((p) => ({
       '@type': 'Offer',
-      name: `Floor plan, ${p.areaLabel} (${p.typicalLabel})`,
+      name: `Floor plan, ${p.areaLabel}`,
       priceSpecification: {
         '@type': 'PriceSpecification',
         minPrice: p.floorPlan,
@@ -200,23 +200,22 @@ export default function FloorPlansPage() {
             </thead>
             <tbody className="divide-y divide-secondary-100">
               {pricing.map((row) => (
-                <tr key={row.type} className="bg-white hover:bg-secondary-50">
+                <tr key={row.id} className="bg-white hover:bg-secondary-50">
                   <td className="px-4 py-3">
                     <span className="block font-bold text-secondary-900">{row.areaLabel}</span>
-                    <span className="mt-0.5 block text-xs text-secondary-600">{row.typicalLabel}</span>
                   </td>
-                  <td className="px-4 py-3 text-right text-secondary-700 whitespace-nowrap">From {`£${row.epc}`}</td>
-                  <td className="px-4 py-3 text-right text-secondary-700 whitespace-nowrap">From {`£${row.floorPlan}`}</td>
+                  <td className="px-4 py-3 text-right text-secondary-700 whitespace-nowrap">{row.startingPrice ? 'From ' : ''}{`£${row.epc}`}</td>
+                  <td className="px-4 py-3 text-right text-secondary-700 whitespace-nowrap">{row.startingPrice ? 'From ' : ''}{`£${row.floorPlan}`}</td>
                   <td className="px-4 py-3 text-right bg-primary-50 whitespace-nowrap">
                     <span className="font-bold text-primary-800">
-                      {row.areaMax === null && (
+                      {row.startingPrice && (
                         <span className="text-xs font-medium text-primary-700">From </span>
                       )}
                       {`£${formatPrice(row.bundle)}`}
                     </span>
-                    <span className="block text-xs font-semibold text-primary-700">
+                    {!row.startingPrice && <span className="block text-xs font-semibold text-primary-700">
                       Save {`£${formatPrice(bundleSaving(row))}`}
-                    </span>
+                    </span>}
                   </td>
                 </tr>
               ))}

@@ -44,7 +44,7 @@ export function Pricing({ sourcePage }: { sourcePage: SourcePage }) {
           ]}
           href={quoteHref({ service: 'epc', sourcePage, ctaId: 'pricing' })}
           alternative={{
-            text: 'Don’t want it on the public register? The EPC Pre-Assessment is the same survey at the same price, not lodged.',
+            text: `Don’t want it on the public register? The EPC Pre-Assessment is the same survey, not lodged, from £${priceFrom.preAssessment} with a personalised improvement plan included.`,
             linkLabel: 'See how it works',
             href: '/services/epc-pre-assessment',
           }}

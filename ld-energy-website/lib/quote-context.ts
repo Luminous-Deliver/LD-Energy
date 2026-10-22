@@ -40,7 +40,8 @@ export function quoteHref(context: QuoteContext = {}): string {
 
 export function quoteContextFromForm(values: Pick<ContactInput, 'services' | 'areaBand' | 'speed' | 'improvementPlan' | 'sourcePage' | 'ctaId'>): QuoteContext {
   const service = (Object.entries(quoteServices).find(([, label]) => values.services.includes(label))?.[0] || 'epc') as QuoteService
-  return { service, area: values.areaBand || undefined, speed: values.speed === EXPRESS_SPEED ? 'express' : 'standard', plan: values.improvementPlan, sourcePage: values.sourcePage, ctaId: values.ctaId }
+  const area = areaChoices.includes(values.areaBand as AreaChoice) ? values.areaBand as AreaChoice : undefined
+  return { service, area, speed: values.speed === EXPRESS_SPEED ? 'express' : 'standard', plan: values.improvementPlan, sourcePage: values.sourcePage, ctaId: values.ctaId }
 }
 
 /** Default intent for persistent/shared service-page quote actions. */

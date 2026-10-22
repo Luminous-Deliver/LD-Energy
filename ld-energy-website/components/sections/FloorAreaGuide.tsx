@@ -11,21 +11,22 @@ import { areaBands } from '@/lib/floor-area'
 import { quoteHref } from '@/lib/quote-context'
 import { conversionEvent } from '@/lib/conversion-events'
 import { guideEstimate } from '@/lib/pricing-estimate'
-import { EXPRESS_SPEED } from '@/lib/booking-options'
+import { EXPRESS_SPEED, PRE_ASSESSMENT } from '@/lib/booking-options'
 import {
   pricing,
   formatPrice,
   type PricingBand,
-  type PropertyType,
 } from '@/lib/site'
+
+type BandId = PricingBand['id']
 
 /**
  * Floor-area guide estimator.
  *
  * The information hierarchy is the whole point: floor area is the real pricing
- * driver, so m² is the dominant element in every band and the bedroom
- * description is a muted caption. Reversing those two is what led customers to
- * believe bedroom count *was* the pricing rule and the number was final.
+ * driver, so m² is the only label on a band. Bedroom captions led customers to
+ * believe bedroom count *was* the pricing rule and the number was final, so the
+ * bands carry none (Abdul's pricing spec, 22/10/2026).
  *
  * A banded selector rather than a slider (which would imply precision guide
  * pricing doesn't have) or a six-column table (which cannot survive 390px).
@@ -41,21 +42,21 @@ function BandPicker({
   sourcePage,
 }: {
   sourcePage: SourcePage
-  selected: PropertyType | 'unknown' | undefined
-  onSelect: (t: PropertyType | 'unknown') => void
+  selected: BandId | 'unknown' | undefined
+  onSelect: (t: BandId | 'unknown') => void
 }) {
   return (
     <fieldset>
       <legend className="sr-only">Choose an internal floor area range</legend>
       <div className="grid gap-2.5 sm:grid-cols-2">
         {pricing.map((p) => {
-          const active = p.type === selected
+          const active = p.id === selected
           return (
             <button
-              key={p.type}
+              key={p.id}
               type="button"
               aria-pressed={active}
-              onClick={() => onSelect(p.type)}
+              onClick={() => onSelect(p.id)}
               className={cn(
                 'flex min-h-[44px] flex-col rounded-xl border p-3.5 text-left transition-all duration-200',
                 active
@@ -63,10 +64,7 @@ function BandPicker({
                   : 'border-secondary-200 bg-white hover:border-secondary-300 hover:bg-secondary-50',
               )}
             >
-              {/* PRIMARY: floor area */}
               <span className="text-xl font-bold tracking-tight text-secondary-900">{p.areaLabel}</span>
-              {/* SECONDARY: familiar reference, deliberately muted */}
-              <span className="mt-0.5 text-sm text-secondary-600">{p.typicalLabel}</span>
             </button>
           )
         })}
@@ -99,24 +97,26 @@ function ResultPanel({ band, unknown, sourcePage }: { band?: PricingBand; unknow
   const epc = guideEstimate({ areaBand, services: ['EPC Certificate'] })
   const floorPlan = guideEstimate({ areaBand, services: ['Floor Plan'] })
   const bundle = guideEstimate({ areaBand, services: ['Both (Bundle)'] })
+  const preAssessment = guideEstimate({ areaBand, services: [PRE_ASSESSMENT] })
   const express = guideEstimate({ areaBand, services: ['EPC Certificate'], speed: EXPRESS_SPEED })
+  // A standard band's figures are guide prices; only the open-ended top band reads "from".
+  const from = band.startingPrice ? <span className="text-xs font-medium text-secondary-600">from </span> : null
   return (
     <div className="rounded-2xl border border-secondary-200 bg-white p-5 shadow-premium">
       <p className="text-xs font-semibold uppercase tracking-widest text-secondary-600">Guide estimate</p>
       <p className="mt-1 text-2xl font-bold tracking-tight text-secondary-900">{band.areaLabel}</p>
-      <p className="text-sm text-secondary-600">{band.typicalLabel}</p>
 
       <dl className="mt-4 divide-y divide-secondary-100 border-t border-secondary-100">
         <div className="flex items-baseline justify-between gap-3 py-2.5">
           <dt className="text-sm text-secondary-700">EPC guide</dt>
           <dd className="text-base font-bold text-secondary-900">
-            <span className="text-xs font-medium text-secondary-600">from </span>{`£${epc.total}`}
+            {from}{`£${epc.total}`}
           </dd>
         </div>
         <div className="flex items-baseline justify-between gap-3 py-2.5">
           <dt className="text-sm text-secondary-700">Floor plan guide</dt>
           <dd className="text-base font-bold text-secondary-900">
-            <span className="text-xs font-medium text-secondary-600">from </span>{`£${floorPlan.total}`}
+            {from}{`£${floorPlan.total}`}
           </dd>
         </div>
         <div className="flex items-baseline justify-between gap-3 bg-accent-50/60 py-2.5">
@@ -126,12 +126,19 @@ function ResultPanel({ band, unknown, sourcePage }: { band?: PricingBand; unknow
           </dt>
           <dd className="text-right">
             <span className="text-base font-bold text-accent-700">
-              <span className="text-xs font-medium text-secondary-600">from </span>{`£${bundle.total}`}
+              {from}{`£${bundle.total}`}
             </span>
-            <span className="block text-xs font-semibold text-accent-700">
-              Save {`£${formatPrice(bundle.bundleDiscount)}`}
-            </span>
+            {bundle.saving > 0 && <span className="block text-xs font-semibold text-accent-700">
+              Save {`£${formatPrice(bundle.saving)}`}
+            </span>}
           </dd>
+        </div>
+        <div className="flex items-baseline justify-between gap-3 py-2.5">
+          <dt className="text-sm text-secondary-700">
+            Pre-Assessment guide
+            <span className="block text-xs text-secondary-600">Not lodged, improvement plan included</span>
+          </dt>
+          <dd className="text-base font-bold text-secondary-900">{from}{`£${preAssessment.total}`}</dd>
         </div>
         <div className="flex items-baseline justify-between gap-3 py-2.5">
           <dt className="text-sm text-secondary-700">
@@ -143,7 +150,7 @@ function ResultPanel({ band, unknown, sourcePage }: { band?: PricingBand; unknow
       </dl>
 
       <p className="mt-3 text-xs text-secondary-600">
-        Next day works out around {`£${express.total}`} for the EPC on this size of property.
+        Next day {band.startingPrice ? 'starts from' : 'works out around'} {`£${express.total}`} for the EPC on this size of property.
       </p>
 
       <Link
@@ -158,11 +165,11 @@ function ResultPanel({ band, unknown, sourcePage }: { band?: PricingBand; unknow
 }
 
 export function FloorAreaGuide({ sourcePage }: { sourcePage: SourcePage }) {
-  const [selected, setSelected] = useState<PropertyType | 'unknown'>()
-  const band = pricing.find((p) => p.type === selected)
-  const selectBand = (value: PropertyType | 'unknown') => {
+  const [selected, setSelected] = useState<BandId | 'unknown'>()
+  const band = pricing.find((p) => p.id === selected)
+  const selectBand = (value: BandId | 'unknown') => {
     setSelected(value)
-    conversionEvent('estimator_use', { area: value === 'unknown' ? 'unknown' : areaBands[pricing.findIndex(p => p.type === value)] })
+    conversionEvent('estimator_use', { area: value === 'unknown' ? 'unknown' : areaBands[pricing.findIndex(p => p.id === value)] })
   }
 
   return (
@@ -172,8 +179,8 @@ export function FloorAreaGuide({ sourcePage }: { sourcePage: SourcePage }) {
         <h3 className="text-lg font-bold text-secondary-900">Guide pricing by floor area</h3>
       </div>
       <p className="mt-2 max-w-2xl text-secondary-700">
-        Internal floor area (m²) is the main factor in our pricing. Bedroom count is shown only as a
-        rough reference. Select your floor area, or choose “Not sure of floor area”.
+        Internal floor area (m²) is the main factor in our pricing. Select your floor area, or choose
+        “Not sure of floor area”.
       </p>
 
       {/* Tablet and desktop: always visible */}

@@ -10,9 +10,9 @@ import {
 } from 'lucide-react'
 import { Field, Input, Textarea } from '@/components/ui/Input'
 import { cn } from '@/lib/cn'
-import { pricing, priceFrom, site, maxBundleSaving, formatPrice, EXPRESS_SURCHARGE } from '@/lib/site'
-import { areaBands, areaLabel, bandForArea, parseExactArea } from '@/lib/floor-area'
-import { guideEstimate, guideEstimateRows } from '@/lib/pricing-estimate'
+import { pricing, site, maxBundleSaving, formatPrice, EXPRESS_SURCHARGE } from '@/lib/site'
+import { areaBands, areaLabel, bandForArea, parseExactArea, TOP_BAND } from '@/lib/floor-area'
+import { guideEstimate, guideEstimateRows, guidePrice, PLAN_LABEL, ENERGY_REPORT_LABEL } from '@/lib/pricing-estimate'
 import {
   turnaroundCopy, includedList, contactStepIntro, serviceChoices, serviceLabel, customerTypeChoices, nextSteps,
   hasPrepChecklist, PREP_PATH, formatPreferredDate, enquirySummaryText, type BadgeTone,
@@ -31,7 +31,7 @@ import { FORM_DRAFT } from '@/lib/form-layout'
  * Which fields each step validates before moving on: the taps and price, then timing and
  * access. The final step (details) is validated by the whole schema on submit.
  */
-const QUOTE_FIELDS: (keyof ContactInput)[] = ['customerType', 'services', 'areaBand', 'floorArea', 'improvementPlan']
+const QUOTE_FIELDS: (keyof ContactInput)[] = ['customerType', 'services', 'areaBand', 'floorArea', 'floorAreaUnknown', 'improvementPlan', 'energyReport']
 const TITLES = ['Your guide price', 'Timing and access', 'Your details']
 const GATES: (keyof ContactInput)[][] = [QUOTE_FIELDS, ['speed', 'preferredDate', 'notes']]
 const LAST = TITLES.length
@@ -139,7 +139,9 @@ function RequestSent({ data, confirmationSent, focusRef, onReset }: {
   const rows: [string, string][] = [
     ['Service', data.services.map(serviceLabel).join(' + ')],
     estimate.isBulk ? ['Properties', data.propertyCount || 'To be confirmed'] : ['Floor area', areaLabel(data.areaBand, data.floorArea)],
-    ['Guide estimate', estimate.state === 'priced' ? `£${estimate.total}` : estimate.isBulk ? 'Quoted individually' : 'Confirmed after review'],
+    ...(estimate.improvementPlan ? [[PLAN_LABEL, `+£${estimate.improvementPlan}`] as [string, string]] : []),
+    ...(estimate.energyReport ? [[ENERGY_REPORT_LABEL, 'Included at no extra charge'] as [string, string]] : []),
+    ['Guide estimate', estimate.state === 'priced' && estimate.total !== null ? guidePrice(estimate, estimate.total) : estimate.isBulk ? 'Quoted individually' : 'Price to be confirmed'],
     ...(data.preferredDate ? [['Preferred date', formatPreferredDate(data.preferredDate)] as [string, string]] : []),
   ]
   return (
@@ -157,7 +159,7 @@ function RequestSent({ data, confirmationSent, focusRef, onReset }: {
 
       <h3 className="mt-6 text-lg font-semibold">What happens next</h3>
       <ol className="mt-3 space-y-3">
-        {nextSteps(kind, data.speed).map((step, index) => (
+        {nextSteps(kind, data.speed, estimate.energyReport).map((step, index) => (
           <li key={step} className="flex gap-3 text-base leading-relaxed text-secondary-700">
             <span aria-hidden="true" className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary-900 text-xs font-bold text-white">{index + 1}</span>
             <span className="min-w-0">{step}</span>
@@ -225,6 +227,9 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
   const [problem, setProblem] = useState<SendProblem | null>(null)
   const [sent, setSent] = useState<{ data: ContactInput; confirmationSent: boolean } | null>(null)
   const [showErrors, setShowErrors] = useState(false)
+  // The shared floor-area field. "Over 115 m²" opens it; any other band opens it on request. Once
+  // the customer types, it stays open even when their figure moves them to a smaller band.
+  const [areaOpen, setAreaOpen] = useState(false)
   const headingRef = useRef<HTMLHeadingElement>(null)
   const successRef = useRef<HTMLDivElement>(null)
   const formRef = useRef<HTMLFormElement>(null)
@@ -240,7 +245,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
     shouldFocusError: false,
     defaultValues: {
       name: '', phone: '', email: '', address: '', postcode: '', services: ['EPC Certificate'],
-      areaBand: '', floorArea: '', customerType: '', improvementPlan: false, speed: 'Standard (72 hours)',
+      areaBand: '', floorArea: '', floorAreaUnknown: false, customerType: '', improvementPlan: false, energyReport: false, speed: 'Standard (72 hours)',
       areaPage, sourcePage: sourcePage || sourcePageForPath(pathname), ctaId: defaultCta,
       propertyCount: '', preferredDate: '', notes: '', website: '', turnstileToken: FORM_DRAFT ? 'draft-preview' : '', consent: false,
     },
@@ -274,7 +279,9 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
     if (!request || variant !== 'hero') return
     serviceTouched.current = true
     setValue('services', [quoteServices[request.service]])
-    if (request.service === 'floor-plan') { setValue('speed', 'Standard (72 hours)'); setValue('improvementPlan', false) }
+    // The same rules as choosing a tab: no hidden add-on survives a change of service.
+    if (request.service !== 'epc' && request.service !== 'bundle') { setValue('speed', 'Standard (72 hours)'); setValue('improvementPlan', false) }
+    setValue('energyReport', false)   // the homepage's buttons never pick the Pre-Assessment
     if (status !== 'success') { moveFocus.current = true; setStep(1) }
   }, [request, variant, setValue, status])
 
@@ -304,15 +311,15 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
   const estimate = guideEstimate(values)
   const publishQuote = usePublishQuote()
   const [selectedService] = values.services
-  const { areaBand, floorArea, customerType, speed, improvementPlan } = values
+  const { areaBand, floorArea, customerType, speed, improvementPlan, energyReport } = values
   useEffect(() => {
     // Desktop summary panels only; selections, never customer details.
-    publishQuote?.({ service: selectedService, areaBand: areaBand || '', floorArea: floorArea || '', customerType: customerType || '', speed, improvementPlan: !!improvementPlan })
-  }, [publishQuote, selectedService, areaBand, floorArea, customerType, speed, improvementPlan])
+    publishQuote?.({ service: selectedService, areaBand: areaBand || '', floorArea: floorArea || '', customerType: customerType || '', speed, improvementPlan: !!improvementPlan, energyReport: !!energyReport })
+  }, [publishQuote, selectedService, areaBand, floorArea, customerType, speed, improvementPlan, energyReport])
   const { isBulk, isLodged, canHavePlan, planIncluded, productKind } = estimate
-  const estimateText = estimate.state === 'awaiting-area' ? '' : estimate.state === 'priced'
-    ? `Guide estimate: £${estimate.total} · ${areaLabel(values.areaBand, values.floorArea)}`
-    : isBulk ? 'Your portfolio will be quoted individually.' : "We'll confirm your exact quote after reviewing your property details."
+  const estimateText = estimate.state === 'awaiting-area' ? '' : estimate.state === 'priced' && estimate.total !== null
+    ? `Guide estimate: ${guidePrice(estimate, estimate.total)} · ${areaLabel(values.areaBand, values.floorArea)}`
+    : isBulk ? 'Your portfolio will be quoted individually.' : "Price to be confirmed. We'll confirm the size and price from your property details."
 
   function start() {
     if (!started.current) { started.current = true; conversionEvent('form_start', quoteContextFromForm(getValues())) }
@@ -379,7 +386,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
   if (status === 'success' && sent) return (
     <div className={shell}>
       <RequestSent data={sent.data} confirmationSent={sent.confirmationSent} focusRef={successRef} onReset={() => {
-        reset(); started.current = false; serviceTouched.current = false; setSent(null); setStatus('idle'); moveFocus.current = true; setStep(1)
+        reset(); started.current = false; serviceTouched.current = false; setAreaOpen(false); setSent(null); setStatus('idle'); moveFocus.current = true; setStep(1)
         rememberCustomerType('', window.history)
         if (dedicated) window.history.replaceState(window.history.state, '', quoteHref())
       }} />
@@ -391,29 +398,81 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
     serviceTouched.current = true
     if (value === BULK && getValues('customerType') === 'Homeowner') { setValue('customerType', ''); rememberCustomerType('', window.history) }
     setValue('services', [value as ContactInput['services'][number]], { shouldValidate: !!errors.services })
+    // No hidden add-on survives a change of service: the paid plan only exists on the EPC and the
+    // bundle (moving between those two keeps it), the free energy report only on the Pre-Assessment.
     const lodged = value === 'EPC Certificate' || value === 'Both (Bundle)'
     if (!lodged) { setValue('speed', 'Standard (72 hours)'); setValue('improvementPlan', false) }
+    if (value !== PRE_ASSESSMENT) setValue('energyReport', false)
     rememberSelection(); conversionEvent('service_selection', quoteContextFromForm(getValues()))
   }
   const chooseArea = (value: string) => {
     setValue('areaBand', value as ContactInput['areaBand'], { shouldValidate: !!errors.areaBand })
-    // A typed figure stays only while it agrees with the chosen size.
+    // A typed figure stays only while it agrees with the chosen size, so picking another size clears it.
     const typed = getValues('floorArea'), exact = parseExactArea(typed)
     if (typed && (exact === undefined || bandForArea(exact) !== value)) { setValue('floorArea', ''); clearErrors('floorArea') }
+    if (value !== TOP_BAND) setValue('floorAreaUnknown', false)
+    else clearErrors('floorArea')
     rememberSelection(); conversionEvent('estimator_use', quoteContextFromForm(getValues()))
   }
   const sizeNote = errors.floorArea?.message || ((parseExactArea(floorArea) ?? 0) > 300 ? 'That is a very large home. If your figure is in square feet, divide it by 10.76 to get m².' : '')
-  const baseTotal = (band: string) => guideEstimate({ services: values.services, areaBand: band }).total
-  const fromPrice = selectedService === 'Floor Plan' ? priceFrom.floorPlan : selectedService === 'Both (Bundle)' ? priceFrom.bundle : priceFrom.epc
+  const baseTotal = (band: string) => guideEstimate({ services: values.services, areaBand: band })
   const bandIndex = areaBands.indexOf(values.areaBand as (typeof areaBands)[number])
   const band = bandIndex >= 0 ? pricing[bandIndex] : undefined
+  const onTopBand = values.areaBand === TOP_BAND
+  const showArea = areaOpen || onTopBand || !!floorArea
 
   const planChoice = canHavePlan && !planIncluded && (
-    <label className="bf-check">
+    <label className="bf-check bf-check--offer">
       <input type="checkbox" className="bf-check__box" {...register('improvementPlan', { onChange: rememberSelection })} />
-      <span className="min-w-0"><span className="bf-check__t">Add the EPC Improvement Plan <span className="whitespace-nowrap">(+£{site.addOns.improvementPlan})</span></span>
-        <span className="bf-check__d">Your full Energy Report plus Abdul&apos;s personalised plan explaining what&apos;s holding the rating back and which improvements to consider first. Your standard EPC recommendations are included either way.</span></span>
+      {/* Abdul's wording, 22/10/2026 pricing spec §7 */}
+      <span className="min-w-0"><span className="bf-check__t">Add a personalised EPC Improvement Plan <span className="whitespace-nowrap">— £{site.addOns.improvementPlan}</span></span>
+        <span className="bf-check__d">A written explanation of what is affecting your rating and which improvements to consider first. Your standard EPC recommendations are included whether or not you choose this extra.</span></span>
     </label>
+  )
+  const reportChoice = productKind === 'preAssessment' && (
+    <label className="bf-check">
+      <input type="checkbox" className="bf-check__box" {...register('energyReport', { onChange: rememberSelection })} />
+      {/* Abdul's wording, 22/10/2026 pricing spec §6. Free, so it never changes the price. */}
+      <span className="min-w-0"><span className="bf-check__t">Include a separate energy report — no extra charge</span>
+        <span className="bf-check__d">Receive a separate summary of the assessment findings alongside your personalised improvement plan.</span></span>
+    </label>
+  )
+
+  /** One shared floor-area field (spec 2, 22/10/2026): under the top band's row, labelled for the band it serves. */
+  const areaField = (
+    <div className="bf__area">
+      <label htmlFor="floorArea" className="bf__area-label">{onTopBand ? 'Approximate internal floor area' : 'Internal floor area'}</label>
+      <p id="floorArea-help" className="bf__sub">{onTopBand ? 'Include all floors. An estimate is fine.' : 'Enter the size if known. An estimate is fine.'}</p>
+      <div className="bf__area-row">
+        <div className="relative w-36">
+          <Input id="floorArea" inputMode="decimal" autoComplete="off" maxLength={10} placeholder={onTopBand ? 'e.g. 145' : 'e.g. 84'}
+            aria-invalid={!!errors.floorArea} aria-describedby={['floorArea-help', sizeNote ? 'floorArea-note' : ''].filter(Boolean).join(' ')} hasError={!!errors.floorArea} className="pr-10"
+            {...register('floorArea', {
+              onChange: event => {
+                setAreaOpen(true)
+                const exact = parseExactArea(event.target.value)
+                if (event.target.value) setValue('floorAreaUnknown', false)
+                if (exact !== undefined && getValues('areaBand') !== bandForArea(exact)) {
+                  setValue('areaBand', bandForArea(exact), { shouldValidate: !!errors.areaBand }); rememberSelection()
+                }
+                if (errors.floorArea) void trigger('floorArea')
+              },
+              onBlur: () => { if (parseExactArea(getValues('floorArea')) !== undefined) conversionEvent('estimator_use', quoteContextFromForm(getValues())) },
+            })} />
+          <span aria-hidden="true" className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-base text-secondary-600">m²</span>
+        </div>
+        {!onTopBand && <span className="text-sm text-secondary-600">Optional</span>}
+      </div>
+      {onTopBand && (
+        <label className="bf__area-unknown">
+          <input type="checkbox" className="bf-check__box" {...register('floorAreaUnknown', {
+            onChange: event => { if (event.target.checked) { setValue('floorArea', ''); clearErrors('floorArea') } },
+          })} />
+          I don&rsquo;t know the floor area
+        </label>
+      )}
+      {sizeNote && <p id="floorArea-note" role={errors.floorArea ? 'alert' : undefined} className={cn('mt-1.5 text-sm', errors.floorArea ? 'text-red-700' : 'text-secondary-600')}>{sizeNote}</p>}
+    </div>
   )
 
   const quoteStep = (
@@ -474,48 +533,38 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
           ) : (
             <fieldset className="min-w-0" aria-invalid={!!errors.areaBand} aria-describedby={['areaBand-hint', errors.areaBand ? 'areaBand-error' : ''].filter(Boolean).join(' ')}>
               <legend className="bf__legend">How big is the property?</legend>
-              <p id="areaBand-hint" className="bf__sub">Internal floor area. Bedrooms are only a rough guide.</p>
+              <p id="areaBand-hint" className="bf__sub">Choose the approximate internal floor area. Not sure? We can confirm it from your property details.</p>
               <div className="bf__sizes">
                 {areaBands.map((b, i) => {
                   const checked = values.areaBand === b
-                  const total = baseTotal(b)
+                  const row = baseTotal(b)
+                  const price = row.baseGuide !== null ? guidePrice(row, row.baseGuide) : ''
                   return (
-                    <label key={b} className="bf-tile bf-tile--size" data-checked={checked || undefined}>
-                      <input type="radio" name="areaBand" value={b} checked={checked} required className="bf-radio"
-                        aria-label={`${pricing[i].areaLabel}, ${pricing[i].typicalLabel}${total ? `, £${formatPrice(total)}` : ''}`}
-                        onChange={() => chooseArea(b)} />
-                      <span className="bf-size__top"><b>{pricing[i].areaLabel}</b>{total !== null && <span className="tabular-nums">£{formatPrice(total)}</span>}</span>
-                      <span className="bf-tile__d">{pricing[i].typicalLabel}</span>
-                    </label>
+                    <div key={b} className="contents">
+                      <label className="bf-tile bf-tile--size" data-checked={checked || undefined}>
+                        <input type="radio" name="areaBand" value={b} checked={checked} required className="bf-radio"
+                          aria-label={`${pricing[i].areaLabel}${price ? `, ${price}` : ''}`}
+                          onChange={() => chooseArea(b)} />
+                        <span className="bf-size__top"><b>{pricing[i].areaLabel}</b>{price && <span className="tabular-nums">{price}</span>}</span>
+                      </label>
+                      {b === TOP_BAND && showArea && areaField}
+                    </div>
                   )
                 })}
                 <label className="bf-tile bf-tile--unsure" data-checked={values.areaBand === 'unknown' || undefined}>
                   <input type="radio" name="areaBand" value="unknown" checked={values.areaBand === 'unknown'} required className="bf-radio"
                     aria-label="Not sure of floor area" onChange={() => chooseArea('unknown')} />
                   <HelpCircle aria-hidden="true" className="h-5 w-5 shrink-0" />
-                  <span><b>Not sure of the size?</b><span className="bf-tile__d">We&rsquo;ll confirm the exact price from your property details.</span></span>
+                  <span className="min-w-0 flex-1"><span className="bf-size__top"><b>Not sure of the size?</b><span>Price confirmed before booking</span></span>
+                    <span className="bf-tile__d">We&rsquo;ll confirm the size and price from your property details.</span></span>
                 </label>
               </div>
-              <div className="bf__exact">
-                <label htmlFor="floorArea" className="text-[15px] font-semibold text-secondary-900">Know the exact size?</label>
-                <div className="relative w-32">
-                  <Input id="floorArea" inputMode="decimal" autoComplete="off" maxLength={10} placeholder="e.g. 84"
-                    aria-invalid={!!errors.floorArea} aria-describedby={sizeNote ? 'floorArea-note' : undefined} hasError={!!errors.floorArea} className="pr-10"
-                    {...register('floorArea', {
-                      onChange: event => {
-                        const exact = parseExactArea(event.target.value)
-                        if (exact !== undefined && getValues('areaBand') !== bandForArea(exact)) {
-                          setValue('areaBand', bandForArea(exact), { shouldValidate: !!errors.areaBand }); rememberSelection()
-                        }
-                        if (errors.floorArea) void trigger('floorArea')
-                      },
-                      onBlur: () => { if (parseExactArea(getValues('floorArea')) !== undefined) conversionEvent('estimator_use', quoteContextFromForm(getValues())) },
-                    })} />
-                  <span aria-hidden="true" className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-base text-secondary-600">m²</span>
-                </div>
-                <span className="text-sm text-secondary-600">Optional</span>
-              </div>
-              {sizeNote && <p id="floorArea-note" role={errors.floorArea ? 'alert' : undefined} className={cn('mt-1.5 text-sm', errors.floorArea ? 'text-red-700' : 'text-secondary-600')}>{sizeNote}</p>}
+              {!showArea && (
+                <button type="button" className="bf__more"
+                  onClick={() => { setAreaOpen(true); requestAnimationFrame(() => document.getElementById('floorArea')?.focus()) }}>
+                  Know the exact size? Enter it in m²
+                </button>
+              )}
               {errors.areaBand && <p id="areaBand-error" role="alert" className="mt-2 text-sm text-red-700">{errors.areaBand.message}</p>}
             </fieldset>
           )}
@@ -525,21 +574,28 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
           <p className="bf__est-label">Estimated guide price</p>
           {isBulk ? (
             <><p className="bf__price"><b>Quote</b></p><p className="bf__for">Several properties are quoted individually.</p></>
-          ) : estimate.state === 'priced' && band ? (
+          ) : estimate.state === 'priced' && band && estimate.total !== null ? (
             <>
-              <p className="bf__price"><b data-price className="tabular-nums">£{formatPrice(estimate.total ?? 0)}</b><span>{isLodged || productKind === 'preAssessment' ? 'inc. assessment' : 'inc. on-site measuring'}{isLodged ? ' and GOV.UK lodgement' : ''}</span></p>
-              <p className="bf__for">{areaLabel(values.areaBand, values.floorArea)} · {band.typicalLabel}</p>
+              <p className="bf__price">{estimate.isStartingPrice && <small>From</small>}<b data-price className="tabular-nums">£{formatPrice(estimate.total)}</b><span>{isLodged || productKind === 'preAssessment' ? 'inc. assessment' : 'inc. on-site measuring'}{isLodged ? ' and GOV.UK lodgement' : ''}</span></p>
+              <p className="bf__for">{areaLabel(values.areaBand, values.floorArea)}</p>
+              {estimate.isStartingPrice && <p className="bf__for">Final price depends on property size and complexity. We&rsquo;ll confirm your exact quote before booking.</p>}
+              {estimate.saving > 0 && <p className="bf__save">Save £{estimate.saving} compared with booking separately.</p>}
               <dl className="bf__rows">{guideEstimateRows(estimate).map(([label, amount]) => <div key={label}><dt>{label}</dt><dd className="tabular-nums">{amount}</dd></div>)}</dl>
             </>
-          ) : values.areaBand === 'unknown' ? (
-            <><p className="bf__price"><b data-price>Quote</b></p><p className="bf__for">Send your property details and we&rsquo;ll confirm the exact price.</p></>
+          ) : estimate.state === 'manual-quote' ? (
+            <>
+              <p className="bf__price bf__price--text"><b data-price>Price to be confirmed</b></p>
+              <p className="bf__for">We&rsquo;ll confirm the size and price from your property details.</p>
+              <dl className="bf__rows">{guideEstimateRows(estimate).map(([label, amount]) => <div key={label}><dt>{label}</dt><dd className="tabular-nums">{amount}</dd></div>)}</dl>
+            </>
           ) : (
-            <><p className="bf__price"><small>From</small><b data-price className="tabular-nums">£{formatPrice(fromPrice)}</b></p><p className="bf__for">Pick a size for your guide price.</p></>
+            <><p className="bf__price"><small>From</small><b data-price className="tabular-nums">£{formatPrice(estimate.fromTotal ?? 0)}</b></p><p className="bf__for">Pick a size for your guide price.</p></>
           )}
-          {(planChoice || planIncluded) && <div className="bf__extras">
+          {(planChoice || reportChoice) && <div className="bf__extras">
             {planChoice}
-            {planIncluded && <p className="bf__note">The Energy Report and written Improvement Plan are included in your Pre-Assessment.</p>}
+            {reportChoice}
           </div>}
+          {planIncluded && estimate.state === 'awaiting-area' && <p className="bf__note mt-3">Your personalised written improvement plan is included in the price.</p>}
           <p className="bf__fine"><Check aria-hidden="true" className="h-4 w-4 shrink-0 text-[#386B59]" />No upfront payment. You pay once the assessment is done.</p>
           <p className="bf__fine bf__fine--quiet">Exact price and appointment confirmed before booking.</p>
         </div>
@@ -625,7 +681,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
       <p data-estimate-announcement className="sr-only" aria-live="polite" aria-atomic="true">{estimateText}</p>
       {step > 1 && estimateText && <div data-estimate-summary className="bf__summary">
         <p><b>{estimateText}</b></p>
-        <p className="mt-0.5">{serviceLabel(selectedService)}{values.customerType ? ` · ${values.customerType}` : ''}{speed === EXPRESS_SPEED ? ' · next-day lodgement' : ''}{improvementPlan ? ' · Improvement Plan' : ''}</p>
+        <p className="mt-0.5">{serviceLabel(selectedService)}{values.customerType ? ` · ${values.customerType}` : ''}{speed === EXPRESS_SPEED ? ' · next-day lodgement' : ''}{estimate.improvementPlan ? ' · Improvement Plan' : ''}{estimate.energyReport ? ' · separate energy report' : ''}</p>
         <button type="button" className="bf__change" onClick={() => { moveFocus.current = true; setStep(1) }}>Change</button>
       </div>}
 

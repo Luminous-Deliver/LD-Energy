@@ -7,12 +7,15 @@ import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { PageHero } from '@/components/sections/PageHero'
 import { CtaStrip } from '@/components/sections/CtaStrip'
 import { Accordion } from '@/components/ui/Accordion'
+import { GuidePriceNote } from '@/components/ui/GuidePriceNote'
 import { pricing,
   site,
   formatPrice,
   bundleSaving,
   maxBundleSaving,
   priceFrom,
+  standardBands,
+  topBand,
   EXPRESS_SURCHARGE, defaultOgImage } from '@/lib/site'
 import type { FaqItem } from '@/lib/faq'
 
@@ -59,7 +62,7 @@ const notIncluded = [
 const additionalCharges: Array<{ label: string; guide: string }> = [
   { label: 'Next-day service', guide: `+£${EXPRESS_SURCHARGE}` },
   { label: 'EPC Improvement Plan', guide: `+£${site.addOns.improvementPlan}` },
-  { label: 'EPC Pre-Assessment (not lodged)', guide: 'Same as the EPC band' },
+  { label: 'EPC Pre-Assessment (not lodged), improvement plan included', guide: `From £${priceFrom.preAssessment}` },
   { label: 'Lodging a held Pre-Assessment later', guide: `+£${site.addOns.lodgeLater}` },
   { label: 'Extensions, loft conversions or unusual layouts', guide: 'Exact quote' },
   { label: 'Multiple floors or additional measurement complexity', guide: 'Exact quote' },
@@ -69,7 +72,7 @@ const additionalCharges: Array<{ label: string; guide: string }> = [
 const pricingFaq: FaqItem[] = [
   {
     q: 'How much does an EPC cost in London?',
-    a: `Guide prices start at £${pricing[0].epc} for properties up to 37 m² and rise with internal floor area, up to £${pricing[5].epc} for homes over 121 m². These are starting estimates, not fixed quotes — the final price depends on the internal floor area (m²), any extensions or loft conversions, layout and condition. Your exact quote is confirmed before you book.`,
+    a: `Guide prices start at £${pricing[0].epc} for properties ${pricing[0].areaLabel.toLowerCase()} and rise with internal floor area. Homes ${topBand.areaLabel.toLowerCase()} start from £${topBand.epc}. These are guide prices, not fixed quotes — the final price depends on the internal floor area (m²), any extensions or loft conversions, layout and condition. Your exact quote is confirmed before you book.`,
   },
   {
     q: 'Are there any hidden fees?',
@@ -81,7 +84,7 @@ const pricingFaq: FaqItem[] = [
   },
   {
     q: 'How much is an EPC Pre-Assessment?',
-    a: `The same as the EPC for that floor-area band — from £${pricing[0].epc} — because it is the same visit, the same measuring and the same evidence gathering; only the lodgement is skipped. The Energy Report and the written Improvement Plan are included rather than charged on top. If you later decide you want the certificate after all, we can usually lodge the same survey for £${site.addOns.lodgeLater} with no second visit, provided nothing at the property has changed and the survey remains valid for lodgement under applicable rules. It is not a substitute for an EPC where one is legally required.`,
+    a: `From £${priceFrom.preAssessment}, on the same floor-area bands as the EPC. It is the same visit, the same measuring and the same evidence gathering; only the lodgement is skipped, and your personalised written improvement plan is included in the price. A separate energy report is available at no extra charge if you ask for it. If you later decide you want the certificate after all, we can usually lodge the same survey for £${site.addOns.lodgeLater} with no second visit, provided nothing at the property has changed and the survey remains valid for lodgement under applicable rules. It is not a substitute for an EPC where one is legally required.`,
   },
   {
     q: 'Do you charge for travel?',
@@ -100,8 +103,8 @@ const pricingFaq: FaqItem[] = [
     a: `Floor plans have guide prices from £${priceFrom.floorPlan}, priced on the same internal floor-area bands as the EPC. Booking an EPC and floor plan together costs less than booking them separately — up to £${formatPrice(maxBundleSaving)} less — because we measure the property during the assessment anyway, so it is one visit rather than two. Your exact quote is confirmed before booking.`,
   },
   {
-    q: 'What if my property is larger than 121 m²?',
-    a: `Guide prices for homes over 121 m² start at £${pricing[5].epc} for the EPC, £${pricing[5].floorPlan} for a floor plan and £${pricing[5].bundle} for both together. Large properties vary a great deal in layout and complexity, so this band is a starting point rather than a typical figure — send us the address and we will confirm the exact quote before you book.`,
+    q: `What if my property is larger than ${standardBands[standardBands.length - 1].areaMax} m²?`,
+    a: `Guide prices for homes ${topBand.areaLabel.toLowerCase()} start from £${topBand.epc} for the EPC, £${topBand.floorPlan} for a floor plan and £${topBand.bundle} for both together. Large properties vary a great deal in layout and complexity, so this band is a starting point rather than a typical figure — send us the address and we will confirm the exact quote before you book.`,
   },
 ]
 
@@ -116,7 +119,7 @@ const offerCatalog = {
     position: i + 1,
     item: {
       '@type': 'Offer',
-      name: `Domestic EPC, ${row.areaLabel} (${row.typicalLabel})`,
+      name: `Domestic EPC, ${row.areaLabel}`,
       // minPrice, not price: every figure on this page is a starting guide, and
       // marking it as a fixed price would misrepresent visible page content.
       priceSpecification: {
@@ -174,9 +177,9 @@ export default function PricingPage() {
           <div className="flex gap-3 rounded-xl border border-warm-200 bg-warm-50 p-4">
             <Info className="w-5 h-5 text-warm-600 shrink-0 mt-0.5" aria-hidden="true" />
             <div>
-              <p className="font-semibold text-secondary-900">These are starting prices</p>
+              <p className="font-semibold text-secondary-900">These are guide prices</p>
               <p className="mt-1 text-sm text-secondary-700 leading-relaxed">
-                Every figure below is a guide estimate, not a fixed quote. You get an exact price confirmed before you book.
+                Every figure below is a guide estimate, not a fixed quote. The largest band shows starting prices. You get an exact price confirmed before you book.
               </p>
             </div>
           </div>
@@ -195,39 +198,33 @@ export default function PricingPage() {
         <div className="mt-8 overflow-hidden rounded-2xl border border-secondary-200 shadow-premium sm:hidden">
           <ul className="divide-y divide-secondary-100">
             {pricing.map((row) => (
-              <li key={row.type} className="bg-white px-4 py-4">
+              <li key={row.id} className="bg-white px-4 py-4">
                 <p className="flex items-center gap-1.5 text-base font-bold text-secondary-900">
                   <Ruler className="w-3.5 h-3.5 shrink-0 text-secondary-500" aria-hidden="true" />
                   {row.areaLabel}
                 </p>
-                <p className="mt-0.5 text-xs text-secondary-600">{row.typicalLabel}</p>
                 <dl className="mt-3 grid grid-cols-2 gap-2 text-sm">
-                  <div>
-                    <dt className="text-xs font-medium text-secondary-600">EPC</dt>
-                    <dd>
-                      <span className="text-xs font-medium text-secondary-600">From</span>{' '}
-                      <span className="text-base font-bold text-secondary-900">{`£${formatPrice(row.epc)}`}</span>
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs font-medium text-secondary-600">Floor plan</dt>
-                    <dd>
-                      <span className="text-xs font-medium text-secondary-600">From</span>{' '}
-                      <span className="text-base font-bold text-secondary-900">{`£${formatPrice(row.floorPlan)}`}</span>
-                    </dd>
-                  </div>
+                  {([['EPC', row.epc], ['Floor plan', row.floorPlan], ['Pre-Assessment (not lodged)', row.preAssessment]] as const).map(([label, value]) => (
+                    <div key={label}>
+                      <dt className="text-xs font-medium text-secondary-600">{label}</dt>
+                      <dd>
+                        {row.startingPrice && <><span className="text-xs font-medium text-secondary-600">From</span>{' '}</>}
+                        <span className="text-base font-bold text-secondary-900">{`£${formatPrice(value)}`}</span>
+                      </dd>
+                    </div>
+                  ))}
                   <div className="col-span-2 flex flex-wrap items-baseline justify-between gap-x-3 rounded-lg bg-primary-50 px-3 py-2">
                     <dt className="text-xs font-semibold text-primary-800">EPC + floor plan</dt>
                     <dd className="text-right">
                       <span className="text-base font-bold text-primary-800">
-                        {row.areaMax === null && (
+                        {row.startingPrice && (
                           <span className="text-xs font-medium text-primary-700">From </span>
                         )}
                         {`£${formatPrice(row.bundle)}`}
                       </span>{' '}
-                      <span className="text-xs font-semibold text-primary-700">
+                      {!row.startingPrice && <span className="text-xs font-semibold text-primary-700">
                         Save {`£${formatPrice(bundleSaving(row))}`}
-                      </span>
+                      </span>}
                     </dd>
                   </div>
                 </dl>
@@ -235,7 +232,7 @@ export default function PricingPage() {
             ))}
           </ul>
           <p className="bg-secondary-50 border-t border-secondary-200 px-4 py-3 text-xs text-secondary-500 leading-relaxed">
-            All figures are guide estimates and act as starting prices. Internal floor area (m²) is the single biggest factor in the final price, alongside extensions, loft conversions, layout and condition. Savings shown are the difference between the two services booked separately and booked together.{' '}
+            All figures are guide prices; the largest band shows starting prices. Internal floor area (m²) is the single biggest factor in the final price, alongside extensions, loft conversions, layout and condition. Savings shown are the difference between the two services booked separately and booked together.{' '}
             <a href={quoteHref({ sourcePage: 'pricing', ctaId: 'inline' })} className="font-medium text-primary-700 underline">Request an exact quote</a>.
           </p>
         </div>
@@ -246,9 +243,12 @@ export default function PricingPage() {
               <thead>
                 <tr className="bg-secondary-50 border-b border-secondary-200">
                   <th scope="col" className="px-5 py-3.5 text-left font-semibold text-secondary-700">Internal floor area</th>
-                  <th scope="col" className="px-4 py-3.5 text-left font-medium text-secondary-600">Typical property</th>
                   <th scope="col" className="px-4 py-3.5 text-right font-semibold text-secondary-900">EPC</th>
                   <th scope="col" className="px-4 py-3.5 text-right font-semibold text-secondary-900">Floor plan</th>
+                  <th scope="col" className="px-4 py-3.5 text-right font-semibold text-secondary-900">
+                    Pre-Assessment
+                    <span className="mt-1 block text-[10px] font-bold uppercase tracking-wider text-secondary-500">Not lodged</span>
+                  </th>
                   <th scope="col" className="px-4 py-3.5 text-right font-semibold text-primary-800 bg-primary-50">
                     EPC + floor plan
                     <span className="mt-1 block text-[10px] font-bold uppercase tracking-wider text-primary-700">
@@ -259,7 +259,7 @@ export default function PricingPage() {
               </thead>
               <tbody className="divide-y divide-secondary-100">
                 {pricing.map((row) => (
-                  <tr key={row.type} className="bg-white hover:bg-secondary-50/70 transition-colors">
+                  <tr key={row.id} className="bg-white hover:bg-secondary-50/70 transition-colors">
                     {/* PRIMARY: floor area drives the guide band */}
                     <th scope="row" className="px-5 py-3.5 text-left">
                       <span className="flex items-center gap-1.5 text-base font-bold text-secondary-900">
@@ -267,28 +267,25 @@ export default function PricingPage() {
                         {row.areaLabel}
                       </span>
                     </th>
-                    {/* SECONDARY: familiar reference only, deliberately muted */}
-                    <td className="px-4 py-3.5 text-xs font-normal text-secondary-600">{row.typicalLabel}</td>
-                    <td className="px-4 py-3.5 text-right whitespace-nowrap">
-                      <span className="text-xs font-medium text-secondary-600">From</span>{' '}
-                      <span className="text-base font-bold text-secondary-900">{`£${formatPrice(row.epc)}`}</span>
-                    </td>
-                    <td className="px-4 py-3.5 text-right whitespace-nowrap">
-                      <span className="text-xs font-medium text-secondary-600">From</span>{' '}
-                      <span className="text-base font-bold text-secondary-900">{`£${formatPrice(row.floorPlan)}`}</span>
-                    </td>
+                    {/* Standard bands are guide prices; the open-ended top band shows starting prices */}
+                    {[row.epc, row.floorPlan, row.preAssessment].map((value, i) => (
+                      <td key={i} className="px-4 py-3.5 text-right whitespace-nowrap">
+                        {row.startingPrice && <><span className="text-xs font-medium text-secondary-600">From</span>{' '}</>}
+                        <span className="text-base font-bold text-secondary-900">{`£${formatPrice(value)}`}</span>
+                      </td>
+                    ))}
                     <td className="px-4 py-3.5 text-right bg-primary-50 whitespace-nowrap">
                       <span className="text-base font-bold text-primary-800">
                         {/* Open-ended top band varies far more, so it is the one
                             bundle figure presented as a starting point. */}
-                        {row.areaMax === null && (
+                        {row.startingPrice && (
                           <span className="text-xs font-medium text-primary-700">From </span>
                         )}
                         {`£${formatPrice(row.bundle)}`}
                       </span>
-                      <span className="block text-xs font-semibold text-primary-700">
+                      {!row.startingPrice && <span className="block text-xs font-semibold text-primary-700">
                         Save {`£${formatPrice(bundleSaving(row))}`}
-                      </span>
+                      </span>}
                     </td>
                   </tr>
                 ))}
@@ -296,7 +293,7 @@ export default function PricingPage() {
               <tfoot>
                 <tr className="bg-secondary-50 border-t border-secondary-200">
                   <td colSpan={5} className="px-5 py-3 text-xs text-secondary-500 leading-relaxed">
-                    All figures are guide estimates and act as starting prices. Internal floor area (m²) is the single biggest factor in the final price, alongside extensions, loft conversions, layout and condition. Savings shown are the difference between the two services booked separately and booked together.{' '}
+                    All figures are guide prices; the largest band shows starting prices. Internal floor area (m²) is the single biggest factor in the final price, alongside extensions, loft conversions, layout and condition. Savings shown are the difference between the two services booked separately and booked together.{' '}
                     <a href={quoteHref({ sourcePage: 'pricing', ctaId: 'inline' })} className="font-medium text-primary-700 underline">Request an exact quote</a>.
                   </td>
                 </tr>
@@ -304,6 +301,8 @@ export default function PricingPage() {
             </table>
           </div>
         </div>
+
+        <GuidePriceNote className="mt-6" />
 
         <div className="mt-6 rounded-xl bg-primary-50 border border-primary-200 p-6 flex items-start gap-4">
           <Sparkles className="w-6 h-6 text-primary-700 shrink-0 mt-0.5" aria-hidden="true" />

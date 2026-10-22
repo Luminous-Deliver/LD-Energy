@@ -32,7 +32,7 @@ const out = path.resolve(process.env.BOOKING_EVIDENCE_DIR || '../../../audits/we
       copy.push({ route, enquiryLabels: labels.map(label => label.trim()), passed: true })
     }
     await page.goto(base + '/contact', { waitUntil: 'networkidle' })
-    assert.match(await page.locator('form').innerText(), /Your full Energy Report plus Abdul's personalised plan explaining what's holding the rating back and which improvements to consider first\. Your standard EPC recommendations are included either way\./)
+    assert.match(await page.locator('form').innerText(), /A written explanation of what is affecting your rating and which improvements to consider first\. Your standard EPC recommendations are included whether or not you choose this extra\./)
     assert.doesNotMatch(await page.locator('form').innerText(), /Recommendations remain on your EPC|Who are you booking as/)
     fs.writeFileSync(path.join(out, 'production-layout-copy.json'), JSON.stringify({ measurements, copy }, null, 2))
     console.log('PASS production first-control positions at all 8 widths and enquiry labels on 13 changed surfaces')

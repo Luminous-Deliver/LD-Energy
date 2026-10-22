@@ -9,7 +9,7 @@ const { POST } = require('../app/api/contact/route.ts')
 const { boroughMeta } = require('../lib/boroughs.ts')
 const { sourcePages, ctaIds, customerTypeForSource } = require('../lib/enquiry-attribution.ts')
 
-const sample = { name: 'Test Customer', email: 'test@example.invalid', phone: '07000000000', address: '1 Test Road', postcode: 'E15 1AA', areaBand: '53-70', services: ['EPC Certificate'], customerType: 'Homeowner', speed: 'Standard (72 hours)', consent: true, turnstileToken: 'mock-token', website: '' }
+const sample = { name: 'Test Customer', email: 'test@example.invalid', phone: '07000000000', address: '1 Test Road', postcode: 'E15 1AA', areaBand: '55-75', services: ['EPC Certificate'], customerType: 'Homeowner', speed: 'Standard (72 hours)', consent: true, turnstileToken: 'mock-token', website: '' }
 
 test('every service and band retains prices and eligible extras; unknown and absent area never have a total', () => {
   for (const [service, label] of Object.entries(quoteServices)) {
@@ -17,16 +17,21 @@ test('every service and band retains prices and eligible extras; unknown and abs
       for (const express of [false, true]) for (const plan of [false, true]) {
         const estimate = guideEstimate({ areaBand, services: [label], speed: express ? EXPRESS_SPEED : sample.speed, improvementPlan: plan })
         const lodged = service === 'epc' || service === 'bundle'
-        const base = service === 'bulk' ? null : service === 'bundle' ? pricing[index].bundle : service === 'floor-plan' ? pricing[index].floorPlan : pricing[index].epc
+        const base = service === 'bulk' ? null : service === 'bundle' ? pricing[index].bundle : service === 'floor-plan' ? pricing[index].floorPlan
+          : service === 'pre-assessment' ? pricing[index].preAssessment : pricing[index].epc
         assert.equal(estimate.total, base === null ? null : base + (lodged && express ? EXPRESS_SURCHARGE : 0) + (lodged && plan ? site.addOns.improvementPlan : 0))
         assert.equal(estimate.isLodged, lodged)
         assert.equal(estimate.planIncluded, service === 'pre-assessment')
+        assert.equal(estimate.isStartingPrice, service !== 'bulk' && !!pricing[index].startingPrice)
       }
     }
     for (const areaBand of ['', undefined, 'unknown']) {
       const estimate = guideEstimate({ areaBand, services: [label], speed: EXPRESS_SPEED, improvementPlan: true })
       assert.equal(estimate.total, null)
-      assert.deepEqual(guideEstimateRows(estimate), [])
+      // An unknown size never shows a figure for the service; a chosen extra may still be listed on its own.
+      const rows = guideEstimateRows(estimate)
+      if (areaBand !== 'unknown') assert.deepEqual(rows, [])
+      for (const [rowLabel, value] of rows) assert.match(value, /^\+£\d+$|^Included/, rowLabel)
       assert.doesNotMatch(guideEstimateLine(estimate), /£0|£85|NaN|null|undefined/)
     }
   }
@@ -39,7 +44,8 @@ test('server schema accepts unknown area and legacy clients, rejects missing/con
     const legacy = { ...sample, areaBand: undefined, propertyType }
     assert.equal(contactSchema.safeParse(legacy).success, true)
     assert.equal(guideEstimate(legacy).total, pricing[index].epc)
-    assert.equal(contactSchema.safeParse({ ...legacy, areaBand: areaBands[index] }).success, true)
+    // The open-ended top band asks for an approximate area or "I don't know the floor area".
+    assert.equal(contactSchema.safeParse({ ...legacy, areaBand: areaBands[index], floorAreaUnknown: !!pricing[index].startingPrice }).success, true)
     assert.equal(contactSchema.safeParse({ ...legacy, areaBand: 'unknown' }).success, false)
   }
   assert.equal(contactSchema.safeParse({ ...sample, services: [BULK], areaBand: '', address: '', postcode: '', propertyCount: '20+' }).success, true)
@@ -56,24 +62,80 @@ test('an exact floor area is optional, picks its own band and must agree with th
   assert.equal(parseExactArea('85 m2'), 85)
   assert.equal(parseExactArea('85m²'), 85)
   assert.equal(parseExactArea('134 sqm'), 134)
-  for (const bad of ['', undefined, 'abc', '0', '9', '2001', '-50', '1,200', '85 sq ft', '1e3', '85.123']) assert.equal(parseExactArea(bad), undefined, String(bad))
-  // "Up to 37 m²" means 37 or less, so anything above a band's top figure is in the next band.
-  for (const [m2, band] of [[10, 'up-to-37'], [37, 'up-to-37'], [37.5, '38-52'], [52, '38-52'], [53, '53-70'], [95, '71-95'], [96, '96-120'], [120, '96-120'], [120.4, '121-plus'], [134, '121-plus'], [2000, '121-plus']]) assert.equal(bandForArea(m2), band, String(m2))
+  // Spec §9: zero, negative and non-numeric values are rejected; any positive figure is accepted.
+  for (const bad of ['', undefined, 'abc', '0', '0.0', '-50', '1,200', '85 sq ft', '1e3', '85.123']) assert.equal(parseExactArea(bad), undefined, String(bad))
+  assert.equal(parseExactArea('9'), 9)
+  assert.equal(parseExactArea('2001'), 2001)
+  // Spec §9's boundaries: a band includes its ceiling, and decimals are never rounded into another band.
+  for (const [m2, band] of [[0.5, 'up-to-40'], [40, 'up-to-40'], [40.5, '40-55'], [55, '40-55'], [55.5, '55-75'], [75, '55-75'], [75.5, '75-95'], [95, '75-95'], [95.5, '95-115'], [115, '95-115'], [115.5, 'over-115'], [134, 'over-115'], [2000, 'over-115']]) assert.equal(bandForArea(m2), band, String(m2))
   for (const [index, band] of pricing.entries()) if (band.areaMax) assert.equal(bandForArea(band.areaMax), areaBands[index])
-  assert.equal(areaLabel('121-plus', '134'), '134 m²')
-  assert.equal(areaLabel('71-95', '74.30'), '74.3 m²')
-  assert.equal(areaLabel('121-plus', ''), '121 m²+')
-  assert.equal(areaLabel('121-plus', 'lots'), '121 m²+')
-  assert.equal(contactSchema.safeParse({ ...sample, areaBand: '121-plus', floorArea: '134' }).success, true)
+  assert.equal(areaLabel('over-115', '134'), '134 m²')
+  assert.equal(areaLabel('55-75', '74.30'), '74.3 m²')
+  assert.equal(areaLabel('over-115', ''), 'Over 115 m²')
+  assert.equal(areaLabel('over-115', 'lots'), 'Over 115 m²')
+  assert.equal(areaLabel('53-70', ''), '53–70 m² (earlier price list)')
+  assert.equal(contactSchema.safeParse({ ...sample, areaBand: 'over-115', floorArea: '134' }).success, true)
   assert.equal(contactSchema.safeParse({ ...sample, floorArea: '' }).success, true)
-  const mismatch = contactSchema.safeParse({ ...sample, areaBand: '53-70', floorArea: '134' })
+  // Spec 2: the top band needs an approximate figure, or "I don't know the floor area".
+  assert.equal(contactSchema.safeParse({ ...sample, areaBand: 'over-115' }).success, false)
+  assert.equal(contactSchema.safeParse({ ...sample, areaBand: 'over-115', floorAreaUnknown: true }).success, true)
+  const mismatch = contactSchema.safeParse({ ...sample, areaBand: '55-75', floorArea: '134' })
   assert.equal(mismatch.success, false)
   assert.deepEqual(mismatch.error.issues.map(issue => issue.path.join('.')), ['floorArea'])
-  for (const floorArea of ['lots', '5', '5000']) assert.equal(contactSchema.safeParse({ ...sample, floorArea }).success, false, floorArea)
+  for (const floorArea of ['lots', '0', '-5', '5000']) assert.equal(contactSchema.safeParse({ ...sample, floorArea }).success, false, floorArea)
+  assert.equal(contactSchema.safeParse({ ...sample, floorArea: '0' }).error.issues[0].message, 'Enter a floor area greater than 0 m².')
+  // A page cached before the 22/10/2026 price change can still send a retired band.
+  assert.equal(contactSchema.safeParse({ ...sample, areaBand: '53-70' }).success, true)
+  assert.equal(guideEstimate({ ...sample, areaBand: '53-70' }).total, null)
+  assert.equal(guideEstimate({ ...sample, areaBand: '53-70' }).priceStatus, 'to-confirm')
   assert.equal(contactSchema.safeParse({ ...sample, areaBand: 'unknown', floorArea: '134' }).success, false)
   // A portfolio has no single floor area, so a stray figure is ignored rather than blocking it.
   assert.equal(contactSchema.safeParse({ ...sample, services: [BULK], areaBand: '', address: '', postcode: '', propertyCount: '20+', floorArea: 'lots' }).success, true)
-  assert.ok(enquirySummaryText({ ...sample, areaBand: '121-plus', floorArea: '134' }).includes('Floor area: 134 m²'))
+  assert.ok(enquirySummaryText({ ...sample, areaBand: 'over-115', floorArea: '134' }).includes('Floor area: 134 m²'))
+})
+
+test('the 22/10/2026 pricing spec: example totals, statuses, savings, starting prices and the free report', () => {
+  const { priceFrom, maxBundleSaving, topBand } = require('../lib/site.ts')
+  const { guidePrice, bookingPriceRows } = require('../lib/pricing-estimate.ts')
+  const EPC = 'EPC Certificate', BUNDLE = 'Both (Bundle)', FP = 'Floor Plan'
+  const show = e => e.state === 'priced' ? guidePrice(e, e.total) : null
+  // Spec §14's example totals, verbatim.
+  for (const [areaBand, service, plan, report, expected] of [
+    ['up-to-40', EPC, false, false, '£65'], ['up-to-40', EPC, true, false, '£100'], ['55-75', EPC, false, false, '£85'],
+    ['75-95', EPC, false, false, '£95'], ['95-115', BUNDLE, false, false, '£175'], ['95-115', BUNDLE, true, false, '£210'],
+    ['over-115', EPC, false, false, 'From £120'], ['over-115', EPC, true, false, 'From £155'], ['over-115', BUNDLE, false, false, 'From £210'],
+    ['over-115', BUNDLE, true, false, 'From £245'], ['up-to-40', PRE_ASSESSMENT, false, false, '£90'], ['up-to-40', PRE_ASSESSMENT, false, true, '£90'],
+    ['over-115', PRE_ASSESSMENT, false, false, 'From £145'],
+  ]) assert.equal(show(guideEstimate({ areaBand, services: [service], improvementPlan: plan, energyReport: report })), expected, `${areaBand} ${service} ${plan} ${report}`)
+  // Spec §2's table, every cell.
+  const table = [[65, 55, 105, 90], [75, 65, 120, 100], [85, 75, 135, 110], [95, 90, 155, 120], [105, 105, 175, 130], [120, 125, 210, 145]]
+  assert.deepEqual(pricing.map(b => [b.epc, b.floorPlan, b.bundle, b.preAssessment]), table)
+  assert.deepEqual(pricing.map(b => b.areaLabel), ['Up to 40 m²', 'Over 40–55 m²', 'Over 55–75 m²', 'Over 75–95 m²', 'Over 95–115 m²', 'Over 115 m²'])
+  assert.equal(topBand.startingPrice, true)
+  // Spec §5's savings; none promised on the top band; the headline is £35.
+  assert.deepEqual(areaBands.map(areaBand => guideEstimate({ areaBand, services: [BUNDLE] }).saving), [15, 20, 25, 30, 35, 0])
+  assert.equal(maxBundleSaving, 35)
+  assert.equal(guideEstimate({ areaBand: 'unknown', services: [BUNDLE] }).saving, 0)
+  // Spec §8A: starting summaries before a size, with the plan added where it applies.
+  assert.deepEqual([EPC, FP, BUNDLE, PRE_ASSESSMENT].map(service => guideEstimate({ areaBand: '', services: [service] }).fromTotal), [65, 55, 105, 90])
+  assert.deepEqual([EPC, BUNDLE].map(service => guideEstimate({ areaBand: '', services: [service], improvementPlan: true }).fromTotal), [100, 140])
+  assert.equal(priceFrom.preAssessment, 90)
+  // Spec §7: the paid plan never applies to Floor Plan or Pre-Assessment; the free report only to Pre-Assessment.
+  for (const service of [FP, PRE_ASSESSMENT]) assert.equal(guideEstimate({ areaBand: '55-75', services: [service], improvementPlan: true }).improvementPlan, 0)
+  for (const service of [EPC, BUNDLE, FP]) assert.equal(guideEstimate({ areaBand: '55-75', services: [service], energyReport: true }).energyReport, false)
+  // Spec §8D: unknown size, no invented total, the plan listed on its own.
+  const unsure = guideEstimate({ areaBand: 'unknown', services: [EPC], improvementPlan: true })
+  assert.equal(unsure.total, null)
+  assert.deepEqual(guideEstimateRows(unsure), [['Personalised EPC Improvement Plan', '+£35']])
+  assert.deepEqual(guideEstimateRows(guideEstimate({ areaBand: 'unknown', services: [PRE_ASSESSMENT], energyReport: true })).at(-1), ['Separate energy report', 'Included at no extra charge'])
+  // Spec §12: the booking's price record distinguishes the three kinds of figure.
+  const record = e => Object.fromEntries(bookingPriceRows(e))
+  assert.equal(record(guideEstimate({ areaBand: '55-75', services: [EPC] }))['Price status'], 'Standard guide')
+  assert.equal(record(guideEstimate({ areaBand: 'over-115', services: [EPC] }))['Price status'], 'Starting price')
+  assert.equal(record(guideEstimate({ areaBand: 'over-115', services: [EPC] }))['Guide total'], 'From £120')
+  assert.equal(record(unsure)['Price status'], 'To be confirmed')
+  assert.equal(record(unsure)['Guide total'], 'To be confirmed')
+  assert.equal(record(guideEstimate({ areaBand: 'up-to-40', services: [PRE_ASSESSMENT], energyReport: true }))['Separate energy report'], 'Requested (no extra charge)')
 })
 
 test('quote links allow only safe selections, preserve intent and never contain customer data or prices', () => {
@@ -120,8 +182,10 @@ test('operational attribution accepts only controlled categories and never URL t
 
 test('form add-on copy uses the approved additional-product model', () => {
   const form = require('node:fs').readFileSync(require('node:path').join(__dirname, '../components/forms/ContactForm.tsx'), 'utf8')
-  assert.match(form, /Add the EPC Improvement Plan/)
-  assert.match(form, /Your standard EPC recommendations are included either way\./)
+  // Abdul's wording, 22/10/2026 pricing spec §6 and §7
+  assert.match(form, /Add a personalised EPC Improvement Plan/)
+  assert.match(form, /Your standard EPC recommendations are included whether or not you choose this extra\./)
+  assert.match(form, /Include a separate energy report — no extra charge/)
   assert.doesNotMatch(form, /Recommendations remain on your EPC|£9|fixed rating gains/)
 })
 
@@ -147,7 +211,7 @@ test('contact API security, recalculation and both email representations with de
       assert.ok(messages[0].text.includes(`Area page: ${area.name}`))
       assert.ok(messages[0].html.includes(area.name.replace(/&/g, '&amp;').replace(/'/g, '&#39;')))
       assert.match(messages[0].text, /Source page: area\nCTA: pricing/)
-      assert.match(messages[0].text, /Internal floor area: 53/)
+      assert.match(messages[0].text, /Internal floor area: Over 55–75 m²/)
       assert.doesNotMatch(messages[1].text + messages[1].html, /Area page|Source page|>CTA</)
     }
     for (const areaPage of ['__proto__', '<img src=x onerror=alert(1)>', 'invented-borough', '']) {
@@ -171,7 +235,7 @@ test('contact API security, recalculation and both email representations with de
       for (const message of messages) {
         assert.doesNotMatch(message.html, /<Test Customer>|£null|£undefined|£0|£85/)
         assert.doesNotMatch(message.text, /undefined|NaN/)
-        assert.match(message.text, /quoted individually|exact quote after reviewing/i)
+        assert.match(message.text, /quoted individually|exact quote after reviewing|price to be confirmed/i)
       }
     }
     messages = []
@@ -181,12 +245,27 @@ test('contact API security, recalculation and both email representations with de
 
     // A customer's own figure reaches Abdul with the band that priced the guide.
     messages = []
-    assert.equal((await request({ ...sample, areaBand: '121-plus', floorArea: '134' })).status, 200)
+    assert.equal((await request({ ...sample, areaBand: 'over-115', floorArea: '134' })).status, 200)
     assert.equal(messages[0].subject, 'EPC booking: Test Customer — 134 m² (E15 1AA)')
-    assert.match(messages[0].text, /Internal floor area: 134 m² \(customer's figure\) · 121 m²\+ band/)
-    assert.match(messages[0].text, /£125 guide/)
+    assert.match(messages[0].text, /Internal floor area: 134 m² \(customer's figure\) · Over 115 m² band/)
+    assert.match(messages[0].text, /From £120 starting price/)
+    assert.match(messages[0].text, /Price status: Starting price/)
     assert.match(messages[1].text, /Floor area: 134 m²/)
-    assert.equal((await request({ ...sample, areaBand: '53-70', floorArea: '134' })).status, 400)
+    assert.match(messages[1].text, /From £120, a starting price for a larger home/)
+    assert.equal((await request({ ...sample, areaBand: '55-75', floorArea: '134' })).status, 400)
+    // A retired band from a cached page still reaches Abdul, named, with no figure priced from it.
+    messages = []
+    assert.equal((await request({ ...sample, areaBand: '53-70' })).status, 200)
+    assert.match(messages[0].text, /Internal floor area: 53–70 m² \(earlier price list\)/)
+    assert.match(messages[0].text, /Price status: To be confirmed/)
+    assert.doesNotMatch(messages[0].text + messages[1].text, /£85/)
+    // The Pre-Assessment's free energy report is recorded and shown; the price is unchanged.
+    messages = []
+    assert.equal((await request({ ...sample, services: [PRE_ASSESSMENT], areaBand: 'up-to-40', energyReport: true })).status, 200)
+    assert.match(messages[0].text, /Separate energy report: Requested \(no extra charge\)/)
+    assert.match(messages[0].text, /£90 guide/)
+    assert.match(messages[1].text, /Also included: Separate energy report, at no extra charge/)
+    assert.match(messages[1].text, /improvement plan and your separate energy report are sent within 72 hours/)
     messages = []
     assert.equal((await request({ ...sample, services: [BULK], propertyCount: '5', floorArea: '134' })).status, 200)
     assert.doesNotMatch(messages[0].text + messages[0].subject + messages[1].text, /134 m²/)
@@ -309,7 +388,7 @@ test('customer types, next steps, dates and the fallback summary', () => {
   assert.equal(formatPreferredDate(''), '')
   assert.equal(serviceLabel(BULK), 'Agency / portfolio enquiry')
   const summary = enquirySummaryText({ ...sample, services: ['Both (Bundle)'], speed: EXPRESS_SPEED, improvementPlan: true, preferredDate: '2026-10-07', notes: 'Side gate' })
-  for (const expected of ['Service: EPC + Floor Plan', 'Floor area: 53–70 m²', 'I am: Homeowner', 'Lodgement: next day', 'Add-on: EPC Improvement Plan', 'Address: 1 Test Road, E15 1AA', 'Preferred date: 07/10/2026', 'Notes: Side gate', 'Name: Test Customer', 'Phone: 07000000000', 'Email: test@example.invalid']) assert.ok(summary.includes(expected), expected)
+  for (const expected of ['Service: EPC + Floor Plan', 'Floor area: Over 55–75 m²', 'I am: Homeowner', 'Lodgement: next day', 'Add-on: EPC Improvement Plan', 'Address: 1 Test Road, E15 1AA', 'Preferred date: 07/10/2026', 'Notes: Side gate', 'Name: Test Customer', 'Phone: 07000000000', 'Email: test@example.invalid']) assert.ok(summary.includes(expected), expected)
   const bulk = enquirySummaryText({ ...sample, services: [BULK], customerType: 'Estate agent', propertyCount: '20+', address: 'A\nB', postcode: '' })
   assert.match(bulk, /Properties: 20\+/)
   assert.match(bulk, /Properties and postcodes: A\nB/)

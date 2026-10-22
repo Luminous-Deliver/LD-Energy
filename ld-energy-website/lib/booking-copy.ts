@@ -1,6 +1,7 @@
 import type { ProductKind } from '@/lib/pricing-estimate'
 import { BULK, PRE_ASSESSMENT, EXPRESS_SPEED, type customerTypes } from '@/lib/booking-options'
 import { areaLabel } from '@/lib/floor-area'
+import { maxBundleSaving } from '@/lib/site'
 
 export type BadgeTone = 'green' | 'navy'
 
@@ -9,13 +10,14 @@ export type BadgeTone = 'green' | 'navy'
  * Badges show at every width; each radio keeps `label` as its accessible name. Green marks
  * the saving, navy marks a different kind of service (private survey, agency work).
  * `fullRow` spans the grid row from two columns up, so the odd option never leaves an empty cell.
- * "Better value" holds for every band: the bundle is below EPC plus floor plan.
+ * The bundle's saving is derived from the standard bands (`maxBundleSaving`). Descriptions are
+ * Abdul's wording from the 22/10/2026 pricing spec.
  */
 export const serviceChoices: { value: string; label: string; description: string; badge?: string; badgeTone?: BadgeTone; fullRow?: boolean }[] = [
   { value: 'EPC Certificate', label: 'Domestic EPC', description: 'On-site assessment and an EPC lodged on the government register.' },
-  { value: 'Both (Bundle)', label: 'EPC + Floor Plan', description: 'Both services for the same property in one visit, with the bundle price.', badge: 'Better value', badgeTone: 'green' },
-  { value: 'Floor Plan', label: 'Floor Plan', description: 'Laser-measured drawing showing layout and room sizes.' },
-  { value: PRE_ASSESSMENT, label: 'EPC Pre-Assessment', description: 'Find out your score privately. Nothing is lodged.', badge: 'Private', badgeTone: 'navy' },
+  { value: 'Both (Bundle)', label: 'EPC + Floor Plan', description: 'Both services for the same property in one visit, with a discounted bundle price.', badge: `Save up to £${maxBundleSaving}`, badgeTone: 'green' },
+  { value: 'Floor Plan', label: 'Floor Plan', description: 'Laser-measured drawing showing the property layout and room sizes.' },
+  { value: PRE_ASSESSMENT, label: 'EPC Pre-Assessment', description: 'Private energy assessment with a personalised improvement plan. An optional separate energy report is available at no extra charge. No EPC is lodged.', badge: 'Not lodged', badgeTone: 'navy' },
   { value: BULK, label: 'Agency / portfolio enquiry', description: 'Multiple properties or ongoing instructions, quoted individually.', badge: 'Agencies', badgeTone: 'navy', fullRow: true },
 ]
 
@@ -49,7 +51,7 @@ export const OPENING_HOURS = 'Mon–Sun, 8am–8pm'
  * confirmation email so the two never disagree. Turnaround wording matches the published
  * service pages; visit length is left out because it varies with floor area.
  */
-export function nextSteps(kind: ProductKind, speed?: string): string[] {
+export function nextSteps(kind: ProductKind, speed?: string, energyReport?: boolean): string[] {
   if (kind === 'bulk') return [
     `Abdul reviews your portfolio and replies with volume rates during opening hours (${OPENING_HOURS}).`,
     'Once you agree the rates, visits are arranged property by property, around your tenants.',
@@ -67,7 +69,7 @@ export function nextSteps(kind: ProductKind, speed?: string): string[] {
     case 'floorPlan':
       return [...steps, 'After the visit, your floor plans are sent as JPG and PDF within 72 hours.']
     case 'preAssessment':
-      return [...steps, 'After the visit, your Energy Report and written plan are sent within 72 hours. Nothing is lodged on the public register.']
+      return [...steps, `After the visit, your personalised written improvement plan${energyReport ? ' and your separate energy report are' : ' is'} sent within 72 hours. Nothing is lodged on the public register.`]
     case 'none':
       return steps
     default:
@@ -101,7 +103,7 @@ export function formatPreferredDate(value?: string): string {
 export interface EnquirySummaryInput {
   name: string; phone: string; email: string; address: string; postcode: string
   services: string[]; areaBand?: string; floorArea?: string; customerType: string; speed: string
-  improvementPlan?: boolean; propertyCount?: string; preferredDate?: string; notes?: string
+  improvementPlan?: boolean; energyReport?: boolean; propertyCount?: string; preferredDate?: string; notes?: string
 }
 
 /**
@@ -117,7 +119,8 @@ export function enquirySummaryText(data: EnquirySummaryInput): string {
     isBulk ? `Properties: ${data.propertyCount || 'To confirm'}` : `Floor area: ${areaLabel(data.areaBand, data.floorArea)}`,
     `I am: ${data.customerType || 'Not selected'}`,
     ...(!isBulk && data.speed === EXPRESS_SPEED ? ['Lodgement: next day'] : []),
-    ...(data.improvementPlan ? ['Add-on: EPC Improvement Plan'] : []),
+    ...(data.improvementPlan && !data.services.includes(PRE_ASSESSMENT) ? ['Add-on: EPC Improvement Plan'] : []),
+    ...(data.energyReport && data.services.includes(PRE_ASSESSMENT) ? ['Also: a separate energy report (no extra charge)'] : []),
     ...(isBulk ? (data.address ? [`Properties and postcodes: ${data.address}`] : []) : [`Address: ${[data.address, data.postcode].filter(Boolean).join(', ')}`]),
     ...(data.preferredDate ? [`Preferred date: ${formatPreferredDate(data.preferredDate)}`] : []),
     ...(data.notes ? [`Notes: ${data.notes}`] : []),
@@ -139,7 +142,7 @@ export function turnaroundCopy(kind: ProductKind): string {
     case 'bulk':
       return 'Turnaround and visit dates are agreed per property once we have quoted your volume rate, so there is nothing to choose here yet.'
     case 'preAssessment':
-      return 'Nothing is lodged on the government register, so there is no certificate to expedite and no next-day option. Your Energy Report and written plan are sent within 72 hours of the visit.'
+      return 'Nothing is lodged on the government register, so there is no certificate to expedite and no next-day option. Your personalised written improvement plan is sent within 72 hours of the visit.'
     case 'floorPlan':
       return 'Floor plans are not lodged on the government register, so there is no next-day lodgement option. Your plans are supplied as JPG and PDF within 72 hours of the visit.'
     case 'none':
@@ -165,11 +168,12 @@ export function includedList(kind: ProductKind): string[] {
         'Certificate link sent once lodged',
       ]
     case 'preAssessment':
+      // Abdul's "What you get" list, 22/10/2026 pricing spec §6
       return [
-        'Full survey by an accredited assessor',
-        'Nothing lodged — no entry on the public register',
-        'Energy Report + written Improvement Plan',
-        'No Travel/Call-out Surcharges',
+        'Property energy assessment',
+        'Personalised written improvement plan',
+        'Optional separate energy report at no extra charge',
+        'No EPC lodged on the public register',
       ]
     case 'floorPlan':
       return [
@@ -198,7 +202,7 @@ export function contactStepIntro(kind: ProductKind): string {
     case 'bulk':
       return 'Tell us where to send the quote, and list the properties you need covered.'
     case 'preAssessment':
-      return 'Provide the property details and where we should send your report. Nothing is lodged on the public register.'
+      return 'Provide the property details and where we should send your improvement plan. Nothing is lodged on the public register.'
     case 'floorPlan':
       return 'Provide the property details and where we should send the invoice and your floor plans.'
     case 'epc':

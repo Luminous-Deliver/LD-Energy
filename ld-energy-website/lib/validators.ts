@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { sourcePages, ctaIds } from '@/lib/enquiry-attribution'
-import { areaChoices, bandForArea, legacyArea, parseExactArea, EXACT_AREA_MAX, EXACT_AREA_MIN } from '@/lib/floor-area'
+import { submittedAreaChoices, bandForArea, legacyArea, parseExactArea, FLOOR_AREA_ERROR, TOP_BAND } from '@/lib/floor-area'
 import { propertyTypes, services, customerTypes, speeds, BULK, ukPostcodeRegex } from '@/lib/booking-options'
 export { propertyTypes, services, customerTypes, speeds, BULK, PRE_ASSESSMENT, EXPRESS_SPEED, ukPostcodeRegex } from '@/lib/booking-options'
 
@@ -23,9 +23,12 @@ export const contactSchema = z
   /** Not asked for on a bulk enquiry — see the `superRefine` below. */
   postcode: z.string().trim().toUpperCase().max(12),
   propertyType: z.enum(propertyTypes).optional(),
-  areaBand: z.union([z.enum(areaChoices), z.literal('')]).optional(),
+  /** A current band, "unknown", or a band retired on 22/10/2026 that a cached page can still send. */
+  areaBand: z.union([z.enum(submittedAreaChoices), z.literal('')]).optional(),
   /** Optional exact figure in m². The band stays the pricing input; this must fall inside it. */
   floorArea: z.string().trim().max(20).optional().or(z.literal('')),
+  /** "I don't know the floor area", offered with the open-ended top band instead of a figure. */
+  floorAreaUnknown: z.boolean().optional().default(false),
   customerType: z.union([z.enum(customerTypes), z.literal('')]).refine((value): boolean => value !== '', 'Please tell us who you are'),
   sourcePage: z.enum(sourcePages).optional(),
   ctaId: z.enum(ctaIds).optional(),
@@ -37,6 +40,8 @@ export const contactSchema = z
   /** Additional Energy Report and personalised plan. Standard EPC recommendations
    *  are included whether or not this optional add-on is selected. */
   improvementPlan: z.boolean().optional().default(false),
+  /** A Pre-Assessment's optional separate energy report, at no extra charge. Ignored on any other service. */
+  energyReport: z.boolean().optional().default(false),
   speed: z.enum(speeds, { required_error: 'Please choose a service speed' }),
   preferredDate: z.string().trim().max(40).optional().or(z.literal('')),
   notes: z.string().trim().max(2000).optional().or(z.literal('')),
@@ -82,13 +87,17 @@ export const contactSchema = z
       return
     }
 
+    const exact = parseExactArea(data.floorArea)
     if (data.floorArea) {
-      const exact = parseExactArea(data.floorArea)
       if (exact === undefined) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['floorArea'], message: `Enter the floor area as a number of square metres, between ${EXACT_AREA_MIN} and ${EXACT_AREA_MAX.toLocaleString('en-GB')}, or leave it blank.` })
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['floorArea'], message: FLOOR_AREA_ERROR })
       } else if (data.areaBand !== bandForArea(exact)) {
         ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['floorArea'], message: 'This figure does not match the size you chose. Check the number or choose the size again.' })
       }
+    }
+    // The top band has no ceiling, so it asks for an approximate figure, or the customer says they don't know.
+    if (data.areaBand === TOP_BAND && exact === undefined && !data.floorAreaUnknown && !data.floorArea) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['floorArea'], message: 'Enter an approximate floor area, or choose “I don’t know the floor area”.' })
     }
 
     if (data.address.length < 5) {

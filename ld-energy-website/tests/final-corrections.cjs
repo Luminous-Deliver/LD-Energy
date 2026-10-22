@@ -42,7 +42,7 @@ const historyKey = 'ldEnergyQuoteForm'
         window.announcements = []
         new MutationObserver(() => window.announcements.push(window.liveNode.textContent)).observe(window.liveNode, { subtree: true, childList: true, characterData: true })
       })
-      for (const [value, expected] of [['up-to-37','£65'],['121-plus','£125'],['unknown',"We'll confirm your exact quote after reviewing your property details."]]) {
+      for (const [value, expected] of [['up-to-40','£65'],['over-115','From £120'],['unknown','Price to be confirmed']]) {
         const input = form.locator(`input[name="areaBand"][value="${value}"]`)
         await input.scrollIntoViewIfNeeded()
         const before = await page.evaluate(() => scrollY)
@@ -51,7 +51,7 @@ const historyKey = 'ldEnergyQuoteForm'
         // The result is on screen where the visitor tapped: the tile carries its own price.
         assert.ok(await page.evaluate(() => { const r = document.activeElement.closest('label').getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight }), 'chosen tile on screen')
         const summary = form.locator('[data-estimate]')
-        assert.ok((await summary.innerText()).includes(expected.startsWith('£') ? expected : 'Quote'))
+        assert.ok((await summary.innerText()).includes(expected.replace('From ', '')))
         if (value === 'unknown') assert.doesNotMatch(await form.locator('[data-estimate-announcement]').innerText(), /£/)
         assert.equal(await page.evaluate(() => window.liveNode === document.querySelector('[data-estimate-announcement]')), true)
         assert.equal(await page.evaluate(() => document.activeElement.value), value)

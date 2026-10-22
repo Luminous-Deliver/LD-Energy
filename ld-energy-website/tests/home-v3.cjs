@@ -12,7 +12,7 @@ const { EXPRESS_SPEED } = require('../lib/validators.ts')
 const base = process.env.BOOKING_TEST_URL || 'http://localhost:3120'
 if (!['localhost', '127.0.0.1'].includes(new URL(base).hostname)) throw new Error('Local preview only')
 
-const bands = ['up-to-37', '38-52', '53-70', '71-95', '96-120', '121-plus']
+const bands = ['up-to-40', '40-55', '55-75', '75-95', '95-115', 'over-115']
 const key = { epc: 'epc', bundle: 'bundle', 'floor-plan': 'floorPlan' }
 const value = { epc: 'EPC Certificate', bundle: 'Both (Bundle)', 'floor-plan': 'Floor Plan' }
 const footerLinks = [
@@ -81,15 +81,17 @@ const footerLinks = [
           price: c.querySelector('[data-price]').textContent,
           tile: [...c.querySelectorAll('.bf-tile--size .bf-size__top span')].map((t) => t.textContent),
           rows: c.querySelector('.bf__rows')?.textContent || '',
+          save: c.querySelector('.bf__save')?.textContent || '',
         }))
         check(got.price === `£${want}`, `${service} ${bands[i]}: price ${got.price} != £${want}`)
-        check(got.tile.join() === pricing.map((p) => `£${p[key[service]]}`).join(), `${service}: tile prices ${got.tile}`)
-        if (service === 'bundle') check(got.rows.includes(`Bundle saving−£${band.epc + band.floorPlan - band.bundle}`), `bundle ${bands[i]}: saving ${got.rows}`)
-        else check(!got.rows.includes('Bundle saving'), `${service}: saving shown`)
+        // The open-ended top band reads "From" and promises no bundle saving (pricing spec, 22/10/2026).
+        check(got.tile.join() === pricing.map((p) => `${p.startingPrice ? 'From ' : ''}£${p[key[service]]}`).join(), `${service}: tile prices ${got.tile}`)
+        if (service === 'bundle' && !band.startingPrice) check(got.save === `Save £${band.epc + band.floorPlan - band.bundle} compared with booking separately.`, `bundle ${bands[i]}: saving ${got.save}`)
+        else check(got.save === '', `${service} ${bands[i]}: saving shown`)
       }
     }
     await card.locator('label.bf-tile--unsure').click()
-    check(await card.locator('[data-price]').textContent() === 'Quote', 'unknown band shows Quote')
+    check(await card.locator('[data-price]').textContent() === 'Price to be confirmed', 'unknown band shows Price to be confirmed')
 
     // Service-card buttons further down: switch service, keep the size, bring the card back into view.
     await pickSize(4)

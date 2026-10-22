@@ -1,4 +1,4 @@
-import { pricing, site, EXPRESS_SURCHARGE } from '@/lib/site'
+import { pricing, priceFrom, topBand, site, EXPRESS_SURCHARGE } from '@/lib/site'
 
 export interface FaqItem {
   q: string
@@ -30,7 +30,7 @@ export const homepageFaq: FaqItem[] = [
   },
   {
     q: 'How much does an EPC cost in London?',
-    a: `Guide EPC prices in London start at £${pricing[0].epc} for properties up to 37 m² and rise with internal floor area, up to £${pricing[5].epc} for homes over 121 m². Internal floor area (m²) is the main pricing factor — bedroom count is only a familiar reference. Next-day lodgement is available for £${EXPRESS_SURCHARGE} extra, and your exact quote is confirmed before booking.`,
+    a: `Guide EPC prices in London start at £${pricing[0].epc} for properties ${pricing[0].areaLabel.toLowerCase()} and rise with internal floor area; homes ${topBand.areaLabel.toLowerCase()} start from £${topBand.epc}. Internal floor area (m²) is the main pricing factor — bedroom count is only a familiar reference. Next-day lodgement is available for £${EXPRESS_SURCHARGE} extra, and your exact quote is confirmed before booking.`,
   },
   {
     q: 'How long does an EPC assessment take?',
@@ -66,7 +66,7 @@ export const homepageFaq: FaqItem[] = [
   },
   {
     q: 'Can I find out my rating without it going on the public register?',
-    a: `Yes — that is an EPC Pre-Assessment. We carry out the full survey exactly as we would for a real EPC, but we do not lodge it, so no certificate is published and nothing appears on the GOV.UK register. You get the score, a breakdown of what is holding it back, and a written improvement plan. It is priced on the same floor-area bands as an EPC because it is the same visit and the same measuring. If you decide you want the certificate afterwards, we can usually lodge the same survey for £${site.addOns.lodgeLater} without a second visit, as long as nothing at the property has changed and the survey data remains valid for lodgement under the applicable rules. It is not a substitute for an EPC where one is legally required, such as marketing a property for sale or rent.`,
+    a: `Yes — that is an EPC Pre-Assessment. We carry out the full survey exactly as we would for a real EPC, but we do not lodge it, so no certificate is published and nothing appears on the GOV.UK register. You get the score, a breakdown of what is holding it back, and a written improvement plan. It is priced on the same floor-area bands as an EPC, from £${priceFrom.preAssessment}, with the written improvement plan included; a separate energy report is available at no extra charge. If you decide you want the certificate afterwards, we can usually lodge the same survey for £${site.addOns.lodgeLater} without a second visit, as long as nothing at the property has changed and the survey data remains valid for lodgement under the applicable rules. It is not a substitute for an EPC where one is legally required, such as marketing a property for sale or rent.`,
   },
   {
     q: 'How do I check my assessor is genuinely accredited?',
@@ -270,7 +270,7 @@ export const fullFaq: FaqCategory[] = [
     items: [
       {
         q: 'How much does an EPC cost?',
-        a: `Guide EPC prices in London start at £${pricing[0].epc} for properties up to 37 m² and rise with internal floor area, up to £${pricing[5].epc} for homes over 121 m². Internal floor area (m²) is the main pricing factor — bedroom count is only a familiar reference. Next-day lodgement is available for £${EXPRESS_SURCHARGE} extra, and your exact quote is confirmed before booking.`,
+        a: `Guide EPC prices in London start at £${pricing[0].epc} for properties ${pricing[0].areaLabel.toLowerCase()} and rise with internal floor area; homes ${topBand.areaLabel.toLowerCase()} start from £${topBand.epc}. Internal floor area (m²) is the main pricing factor — bedroom count is only a familiar reference. Next-day lodgement is available for £${EXPRESS_SURCHARGE} extra, and your exact quote is confirmed before booking.`,
         links: [{ label: 'Guide prices by floor area', href: '/pricing#pricing-table' }],
       },
       {

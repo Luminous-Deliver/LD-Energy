@@ -16,8 +16,8 @@ const out = process.env.BOOKING_EVIDENCE_DIR || '../../../audits/website-growth-
     await page.route('**/api/contact', route => { submission = route.request().postDataJSON(); return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, delivered: true }) }) })
     for (const service of ['floor-plan', 'pre-assessment', 'bulk']) {
       await page.goto(`${process.env.BOOKING_TEST_URL || 'http://localhost:3100'}/contact?service=${service}&area=unknown&speed=express&plan=1#booking-form`, { waitUntil: 'networkidle' })
-      assert.equal(await page.getByRole('checkbox', { name: /Add the EPC Improvement Plan/ }).count(), 0)
-      if (service === 'pre-assessment') assert.match(await page.locator('form').innerText(), /included in your Pre-Assessment/)
+      assert.equal(await page.getByRole('checkbox', { name: /Add a personalised EPC Improvement Plan/ }).count(), 0)
+      if (service === 'pre-assessment') assert.match(await page.locator('form').innerText(), /Personalised improvement plan[\s\S]*Included/)
       if (service === 'bulk') {
         assert.equal(await page.locator('input[name="areaBand"]').count(), 0)
         // A portfolio is never one home someone lives in.

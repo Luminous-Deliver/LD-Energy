@@ -76,10 +76,11 @@ export const site = {
     improvementPlan: 35,
     /**
      * Lodging a held Pre-Assessment survey as a real EPC afterwards, with no
-     * second visit. Set equal to `improvementPlan` deliberately: it makes the
-     * two routes to a lodged EPC-plus-advice cost the same (EPC + plan, or
-     * Pre-Assessment then lodge), so the Pre-Assessment cannot become a
-     * cheaper back door to an ordinary EPC.
+     * second visit. Set equal to `improvementPlan` when Pre-Assessments cost the
+     * EPC price, so the two routes to a lodged EPC-plus-advice cost the same.
+     * Since the 22/10/2026 prices a Pre-Assessment costs £25 more than the EPC,
+     * so Pre-Assessment then lodge costs £25 more than EPC + plan. It is still
+     * never a cheaper back door to an ordinary EPC. Left at £35 pending Abdul.
      *
      * Conditional on nothing having changed at the property since the survey.
      * Any works since — extension, glazing, heating, insulation — need a fresh
@@ -159,8 +160,6 @@ export const servicesMenu = [
   },
 ] as const
 
-export type PropertyType = 'studio' | '1-bed' | '2-bed' | '3-bed' | '4-bed' | '5-bed-plus'
-
 /**
  * Fixed surcharge for next-day (express) delivery. This is one of the few
  * genuinely fixed numbers on the site — it is added to the confirmed quote,
@@ -172,8 +171,12 @@ export const EXPRESS_SURCHARGE = 15
  * CANONICAL PRICING SOURCE.
  *
  * Every figure here is an explicit GUIDE price, not a fixed quote. Internal
- * floor area (m²) is the real pricing driver; the bedroom label exists only
- * because customers recognise "2 bedroom" more readily than "52–70 m²".
+ * floor area (m²) is the pricing driver. Bands carry no bedroom label: a room
+ * count never sets the price (Abdul's pricing spec, 22/10/2026).
+ *
+ * The four services share one set of bands. A band runs from just over the
+ * previous band's ceiling up to and including its own `areaMax`, so 40 m² is
+ * "Up to 40 m²" and 40.5 m² is "Over 40–55 m²".
  *
  * Bundle prices are deliberately stored as explicit values rather than being
  * derived from a percentage of the EPC price. They used to be computed as
@@ -181,40 +184,45 @@ export const EXPRESS_SURCHARGE = 15
  * discount promise into the data model. Each band can now be priced
  * independently without that promise leaking back into the copy.
  *
- * `express` is optional per band and falls back to EXPRESS_SURCHARGE.
+ * `startingPrice` marks the open-ended top band: its figures are starting
+ * prices, always shown with "From", never a fixed total, and they promise no
+ * bundle saving. `express` is optional per band and falls back to EXPRESS_SURCHARGE.
  */
 export interface PricingBand {
-  type: PropertyType
-  /** Familiar bedroom reference. Secondary to floor area — never lead with this. */
-  label: string
-  /** Primary pricing driver, e.g. '52–70 m²'. */
+  /** Stable identifier, sent with an enquiry. See `areaBands` in lib/floor-area.ts. */
+  id: string
+  /** Primary pricing driver, e.g. 'Over 55–75 m²'. */
   areaLabel: string
-  areaMin: number
-  /** null = open-ended top band. */
+  /** Inclusive ceiling in m². null = open-ended top band. */
   areaMax: number | null
-  /** Muted caption used beneath the area figure. */
-  typicalLabel: string
   epc: number
   floorPlan: number
   bundle: number
-  duration: string
+  /** Private, unlodged survey. Includes the personalised written improvement plan. */
+  preAssessment: number
+  startingPrice?: true
   express?: number
 }
 
 export const pricing: PricingBand[] = [
-  { type: 'studio',     label: 'Studio',        areaLabel: 'Up to 37 m²', areaMin: 0,   areaMax: 37,   typicalLabel: 'Studio and compact flats',                     epc: 65,  floorPlan: 55,  bundle: 105, duration: '45 minutes' },
-  { type: '1-bed',      label: '1 bedroom',     areaLabel: '38–52 m²',    areaMin: 38,  areaMax: 52,   typicalLabel: '1-bedroom flats',                              epc: 75,  floorPlan: 65,  bundle: 120, duration: '45–60 minutes' },
-  { type: '2-bed',      label: '2 bedroom',     areaLabel: '53–70 m²',    areaMin: 53,  areaMax: 70,   typicalLabel: '2-bedroom flats and small homes',              epc: 85,  floorPlan: 75,  bundle: 135, duration: '45–60 minutes' },
-  { type: '3-bed',      label: '2–3 bedroom',   areaLabel: '71–95 m²',    areaMin: 71,  areaMax: 95,   typicalLabel: '2–3-bedroom homes',                            epc: 95,  floorPlan: 90,  bundle: 155, duration: '1–1.5 hours' },
-  { type: '4-bed',      label: '3–4 bedroom',   areaLabel: '96–120 m²',   areaMin: 96,  areaMax: 120,  typicalLabel: '3-bedroom houses and compact 4-bedroom homes', epc: 105, floorPlan: 105, bundle: 175, duration: '1.5–2 hours' },
-  { type: '5-bed-plus', label: '4–5+ bedroom',  areaLabel: '121 m²+',     areaMin: 121, areaMax: null, typicalLabel: 'Large homes and 4–5+ bedrooms',                epc: 125, floorPlan: 125, bundle: 215, duration: '1.5–2 hours' },
+  { id: 'up-to-40', areaLabel: 'Up to 40 m²',    areaMax: 40,   epc: 65,  floorPlan: 55,  bundle: 105, preAssessment: 90 },
+  { id: '40-55',    areaLabel: 'Over 40–55 m²',  areaMax: 55,   epc: 75,  floorPlan: 65,  bundle: 120, preAssessment: 100 },
+  { id: '55-75',    areaLabel: 'Over 55–75 m²',  areaMax: 75,   epc: 85,  floorPlan: 75,  bundle: 135, preAssessment: 110 },
+  { id: '75-95',    areaLabel: 'Over 75–95 m²',  areaMax: 95,   epc: 95,  floorPlan: 90,  bundle: 155, preAssessment: 120 },
+  { id: '95-115',   areaLabel: 'Over 95–115 m²', areaMax: 115,  epc: 105, floorPlan: 105, bundle: 175, preAssessment: 130 },
+  { id: 'over-115', areaLabel: 'Over 115 m²',    areaMax: null, epc: 120, floorPlan: 125, bundle: 210, preAssessment: 145, startingPrice: true },
 ]
 
+/** The bands with fixed guide prices, i.e. every band except the open-ended top one. */
+export const standardBands = pricing.filter((p) => !p.startingPrice)
+
 /**
- * Largest genuine bundle saving across all bands. Derived, so the marketing
- * line ("save up to £X") can never drift from the table it summarises.
+ * Largest genuine bundle saving across the standard bands. Derived, so the
+ * marketing line ("save up to £X") can never drift from the table it
+ * summarises. The top band is left out: its prices are starting points, so it
+ * promises no specific saving.
  */
-export const maxBundleSaving = Math.max(...pricing.map((p) => p.epc + p.floorPlan - p.bundle))
+export const maxBundleSaving = Math.max(...standardBands.map((p) => p.epc + p.floorPlan - p.bundle))
 
 /** Express fee for a band — per-band override, else the standard surcharge. */
 export function expressFee(band: PricingBand): number {
@@ -249,7 +257,11 @@ export const priceFrom = {
   epc: Math.min(...pricing.map((p) => p.epc)),
   floorPlan: Math.min(...pricing.map((p) => p.floorPlan)),
   bundle: Math.min(...pricing.map((p) => p.bundle)),
+  preAssessment: Math.min(...pricing.map((p) => p.preAssessment)),
 }
+
+/** The open-ended top band, whose figures are starting prices. */
+export const topBand = pricing[pricing.length - 1]
 
 /**
  * Brand share card from app/opengraph-image.tsx. A page that sets its own

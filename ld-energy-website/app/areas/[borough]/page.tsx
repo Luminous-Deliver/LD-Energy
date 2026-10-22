@@ -10,7 +10,7 @@ import { CtaStrip } from '@/components/sections/CtaStrip'
 import { Accordion } from '@/components/ui/Accordion'
 import { ContactSection } from '@/components/sections/ContactSection'
 import { boroughMeta, boroughIntent, type BoroughIntent } from '@/lib/boroughs'
-import { site, pricing, priceFrom, formatPrice, maxBundleSaving, EXPRESS_SURCHARGE, defaultOgImage } from '@/lib/site'
+import { site, topBand, pricing, priceFrom, formatPrice, maxBundleSaving, EXPRESS_SURCHARGE, defaultOgImage } from '@/lib/site'
 import type { FaqItem } from '@/lib/faq'
 
 interface PageProps {
@@ -86,7 +86,7 @@ function boroughFaq(name: string, postcodeFaq: { q: string; a: string }): FaqIte
     { q: postcodeFaq.q, a: postcodeFaq.a },
     {
       q: `How much does an EPC cost in ${name}?`,
-      a: `Guide EPC prices in ${name} start from £${pricing[0].epc} for properties up to 37 m² and rise with internal floor area, up to £${pricing[5].epc} for homes over 121 m². Internal floor area (m²) is the main factor, alongside extensions, layout and condition, and your exact quote is confirmed before booking. Next-day lodgement is available for £${EXPRESS_SURCHARGE} extra.`,
+      a: `Guide EPC prices in ${name} start from £${pricing[0].epc} for properties ${pricing[0].areaLabel.toLowerCase()} and rise with internal floor area; homes ${topBand.areaLabel.toLowerCase()} start from £${topBand.epc}. Internal floor area (m²) is the main factor, alongside extensions, layout and condition, and your exact quote is confirmed before booking. Next-day lodgement is available for £${EXPRESS_SURCHARGE} extra.`,
     },
     {
       q: `How quickly can I get an EPC in ${name}?`,

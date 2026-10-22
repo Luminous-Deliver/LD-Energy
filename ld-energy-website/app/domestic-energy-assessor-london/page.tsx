@@ -19,7 +19,7 @@ import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { PageHero } from '@/components/sections/PageHero'
 import { Pricing } from '@/components/sections/Pricing'
 import { CtaStrip } from '@/components/sections/CtaStrip'
-import { site, pricing, priceFrom, insurance, EXPRESS_SURCHARGE, defaultOgImage } from '@/lib/site'
+import { site, topBand, pricing, priceFrom, insurance, EXPRESS_SURCHARGE, defaultOgImage } from '@/lib/site'
 import { areaServedLondon } from '@/lib/boroughs'
 import type { FaqItem } from '@/lib/faq'
 
@@ -107,7 +107,7 @@ const deaFaq: FaqItem[] = [
   },
   {
     q: 'How much does a domestic energy assessor charge in London?',
-    a: `Guide prices start from £${pricing[0].epc} for properties up to 37 m² and rise with internal floor area, up to £${pricing[5].epc} for homes over 121 m². These are starting estimates — the final price depends on internal floor area (m²), extensions, layout and condition. There are no travel or call-out charges.`,
+    a: `Guide prices start from £${pricing[0].epc} for properties ${pricing[0].areaLabel.toLowerCase()} and rise with internal floor area; homes ${topBand.areaLabel.toLowerCase()} start from £${topBand.epc}. These are starting estimates — the final price depends on internal floor area (m²), extensions, layout and condition. There are no travel or call-out charges.`,
   },
   {
     q: 'Do I need an accredited assessor for an EPC?',

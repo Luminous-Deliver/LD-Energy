@@ -10,7 +10,7 @@ import { PageHero } from '@/components/sections/PageHero'
 import { Pricing } from '@/components/sections/Pricing'
 import { CtaStrip } from '@/components/sections/CtaStrip'
 import { Faq } from '@/components/sections/Faq'
-import { site, pricing, priceFrom, EXPRESS_SURCHARGE, defaultOgImage } from '@/lib/site'
+import { site, topBand, pricing, priceFrom, EXPRESS_SURCHARGE, defaultOgImage } from '@/lib/site'
 import { areaServedLondon } from '@/lib/boroughs'
 import type { FaqItem } from '@/lib/faq'
 import { Accordion } from '@/components/ui/Accordion'
@@ -113,7 +113,7 @@ const assessed = [
 const serviceFaq: FaqItem[] = [
   {
     q: 'How much does a domestic EPC cost in London?',
-    a: `Guide prices start from £${pricing[0].epc} for properties up to 37 m² and rise with internal floor area, up to £${pricing[5].epc} for homes over 121 m². Internal floor area (m²) is the main factor, alongside extensions, layout and condition. Your exact quote is confirmed before booking.`,
+    a: `Guide prices start from £${pricing[0].epc} for properties ${pricing[0].areaLabel.toLowerCase()} and rise with internal floor area; homes ${topBand.areaLabel.toLowerCase()} start from £${topBand.epc}. Internal floor area (m²) is the main factor, alongside extensions, layout and condition. Your exact quote is confirmed before booking.`,
   },
   {
     q: 'Can I get a next-day EPC?',
@@ -158,7 +158,7 @@ const serviceSchema = {
     name: 'EPC Pricing',
     itemListElement: pricing.map((p) => ({
       '@type': 'Offer',
-      name: `${p.label} EPC`,
+      name: `Domestic EPC, ${p.areaLabel}`,
       priceSpecification: {
         '@type': 'PriceSpecification',
         minPrice: p.epc,

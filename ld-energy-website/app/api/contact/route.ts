@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server'
 import { getRequestContext } from '@cloudflare/next-on-pages'
 import { contactSchema } from '@/lib/validators'
 import { site } from '@/lib/site'
-import { areaLabel, legacyArea } from '@/lib/floor-area'
-import { guideEstimate, guideEstimateLine } from '@/lib/pricing-estimate'
+import { areaLabel, legacyArea, TOP_BAND } from '@/lib/floor-area'
+import { bookingPriceRows, guideEstimate, guideEstimateLine, guidePrice, PLAN_LABEL, ENERGY_REPORT_LABEL } from '@/lib/pricing-estimate'
 import { boroughMeta } from '@/lib/boroughs'
 import { EXPRESS_SPEED } from '@/lib/booking-options'
 import { formatPreferredDate, hasPrepChecklist, nextSteps, OPENING_HOURS, prepChecklist, PREP_PATH, serviceLabel, TENANT_NOTICE } from '@/lib/booking-copy'
@@ -58,12 +58,16 @@ interface ParsedInput extends EnquiryAttribution {
   areaBand?: string
   /** Customer-typed m², already checked against the band. Never set on a bulk enquiry. */
   floorArea?: string
+  /** "I don't know the floor area", on the open-ended top band. */
+  floorAreaUnknown?: boolean
   areaPage?: string
   customerType: string
   services: string[]
   /** Bulk enquiries only — roughly how many properties. */
   propertyCount?: string
   improvementPlan?: boolean
+  /** Pre-Assessment only: the free separate energy report. */
+  energyReport?: boolean
   speed: string
   preferredDate?: string
   notes?: string
@@ -91,6 +95,7 @@ function buildEmail(data: ParsedInput) {
     services: data.services,
     speed: data.speed,
     improvementPlan: data.improvementPlan,
+    energyReport: data.energyReport,
   })
 
   const rows: Array<[string, string]> = [
@@ -106,20 +111,13 @@ function buildEmail(data: ParsedInput) {
       ? 'Not applicable - bulk enquiry'
       : data.floorArea
         ? `${areaLabel(data.areaBand, data.floorArea)} (customer's figure) · ${areaLabel(data.areaBand)} band`
-        : areaLabel(data.areaBand || legacyArea(data.propertyType))],
+        : `${areaLabel(data.areaBand || legacyArea(data.propertyType))}${data.areaBand === TOP_BAND && data.floorAreaUnknown ? ' · customer does not know the floor area' : ''}`],
+    ...(estimate.isBulk ? [] : [['Area band id', data.areaBand || '—'] as [string, string]]),
     ['Customer type', data.customerType],
     ['Service(s)', data.services.join(', ')],
     ...(data.sourcePage ? [['Source page', data.sourcePage] as [string, string]] : []),
     ...(data.ctaId ? [['CTA', data.ctaId] as [string, string]] : []),
     ...(data.areaPage ? [['Area page', boroughMeta[data.areaPage].name] as [string, string]] : []),
-    [
-      'Improvement Plan',
-      estimate.planIncluded
-        ? 'Included in Pre-Assessment'
-        : estimate.improvementPlan > 0
-          ? `Yes (+£${site.addOns.improvementPlan})`
-          : 'No',
-    ],
     [
       'Speed',
       estimate.isBulk
@@ -128,6 +126,7 @@ function buildEmail(data: ParsedInput) {
           ? data.speed
           : 'Within 72 hours — nothing lodged',
     ],
+    ...bookingPriceRows(estimate),
     ['Guide shown to customer', guideEstimateLine(estimate)],
     ['Preferred Date', formatPreferredDate(data.preferredDate) || '—'],
     ['Notes', data.notes || '—'],
@@ -166,7 +165,7 @@ function buildConfirmation(data: ParsedInput) {
   const firstName = data.name.trim().split(/\s+/)[0] || 'there'
   const estimate = guideEstimate(data)
   const isBulkEnquiry = estimate.productKind === 'bulk'
-  const steps = nextSteps(estimate.productKind, data.speed)
+  const steps = nextSteps(estimate.productKind, data.speed, estimate.energyReport)
   const showPrep = hasPrepChecklist(estimate.productKind)
   const tenanted = !isBulkEnquiry && data.customerType === 'Landlord (tenanted)'
   const prepUrl = `${SITE_URL}${PREP_PATH}`
@@ -190,13 +189,16 @@ function buildConfirmation(data: ParsedInput) {
   summary.push(['Booking as', data.customerType])
 
   if (estimate.planIncluded) {
-    summary.push(['Included', 'Energy Report + written Improvement Plan'])
+    summary.push(['Included', 'Personalised written improvement plan'])
   } else if (estimate.improvementPlan > 0) {
-    summary.push(['Add-on', `Improvement Plan (+£${site.addOns.improvementPlan})`])
+    summary.push(['Add-on', `${PLAN_LABEL} (+£${site.addOns.improvementPlan})`])
   }
-  summary.push(['Guide estimate', estimate.state === 'priced'
-    ? `£${estimate.total} guide; exact quote confirmed before booking.`
-    : guideEstimateLine(estimate)])
+  if (estimate.energyReport) summary.push(['Also included', `${ENERGY_REPORT_LABEL}, at no extra charge`])
+  summary.push(['Guide estimate', estimate.state === 'priced' && estimate.total !== null
+    ? estimate.isStartingPrice
+      ? `${guidePrice(estimate, estimate.total)}, a starting price for a larger home; exact quote confirmed before booking.`
+      : `£${estimate.total} guide; exact quote confirmed before booking.`
+    : isBulkEnquiry ? 'Quoted individually' : 'Price to be confirmed. We’ll confirm the size and price from your property details.'])
   if (data.preferredDate) summary.push(['Preferred date', formatPreferredDate(data.preferredDate)])
   if (data.notes) summary.push(['Your notes', data.notes])
 
@@ -443,6 +445,8 @@ export async function POST(req: Request) {
     propertyType: parsed.data.propertyType,
     areaBand: parsed.data.areaBand || legacyArea(parsed.data.propertyType),
     floorArea: parsed.data.services.includes('Bulk / Agency Enquiry') ? undefined : parsed.data.floorArea || undefined,
+    floorAreaUnknown: parsed.data.floorAreaUnknown,
+    energyReport: parsed.data.energyReport,
     areaPage: parsed.data.areaPage,
     sourcePage: parsed.data.sourcePage,
     ctaId: parsed.data.ctaId,

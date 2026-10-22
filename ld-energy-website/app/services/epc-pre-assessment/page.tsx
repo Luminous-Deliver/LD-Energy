@@ -12,7 +12,7 @@ import { site, priceFrom, defaultOgImage } from '@/lib/site'
 import { areaServedLondon } from '@/lib/boroughs'
 
 const LODGE_LATER = `£${site.addOns.lodgeLater}`
-const FROM_PRICE = `£${priceFrom.epc}`
+const FROM_PRICE = `£${priceFrom.preAssessment}`
 
 export const metadata: Metadata = {
   title: `EPC Pre-Assessment London | Your Score Without Lodging It | From ${FROM_PRICE}`,
@@ -42,7 +42,8 @@ const included = [
   'A full survey of the property by an Elmhurst-accredited assessor — the same visit and the same measuring as a real EPC',
   'The score calculated from the assessed property data',
   'A full breakdown of what is helping and what is holding the score back',
-  'Abdul’s personalised Improvement Plan and full Elmhurst Energy Report: priorities, indicative costs and modelled outcomes',
+  'Abdul’s personalised written improvement plan: what to consider improving, in what order, and why',
+  'A separate energy report summarising the assessed energy performance and findings, at no extra charge if you ask for it',
   'Nothing lodged, nothing published — no entry appears on the GOV.UK register',
 ]
 
@@ -78,7 +79,7 @@ const serviceSchema = {
     '@type': 'Offer',
     priceSpecification: {
       '@type': 'PriceSpecification',
-      minPrice: priceFrom.epc,
+      minPrice: priceFrom.preAssessment,
       priceCurrency: 'GBP',
     },
     availability: 'https://schema.org/InStock',
@@ -203,8 +204,9 @@ export default function EpcPreAssessmentPage() {
                 </div>
               </div>
               <p className="mt-4 text-sm text-secondary-700 leading-relaxed">
-                Priced on the same floor-area bands as an EPC — it is the same visit and the same
-                measuring. The Energy Report and written plan are included, not an extra.
+                Priced on the same floor-area bands as an EPC, with its own guide prices. Your
+                personalised written improvement plan is included; a separate energy report is
+                available at no extra charge.
               </p>
               <dl className="mt-4 space-y-2 text-sm border-t border-secondary-100 pt-4">
                 <div className="flex justify-between gap-3">
