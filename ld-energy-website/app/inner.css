@@ -84,6 +84,9 @@
 .in-by b { color: var(--ink); font-weight: 500; }
 .in-by a { text-decoration: underline; text-underline-offset: 2px; }
 .in-hd__art { display: grid; gap: 14px; min-width: 0; }
+.in-hd__map { display: block; width: 100%; height: auto; }
+.in-hd__credit { margin-top: 10px; font-size: 11px; color: var(--ink-3, #6b7083); }
+.in-hd__credit a { text-decoration: underline; text-underline-offset: 2px; }
 .in-terrace { display: block; width: 100%; height: auto; }
 .in-hd__cap { font-size: 13px; line-height: 1.45; color: var(--ink-quiet); }
 .in-tnotes { list-style: none; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; border-top: 1px solid var(--hair); }

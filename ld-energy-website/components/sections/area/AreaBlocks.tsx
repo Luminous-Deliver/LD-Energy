@@ -48,6 +48,9 @@ export const dataSource = (
 
 const linkCls = 'in-link'
 
+/* Boroughs with a drawn map hero (real OSM streets and ONS boundary); the rest keep the terrace until rolled out. */
+const AREA_MAPS = new Set(['newham'])
+
 /* 1. Hero D: the answer and the quote on the left, the drawn terrace with four numbered notes on the right, the
    title-block price list under the answer, and On this page beside it. Title and H1 are unchanged (frozen until 14/12). */
 export function AreaHeroD({ slug, name, s, parent, sections }: {
@@ -105,7 +108,21 @@ export function AreaHeroD({ slug, name, s, parent, sections }: {
         </div>
 
         <figure className="in-hd__art">
-          <div dangerouslySetInnerHTML={{ __html: TERRACE_SVG }} />
+          {AREA_MAPS.has(slug) ? (
+            // eslint-disable-next-line @next/next/no-img-element -- srcset WebP; next/image is unoptimised on Pages
+            <img
+              className="in-hd__map"
+              src={`/areas/maps/${slug}-1400.webp`}
+              srcSet={`/areas/maps/${slug}-700.webp 700w, /areas/maps/${slug}-1400.webp 1400w`}
+              sizes="(min-width: 1024px) 50vw, 100vw"
+              width={1400}
+              height={1160}
+              fetchPriority="high"
+              alt={`Map of ${name}: the borough boundary with its streets, parks, railways and river`}
+            />
+          ) : (
+            <div dangerouslySetInnerHTML={{ __html: TERRACE_SVG }} />
+          )}
           <figcaption>
             <p className="in-eyebrow" style={{ marginBottom: 10 }}>What <span className="num">{fmt(s.ratings.n)}</span> {name} certificates record</p>
             <ol className="in-tnotes">
@@ -113,6 +130,9 @@ export function AreaHeroD({ slug, name, s, parent, sections }: {
                 <li key={n.k}><span className="in-tn__n" aria-hidden="true">{i + 1}</span><span className="in-tn__k">{n.k}</span><b className="num">{n.v}</b><span className="in-tn__v">{n.d}</span></li>
               ))}
             </ol>
+            {AREA_MAPS.has(slug) && (
+              <p className="in-hd__credit">Map data © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap contributors</a>. Boundary: ONS, <a href={OGL} rel="noopener">OGL</a>.</p>
+            )}
           </figcaption>
         </figure>
 
