@@ -534,6 +534,12 @@ export default function PreparingPage() {
                   isn’t a requirement to modernise anything.
                 </p>
                 <p>
+                  The standards have moved on too. Heating, insulation and glazing have improved a lot in the last
+                  decade, and the method’s assumptions, such as fuel prices and how each system performs, are updated
+                  to match. So a home that hasn’t changed since its EPC five or six years ago can score lower today,
+                  because it is now measured against newer standards. It doesn’t always go down: it depends on the home.
+                </p>
+                <p>
                   So a new EPC shouldn’t be expected to reproduce an older certificate exactly, even if the home itself
                   hasn’t changed much. An older EPC reflects the method and information available at the time; a
                   current EPC assesses the home using today’s approved method.
