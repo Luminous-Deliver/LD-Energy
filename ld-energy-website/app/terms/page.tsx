@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { LegalPage } from '@/components/ui/LegalPage'
-import { site, insurance, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE, defaultOgImage } from '@/lib/site'
+import { site, insurance, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE, defaultOgImage, promise } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'Terms of Service',
@@ -46,7 +46,7 @@ export default function TermsPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageSchema) }} />
       <LegalPage
       title="Terms of Service"
-      lastUpdated="14 September 2026"
+      lastUpdated="23 October 2026"
       breadcrumbs={[
         { href: '/', label: 'Home' },
         { href: '/terms', label: 'Terms of Service' },
@@ -132,6 +132,19 @@ export default function TermsPage() {
       <p>
         You may cancel or reschedule an appointment free of charge with at least 24 hours&rsquo; notice. Cancellations or reschedules with less than 24 hours&rsquo; notice may incur a £25 fee to cover travel and time.
       </p>
+
+      <h3 id="our-promise">Our promise</h3>
+      <p>
+        These promises are in addition to your legal rights and do not affect them. Each applies once per booking.
+      </p>
+      <ul>
+        <li>
+          <strong>Lodged within 72 hours, or £{promise.lateLodgement} off.</strong> If your EPC is not lodged on the GOV.UK register within 72 hours of the end of the visit, we take £{promise.lateLodgement} off the fee, or refund £{promise.lateLodgement} if you have already paid. The 72 hours pause while we are waiting on you: for access to anything we could not reach on the day, for paperwork you told us you would send, or for your reply to the draft EPC. They also pause while the GOV.UK register or our accreditation scheme&rsquo;s lodgement system is unavailable.
+        </li>
+        <li>
+          <strong>Moved by us at short notice, £{promise.lateChange} off.</strong> If we cancel or move your visit with less than 24 hours&rsquo; notice, we take £{promise.lateChange} off the fee for the visit when it takes place, or refund £{promise.lateChange} if you then cancel. A trusted, experienced colleague attending at the booked time, which we tell you about in advance, is not a change to your visit.
+        </li>
+      </ul>
 
       <h2>8. Liability</h2>
       <p>

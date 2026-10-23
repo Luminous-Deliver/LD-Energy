@@ -10,6 +10,7 @@ import { HomeQuoteProvider } from './HomeQuoteContext'
 import { HomeQuoteCard } from './HomeQuoteCard'
 import { HomeV7Motion } from './HomeV7Motion'
 import { HeroNight, HeroSky } from './HeroSky'
+import { OurPromise } from '@/components/sections/OurPromise'
 import { PickService } from './PickService'
 import { HomeQuoteBar } from './HomeQuoteBar'
 import { Ico } from './HomeIcon'
@@ -478,6 +479,8 @@ export function HomePage() {
       {/* the service cards and the booking form share one state: "See my price" picks the service in the form */}
       <HomeQuoteProvider>
         <Hero />
+        {/* Our promise, straight after the first screen so nobody books without seeing it (Abdul 23/10) */}
+        <OurPromise />
         <HowItWorks />
         <PhotoBreak />
         <Services />

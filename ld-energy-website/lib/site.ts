@@ -183,6 +183,12 @@ export const servicesMenu = [
  *   lodged that day.
  */
 export const SAME_DAY_LODGEMENT_SURCHARGE = 15
+
+/**
+ * Our promise (Abdul 23/10/2026): money off when we miss. lateChange matches the customer's own late-cancellation fee
+ * (terms section 7). Conditions are in the terms, #our-promise; shown by components/sections/OurPromise.tsx.
+ */
+export const promise = { lateLodgement: 20, lateChange: 25 } as const
 export const NEXT_DAY_VISIT_SURCHARGE = 35
 
 /**
