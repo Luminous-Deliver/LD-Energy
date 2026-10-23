@@ -1,23 +1,22 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { Container } from '@/components/ui/Container'
-import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
-import { PostHeader } from '@/components/blog/PostHeader'
+import { PostHeader, showsScale } from '@/components/blog/PostHeader'
 import { KeyTakeaways } from '@/components/blog/KeyTakeaways'
 import { TableOfContents, extractToc } from '@/components/blog/TableOfContents'
 import { PostContent } from '@/components/blog/PostContent'
-import { CTABanner } from '@/components/blog/CTABanner'
 import { PostFaq } from '@/components/blog/PostFaq'
 import { AuthorBox } from '@/components/blog/AuthorBox'
-import { RelatedPosts } from '@/components/blog/RelatedPosts'
 import { PostSources } from '@/components/blog/PostSources'
 import { InYourArea } from '@/components/blog/InYourArea'
 import { WhatItCosts } from '@/components/blog/WhatItCosts'
-import { guideAreas } from '@/lib/guides'
+import { ReadNext, type NextStep } from '@/components/inner/ReadNext'
+import { InnerEnding } from '@/components/inner/InnerEnding'
+import { BOROUGH_DATA_PAGE, guideAreas, guideGroups } from '@/lib/guides'
+import { quoteHref } from '@/lib/quote-context'
 import { getAllSlugs, getPostBySlug, getRelatedPosts } from '@/lib/blog'
 import { getCategory } from '@/lib/blog-categories'
 import { getAuthor } from '@/lib/authors'
-import { site, priceFrom } from '@/lib/site'
+import { site } from '@/lib/site'
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -58,6 +57,23 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
+/** The question a reader in each group is usually asking, for the Read next cards (board option C). */
+const GROUP_QUESTION: Record<string, string> = {
+  'understand-your-epc': 'Want the basics first?',
+  'before-and-on-the-day': 'Booking a visit?',
+  'letting-and-mees': 'Letting a home?',
+  'improving-your-rating': 'Planning improvements?',
+  'selling-buying-and-floor-plans': 'Selling or buying?',
+}
+
+function groupOf(slug: string) {
+  for (const g of guideGroups) {
+    const hit = g.guides.find((x) => x.slug === slug)
+    if (hit) return { group: g, summary: hit.summary }
+  }
+  return null
+}
+
 export default async function BlogPostPage({ params }: PageProps) {
   const { slug } = await params
   const post = await getPostBySlug(slug)
@@ -65,7 +81,7 @@ export default async function BlogPostPage({ params }: PageProps) {
 
   const category = getCategory(post.category)
   const author = getAuthor(post.author)
-  const related = await getRelatedPosts(slug, 3)
+  const related = await getRelatedPosts(slug, 2)
   const toc = extractToc(post.content)
 
   const breadcrumbs = [
@@ -78,6 +94,33 @@ export default async function BlogPostPage({ params }: PageProps) {
   ]
 
   const url = `${site.url}/blog/${post.slug}`
+
+  const steps: NextStep[] = [
+    ...related.map((r) => {
+      const g = groupOf(r.slug)
+      return {
+        kicker: (g && GROUP_QUESTION[g.group.id]) ?? 'Read next',
+        title: r.title,
+        text: g?.summary ?? r.description,
+        href: `/blog/${r.slug}`,
+      }
+    }),
+    ...(BOROUGH_DATA_PAGE.live
+      ? [{
+          kicker: 'Comparing areas?',
+          title: 'EPC ratings in every London borough',
+          text: 'How homes in each borough rate, from EPCs on the GOV.UK register.',
+          href: BOROUGH_DATA_PAGE.href,
+        }]
+      : []),
+    {
+      kicker: 'Ready for a price?',
+      title: 'Get your exact price',
+      text: 'Tell us the address and the size. We confirm your exact price and a visit time first.',
+      href: quoteHref({ service: 'epc', sourcePage: 'blog', ctaId: 'inline' }),
+      go: true,
+    },
+  ]
 
   const breadcrumbSchema = {
     '@context': 'https://schema.org',
@@ -138,35 +181,37 @@ export default async function BlogPostPage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }}
       />
-      <BreadcrumbNav items={breadcrumbs} />
-      <PostHeader
-        title={post.title}
-        description={post.description}
-        answer={post.answer}
-        category={post.category}
-        author={post.author}
-        publishedAt={post.publishedAt}
-        updatedAt={post.updatedAt}
-        readingTime={post.readingTime}
-      />
-      <article className="py-10 md:py-14">
-        <Container className="max-w-5xl">
-          <KeyTakeaways takeaways={post.keyTakeaways} />
-          <TableOfContents items={toc} />
-          <PostContent source={post.content} />
-          <WhatItCosts />
-          <PostFaq faqs={post.faqs} />
-          <InYourArea slugs={guideAreas(post.category, post.areas)} />
-          <PostSources sources={post.sources} />
-          <AuthorBox author={post.author} />
-          <RelatedPosts posts={related} />
-          <CTABanner
-            variant="final"
-            heading="Ready to get your EPC quote?"
-            body={`Elmhurst and Quidos accredited assessor. Guide prices from £${priceFrom.epc}. Exact price and available timing confirmed before booking.`}
-          />
-        </Container>
-      </article>
+      <div className="gd">
+        <PostHeader
+          slug={post.slug}
+          crumbs={breadcrumbs}
+          title={post.title}
+          description={post.description}
+          answer={post.answer}
+          category={post.category}
+          author={post.author}
+          publishedAt={post.publishedAt}
+          updatedAt={post.updatedAt}
+          readingTime={post.readingTime}
+          keyTakeaways={post.keyTakeaways}
+        />
+        <div className="gd-body">
+          <div className="gd-w gd-body__in">
+            <TableOfContents items={toc} />
+            <article className="gd-art">
+              {showsScale(post.slug) && <KeyTakeaways takeaways={post.keyTakeaways} />}
+              <PostContent source={post.content} />
+              <WhatItCosts />
+              <PostFaq faqs={post.faqs} />
+              <InYourArea slugs={guideAreas(post.category, post.areas)} />
+              <PostSources sources={post.sources} />
+              <AuthorBox author={post.author} />
+            </article>
+          </div>
+        </div>
+        <ReadNext title="Where next?" steps={steps} />
+      </div>
+      <InnerEnding variant="a" source="blog" />
     </>
   )
 }

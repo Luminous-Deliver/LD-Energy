@@ -1,15 +1,13 @@
-import { quoteHref } from '@/lib/quote-context'
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { ArrowRight, MapPin } from 'lucide-react'
-import { Section } from '@/components/ui/Section'
-import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
-import { PageHero } from '@/components/sections/PageHero'
-import { CtaStrip } from '@/components/sections/CtaStrip'
+import { ArrowRight, BarChart3, Clock, MapPin, ShieldCheck } from 'lucide-react'
+import { GuideCrumbs } from '@/components/blog/GuideCrumbs'
+import { GuideScale } from '@/components/blog/GuideScale'
+import { GuideList, type GuideListGroup } from '@/components/blog/GuideList'
+import { InnerEnding } from '@/components/inner/InnerEnding'
 import { getAllPosts, type Post } from '@/lib/blog'
 import { BOROUGH_DATA_PAGE, guideGroups } from '@/lib/guides'
-import { whatsappQuoteHref } from '@/lib/area-page'
-import { site, priceFrom, defaultOgImage } from '@/lib/site'
+import { site, defaultOgImage } from '@/lib/site'
 
 // Title and H1 are frozen until the 14/12 review (references/local-seo.md); the body is the Guides hub
 // of plan PLAN-AREAS-GUIDES-2026-10-22 §8.1.
@@ -70,103 +68,132 @@ export default async function BlogIndexPage() {
     })),
   }
 
+  const groups: GuideListGroup[] = guideGroups.map((g) => ({
+    id: g.id,
+    heading: g.heading,
+    intro: g.intro,
+    guides: g.guides.flatMap((x) => {
+      const p = bySlug.get(x.slug)
+      return p ? [{ slug: x.slug, title: p.title, summary: x.summary, minutes: p.readingTime }] : []
+    }),
+  }))
+  const total = groups.reduce((n, g) => n + g.guides.length, 0)
+  const summaryOf = (slug: string) => guideGroups.flatMap((g) => g.guides).find((x) => x.slug === slug)?.summary ?? ''
+  const groupOf = (slug: string) => guideGroups.find((g) => g.guides.some((x) => x.slug === slug))?.heading ?? ''
+  const feat = bySlug.get('epc-ratings-explained')
+  // the two picture cards: the visit and the house in section (AI illustrations, imagery policy checked 23/10/2026)
+  const sides = [
+    { slug: 'what-happens-during-epc-assessment', img: '/guides/assessor-room', w: 1200, h: 800 },
+    { slug: 'how-to-improve-epc-rating', img: '/guides/house-section', w: 1200, h: 667 },
+  ].flatMap((x) => {
+    const p = bySlug.get(x.slug)
+    return p ? [{ ...x, post: p }] : []
+  })
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify([breadcrumbSchema, blogSchema]) }}
       />
-      <BreadcrumbNav items={breadcrumbs} />
+      <div className="gd">
+        <header className="gd-hub-hero">
+          <div className="gd-w gd-hub-hero__in">
+            <GuideCrumbs items={breadcrumbs} />
+            <h1>EPC Insights &amp; Guides for London Homeowners &amp; Landlords</h1>
+            <p className="gd-hub-hero__lede">{OPENING_ANSWER}</p>
+            <p className="gd-hub-hero__by">
+              <span>
+                <ShieldCheck width={16} height={16} aria-hidden="true" />
+                Written by your assessor, Abdul Motaleb Taher, Elmhurst and Quidos accredited
+              </span>
+              <span>
+                <span className="num">{total}</span> guides
+              </span>
+            </p>
+          </div>
+        </header>
 
-      <PageHero
-        eyebrow="Guides"
-        heading="EPC Insights & Guides for London Homeowners & Landlords"
-        subheading={OPENING_ANSWER}
-        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'blog', ctaId: 'hero' }) }}
-        secondaryCta={{ label: 'WhatsApp a quote request', href: whatsappQuoteHref() }}
-      />
+        <section className="gd-w" aria-label="Start here">
+          <div className="gd-top">
+            {feat && (
+              <Link href={`/blog/${feat.slug}`} className="gd-feat">
+                <div className="gd-feat__art">
+                  <GuideScale art minimum={false} />
+                </div>
+                <span className="gd-feat__b">
+                  <span className="gd-tagline">
+                    <span className="gd-start">Start here</span>
+                    <span className="gd-eyebrow">{groupOf(feat.slug)}</span>
+                  </span>
+                  <b>{feat.title}</b>
+                  <span className="gd-feat__d">{summaryOf(feat.slug)}</span>
+                  <span className="gd-mins">
+                    <Clock width={14} height={14} aria-hidden="true" />
+                    <span className="num">{feat.readingTime}</span> min read
+                  </span>
+                </span>
+              </Link>
+            )}
+            <div className="gd-sides">
+              {sides.map(({ slug, img, w, h, post }) => (
+                <Link key={slug} href={`/blog/${slug}`} className="gd-side">
+                  <span className="gd-side__img">
+                    {/* eslint-disable-next-line @next/next/no-img-element -- next/image is unoptimised on Pages */}
+                    <img src={`${img}-720.webp`} srcSet={`${img}-720.webp 720w, ${img}-1200.webp 1200w`} sizes="(max-width: 899px) 116px, 30vw" alt="" width={w} height={h} loading="lazy" decoding="async" />
+                  </span>
+                  <span className="gd-side__b">
+                    <span className="gd-eyebrow">{groupOf(slug)}</span>
+                    <b>{post.title}</b>
+                    <span className="gd-mins">
+                      <Clock width={14} height={14} aria-hidden="true" />
+                      <span className="num">{post.readingTime}</span> min read
+                    </span>
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
 
-      <Section variant="default" id="guides">
-        <nav aria-label="Guide groups" className="flex flex-wrap gap-2">
-          {guideGroups.map((g) => (
-            <a
-              key={g.id}
-              href={`#${g.id}`}
-              className="inline-flex min-h-11 items-center rounded-full border border-secondary-200 bg-white px-4 text-sm font-medium text-secondary-800 hover:border-primary-300 hover:bg-primary-50"
-            >
-              {g.heading}
-            </a>
-          ))}
-        </nav>
+        <section className="gd-w gd-all" id="guides" aria-labelledby="all-guides">
+          <div className="gd-all__h">
+            <h2 id="all-guides">Every guide, by topic</h2>
+            <p>Pick a topic, then read down the list: each group starts with the guide to read first.</p>
+          </div>
+          <GuideList groups={groups} />
+        </section>
 
-        <div className="mt-10 space-y-14">
-          {guideGroups.map((group) => (
-            <section key={group.id} id={group.id} aria-labelledby={`${group.id}-heading`} className="scroll-mt-28">
-              <h2 id={`${group.id}-heading`} className="text-2xl md:text-3xl font-bold tracking-tight text-secondary-900">
-                {group.heading}
-              </h2>
-              <p className="mt-2 max-w-2xl text-secondary-700">{group.intro}</p>
-              <ul className="mt-6 grid gap-3 md:grid-cols-2">
-                {group.guides.map((g, i) => {
-                  const post = bySlug.get(g.slug)
-                  if (!post) return null
-                  const pillar = i === 0
-                  return (
-                    <li key={g.slug} className={pillar ? 'md:col-span-2' : undefined}>
-                      <Link
-                        href={`/blog/${g.slug}`}
-                        className={`group flex h-full flex-col rounded-lg border p-5 transition-colors hover:border-primary-300 hover:bg-primary-50 ${
-                          pillar ? 'border-primary-200 bg-primary-50/60' : 'border-secondary-200 bg-white'
-                        }`}
-                      >
-                        {pillar && (
-                          <span className="text-xs font-semibold uppercase tracking-wide text-primary-700">Start here</span>
-                        )}
-                        <span className={`font-semibold text-secondary-900 group-hover:text-primary-800 ${pillar ? 'mt-1 text-lg' : ''}`}>
-                          {post.title}
-                        </span>
-                        <span className="mt-1 text-sm text-secondary-700">{g.summary}</span>
-                      </Link>
-                    </li>
-                  )
-                })}
-              </ul>
-            </section>
-          ))}
-        </div>
-      </Section>
-
-      <Section variant="muted" id="local-figures">
-        <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-secondary-900">Local figures</h2>
-        <p className="mt-2 max-w-2xl text-secondary-700">
-          How homes in each London borough rate, from EPCs on the GOV.UK register, and what that means locally.
-        </p>
-        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-          <Link
-            href="/areas"
-            className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-secondary-200 bg-white px-5 py-3 font-semibold text-secondary-900 hover:border-primary-300 hover:bg-primary-50"
-          >
-            <MapPin className="h-4 w-4 text-primary-600" aria-hidden="true" />
-            Find your area
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
-          </Link>
-          {BOROUGH_DATA_PAGE.live && (
-            <Link
-              href={BOROUGH_DATA_PAGE.href}
-              className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-secondary-200 bg-white px-5 py-3 font-semibold text-secondary-900 hover:border-primary-300 hover:bg-primary-50"
-            >
-              {BOROUGH_DATA_PAGE.label}
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-          )}
-        </div>
-      </Section>
-
-      <CtaStrip
-        heading="Need an EPC? Get your exact quote."
-        body={`Elmhurst and Quidos accredited assessor. Guide prices from £${priceFrom.epc}. Lodged within 72 hours.`}
-        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'blog', ctaId: 'bottom' }) }}
-      />
+        <section className="gd-local" id="local-figures" aria-labelledby="local-figures-h">
+          <div className="gd-w gd-local__in">
+            <div>
+              <h2 id="local-figures-h">Local figures</h2>
+              <p>How homes in each London borough rate, from EPCs on the GOV.UK register, and what that means locally.</p>
+            </div>
+            <div className="gd-local__links">
+              <Link href="/areas">
+                <MapPin width={20} height={20} aria-hidden="true" />
+                <span>
+                  Find your area
+                  <small>Prices, ratings and local rules for every borough</small>
+                </span>
+                <ArrowRight className="gd-arrow" width={18} height={18} aria-hidden="true" />
+              </Link>
+              {BOROUGH_DATA_PAGE.live && (
+                <Link href={BOROUGH_DATA_PAGE.href}>
+                  <BarChart3 width={20} height={20} aria-hidden="true" />
+                  <span>
+                    {BOROUGH_DATA_PAGE.label}
+                    <small>All 33 councils side by side</small>
+                  </span>
+                  <ArrowRight className="gd-arrow" width={18} height={18} aria-hidden="true" />
+                </Link>
+              )}
+            </div>
+          </div>
+        </section>
+      </div>
+      <InnerEnding variant="a" source="blog" />
     </>
   )
 }

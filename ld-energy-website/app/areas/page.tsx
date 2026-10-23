@@ -1,18 +1,19 @@
 import { quoteHref } from '@/lib/quote-context'
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { CheckCircle2 } from 'lucide-react'
-import { Section } from '@/components/ui/Section'
+import { ShieldCheck } from 'lucide-react'
+import { Container } from '@/components/ui/Container'
 import { BoroughFinder, type FinderRegion } from '@/components/sections/BoroughFinder'
-import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
-import { PageHero } from '@/components/sections/PageHero'
-import { CtaStrip } from '@/components/sections/CtaStrip'
+import { Ico } from '@/components/sections/home/HomeIcon'
+import { InnerEnding } from '@/components/inner/InnerEnding'
+import { TERRACE_SVG_PLAIN } from '@/components/inner/terrace-svg'
 import { boroughList, boroughMeta } from '@/lib/boroughs'
 import { boroughStats } from '@/lib/borough-stats'
-import { fmt, pct, statsSource, ukDate } from '@/lib/area-page'
+import { fmt, pct, statsSource, ukDate, whatsappQuoteHref } from '@/lib/area-page'
 import { DATA_PAGE_PATH, extremes, londonBoroughs, placesFor, ratingsFinding } from '@/lib/borough-ratings'
 import { regions } from '@/lib/london-regions'
 import { site, priceFrom, defaultOgImage, SAME_DAY_LODGEMENT_SURCHARGE } from '@/lib/site'
+import '../inner.css'
 
 export const metadata: Metadata = {
   title: 'Areas We Cover | EPC Assessor Across London',
@@ -33,11 +34,6 @@ export const metadata: Metadata = {
       `Domestic EPC certificates across all London boroughs. Elmhurst and Quidos accredited, guide prices from £${priceFrom.epc}.`,
   },
 }
-
-const breadcrumbs = [
-  { href: '/', label: 'Home' },
-  { href: '/areas', label: 'Areas' },
-]
 
 /** Neighbourhood pages listed under their borough's row rather than as rows of their own. */
 const children = boroughList.filter((b) => b.kind === 'neighbourhood' && b.partOf)
@@ -67,7 +63,7 @@ export default function AreasPage() {
   const lets = extremes((b) => b.pctLettings, londonBoroughs)
 
   const checklist = [
-    <>One price list for every borough, set by floor area: EPCs from £{priceFrom.epc}. <Link href="/pricing" className="text-primary-700 underline underline-offset-2">See all prices</Link>.</>,
+    <>One price list for every borough, set by floor area: EPCs from £{priceFrom.epc}. <Link href="/pricing" className="in-link">See all prices</Link>.</>,
     <>No travel or call-out charge, wherever you are in London.</>,
     <>Lodged on the GOV.UK register within 72 hours of the visit, or the same day for £{SAME_DAY_LODGEMENT_SURCHARGE} extra.</>,
     <>Every visit is by {site.assessor.name}, accredited with {site.assessor.accreditations.map((a) => a.short).join(' and ')}.</>,
@@ -94,93 +90,110 @@ export default function AreasPage() {
   ]
 
   return (
-    <>
+    <div className="in">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
 
-      <BreadcrumbNav items={breadcrumbs} />
+      {/* Hero in the area-hero D family (inner-page options board, Abdul 23/10/2026): the drawn terrace, no gradient. */}
+      <section className="in-hh" aria-labelledby="areas-h1">
+        <Container className="in-hh__grid">
+          <div className="in-hh__copy">
+            <nav className="in-crumbs" aria-label="Breadcrumb">
+              <ol>
+                <li><Link href="/">Home</Link><span className="sep" aria-hidden="true">›</span></li>
+                <li><span aria-current="page">Areas</span></li>
+              </ol>
+            </nav>
+            <h1 id="areas-h1">EPC Certificates Across London</h1>
+            <p className="in-hd__answer">
+              All 32 London boroughs and the City of London, one set of prices and no travel charge. We are based in Stratford
+              E15, and your exact quote is confirmed before booking.
+            </p>
+            <div className="in-hd__acts">
+              <a className="ld-btn ld-btn--primary" href={quoteHref({ service: 'epc', sourcePage: 'areas', ctaId: 'hero' })} data-enquiry-cta="hero">Get my exact quote</a>
+              <a className="in-wa" href={whatsappQuoteHref()} target="_blank" rel="noopener noreferrer"><Ico name="message" size={18} /> WhatsApp a quote request</a>
+            </div>
+            <ul className="in-hh__facts">
+              <li><b className="num">33</b><span>London councils, one price list</span></li>
+              <li><b className="num">£{priceFrom.epc}</b><span>EPCs from, set by floor area</span></li>
+              <li><b className="num">72 h</b><span>to the GOV.UK register</span></li>
+            </ul>
+          </div>
+          <figure className="in-hd__art" aria-hidden="true">
+            <div dangerouslySetInnerHTML={{ __html: TERRACE_SVG_PLAIN }} />
+          </figure>
+        </Container>
+      </section>
 
-      <PageHero
-        eyebrow="Coverage"
-        heading="EPC Certificates Across London"
-        subheading="All 32 London boroughs and the City of London, one set of prices and no travel charge. We are based in Stratford E15, and your exact quote is confirmed before booking."
-        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'areas', ctaId: 'hero' }) }}
-      />
+      <section className="in-sec" id="all-areas" aria-labelledby="find-h" style={{ paddingTop: 48 }}>
+        <Container>
+          <div className="in-prose">
+            <p className="in-eyebrow">Find your area</p>
+            <h2 id="find-h" className="in-h2">Every London borough, by region</h2>
+            <p className="in-lede">
+              Search by borough, town or postcode district. Each borough page has its own ratings, postcode figures and local rules.
+              A place that isn&rsquo;t listed is still covered by its borough.
+            </p>
+          </div>
 
-      <Section variant="default" id="all-areas" aria-labelledby="find-h">
-        <div className="max-w-3xl">
-          <p className="text-xs uppercase tracking-wide font-semibold text-primary-700">Find your area</p>
-          <h2 id="find-h" className="mt-2 text-3xl md:text-4xl font-bold tracking-tight text-secondary-900">
-            Every London borough, by region
-          </h2>
-          <p className="mt-5 text-lg text-secondary-700 leading-relaxed">
-            Search by borough, town or postcode district. Each borough page has its own ratings, postcode figures and local rules.
-            A place that isn&rsquo;t listed is still covered by its borough.
+          <BoroughFinder regions={finderRegions} />
+
+          <p className="in-src" style={{ marginTop: 24 }}>
+            Regions follow the London Plan sub-regions; town centres are the Plan&rsquo;s major centres. Postcode districts with at
+            least {boroughStats.thresholds.districtMin} certificates are listed. &ldquo;Rated A to C&rdquo; is the share of EPCs for existing
+            homes lodged {ukDate(statsSource.from)} to {ukDate(statsSource.to)}, from the GOV.UK register.
           </p>
-        </div>
+        </Container>
+      </section>
 
-        <BoroughFinder regions={finderRegions} />
+      <section className="in-sec in-sec--band" id="same-price" aria-labelledby="same-h">
+        <Container>
+          <div className="in-prose">
+            <h2 id="same-h" className="in-h2">The same everywhere</h2>
+            <ul className="in-ticks">
+              {checklist.map((item, i) => (
+                <li key={i}><Ico name="check" size={20} /><span>{item}</span></li>
+              ))}
+            </ul>
+          </div>
+        </Container>
+      </section>
 
-        <p className="mt-6 max-w-3xl text-xs leading-relaxed text-secondary-600">
-          Regions follow the London Plan sub-regions; town centres are the Plan&rsquo;s major centres. Postcode districts with at
-          least {boroughStats.thresholds.districtMin} certificates are listed. &ldquo;Rated A to C&rdquo; is the share of EPCs for existing
-          homes lodged {ukDate(statsSource.from)} to {ukDate(statsSource.to)}, from the GOV.UK register.
-        </p>
-      </Section>
+      <section className="in-sec" id="differences" aria-labelledby="diff-h">
+        <Container>
+          <div className="in-prose">
+            <h2 id="diff-h" className="in-h2">What differs between boroughs</h2>
+            <dl className="in-diffs">
+              <div><dt>Ratings</dt><dd>{pct(top.ratings.pct.AtoC)} of EPCs in {top.name} are rated A to C, against {pct(bottom.ratings.pct.AtoC)} in {bottom.name}.</dd></div>
+              <div><dt>Home sizes</dt><dd>The typical home on a certificate is {size.high.floorArea.median} m² in {size.high.name} and {size.low.floorArea.median} m² in {size.low.name}, and size sets the price.</dd></div>
+              <div><dt>Renting</dt><dd>Private lettings are {pct(lets.high.pctLettings)} of certificates in {lets.high.name} and {pct(lets.low.pctLettings)} in {lets.low.name}.</dd></div>
+            </dl>
+            <p>
+              <Link href={DATA_PAGE_PATH} className="in-link in-arrow">EPC ratings in every London borough <Ico name="arrow-right" size={18} /></Link>
+            </p>
+            <p className="in-note">From {fmt(boroughStats.london.certificates)} certificates on the GOV.UK register (file of {ukDate(statsSource.fileUpdated)}).</p>
+          </div>
+        </Container>
+      </section>
 
-      <Section variant="muted" id="same-price" aria-labelledby="same-h">
-        <div className="max-w-3xl">
-          <h2 id="same-h" className="text-3xl md:text-4xl font-bold tracking-tight text-secondary-900">The same everywhere</h2>
-          <ul className="mt-6 space-y-3">
-            {checklist.map((item, i) => (
-              <li key={i} className="flex items-start gap-3 text-secondary-700 leading-relaxed">
-                <CheckCircle2 className="w-5 h-5 text-primary-600 shrink-0 mt-0.5" aria-hidden="true" />
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </Section>
+      <section className="in-sec in-sec--band" id="coverage-info" aria-labelledby="outside-h">
+        <Container>
+          <div className="in-prose">
+            <h2 id="outside-h" className="in-h2">Outside London</h2>
+            <p className="in-lede">
+              We&apos;re based in Stratford (E15), in the London Borough of Newham, and cover all 32 London boroughs plus the City of London. We also serve surrounding areas within a 1.5-hour radius, including parts of Essex, Kent, Hertfordshire and Surrey.
+            </p>
+            <p>There are no travel or call-out charges.</p>
+            <p className="in-by">
+              <ShieldCheck size={18} className="i" aria-hidden="true" />
+              <span>By <Link href="/about"><b>{site.assessor.name}</b></Link>, Domestic Energy Assessor ({site.assessor.accreditations.map((a) => `${a.short} ${a.number}`).join(', ')}). Figures updated {ukDate(statsSource.generated)}.</span>
+            </p>
+          </div>
+        </Container>
+      </section>
 
-      <Section variant="default" id="differences" aria-labelledby="diff-h">
-        <div className="max-w-3xl">
-          <h2 id="diff-h" className="text-3xl md:text-4xl font-bold tracking-tight text-secondary-900">What differs between boroughs</h2>
-          <ul className="mt-6 space-y-3 text-secondary-700 leading-relaxed list-disc pl-5">
-            <li><strong className="text-secondary-900">Ratings.</strong> {pct(top.ratings.pct.AtoC)} of EPCs in {top.name} are rated A to C, against {pct(bottom.ratings.pct.AtoC)} in {bottom.name}.</li>
-            <li><strong className="text-secondary-900">Home sizes.</strong> The typical home on a certificate is {size.high.floorArea.median} m² in {size.high.name} and {size.low.floorArea.median} m² in {size.low.name}, and size sets the price.</li>
-            <li><strong className="text-secondary-900">Renting.</strong> Private lettings are {pct(lets.high.pctLettings)} of certificates in {lets.high.name} and {pct(lets.low.pctLettings)} in {lets.low.name}.</li>
-          </ul>
-          <p className="mt-6">
-            <Link href={DATA_PAGE_PATH} className="inline-flex min-h-[44px] items-center gap-1.5 font-semibold text-primary-700 hover:text-primary-800">
-              EPC ratings in every London borough <span aria-hidden="true">→</span>
-            </Link>
-          </p>
-          <p className="text-sm text-secondary-600">From {fmt(boroughStats.london.certificates)} certificates on the GOV.UK register (file of {ukDate(statsSource.fileUpdated)}).</p>
-        </div>
-      </Section>
-
-      <Section variant="muted" id="coverage-info" aria-labelledby="outside-h">
-        <div className="max-w-3xl">
-          <h2 id="outside-h" className="text-3xl md:text-4xl font-bold tracking-tight text-secondary-900">
-            Outside London
-          </h2>
-          <p className="mt-5 text-lg text-secondary-700 leading-relaxed">
-            We&apos;re based in Stratford (E15), in the London Borough of Newham, and cover all 32 London boroughs plus the City of London. We also serve surrounding areas within a 1.5-hour radius, including parts of Essex, Kent, Hertfordshire and Surrey.
-          </p>
-          <p className="mt-4 text-secondary-700 leading-relaxed">
-            There are no travel or call-out charges.
-          </p>
-          <p className="mt-8 text-sm text-secondary-600">
-            By <Link href="/about" className="font-semibold text-secondary-800 underline-offset-2 hover:underline">{site.assessor.name}</Link>,
-            {' '}Domestic Energy Assessor ({site.assessor.accreditations.map((a) => `${a.short} ${a.number}`).join(', ')}). Figures updated {ukDate(statsSource.generated)}.
-          </p>
-        </div>
-      </Section>
-
-      <CtaStrip
-        heading="Can't Find Your Area?"
-        body="Send your postcode and we'll confirm coverage."
-        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'areas', ctaId: 'bottom' }) }}
-      />
-    </>
+      <InnerEnding variant="a" source="areas"
+        heading="Can't find your area?"
+        text="Send your postcode and we'll confirm coverage, with your exact price and a visit time before you book." />
+    </div>
   )
 }

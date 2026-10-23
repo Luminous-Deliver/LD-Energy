@@ -3,14 +3,13 @@ import Link from 'next/link'
 import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { Container } from '@/components/ui/Container'
 import { Section } from '@/components/ui/Section'
-import { CtaStrip } from '@/components/sections/CtaStrip'
+import { InnerEnding } from '@/components/inner/InnerEnding'
 import { MixBar, OGL, SourceLine, dataSource, period } from '@/components/sections/area/AreaBlocks'
 import { BoroughExplorer, type ExplorerTile } from '@/components/sections/ratings/BoroughExplorer'
 import { SortableTable, type SortColumn, type SortRow } from '@/components/sections/ratings/SortableTable'
 import type { AreaSummary } from '@/lib/borough-stats-types'
 import { bandEpcPrice, bandPhrase, boroughCount, fmt, london, pct, rankLabel, statsSource, ukDate } from '@/lib/area-page'
 import { DATA_PAGE_PATH, boroughsAtoZ, rankedByAtoC, ratingsFinding, ratingsHeadline, tileLabel, tilePosition } from '@/lib/borough-ratings'
-import { quoteHref } from '@/lib/quote-context'
 import { defaultOgImage, site } from '@/lib/site'
 
 const url = `${site.url}${DATA_PAGE_PATH}`
@@ -262,11 +261,9 @@ export default function RatingsByBoroughPage() {
         </div>
       </Section>
 
-      <CtaStrip
-        heading="Need an EPC in London?"
-        body="One price list for every borough, no travel charge. Send the property details for your exact quote."
-        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'other', ctaId: 'bottom' }), ctaId: 'bottom' }}
-      />
+      <InnerEnding variant="b" source="other"
+        heading="Need an EPC in London? Pick your size"
+        text="One price list for every borough, no travel charge. Every row opens the quote with that size filled in." />
     </>
   )
 }

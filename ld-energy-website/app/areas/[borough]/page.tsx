@@ -6,7 +6,7 @@ import { Section } from '@/components/ui/Section'
 import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { PageHero } from '@/components/sections/PageHero'
 import { LocalPricingSummary } from '@/components/sections/LocalPricingSummary'
-import { CtaStrip } from '@/components/sections/CtaStrip'
+import { InnerEnding } from '@/components/inner/InnerEnding'
 import { Accordion } from '@/components/ui/Accordion'
 import { ContactSection } from '@/components/sections/ContactSection'
 import { boroughMeta, boroughIntent, type BoroughIntent } from '@/lib/boroughs'
@@ -375,11 +375,10 @@ export default async function BoroughPage({ params }: PageProps) {
 
       <ContactSection areaPage={data.slug} sourcePage="area" />
 
-      <CtaStrip
-        heading={`Get an EPC quote in ${data.name}`}
-        body={`Fast, transparent-priced EPC certificates in ${data.name}. Appointments 7 days a week.`}
-        primaryCta={{ label: 'Get my exact quote', href: '#contact', ctaId: 'bottom' }}
-      />
+      <InnerEnding variant="a" quote="#contact" source="area"
+        eyebrow={`${data.name} · from £${priceFrom.epc}`}
+        heading={`Book your ${data.name} EPC`}
+        text={`Fast, transparent-priced EPC certificates in ${data.name}. Appointments 7 days a week.`} />
     </>
   )
 }
