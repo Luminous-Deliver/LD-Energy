@@ -95,20 +95,22 @@ html { font-synthesis-weight: none; }
    the dock and the homepage's price bar carry the quote action. */
 @media (max-width: 759px) { .sh__quote { display: none; } .sh__menu { margin-left: auto; } }
 
-/* Logo A (BRIEF § v6.1, locked 21/10): the master lockup's two lines as live Jost beside the full-weight house,
+/* Logo A, nav option 1 (Abdul 23/10, "a step heavier"): the navy outline thickened by a same-colour stroke in
+   ld-energy-mark-nav.svg (paths untouched, leaf and roof as drawn), house 38 px, name Jost SemiBold 19 px.
+   Was (BRIEF § v6.1, locked 21/10): the master lockup's two lines as live Jost beside the full-weight house,
    his traced geometry untouched (public/brand/ld-energy-mark-full.svg). Name .07em, tagline .17em, 10 px to the
    house: about 197 px on desktop, 174 px on phones. The two text lines share one measure. */
 .lg { display: inline-flex; align-items: center; flex: none; min-height: 44px; color: var(--ink); text-decoration: none; }
-.lg__mark { display: block; height: 34px; width: auto; flex: none; }
-.lg__words { display: grid; justify-items: start; gap: 7px; margin-left: 10px; }   /* 13 + 7 + 8 = 28: (34 - 28) / 2 is whole */
+.lg__mark { display: block; height: 38px; width: auto; flex: none; }
+.lg__words { display: grid; justify-items: start; gap: 8px; margin-left: 11px; }   /* 14 + 8 + 8 = 30: (38 - 30) / 2 is whole */
 .lg__name, .lg__tag { text-transform: uppercase; white-space: nowrap; }
-.lg__name { --t: .07em; font: 500 18px/13px var(--font-sans); letter-spacing: var(--t); margin-right: calc(-1 * var(--t)); color: var(--ink); }
-.lg__tag { --t: .17em; font: 500 10px/8px var(--font-sans); letter-spacing: var(--t); margin-right: calc(-1 * var(--t)); color: var(--sage-700); }
+.lg__name { --t: .06em; font: 600 19px/14px var(--font-sans); letter-spacing: var(--t); margin-right: calc(-1 * var(--t)); color: var(--ink); }
+.lg__tag { --t: .17em; font: 600 10.5px/8px var(--font-sans); letter-spacing: var(--t); margin-right: calc(-1 * var(--t)); color: var(--sage-700); }
 @media (max-width: 759px) {
-  .lg__mark { height: 30px; }
-  .lg__words { gap: 5px; margin-left: 9px; }
-  .lg__name { font-size: 16px; line-height: 12px; }
-  .lg__tag { font-size: 9px; line-height: 7px; --t: .16em; }
+  .lg__mark { height: 33px; }
+  .lg__words { gap: 6px; margin-left: 10px; }
+  .lg__name { font-size: 17px; line-height: 13px; }
+  .lg__tag { font-size: 9.5px; line-height: 7px; --t: .16em; }
 }
 
 /* --------------------------------------------------------------- phone menu -- */

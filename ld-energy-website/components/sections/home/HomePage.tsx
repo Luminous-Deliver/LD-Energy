@@ -43,18 +43,6 @@ function Facts() {
 }
 
 /** One plane of the scene: a phone cut (portrait) and a desktop cut (wide) of the same morning. */
-function Plane({ name, phone, wide, priority }: { name: string; phone: [number, number]; wide: number[]; priority?: boolean }) {
-  const set = (cut: string, ws: number[]) => ws.map((w) => `/home/roofs-${cut}-${name}-${w}.webp ${w}w`).join(', ')
-  return (
-    <picture>
-      <source media="(max-width: 759px)" srcSet={set('tall', phone)} sizes="122vw" />
-      {/* eslint-disable-next-line @next/next/no-img-element -- next/image is unoptimised on Pages; the planes need <picture> */}
-      <img src={`/home/roofs-wide-${name}-1600.webp`} srcSet={set('wide', wide)} sizes="100vw" alt="" width={1600} height={900}
-        {...(priority ? { fetchPriority: 'high' as const } : { decoding: 'async' as const })} />
-    </picture>
-  )
-}
-
 function Hero() {
   const wa = whatsappQuoteHref()
   return (
@@ -62,9 +50,14 @@ function Hero() {
       <div className="hero__stage">
         <div className="scene-wrap">
           <div className="scene" aria-hidden="true">
-            <div className="pl pl--far"><Plane name="far" phone={[720, 1200]} wide={[900, 1600, 2560]} /></div>
+            {/* hero B (Abdul 23/10): the AI terrace cut open replaces the rooftop photo; one plane carries it, the
+                motion script still writes the far, glow and mist planes, so they stay as empty boxes */}
+            <div className="pl pl--far" />
             <div className="pl pl--glow" />
-            <div className="pl pl--mid"><Plane name="mid" phone={[720, 1200]} wide={[900, 1600, 2560]} priority /></div>
+            <div className="pl pl--mid">
+              {/* eslint-disable-next-line @next/next/no-img-element -- next/image is unoptimised on Pages */}
+              <img src="/home/hero-cutaway-1600.webp" srcSet="/home/hero-cutaway-900.webp 900w, /home/hero-cutaway-1600.webp 1600w, /home/hero-cutaway-2560.webp 2560w" sizes="(max-width: 759px) 135vw, 100vw" alt="" width={1600} height={900} fetchPriority="high" />
+            </div>
             <div className="pl pl--mist" />
           </div>
           <span className="hero__scrim" aria-hidden="true" />
@@ -81,16 +74,7 @@ function Hero() {
               <a className="link arrow-link" href={wa} {...ext}>Or message us on WhatsApp</a>
             </div>
           </div>
-          <div className="scene scene--front" aria-hidden="true">
-            {/* desktop only, in the first screen; phones get a 1 px placeholder so the hidden image is never fetched */}
-            <div className="pl pl--near">
-              <picture>
-                <source media="(max-width: 759px)" srcSet="data:image/gif;base64,R0lGODlhAQABAAAAACw=" />
-                {/* eslint-disable-next-line @next/next/no-img-element -- see Plane */}
-                <img src="/home/roofs-ridge-1600.webp" srcSet="/home/roofs-ridge-900.webp 900w, /home/roofs-ridge-1600.webp 1600w" sizes="100vw" alt="" width={1600} height={417} decoding="async" />
-              </picture>
-            </div>
-          </div>
+          <p className="hero__credit">An AI-generated illustration.</p>
         </div>
 
         {/* the sheet: its strip is in the first screen; the example report rises over the scene as the page moves */}
@@ -211,11 +195,12 @@ function HowItWorks() {
 }
 
 function PhotoBreak() {
+  // replaced the AI street photo (Abdul 23/10: "looks a bit random") with scene 3, the assessor on the visit, his board pick
   return (
-    <figure className="break" aria-label="A London street of Edwardian terraced houses">
-      {/* eslint-disable-next-line @next/next/no-img-element -- next/image is unoptimised on Pages; phones crop the band to about 137vw */}
-      <img src="/home/street-break-1600.webp" srcSet="/home/street-break-900.webp 900w, /home/street-break-1600.webp 1600w" sizes="(max-width: 759px) 137vw, 100vw" alt="" width={1600} height={900} loading="lazy" decoding="async" />
-      <figcaption className="wrap">An AI-generated London street.</figcaption>
+    <figure className="break break--scene wrap">
+      {/* eslint-disable-next-line @next/next/no-img-element -- next/image is unoptimised on Pages */}
+      <img src="/home/assessor-visit-1600.webp" srcSet="/home/assessor-visit-900.webp 900w, /home/assessor-visit-1600.webp 1600w" sizes="(max-width: 1240px) 92vw, 1140px" alt="An assessor in a sage jacket measures a London front room with a laser measure, beside a sash window and a column radiator" width={1600} height={1067} loading="lazy" decoding="async" />
+      <figcaption>Every room is measured and the heating, windows and insulation recorded. An AI-generated illustration.</figcaption>
     </figure>
   )
 }
@@ -468,8 +453,7 @@ function Close() {
 
 export function HomePage() {
   // The LCP image: the rooftop plane, the wide cut from 760 px and the portrait cut on phones.
-  preload('/home/roofs-wide-mid-1600.webp', { as: 'image', fetchPriority: 'high', imageSrcSet: '/home/roofs-wide-mid-900.webp 900w, /home/roofs-wide-mid-1600.webp 1600w, /home/roofs-wide-mid-2560.webp 2560w', imageSizes: '100vw', media: '(min-width: 760px)' })
-  preload('/home/roofs-tall-mid-720.webp', { as: 'image', fetchPriority: 'high', imageSrcSet: '/home/roofs-tall-mid-720.webp 720w, /home/roofs-tall-mid-1200.webp 1200w', imageSizes: '122vw', media: '(max-width: 759px)' })
+  preload('/home/hero-cutaway-1600.webp', { as: 'image', fetchPriority: 'high', imageSrcSet: '/home/hero-cutaway-900.webp 900w, /home/hero-cutaway-1600.webp 1600w, /home/hero-cutaway-2560.webp 2560w', imageSizes: '(max-width: 759px) 135vw, 100vw' })
   return (
     <div className="hp">
       {/* the service cards and the booking form share one state: "See my price" picks the service in the form */}

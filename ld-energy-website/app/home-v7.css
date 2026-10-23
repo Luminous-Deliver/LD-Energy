@@ -73,6 +73,10 @@ html:has(.hp) { scroll-padding-top: calc(var(--head-h) + 24px); }
 .hp-hero .pl--mist { background: linear-gradient(180deg, transparent 50%, rgba(250, 244, 235, .5) 59%, rgba(250, 244, 235, .25) 66%, transparent 74%); }
 .hp-hero .pl--near { left: 0; width: 100%; aspect-ratio: auto; transform: translate3d(0, 62%, 0); }
 .hp-hero .pl--near img { height: auto; }
+/* hero B (23/10): the cut-away on its own paper; the paper fade under the copy is always on from 760 px */
+.hp-hero .hero__stage { background: #FAF9F4; }
+.hp-hero .pl--far, .hp-hero .pl--glow, .hp-hero .pl--mist { display: none; }
+.hp-hero .pl--mid { background: #FAF9F4; }
 .hp-hero .hero__copy { position: relative; z-index: 2; display: grid; gap: 26px; justify-items: start; align-content: start;
   padding-top: calc(var(--head-h) + clamp(48px, 10vh, 110px)); will-change: transform; }
 .hp-hero .hero__head { display: grid; gap: 16px; justify-items: start; }
@@ -280,6 +284,8 @@ html:has(.hp) { scroll-padding-top: calc(var(--head-h) + 24px); }
 .hp .break { margin: 0; }
 .hp .break img { display: block; width: 100%; max-width: none; height: clamp(300px, 40vw, 600px); object-fit: cover; object-position: 50% 62%; }
 .hp .break figcaption { font-size: 13px; color: var(--ink-quiet); padding-top: 10px; }
+.hp .break--scene { max-width: 1140px; margin-inline: auto; padding-block: 8px 24px; }
+.hp .break--scene img { height: auto; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 8px; }
 
 /* =========================================================== what you get === */
 /* the live service cards as paper sheets: the one-visit bundle in the middle, wider and raised 20 px, the only filled button */
@@ -646,4 +652,22 @@ body:has(.hp) .dock { display: none !important; }
 @media (prefers-reduced-motion: reduce) {
   .hp *, .hp *::before, .hp *::after { transition-duration: 0s !important; }
   .hp .btn:active, .hp .bf__go:active { transform: none; }
+}
+
+/* hero B (23/10), after every other hero rule so it wins. Desktop: the picture never grows taller than the space under
+   the header (the roof stays clear of the nav on short screens), sits against the right edge, and its left edge fades
+   into the paper; the copy keeps a paper fade at every height */
+@media (min-width: 760px) {
+  .hp-hero .pl--mid { --pw: min(max(100%, 177.78svh), calc((100svh - var(--strip-h) - var(--head-h) - 12px) * 1.7778));
+    width: var(--pw); left: calc(100% - var(--pw) / 2);
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 22%); mask-image: linear-gradient(90deg, transparent 0, #000 22%); }
+  .hp-hero .hero__scrim { display: block; background: linear-gradient(90deg, rgba(250, 249, 244, .97) 0, rgba(250, 249, 244, .88) 32%, rgba(250, 249, 244, 0) 52%); }
+  .hp-hero .hero__credit { position: absolute; left: max(var(--gutter, 48px), calc((100% - 1240px) / 2 + var(--gutter, 48px))); bottom: calc(var(--strip-h) + 12px); z-index: 2; margin: 0; font-size: 12px; color: var(--ink-quiet); }
+}
+@media (min-width: 760px) and (prefers-reduced-motion: no-preference) { .hp-hero:not(.is-static) .pl--mid { bottom: 0; } }
+/* phones: the landscape cut-away under the copy, shifted left so the cut-open house stays in frame */
+@media (max-width: 759px) {
+  .hp-hero .pl--mid { width: 135vw; height: auto; aspect-ratio: 16 / 9; margin-left: -18vw; bottom: 0; }
+  .hp-hero .hero__copy { padding-bottom: calc(70vw + 4px); }
+  .hp-hero .hero__credit { display: none; }
 }

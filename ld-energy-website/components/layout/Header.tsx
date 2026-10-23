@@ -25,7 +25,7 @@ export function LogoLockup() {
   return (
     <Link prefetch={false} href="/" className="lg">
       {/* eslint-disable-next-line @next/next/no-img-element -- a 16 KB vector; next/image would add nothing */}
-      <img className="lg__mark" src="/brand/ld-energy-mark-full.svg" alt="" width={66} height={34} fetchPriority="high" />
+      <img className="lg__mark" src="/brand/ld-energy-mark-nav.svg" alt="" width={72} height={38} fetchPriority="high" />
       <span className="lg__words">
         <span className="lg__name">L&amp;D Energy</span>
         <span className="lg__tag">EPC · Floor plans</span>
