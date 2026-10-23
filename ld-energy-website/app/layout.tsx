@@ -125,7 +125,7 @@ const localBusinessSchema = {
     itemListElement: [
       ...pricing.map((p) => ({
         '@type': 'Offer',
-        itemOffered: { '@type': 'Service', name: `Domestic EPC Certificate, ${p.areaLabel}` },
+        itemOffered: { '@type': 'Service', name: `Domestic EPC, ${p.areaLabel}` },
         // minPrice: these are guide prices, and marking them as fixed `price`
         // would misrepresent what the pricing page actually says.
         priceSpecification: { '@type': 'PriceSpecification', minPrice: p.epc, priceCurrency: 'GBP' },

@@ -16,7 +16,7 @@ import { priceFrom, formatPrice, site } from '@/lib/site'
 const services = [
   {
     Icon: FileText,
-    title: 'Domestic EPC Certificate',
+    title: 'Domestic EPC',
     href: '/services/domestic-epc',
     description:
       'Required by law when selling or letting in England and Wales. Lodged on the official GOV.UK EPC register, valid for ten years.',
@@ -28,7 +28,7 @@ const services = [
   },
   {
     Icon: Ruler,
-    title: 'Property Floor Plans',
+    title: 'Floor Plans',
     href: '/services/floor-plans',
     description:
       'Laser-measured 2D plans drawn to Rightmove and Zoopla specification, supplied as JPG and PDF files.',

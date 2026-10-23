@@ -147,7 +147,7 @@ const serviceSchema = {
   '@context': 'https://schema.org',
   '@type': 'Service',
   serviceType: 'Energy Performance Certificate Assessment',
-  name: 'Domestic EPC Certificate',
+  name: 'Domestic EPC',
   description:
     'Official Energy Performance Certificate for residential properties, required for selling or renting in England and Wales.',
   provider: { '@id': `${site.url}/#business` },

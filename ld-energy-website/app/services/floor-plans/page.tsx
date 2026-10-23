@@ -67,7 +67,7 @@ const serviceSchema = {
   '@context': 'https://schema.org',
   '@type': 'Service',
   serviceType: 'Property Floor Plan',
-  name: 'Professional Property Floor Plans',
+  name: 'Floor Plans',
   description:
     'Professionally measured illustrative floor plans for property marketing across London, with approximate dimensions. Not architectural or legal plans.',
   provider: { '@id': `${site.url}/#business` },
