@@ -23,14 +23,20 @@
 @media (max-width: 1099px) { .pp-sec { scroll-margin-top: 84px; } }
 @media (min-width: 760px) and (max-width: 1099px) { .pp-sec { scroll-margin-top: calc(var(--head-h) + 84px); } }
 
-/* the three things: numbered, hairline-ruled */
-.pp-three { list-style: none; padding: 0; margin-top: 20px; border-top: 1px solid var(--ink); }
-.pp-three li { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 12px; padding: 18px 0; border-bottom: 1px solid var(--hair); }
-.pp-three li:last-child { border-bottom: 0; }
-.pp-three__n { font: 400 30px/1 var(--font-serif); color: var(--sage-700); }
-.pp-three h3 { font-size: 22px; line-height: 1.2; }
-.pp-three p { margin-top: 6px; font-size: 16px; line-height: 1.6; color: var(--ink-quiet); }
-@media (min-width: 760px) { .pp-three li { grid-template-columns: 56px minmax(0, 1fr); padding: 22px 0; } .pp-three__n { font-size: 36px; } .pp-three h3 { font-size: 24px; } .pp-three p { font-size: 17px; } }
+/* please read: What to prepare and Important notes, ruled lists; each block is its own link target */
+.pp-sub { margin-top: 32px; scroll-margin-top: calc(var(--head-h) + 20px); }
+.pp-sub h3 { font-size: 24px; line-height: 1.2; }
+.pp-list { list-style: none; padding: 0; margin-top: 14px; border-top: 1px solid var(--ink); }
+.pp-list li { padding: 16px 0; border-bottom: 1px solid var(--hair); }
+.pp-sub:last-child .pp-list li:last-child { border-bottom: 0; padding-bottom: 0; }
+.pp-list b { display: block; font-weight: 500; font-size: 17px; line-height: 1.35; color: var(--ink); }
+.pp-list p { margin-top: 4px; font-size: 16px; line-height: 1.6; color: var(--ink-quiet); max-width: 64ch; }
+.pp-more { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 16px; }
+.pp-list .pp-more { margin-top: 2px; min-height: 40px; }
+.pp-sub > .pp-more { margin-top: 8px; }
+@media (min-width: 760px) { .pp-sub { margin-top: 40px; } .pp-sub h3 { font-size: 26px; } .pp-list b { font-size: 18px; } .pp-list p { font-size: 17px; } }
+@media (max-width: 1099px) { .pp-sub { scroll-margin-top: 84px; } }
+@media (min-width: 760px) and (max-width: 1099px) { .pp-sub { scroll-margin-top: calc(var(--head-h) + 84px); } }
 
 /* ------------------------------------------------------------------ the checklist */
 .pp-check { margin-top: 24px; }
@@ -117,7 +123,14 @@
 .pp-prose p { font-size: 17px; line-height: 1.65; }
 .pp-prose a { color: var(--sage-700); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
 .pp-prose a:hover { color: var(--sage-800); text-decoration-thickness: 2px; }
-@media (max-width: 1099px) { .pp-prose h3 { scroll-margin-top: 84px; } }
+.pp-prose h4 { margin-top: 24px; font: 400 19px/1.25 var(--font-serif); color: var(--ink); scroll-margin-top: calc(var(--head-h) + 20px); }
+.pp-prose h4 + p { margin-top: 6px; }
+.pp-prose p + p { margin-top: 12px; }
+.pp-reasons { list-style: disc; margin: 12px 0 16px; padding-left: 20px; font-size: 16px; line-height: 1.55; color: var(--ink-quiet); }
+.pp-reasons li + li { margin-top: 4px; }
+.pp-reasons li::marker { color: var(--sage-700); }
+@media (min-width: 760px) { .pp-reasons { font-size: 17px; } }
+@media (max-width: 1099px) { .pp-prose h3, .pp-prose h4 { scroll-margin-top: 84px; } }
 
 /* changes, fees and payment: plain, nothing folded away */
 .pp-qa { margin: 20px 0 0; border-top: 1px solid var(--ink); }
@@ -152,7 +165,7 @@
   .gd-art { max-width: none; }
   .pp-sec { padding-top: 14pt; margin-top: 14pt; break-inside: auto; }
   .pp-sec h2 { font-size: 17pt; break-after: avoid; }
-  .pp-grp, .pp-three li, .pp-day li, .pp-qa div, .pp-ev tr, .pp-when li { break-inside: avoid; }
+  .pp-grp, .pp-list li, .pp-day li, .pp-qa div, .pp-ev tr, .pp-when li { break-inside: avoid; }
   .pp-grp__h { break-after: avoid; }
   .pp-item { min-height: 0; padding: 6pt 0; }
   .pp-box { border: 1.5px solid #000; }

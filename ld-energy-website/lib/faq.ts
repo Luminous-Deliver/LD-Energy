@@ -156,8 +156,8 @@ export const fullFaq: FaqCategory[] = [
       },
       {
         q: 'What documents should I have ready for my EPC assessment?',
-        a: 'None are compulsory, but where they exist they can help: window and door installation certificates, loft, wall or floor insulation records, building-control paperwork for extensions, boiler and hot-water cylinder details, heat-pump commissioning documents, and solar or MCS documentation. They matter because an improvement that cannot be seen or evidenced may have to be recorded using a default assumption instead.',
-        links: [{ label: 'What to have ready', href: '/preparing-for-your-epc' }],
+        a: 'None are compulsory, but where they exist they can help: window and door installation certificates, loft, wall or floor insulation certificates or guarantees (with their certificate or guarantee number), building-control paperwork for extensions, boiler and hot-water cylinder details, heat-pump commissioning documents, and solar or MCS documentation. They matter because an improvement that cannot be seen or evidenced may have to be recorded using a default assumption instead.',
+        links: [{ label: 'Documents and evidence that may help', href: '/preparing-for-your-epc#documents-and-evidence' }],
       },
       {
         q: 'What happens if my insulation cannot be seen?',
@@ -249,8 +249,8 @@ export const fullFaq: FaqCategory[] = [
       },
       {
         q: 'What do I need to prepare?',
-        a: 'No specific preparation is required. Just provide normal access to all rooms, loft hatches if accessible, the boiler, hot water cylinder, and any heating controls. Documentation such as boiler service records or insulation guarantees can be helpful but is not required.',
-        links: [{ label: 'What to have ready', href: '/preparing-for-your-epc#what-to-have-ready' }],
+        a: 'Mostly access. Every room, the loft hatch, the boiler, hot water cylinder, heating controls and meters need to be reachable, and someone needs to be there to let the assessor in. Paperwork is not compulsory, but hidden insulation can only be recorded from documents: have the insulation certificate or guarantee ready, with its certificate or guarantee number. Without evidence, the method uses the default for the age of the home. A heating system that is fitted but cannot be inspected, with no paperwork for it, means the EPC cannot be finished until access is given.',
+        links: [{ label: 'What to prepare', href: '/preparing-for-your-epc#what-to-prepare' }, { label: 'What to have ready', href: '/preparing-for-your-epc#what-to-have-ready' }],
       },
       {
         q: 'How quickly will I get my certificate?',
