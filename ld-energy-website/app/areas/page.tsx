@@ -72,7 +72,8 @@ export default function AreasPage() {
     <>One price list for every borough, set by floor area: EPCs from £{priceFrom.epc}. <Link href="/pricing" className="in-link">See all prices</Link>.</>,
     <>No travel or call-out charge, wherever you are in London.</>,
     <>Lodged on the GOV.UK register within 72 hours of the visit, or the same day for £{SAME_DAY_LODGEMENT_SURCHARGE} extra.</>,
-    <>Every visit is by {site.assessor.name}, accredited with {site.assessor.accreditations.map((a) => a.short).join(' and ')}.</>,
+    // not "every visit": a trusted colleague covers if Abdul is ill (Abdul 23/10/2026)
+    <>Visits by {site.assessor.name}, accredited with {site.assessor.accreditations.map((a) => a.short).join(' and ')}.</>,
   ]
 
   const schema = [
