@@ -1,12 +1,40 @@
 'use client'
 
-import { useRef } from 'react'
-import { ChevronDown, List } from 'lucide-react'
+import { useRef, useState } from 'react'
+import { Check, ChevronDown, Link2, List } from 'lucide-react'
 import type { TocItem } from '@/lib/heading-text'
 import { jumpTo, useScrollSpy } from '@/components/inner/useScrollSpy'
 
 interface TableOfContentsProps {
   items: TocItem[]
+  /** Sections worth sending on their own: each gets a copy-link button (prep page, Abdul 24/10/2026). */
+  share?: { id: string; label: string }[]
+}
+
+/** One copy-link row per section; the full address with its #section, so it can be pasted into WhatsApp or email. */
+function Share({ share }: { share: NonNullable<TableOfContentsProps['share']> }) {
+  const [copied, setCopied] = useState<string | null>(null)
+  const copy = async (id: string) => {
+    const url = `${window.location.origin}${window.location.pathname}#${id}`
+    try { await navigator.clipboard.writeText(url) } catch { window.prompt('Copy this link', url) }
+    setCopied(id)
+    window.setTimeout(() => setCopied((c) => (c === id ? null : c)), 2000)
+  }
+  return (
+    <div className="gd-share">
+      <p className="gd-eyebrow">Copy a link to send</p>
+      <ul>
+        {share.map((s) => (
+          <li key={s.id}>
+            <button type="button" onClick={() => copy(s.id)} aria-live="polite">
+              {copied === s.id ? <Check width={16} height={16} aria-hidden="true" /> : <Link2 width={16} height={16} aria-hidden="true" />}
+              <span>{copied === s.id ? 'Link copied' : s.label}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
 }
 
 function Items({ items, active, onPick }: TableOfContentsProps & { active: string | null; onPick?: () => void }) {
@@ -28,7 +56,7 @@ function Items({ items, active, onPick }: TableOfContentsProps & { active: strin
  * Contents: a sticky disclosure on phones and tablets that names the section being read, a sticky rail beside the
  * article from 1100 px with that section marked (Abdul 23/10: the titles should follow the reader).
  */
-export function TableOfContents({ items }: TableOfContentsProps) {
+export function TableOfContents({ items, share }: TableOfContentsProps) {
   const ids = (items ?? []).map((i) => i.id)
   const active = useScrollSpy(ids)
   const details = useRef<HTMLDetailsElement>(null)
@@ -50,10 +78,12 @@ export function TableOfContents({ items }: TableOfContentsProps) {
           <ChevronDown className="chev" width={18} height={18} aria-hidden="true" />
         </summary>
         <Items items={items} active={active} onPick={() => { if (details.current) details.current.open = false }} />
+        {share && share.length > 0 && <Share share={share} />}
       </details>
       <div className="gd-toc__rail">
         <p className="gd-eyebrow">On this page</p>
         <Items items={items} active={active} />
+        {share && share.length > 0 && <Share share={share} />}
       </div>
     </nav>
   )

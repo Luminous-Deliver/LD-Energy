@@ -65,6 +65,14 @@ const toc = [
   { id: 'fees-and-changes', text: 'Changes, fees and payment', level: 2 },
 ]
 
+/* The three sections Abdul sends on their own (24/10/2026): before the visit, and the two usual complaints */
+const shareLinks = [
+  { id: 'please-read', label: 'Please read before your EPC' },
+  { id: 'why-your-epc-may-differ', label: 'Why your EPC may differ' },
+  { id: 'how-your-epc-rating-is-calculated', label: 'How your rating is calculated' },
+  { id: 'what-counts', label: 'Done work? What counts' },
+]
+
 const crumbs = [
   { href: '/', label: 'Home' },
   { href: PATH, label: 'Preparing for your EPC' },
@@ -332,7 +340,7 @@ export default function PreparingPage() {
 
         <div className="gd-body">
           <div className="gd-w gd-body__in">
-            <TableOfContents items={toc} />
+            <TableOfContents items={toc} share={shareLinks} />
             <article className="gd-art pp-art">
               <section id="please-read" className="pp-sec pp-sec--first" aria-labelledby="please-read-h">
                 <h2 id="please-read-h">Please read before your EPC</h2>
@@ -478,10 +486,20 @@ export default function PreparingPage() {
 
                 <h3 id="what-counts">What counts towards your rating</h3>
                 <p>
-                  Many homeowners renovate and then find the rating hasn’t moved as far as they hoped. The EPC
-                  measures a fixed set of things, so it helps to know which upgrades count and by how much before you
-                  spend. Some examples:
+                  Many homeowners renovate and then find the rating hasn’t moved as far as they hoped. Two things are
+                  worth knowing:
                 </p>
+                <ul className="pp-reasons">
+                  <li>
+                    <strong>Not every change counts towards an EPC rating.</strong> The EPC measures a fixed set of
+                    things, so work that makes a home nicer, or even saves energy, may not move the score.
+                  </li>
+                  <li>
+                    <strong>The higher bands are much harder to reach.</strong> Going from C to B takes far more than
+                    moving between the lower bands, and it usually needs solar panels.
+                  </li>
+                </ul>
+                <p>Some examples of what does and doesn’t count:</p>
                 <ul className="pp-reasons">
                   <li>
                     Loft insulation at both the floor of the loft (the joists) and the roof slope (the rafters): only the
@@ -491,9 +509,6 @@ export default function PreparingPage() {
                     Underfloor heating run from the same boiler as your radiators: the rating follows the boiler far more
                     than how the heat is delivered, so it rarely changes the score. With a heat pump, if radiators heat
                     half the floor area or more, only the radiators are counted.
-                  </li>
-                  <li>
-                    Going from C to B is much harder than moving between the lower bands. It usually needs solar panels.
                   </li>
                   <li>Hidden insulation only counts with paperwork that shows the thickness.</li>
                 </ul>
