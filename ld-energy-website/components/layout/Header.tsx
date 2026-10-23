@@ -20,7 +20,8 @@ export const headerNav = [
   { href: '/about', label: 'About' },
 ] as const
 
-/** Logo A, locked 21/10/2026: his traced house at full weight beside the two lines of the master lockup in live text. */
+/** Logo A, locked 21/10/2026: his traced house at full weight beside the two lines of the master lockup in live text.
+ *  Wordmark option 2 (Abdul 23/10/2026): L&D Bold 700, ENERGY Regular 400. */
 export function LogoLockup() {
   return (
     <Link prefetch={false} href="/" className="lg">
@@ -30,7 +31,7 @@ export function LogoLockup() {
       {/* eslint-disable-next-line @next/next/no-img-element -- as above */}
       <img className="lg__mark lg__mark--rev" src="/brand/ld-energy-mark-nav-reversed.svg" alt="" width={72} height={38} loading="lazy" />
       <span className="lg__words">
-        <span className="lg__name">L&amp;D Energy</span>
+        <span className="lg__name"><b>L&amp;D</b> Energy</span>
         <span className="lg__tag">EPC · Floor plans</span>
       </span>
     </Link>
@@ -101,7 +102,7 @@ export function Header({ waHref }: { waHref: string }) {
       <Link prefetch={false} href="/" className="pill__home" aria-label="L&D Energy home">
         {/* eslint-disable-next-line @next/next/no-img-element -- the header's own mark, already loaded */}
         <img src="/brand/ld-energy-mark-nav.svg" alt="" width={45} height={24} />
-        <span>L&amp;D Energy</span>
+        <span><b>L&amp;D</b> Energy</span>
       </Link>
       <ul>
         {headerNav.map((link) => (

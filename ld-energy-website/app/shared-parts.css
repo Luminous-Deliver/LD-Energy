@@ -106,7 +106,9 @@ html { font-synthesis-weight: none; }
 .lg__mark { display: block; height: 32px; width: auto; flex: none; }
 .lg__words { display: grid; justify-items: start; gap: 7px; margin-left: 10px; }   /* 12 + 7 + 7 = 26: (32 - 26) / 2 is whole */
 .lg__name, .lg__tag { text-transform: uppercase; white-space: nowrap; }
-.lg__name { --t: .06em; font: 600 16px/12px var(--font-sans); letter-spacing: var(--t); margin-right: calc(-1 * var(--t)); color: var(--ink); }
+/* option 2 (Abdul 23/10/2026, premium board): L&D Bold 700, ENERGY Regular 400, same tracking; was one weight, 600 */
+.lg__name b, .pill__home b { font-weight: 700; }
+.lg__name { --t: .06em; font: 400 16px/12px var(--font-sans); letter-spacing: var(--t); margin-right: calc(-1 * var(--t)); color: var(--ink); }
 .lg__tag { --t: .17em; font: 600 9px/7px var(--font-sans); letter-spacing: var(--t); margin-right: calc(-1 * var(--t)); color: var(--sage-700); }
 /* P1 (Abdul 23/10/2026, "P1 · smaller"): phones take L1's proportions so phone and desktop match, house 28 px,
    name 14.5 px. 11 + 5 + 6 = 22: (28 - 22) / 2 is whole. Was house 33 px, name 17 px. */
@@ -196,7 +198,7 @@ html { font-synthesis-weight: none; }
   .pill__home { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding-right: 10px; margin-right: 2px;
     border-right: 1px solid var(--hair); color: var(--ink); text-decoration: none; }
   .pill__home img { display: block; height: 24px; width: auto; }
-  .pill__home span { --t: .06em; font: 600 13px/1 var(--font-sans); letter-spacing: var(--t); text-transform: uppercase; white-space: nowrap; }
+  .pill__home span { --t: .06em; font: 400 13px/1 var(--font-sans); letter-spacing: var(--t); text-transform: uppercase; white-space: nowrap; }
   .pill ul { display: flex; margin: 0; padding: 0; list-style: none; }
   .pill ul a { display: inline-flex; align-items: center; min-height: 40px; padding: 0 12px; border-radius: 999px; font-size: 15px;
     color: var(--ink); text-decoration: none; transition: background-color .2s var(--ease-out), color .2s var(--ease-out); }

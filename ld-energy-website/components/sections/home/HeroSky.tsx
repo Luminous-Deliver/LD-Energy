@@ -29,8 +29,10 @@ const FLOORS = [
   { x: 1852, y: 636, w: 756, h: 272 },
   { x: 1852, y: 912, w: 672, h: 268 },
 ]
-const STARS_START = 200, STARS_SPREAD = 1800
-const LIGHTS_START = 2300, LIGHTS_GAP = 650
+// Abdul 23/10/2026 (second pass): the first room switched on too late (about 2.3 s), make it about 0.5 s; more stars,
+// brighter. The stars now arrive alongside the first floors instead of before them.
+const STARS_START = 0, STARS_SPREAD = 1400
+const LIGHTS_START = 500, LIGHTS_GAP = 520
 
 interface Star { x: number; y: number; r: number; delay: number; speed: number; phase: number }
 interface Region { x: number; y: number; w: number; h: number }
@@ -70,7 +72,7 @@ function findStars(img: HTMLImageElement, count: number): Star[] {
     const big = rand()
     stars.push({
       x: reg.x + (x + rand()) * k, y: reg.y + (y + rand()) * k,
-      r: big < 0.16 ? 3 : 1.5 + rand() * 1.2, delay: STARS_START + rand() * STARS_SPREAD, speed: 0.5 + rand() * 1.2, phase: rand() * 6.28,
+      r: big < 0.12 ? 3.4 : 1.9 + rand() * 1.4, delay: STARS_START + rand() * STARS_SPREAD, speed: 0.5 + rand() * 1.2, phase: rand() * 6.28,
     })
   }
   return stars
@@ -174,7 +176,7 @@ export function HeroSky() {
       copy.decoding = 'async'
       copy.onload = () => {
         if (copy.src !== src) return
-        stars = fx === 'lights' ? [] : findStars(copy, regionOf(copy) === PHONE_CROP ? 70 : 120)
+        stars = fx === 'lights' ? [] : findStars(copy, regionOf(copy) === PHONE_CROP ? 110 : 200)
         shades = fx === 'stars' ? [] : floorShades(copy)
         // the sequence starts once the shades exist, so the rooms never show lit before they switch on
         if (!t0Set) { t0 = 0; t0Set = true }
@@ -194,13 +196,20 @@ export function HeroSky() {
 
       ctx!.fillStyle = '#F7F1E0'
       for (const st of stars) {
-        const fade = Math.min(1, Math.max(0, (t - st.delay) / 1100))
+        const fade = Math.min(1, Math.max(0, (t - st.delay) / 800))
         if (!fade) continue
-        const tw = still ? 0.92 : 0.74 + 0.26 * Math.sin(st.phase + (t / 1000) * st.speed)
-        const r = st.r * px * 0.6
+        const tw = still ? 1 : 0.84 + 0.16 * Math.sin(st.phase + (t / 1000) * st.speed)
+        const r = st.r * px * 0.7
         ctx!.globalAlpha = fade * fade * tw
         ctx!.beginPath(); ctx!.arc(st.x, st.y, r, 0, 6.2832); ctx!.fill()
-        if (st.r > 2.6) { ctx!.globalAlpha = fade * tw * 0.22; ctx!.beginPath(); ctx!.arc(st.x, st.y, r * 3.4, 0, 6.2832); ctx!.fill() }
+        if (st.r > 2.6) {
+          // a soft falloff, not a flat disc: a flat halo read as grey bubbles
+          const g = ctx!.createRadialGradient(st.x, st.y, 0, st.x, st.y, r * 4)
+          g.addColorStop(0, 'rgba(255,250,235,0.55)'); g.addColorStop(0.35, 'rgba(255,250,235,0.12)'); g.addColorStop(1, 'rgba(255,250,235,0)')
+          ctx!.globalAlpha = fade * tw; ctx!.fillStyle = g
+          ctx!.beginPath(); ctx!.arc(st.x, st.y, r * 4, 0, 6.2832); ctx!.fill()
+          ctx!.fillStyle = '#F7F1E0'
+        }
       }
 
       if (!still) shades.forEach((shade, i) => {
