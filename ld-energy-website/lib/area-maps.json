@@ -1,0 +1,861 @@
+{
+ "newham": {
+  "labels": [
+   {
+    "name": "East Ham",
+    "x": 61.24,
+    "y": 47.52
+   },
+   {
+    "name": "Manor Park",
+    "x": 56.63,
+    "y": 24.46
+   },
+   {
+    "name": "Canning Town",
+    "x": 33.58,
+    "y": 67.05
+   },
+   {
+    "name": "Silvertown",
+    "x": 50.47,
+    "y": 89.06
+   }
+  ],
+  "pin": {
+   "x": 24.13,
+   "y": 34.53
+  }
+ },
+ "city-of-london": {
+  "labels": [
+   {
+    "name": "Barbican",
+    "x": 51.86,
+    "y": 34.16
+   },
+   {
+    "name": "Temple",
+    "x": 14.87,
+    "y": 60.4
+   },
+   {
+    "name": "Aldgate",
+    "x": 85.02,
+    "y": 57.72
+   },
+   {
+    "name": "Monument",
+    "x": 67.32,
+    "y": 72.31
+   },
+   {
+    "name": "St Paul's",
+    "x": 43.01,
+    "y": 56.48
+   }
+  ],
+  "pin": null
+ },
+ "barking-dagenham": {
+  "labels": [
+   {
+    "name": "Barking",
+    "x": 25.66,
+    "y": 66.45
+   },
+   {
+    "name": "Dagenham",
+    "x": 59.97,
+    "y": 64.16
+   },
+   {
+    "name": "Barking Riverside",
+    "x": 39.7,
+    "y": 84.6
+   }
+  ],
+  "pin": null
+ },
+ "barnet": {
+  "labels": [
+   {
+    "name": "Edgware",
+    "x": 27.14,
+    "y": 46.29
+   },
+   {
+    "name": "High Barnet",
+    "x": 56.46,
+    "y": 19.73
+   },
+   {
+    "name": "Finchley",
+    "x": 64.15,
+    "y": 61.49
+   },
+   {
+    "name": "Mill Hill",
+    "x": 43.95,
+    "y": 47.93
+   }
+  ],
+  "pin": null
+ },
+ "bexley": {
+  "labels": [
+   {
+    "name": "Sidcup",
+    "x": 30.89,
+    "y": 78.26
+   },
+   {
+    "name": "Erith",
+    "x": 64.0,
+    "y": 33.62
+   },
+   {
+    "name": "Bexleyheath",
+    "x": 49.97,
+    "y": 53.6
+   },
+   {
+    "name": "Falconwood",
+    "x": 25.26,
+    "y": 52.11
+   }
+  ],
+  "pin": null
+ },
+ "brent": {
+  "labels": [
+   {
+    "name": "Willesden",
+    "x": 66.5,
+    "y": 70.14
+   },
+   {
+    "name": "Wembley",
+    "x": 30.75,
+    "y": 62.57
+   },
+   {
+    "name": "Queen's Park",
+    "x": 85.46,
+    "y": 81.72
+   }
+  ],
+  "pin": null
+ },
+ "bromley": {
+  "labels": [
+   {
+    "name": "Orpington",
+    "x": 68.58,
+    "y": 42.9
+   },
+   {
+    "name": "Penge",
+    "x": 23.5,
+    "y": 23.96
+   },
+   {
+    "name": "Chislehurst",
+    "x": 60.42,
+    "y": 25.18
+   },
+   {
+    "name": "Biggin Hill",
+    "x": 47.72,
+    "y": 77.86
+   }
+  ],
+  "pin": null
+ },
+ "camden": {
+  "labels": [
+   {
+    "name": "Hampstead",
+    "x": 36.1,
+    "y": 30.44
+   },
+   {
+    "name": "Camden Town",
+    "x": 62.22,
+    "y": 55.07
+   },
+   {
+    "name": "Bloomsbury",
+    "x": 72.36,
+    "y": 80.97
+   },
+   {
+    "name": "Highgate",
+    "x": 57.46,
+    "y": 10.31
+   },
+   {
+    "name": "Kilburn",
+    "x": 21.67,
+    "y": 51.33
+   }
+  ],
+  "pin": null
+ },
+ "croydon": {
+  "labels": [
+   {
+    "name": "Thornton Heath",
+    "x": 43.7,
+    "y": 22.21
+   },
+   {
+    "name": "Purley",
+    "x": 38.07,
+    "y": 60.21
+   },
+   {
+    "name": "Old Coulsdon",
+    "x": 36.84,
+    "y": 80.21
+   }
+  ],
+  "pin": null
+ },
+ "ealing": {
+  "labels": [
+   {
+    "name": "Acton",
+    "x": 79.14,
+    "y": 66.18
+   },
+   {
+    "name": "Southall",
+    "x": 28.73,
+    "y": 63.31
+   },
+   {
+    "name": "Hanwell",
+    "x": 47.15,
+    "y": 65.38
+   },
+   {
+    "name": "Northolt",
+    "x": 31.66,
+    "y": 29.42
+   },
+   {
+    "name": "Greenford",
+    "x": 39.95,
+    "y": 47.25
+   }
+  ],
+  "pin": null
+ },
+ "enfield": {
+  "labels": [
+   {
+    "name": "Palmers Green",
+    "x": 44.27,
+    "y": 79.24
+   },
+   {
+    "name": "Edmonton",
+    "x": 59.79,
+    "y": 70.75
+   },
+   {
+    "name": "Ponders End",
+    "x": 77.72,
+    "y": 54.17
+   },
+   {
+    "name": "Cockfosters",
+    "x": 25.7,
+    "y": 50.82
+   }
+  ],
+  "pin": null
+ },
+ "greenwich": {
+  "labels": [
+   {
+    "name": "Woolwich",
+    "x": 56.79,
+    "y": 35.21
+   },
+   {
+    "name": "Greenwich Peninsula",
+    "x": 27.24,
+    "y": 20.2
+   },
+   {
+    "name": "Eltham",
+    "x": 52.64,
+    "y": 66.67
+   },
+   {
+    "name": "Thamesmead",
+    "x": 83.35,
+    "y": 19.27
+   },
+   {
+    "name": "Kidbrooke",
+    "x": 39.73,
+    "y": 50.14
+   }
+  ],
+  "pin": null
+ },
+ "hackney": {
+  "labels": [
+   {
+    "name": "Hackney Wick",
+    "x": 76.77,
+    "y": 56.6
+   },
+   {
+    "name": "Stoke Newington",
+    "x": 33.37,
+    "y": 36.55
+   },
+   {
+    "name": "Dalston",
+    "x": 38.14,
+    "y": 58.29
+   },
+   {
+    "name": "Clapton",
+    "x": 53.53,
+    "y": 35.46
+   },
+   {
+    "name": "Shoreditch",
+    "x": 35.17,
+    "y": 82.84
+   }
+  ],
+  "pin": null
+ },
+ "hammersmith-fulham": {
+  "labels": [
+   {
+    "name": "Fulham",
+    "x": 56.8,
+    "y": 80.88
+   },
+   {
+    "name": "Hammersmith",
+    "x": 45.8,
+    "y": 58.55
+   }
+  ],
+  "pin": null
+ },
+ "haringey": {
+  "labels": [
+   {
+    "name": "Tottenham",
+    "x": 75.85,
+    "y": 37.44
+   },
+   {
+    "name": "Wood Green",
+    "x": 47.58,
+    "y": 38.07
+   },
+   {
+    "name": "Muswell Hill",
+    "x": 26.31,
+    "y": 46.0
+   },
+   {
+    "name": "Crouch End",
+    "x": 38.49,
+    "y": 60.6
+   },
+   {
+    "name": "South Tottenham",
+    "x": 71.61,
+    "y": 62.46
+   }
+  ],
+  "pin": null
+ },
+ "harrow": {
+  "labels": [
+   {
+    "name": "Stanmore",
+    "x": 63.18,
+    "y": 29.73
+   },
+   {
+    "name": "Pinner",
+    "x": 29.02,
+    "y": 49.94
+   },
+   {
+    "name": "Wealdstone",
+    "x": 53.08,
+    "y": 53.12
+   },
+   {
+    "name": "Sudbury Hill",
+    "x": 51.79,
+    "y": 85.28
+   },
+   {
+    "name": "Rayners Lane",
+    "x": 32.42,
+    "y": 69.76
+   }
+  ],
+  "pin": null
+ },
+ "havering": {
+  "labels": [
+   {
+    "name": "Romford",
+    "x": 33.44,
+    "y": 40.25
+   },
+   {
+    "name": "Rainham",
+    "x": 38.79,
+    "y": 75.67
+   },
+   {
+    "name": "Upminster",
+    "x": 54.02,
+    "y": 52.11
+   },
+   {
+    "name": "Harold Hill",
+    "x": 45.09,
+    "y": 23.02
+   }
+  ],
+  "pin": null
+ },
+ "hillingdon": {
+  "labels": [
+   {
+    "name": "Ruislip",
+    "x": 53.79,
+    "y": 33.12
+   },
+   {
+    "name": "Uxbridge",
+    "x": 40.43,
+    "y": 48.83
+   },
+   {
+    "name": "West Drayton",
+    "x": 44.25,
+    "y": 68.8
+   }
+  ],
+  "pin": null
+ },
+ "hounslow": {
+  "labels": [
+   {
+    "name": "Chiswick",
+    "x": 85.31,
+    "y": 26.53
+   },
+   {
+    "name": "Brentford",
+    "x": 62.4,
+    "y": 31.07
+   },
+   {
+    "name": "Feltham",
+    "x": 27.14,
+    "y": 63.44
+   },
+   {
+    "name": "Cranford",
+    "x": 27.14,
+    "y": 36.29
+   }
+  ],
+  "pin": null
+ },
+ "islington": {
+  "labels": [
+   {
+    "name": "Archway",
+    "x": 30.4,
+    "y": 21.84
+   },
+   {
+    "name": "Highbury",
+    "x": 55.2,
+    "y": 51.86
+   },
+   {
+    "name": "Finsbury",
+    "x": 63.98,
+    "y": 88.1
+   },
+   {
+    "name": "Finsbury Park",
+    "x": 49.8,
+    "y": 24.44
+   }
+  ],
+  "pin": null
+ },
+ "kensington-chelsea": {
+  "labels": [
+   {
+    "name": "Chelsea",
+    "x": 70.08,
+    "y": 74.32
+   },
+   {
+    "name": "Earl's Court",
+    "x": 44.94,
+    "y": 69.27
+   },
+   {
+    "name": "Notting Hill",
+    "x": 36.46,
+    "y": 38.37
+   }
+  ],
+  "pin": null
+ },
+ "kingston": {
+  "labels": [
+   {
+    "name": "New Malden",
+    "x": 58.54,
+    "y": 31.76
+   },
+   {
+    "name": "Surbiton",
+    "x": 42.56,
+    "y": 40.73
+   },
+   {
+    "name": "Chessington",
+    "x": 44.44,
+    "y": 68.17
+   }
+  ],
+  "pin": null
+ },
+ "lambeth": {
+  "labels": [
+   {
+    "name": "Streatham",
+    "x": 42.55,
+    "y": 76.44
+   },
+   {
+    "name": "Kennington",
+    "x": 52.5,
+    "y": 24.68
+   },
+   {
+    "name": "Clapham",
+    "x": 39.13,
+    "y": 48.5
+   },
+   {
+    "name": "Herne Hill",
+    "x": 56.67,
+    "y": 53.8
+   }
+  ],
+  "pin": null
+ },
+ "lewisham": {
+  "labels": [
+   {
+    "name": "Sydenham",
+    "x": 30.8,
+    "y": 78.69
+   },
+   {
+    "name": "Catford",
+    "x": 49.03,
+    "y": 58.62
+   },
+   {
+    "name": "New Cross",
+    "x": 42.15,
+    "y": 26.6
+   },
+   {
+    "name": "Grove Park",
+    "x": 71.92,
+    "y": 73.14
+   },
+   {
+    "name": "Lee",
+    "x": 66.48,
+    "y": 46.41
+   }
+  ],
+  "pin": null
+ },
+ "merton": {
+  "labels": [
+   {
+    "name": "Wimbledon",
+    "x": 38.62,
+    "y": 36.37
+   },
+   {
+    "name": "Raynes Park",
+    "x": 22.17,
+    "y": 50.25
+   },
+   {
+    "name": "Mitcham",
+    "x": 66.6,
+    "y": 56.42
+   },
+   {
+    "name": "Morden",
+    "x": 46.89,
+    "y": 62.97
+   }
+  ],
+  "pin": null
+ },
+ "redbridge": {
+  "labels": [
+   {
+    "name": "Ilford",
+    "x": 45.89,
+    "y": 78.19
+   },
+   {
+    "name": "Woodford",
+    "x": 25.83,
+    "y": 32.01
+   },
+   {
+    "name": "Wanstead",
+    "x": 23.42,
+    "y": 60.68
+   },
+   {
+    "name": "Barkingside",
+    "x": 52.99,
+    "y": 47.97
+   },
+   {
+    "name": "Chadwell Heath",
+    "x": 76.26,
+    "y": 66.35
+   }
+  ],
+  "pin": {
+   "x": 8.76,
+   "y": 93.57
+  }
+ },
+ "richmond": {
+  "labels": [
+   {
+    "name": "Richmond",
+    "x": 52.11,
+    "y": 31.37
+   },
+   {
+    "name": "Teddington",
+    "x": 38.28,
+    "y": 60.96
+   },
+   {
+    "name": "Barnes",
+    "x": 76.68,
+    "y": 20.46
+   },
+   {
+    "name": "Hampton",
+    "x": 22.13,
+    "y": 72.2
+   },
+   {
+    "name": "Whitton",
+    "x": 27.21,
+    "y": 40.35
+   }
+  ],
+  "pin": null
+ },
+ "southwark": {
+  "labels": [
+   {
+    "name": "Bermondsey",
+    "x": 54.32,
+    "y": 18.37
+   },
+   {
+    "name": "Camberwell",
+    "x": 39.56,
+    "y": 40.29
+   },
+   {
+    "name": "Elephant and Castle",
+    "x": 35.64,
+    "y": 20.33
+   },
+   {
+    "name": "Dulwich",
+    "x": 43.71,
+    "y": 72.22
+   },
+   {
+    "name": "Nunhead",
+    "x": 59.24,
+    "y": 53.03
+   }
+  ],
+  "pin": null
+ },
+ "sutton": {
+  "labels": [
+   {
+    "name": "Carshalton",
+    "x": 62.39,
+    "y": 40.03
+   },
+   {
+    "name": "Cheam",
+    "x": 28.27,
+    "y": 49.8
+   },
+   {
+    "name": "Beddington",
+    "x": 80.14,
+    "y": 32.62
+   }
+  ],
+  "pin": null
+ },
+ "tower-hamlets": {
+  "labels": [
+   {
+    "name": "Isle of Dogs",
+    "x": 63.77,
+    "y": 75.61
+   },
+   {
+    "name": "Whitechapel",
+    "x": 26.7,
+    "y": 46.84
+   },
+   {
+    "name": "Bow",
+    "x": 55.76,
+    "y": 27.14
+   },
+   {
+    "name": "Bethnal Green",
+    "x": 34.1,
+    "y": 28.01
+   },
+   {
+    "name": "Limehouse",
+    "x": 49.97,
+    "y": 52.97
+   }
+  ],
+  "pin": {
+   "x": 76.14,
+   "y": 9.47
+  }
+ },
+ "waltham-forest": {
+  "labels": [
+   {
+    "name": "Walthamstow",
+    "x": 49.74,
+    "y": 62.24
+   },
+   {
+    "name": "Chingford",
+    "x": 60.19,
+    "y": 20.92
+   },
+   {
+    "name": "Leytonstone",
+    "x": 63.48,
+    "y": 76.54
+   },
+   {
+    "name": "Hale End",
+    "x": 59.97,
+    "y": 44.92
+   }
+  ],
+  "pin": null
+ },
+ "wandsworth": {
+  "labels": [
+   {
+    "name": "Tooting",
+    "x": 66.02,
+    "y": 79.58
+   },
+   {
+    "name": "Balham",
+    "x": 76.82,
+    "y": 58.35
+   },
+   {
+    "name": "Battersea",
+    "x": 63.27,
+    "y": 25.69
+   },
+   {
+    "name": "Putney",
+    "x": 34.72,
+    "y": 36.05
+   },
+   {
+    "name": "Earlsfield",
+    "x": 52.15,
+    "y": 56.22
+   }
+  ],
+  "pin": null
+ },
+ "westminster": {
+  "labels": [
+   {
+    "name": "Pimlico",
+    "x": 69.08,
+    "y": 86.42
+   },
+   {
+    "name": "Maida Vale",
+    "x": 28.22,
+    "y": 26.1
+   },
+   {
+    "name": "Mayfair",
+    "x": 63.3,
+    "y": 51.9
+   },
+   {
+    "name": "Paddington",
+    "x": 41.2,
+    "y": 43.96
+   },
+   {
+    "name": "Covent Garden",
+    "x": 82.95,
+    "y": 50.88
+   }
+  ],
+  "pin": null
+ }
+}

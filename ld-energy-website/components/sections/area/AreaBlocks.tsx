@@ -6,6 +6,7 @@ import { FiguresDrawer } from '@/components/inner/FiguresDrawer'
 import { OnThisPage, type PageSection } from '@/components/inner/OnThisPage'
 import { TERRACE_SVG } from '@/components/inner/terrace-svg'
 import { boroughMeta } from '@/lib/boroughs'
+import areaMaps from '@/lib/area-maps.json'
 import type { AreaSummary, RatingGroup } from '@/lib/borough-stats-types'
 import type { AreaLocal, CouncilSection } from '@/lib/area-local'
 import type { FaqItem } from '@/lib/faq'
@@ -49,7 +50,13 @@ export const dataSource = (
 const linkCls = 'in-link'
 
 /* Boroughs with a drawn map hero (real OSM streets and ONS boundary); the rest keep the terrace until rolled out. */
-const AREA_MAPS = new Set(['newham'])
+/* Each borough's map hero: real ONS boundary and OSM streets, rendered by
+   projects/ld-energy-redesign-2026-10/scrollcraft/builds/area-hero-options/map/render2.py. Labels are OSM place names,
+   ranked by the borough's own areasCovered copy, positioned in % of the image; pin is the Stratford base. */
+type AreaMap = { labels: { name: string; x: number; y: number }[]; pin: { x: number; y: number } | null }
+const AREA_MAPS = areaMaps as Record<string, AreaMap>
+/* A neighbourhood page shows its borough's map. */
+const mapSlug = (slug: string) => (AREA_MAPS[slug] ? slug : boroughMeta[slug]?.partOf && AREA_MAPS[boroughMeta[slug].partOf!] ? boroughMeta[slug].partOf! : null)
 
 /* 1. Hero D: the answer and the quote on the left, the drawn terrace with four numbered notes on the right, the
    title-block price list under the answer, and On this page beside it. Title and H1 are unchanged (frozen until 14/12). */
@@ -66,6 +73,7 @@ export function AreaHeroD({ slug, name, s, parent, sections }: {
     { k: 'Floor area', v: s.floorArea.median ? `${s.floorArea.median} m²` : '–', d: s.floorArea.houses ? `median; houses ${s.floorArea.houses} m²` : 'median' },
   ]
   const share = (id: string) => s.sizeBands.find((b) => b.id === id)?.pct
+  const map = mapSlug(slug)
   return (
     <section className="in-hd" aria-labelledby="area-h1">
       <Container className="in-hd__grid">
@@ -108,18 +116,28 @@ export function AreaHeroD({ slug, name, s, parent, sections }: {
         </div>
 
         <figure className="in-hd__art">
-          {AREA_MAPS.has(slug) ? (
-            // eslint-disable-next-line @next/next/no-img-element -- srcset WebP; next/image is unoptimised on Pages
-            <img
-              className="in-hd__map"
-              src={`/areas/maps/${slug}-1400.webp`}
-              srcSet={`/areas/maps/${slug}-700.webp 700w, /areas/maps/${slug}-1400.webp 1400w`}
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              width={1400}
-              height={1160}
-              fetchPriority="high"
-              alt={`Map of ${name}: the borough boundary with its streets, parks, railways and river`}
-            />
+          {map ? (
+            <div className="in-hd__mapwrap">
+              {/* eslint-disable-next-line @next/next/no-img-element -- srcset WebP; next/image is unoptimised on Pages */}
+              <img
+                className="in-hd__map"
+                src={`/areas/maps/${map}-1400.webp`}
+                srcSet={`/areas/maps/${map}-700.webp 700w, /areas/maps/${map}-1400.webp 1400w`}
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                width={1400}
+                height={1160}
+                fetchPriority="high"
+                alt={`Map of ${boroughMeta[map]?.name ?? name}: the borough boundary with its streets, parks, railways and river`}
+              />
+              {AREA_MAPS[map].labels.map((l) => (
+                <span key={l.name} className="in-map__lb" style={{ left: `${l.x}%`, top: `${l.y}%` }}>{l.name}</span>
+              ))}
+              {AREA_MAPS[map].pin && (
+                <span className="in-map__pin" style={{ left: `${AREA_MAPS[map].pin!.x}%`, top: `${AREA_MAPS[map].pin!.y}%` }}>
+                  <i aria-hidden="true" />Our base, Stratford
+                </span>
+              )}
+            </div>
           ) : (
             <div dangerouslySetInnerHTML={{ __html: TERRACE_SVG }} />
           )}
@@ -130,7 +148,7 @@ export function AreaHeroD({ slug, name, s, parent, sections }: {
                 <li key={n.k}><span className="in-tn__n" aria-hidden="true">{i + 1}</span><span className="in-tn__k">{n.k}</span><b className="num">{n.v}</b><span className="in-tn__v">{n.d}</span></li>
               ))}
             </ol>
-            {AREA_MAPS.has(slug) && (
+            {map && (
               <p className="in-hd__credit">Map data © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap contributors</a>. Boundary: ONS, <a href={OGL} rel="noopener">OGL</a>.</p>
             )}
           </figcaption>
