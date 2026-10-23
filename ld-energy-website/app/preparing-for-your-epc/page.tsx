@@ -514,6 +514,12 @@ export default function PreparingPage() {
                     half the floor area or more, only the radiators are counted.
                   </li>
                   <li>Hidden insulation only counts with paperwork that shows the thickness.</li>
+                  <li>
+                    The loft: if there’s no loft hatch or other way in, it’s recorded as no access and the method uses
+                    the default for the age of the home. If you can get into the loft, your assessor measures the
+                    insulation that’s actually there, which can be more or less than that default. A hatch that’s there
+                    but can’t be opened on the day is recorded as access with the insulation unknown, not as no access.
+                  </li>
                 </ul>
                 <p>
                   These rules are set by the government’s method, not by us, and we can’t change them, so we can’t
