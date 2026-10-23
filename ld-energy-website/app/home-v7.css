@@ -527,3 +527,26 @@ body:has(.hp) .dock { display: none !important; }
 .hp .offer__cost .offer__price { margin-top: 0; }
 .hp .offer__note { font-size: 14px; color: var(--ink-quiet); }
 @media (min-width: 760px) and (max-width: 1099px) { .hp .offer--feature .offer__cost { grid-column: 1 / -1; } }
+
+/* service card polish (Abdul 23/10/2026: "looks good but needs a bit of polishing, there are white spaces"). Measured:
+   the Floor Plan subtitle wraps to two lines, so its divider and lists sat 23 px below the others; the shorter
+   cards left a 100-150 px empty band above the price; at 760-1099 px the feature card's two columns left a hole
+   under "Everything in the Domestic EPC". Now: from 1100 px the three cards share one set of rows (subgrid), so
+   titles, dividers, lists and prices line up across; the price sits on a warm plate to the card's edges, so the
+   space above it is the card's body, not a gap; the feature card's floor-plan list takes the right column whole. */
+.hp .offer__foot { margin: auto -28px -22px; padding: 22px 28px 24px; border-top: 1px solid var(--hair); background: #FAF6EE; }
+.hp .offer--feature .offer__foot { background: #F4F1E8; }
+.hp .offer__groups { margin-bottom: 24px; }
+@media (min-width: 1100px) {
+  @supports (grid-template-rows: subgrid) {
+    .hp .offers { grid-template-rows: repeat(5, auto); row-gap: 0; }
+    .hp .offer { display: grid; grid-row: span 5; grid-template-rows: subgrid; row-gap: 0; }
+    .hp .offer__groups { align-content: start; }
+  }
+}
+@media (min-width: 760px) and (max-width: 1099px) {
+  .hp .offer--feature .offer__groups { grid-template-rows: auto 1fr; row-gap: 20px; }
+  .hp .offer--feature .offer__groups > :nth-child(2) { grid-column: 2; grid-row: 1 / span 2; }
+  .hp .offer--feature .offer__groups > :nth-child(3) { grid-column: 1; grid-row: 2; }
+}
+@media (max-width: 759px) { .hp .offer__foot { margin: auto -20px -18px; padding: 20px 20px 20px; } }

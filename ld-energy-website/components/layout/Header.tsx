@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Container } from '@/components/ui/Container'
@@ -41,17 +41,34 @@ export function LogoLockup() {
 export function Header({ waHref }: { waHref: string }) {
   const pathname = usePathname()
   const [solid, setSolid] = useState(false)
+  const [pill, setPill] = useState(false)
+  const line = useRef<HTMLDivElement>(null)
 
-  // The bar takes the paper ground and the hairline once the page moves; one state change per crossing.
+  // The bar takes the paper ground and the hairline once the page moves, and the pill arrives once the reader is
+  // about half a screen in (nateherk.com docks when the hero is 62% gone); one state change per crossing. The line
+  // is written straight to the element, once per frame, so scrolling never re-renders the header.
   useEffect(() => {
-    const update = () => setSolid(window.scrollY > 0)
-    update()
+    let raf = 0
+    const paint = () => {
+      raf = 0
+      const y = window.scrollY, room = document.documentElement.scrollHeight - window.innerHeight
+      setSolid(y > 0)
+      setPill(y > window.innerHeight * 0.45)
+      if (line.current) line.current.style.transform = `scaleX(${room > 0 ? Math.min(1, y / room) : 0})`
+    }
+    const update = () => { if (!raf) raf = requestAnimationFrame(paint) }
+    paint()
     window.addEventListener('scroll', update, { passive: true })
-    return () => window.removeEventListener('scroll', update)
+    window.addEventListener('resize', update)
+    return () => { cancelAnimationFrame(raf); window.removeEventListener('scroll', update); window.removeEventListener('resize', update) }
   }, [])
+
+  const quoteHref = quoteTargetFor(pathname, 'header')
 
   // the homepage's dusk hero sits under the bar: it goes light-on-dark until the page moves (data-dark)
   return (
+    <>
+    <div ref={line} className="sline" aria-hidden="true" />
     <header className="sh" data-solid={solid} data-dark={pathname === '/' && !solid}>
       <Container className="sh__in">
         <LogoLockup />
@@ -72,12 +89,29 @@ export function Header({ waHref }: { waHref: string }) {
           WhatsApp
         </a>
         {/* Outline, not filled: each page's hero and form hold the one filled action in their view. */}
-        <Link prefetch={false} className="ld-btn ld-btn--line ld-btn--sm sh__quote" href={quoteTargetFor(pathname, 'header')}>
+        <Link prefetch={false} className="ld-btn ld-btn--line ld-btn--sm sh__quote" href={quoteHref}>
           <span className="lbl-l">Get my exact quote</span>
           <span className="lbl-s">Get a quote</span>
         </Link>
         <MobileNav waHref={waHref} />
       </Container>
     </header>
+    {/* the scroll pill, desktop only (shared-parts.css): hidden, it is out of the tab order and the accessibility tree */}
+    <nav aria-label="Primary, compact" className="pill" data-on={pill}>
+      <Link prefetch={false} href="/" className="pill__home" aria-label="L&D Energy home">
+        {/* eslint-disable-next-line @next/next/no-img-element -- the header's own mark, already loaded */}
+        <img src="/brand/ld-energy-mark-nav.svg" alt="" width={45} height={24} />
+        <span>L&amp;D Energy</span>
+      </Link>
+      <ul>
+        {headerNav.map((link) => (
+          <li key={link.href}>
+            <Link prefetch={false} href={link.href} aria-current={pathname === link.href ? 'page' : undefined}>{link.label}</Link>
+          </li>
+        ))}
+      </ul>
+      <Link prefetch={false} className="ld-btn ld-btn--primary" href={quoteHref}>Get a quote</Link>
+    </nav>
+    </>
   )
 }
