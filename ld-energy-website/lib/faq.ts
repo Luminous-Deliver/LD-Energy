@@ -129,6 +129,54 @@ export interface FaqCategory {
   items: FaqItem[]
 }
 
+/**
+ * The questions customers ask once their rating comes back (Abdul's real messages, 24/10/2026). Shared by the FAQ page
+ * and the prep page (#rating-questions), each with an id so one answer can be linked on its own.
+ * Sources: rdsap-conventions.md 3.04 (joist over rafter), 9.02 (evidence), RdSAP 10 from 15 June 2025.
+ */
+export const ratingQuestions: (FaqItem & { id: string })[] = [
+  {
+    id: 'old-epc-was-better',
+    q: 'My old EPC had a better rating. Why has it gone down?',
+    a: 'Older EPCs were done under earlier versions of the method, some well over a decade ago. Standards and assumptions have moved on since, so some things that used to score well don’t carry the same weight now. Since June 2025, existing homes are assessed under RdSAP 10, which is more detailed. A new EPC isn’t a like-for-like comparison with an old one, even if the home hasn’t changed.',
+    links: [{ label: 'The method changed in June 2025', href: '/preparing-for-your-epc#rdsap-10' }],
+  },
+  {
+    id: 'similar-homes-got-a-b',
+    q: 'Similar homes nearby got a B. Why didn’t mine?',
+    a: 'Their EPCs may have been done before June 2025 under the older method, or may have expired. Homes that look alike can also differ in floor area, how many outside walls they have (an end or mid terrace), insulation, heating, and the paperwork that was available on the day. Compare the property details on each certificate, not just the letter.',
+    links: [{ label: 'Why your EPC may differ', href: '/preparing-for-your-epc#why-your-epc-may-differ' }],
+  },
+  {
+    id: 'work-not-counted',
+    q: 'I’ve done a lot of work. Why hasn’t the rating moved more?',
+    a: 'An EPC counts specific things: insulation, windows and doors, heating and hot water, heating controls, lighting and renewables such as solar panels. Changes like dividing a room with partitions or curtains, decorating or new flooring don’t count. Some upgrades count for less than people expect, and going from C to B usually needs solar panels.',
+    links: [{ label: 'What counts towards your rating', href: '/preparing-for-your-epc#what-counts' }],
+  },
+  {
+    id: 'loft-insulation-not-counted',
+    q: 'My loft has 300 mm of insulation. Why wasn’t it counted?',
+    a: 'Insulation can only be recorded if your assessor can see and measure it, or if you have paperwork that shows it’s for your home and states the thickness. If the loft couldn’t be reached, or the insulation was covered, the method has to use a default instead. Send us the paperwork with the thickness before your EPC is lodged and we’ll check whether it can be recorded.',
+    links: [{ label: 'Documents that may help', href: '/preparing-for-your-epc#documents-and-evidence' }],
+  },
+  {
+    id: 'joist-and-rafter-insulation',
+    q: 'I have insulation at the loft floor and in the roof slope. Why does only one count?',
+    a: 'Where a loft is insulated at both the joists (the loft floor) and the rafters (the roof slope), the method counts the joist insulation only. We can photograph and note what we see, but the rafter insulation won’t change the rating.',
+  },
+  {
+    id: 'a-point-or-two-off',
+    q: 'It’s only a point or two off the next band. Can you adjust it?',
+    a: 'No. The rating is worked out by approved software from what was recorded and evidenced, and we can’t move it, even by a point. That stays true if the home isn’t being sold or let, or the EPC is for your own records. If you have paperwork for something we couldn’t see, send it before the EPC is lodged and we’ll check whether it can be recorded.',
+    links: [{ label: 'How your EPC rating is calculated', href: '/preparing-for-your-epc#how-your-epc-rating-is-calculated' }],
+  },
+  {
+    id: 'is-c-a-good-rating',
+    q: 'Is a C a good rating?',
+    a: 'Yes, it’s a strong result for an existing home. The current legal minimum for letting a home is E. The government has confirmed a C target for rented homes from 1 October 2030, but that still needs legislation.',
+  },
+]
+
 export const fullFaq: FaqCategory[] = [
   {
     id: 'about-epcs',
@@ -294,6 +342,11 @@ export const fullFaq: FaqCategory[] = [
         links: [{ label: 'Pricing questions', href: '/pricing#pricing-faq' }],
       },
     ],
+  },
+  {
+    id: 'your-rating',
+    title: 'When your rating comes back',
+    items: ratingQuestions,
   },
   {
     id: 'improvements',

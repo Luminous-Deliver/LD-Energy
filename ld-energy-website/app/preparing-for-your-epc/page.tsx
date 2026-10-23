@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { ArrowDown, CalendarClock, Clock, CreditCard, FileText, Home, Info, KeyRound, Mail, Phone } from 'lucide-react'
 import { GuideCrumbs } from '@/components/blog/GuideCrumbs'
 import { TableOfContents } from '@/components/blog/TableOfContents'
+import { ratingQuestions } from '@/lib/faq'
 import { PrepChecklist } from '@/components/prep/PrepChecklist'
 import { WhatsAppIcon } from '@/components/ui/BrandIcons'
 import { prepGroups } from '@/lib/prep-checklist'
@@ -59,6 +60,7 @@ const toc = [
   { id: 'documents-and-evidence', text: 'Documents that may help', level: 2 },
   { id: 'important', text: 'Quotes, ratings and older EPCs', level: 2 },
   { id: 'what-counts', text: 'What counts towards your rating', level: 3 },
+  { id: 'rating-questions', text: 'When your rating comes back', level: 3 },
   { id: 'on-the-day', text: 'On the day', level: 2 },
   { id: 'who-needs-to-be-there', text: 'Who needs to be there', level: 2 },
   { id: 'after-the-visit', text: 'After the visit', level: 2 },
@@ -71,6 +73,7 @@ const shareLinks = [
   { id: 'why-your-epc-may-differ', label: 'Why your EPC may differ' },
   { id: 'how-your-epc-rating-is-calculated', label: 'How your rating is calculated' },
   { id: 'what-counts', label: 'Done work? What counts' },
+  { id: 'rating-questions', label: 'When your rating comes back' },
 ]
 
 const crumbs = [
@@ -575,6 +578,25 @@ export default function PreparingPage() {
                     GOV.UK notice of approval
                   </a>
                 </p>
+              
+                <h3 id="rating-questions">When your rating comes back</h3>
+                <p>The questions we’re asked most once the rating is in, answered straight.</p>
+                <dl className="pp-qa pp-qa--rating">
+                  {ratingQuestions.map((x) => (
+                    <div key={x.id} id={x.id}>
+                      <dt>{x.q}</dt>
+                      <dd>
+                        {x.a}
+                        {x.links?.map((l) => (
+                          <span key={l.href}>
+                            {' '}
+                            <a href={l.href.replace('/preparing-for-your-epc', '')} className="gd-link">{l.label}</a>
+                          </span>
+                        ))}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
               </section>
 
               <section id="on-the-day" className="pp-sec" aria-labelledby="on-the-day-h">
