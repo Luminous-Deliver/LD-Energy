@@ -66,7 +66,7 @@ export function nextSteps(kind: ProductKind, speed?: string, energyReport?: bool
   ]
   const lodgedWhen = speed === SAME_DAY_LODGEMENT_SPEED || speed === NEXT_DAY_VISIT_SPEED ? 'on the day of the visit' : 'within 72 hours'
   const steps = [
-    `Abdul checks your details and replies with your exact price and available times during opening hours (${OPENING_HOURS}).`,
+    `Abdul checks your details and replies the same working day with your exact price and available times (opening hours ${OPENING_HOURS}).`,
     'You pick a time. Your visit is confirmed once you agree the price and time.',
   ]
   // what to have ready, in the FAQ's wording (v7: the confirmation stopped at opening hours)

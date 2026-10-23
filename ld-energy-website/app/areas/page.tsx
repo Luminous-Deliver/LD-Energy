@@ -3,17 +3,18 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ShieldCheck } from 'lucide-react'
 import { Container } from '@/components/ui/Container'
-import { BoroughFinder, type FinderRegion } from '@/components/sections/BoroughFinder'
+import { AreasMap, type MapBorough } from '@/components/sections/AreasMap'
+import type { FinderRegion } from '@/components/sections/BoroughFinder'
 import { Ico } from '@/components/sections/home/HomeIcon'
 import { InnerEnding } from '@/components/inner/InnerEnding'
-import { TERRACE_SVG_PLAIN } from '@/components/inner/terrace-svg'
 import { boroughList, boroughMeta } from '@/lib/boroughs'
 import { boroughStats } from '@/lib/borough-stats'
-import { fmt, pct, statsSource, ukDate, whatsappQuoteHref } from '@/lib/area-page'
+import { fmt, pct, statsSource, ukDate } from '@/lib/area-page'
 import { DATA_PAGE_PATH, extremes, londonBoroughs, placesFor, ratingsFinding } from '@/lib/borough-ratings'
 import { regions } from '@/lib/london-regions'
 import { site, priceFrom, defaultOgImage, SAME_DAY_LODGEMENT_SURCHARGE } from '@/lib/site'
 import '../inner.css'
+import './areas.css'
 
 export const metadata: Metadata = {
   title: 'Areas We Cover | EPC Assessor Across London',
@@ -57,6 +58,11 @@ const finderRegions: FinderRegion[] = regions.map((r) => ({
     .sort((a, b) => a.name.localeCompare(b.name)),
 }))
 
+/** The same rows, flat, with their region, for the map's side card and search. */
+const mapBoroughs: MapBorough[] = finderRegions.flatMap((r) =>
+  r.rows.map((row) => ({ slug: row.slug, name: row.name, region: r.id, regionName: r.name, places: row.places, districts: row.districts, atoC: row.atoC })),
+)
+
 export default function AreasPage() {
   const { top, bottom } = ratingsFinding()
   const size = extremes((b) => b.floorArea.median ?? 0, londonBoroughs)
@@ -93,9 +99,9 @@ export default function AreasPage() {
     <div className="in">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
 
-      {/* Hero in the area-hero D family (inner-page options board, Abdul 23/10/2026): the drawn terrace, no gradient. */}
+      {/* Hero E from the /areas map prototype (Abdul approved 23/10/2026): copy and facts left, the London illustration right. */}
       <section className="in-hh" aria-labelledby="areas-h1">
-        <Container className="in-hh__grid">
+        <Container className="in-hh__grid in-ah__grid">
           <div className="in-hh__copy">
             <nav className="in-crumbs" aria-label="Breadcrumb">
               <ol>
@@ -110,7 +116,7 @@ export default function AreasPage() {
             </p>
             <div className="in-hd__acts">
               <a className="ld-btn ld-btn--primary" href={quoteHref({ service: 'epc', sourcePage: 'areas', ctaId: 'hero' })} data-enquiry-cta="hero">Get my exact quote</a>
-              <a className="in-wa" href={whatsappQuoteHref()} target="_blank" rel="noopener noreferrer"><Ico name="message" size={18} /> WhatsApp a quote request</a>
+              <a className="in-wa" href="#find">Find your borough</a>
             </div>
             <ul className="in-hh__facts">
               <li><b className="num">33</b><span>London councils, one price list</span></li>
@@ -118,26 +124,58 @@ export default function AreasPage() {
               <li><b className="num">72 h</b><span>to the GOV.UK register</span></li>
             </ul>
           </div>
-          <figure className="in-hd__art" aria-hidden="true">
-            <div dangerouslySetInnerHTML={{ __html: TERRACE_SVG_PLAIN }} />
+          <figure className="in-ah__art">
+            {/* eslint-disable-next-line @next/next/no-img-element -- single WebP; next/image is unoptimised on Pages */}
+            <img
+              src="/areas/hero-london.webp"
+              width={900}
+              height={506}
+              fetchPriority="high"
+              alt="Illustration of an East London district from above, with streets, parks and the river"
+            />
+            <figcaption>An AI-generated illustration.</figcaption>
           </figure>
         </Container>
       </section>
 
-      <section className="in-sec" id="all-areas" aria-labelledby="find-h" style={{ paddingTop: 48 }}>
+      <section className="in-sec" id="find" aria-labelledby="find-h" style={{ paddingTop: 48 }}>
         <Container>
           <div className="in-prose">
             <p className="in-eyebrow">Find your area</p>
-            <h2 id="find-h" className="in-h2">Every London borough, by region</h2>
-            <p className="in-lede">
-              Search by borough, town or postcode district. Each borough page has its own ratings, postcode figures and local rules.
-              A place that isn&rsquo;t listed is still covered by its borough.
-            </p>
+            <h2 id="find-h" className="in-h2">Every London borough, on one map</h2>
+            <p className="in-note">Each borough has its own page with local ratings, postcode figures and council rules. Shaded by London region.</p>
           </div>
+          <AreasMap boroughs={mapBoroughs} regions={regions.map((r) => ({ id: r.id, name: r.name }))} initial="newham" />
+        </Container>
+      </section>
 
-          <BoroughFinder regions={finderRegions} />
+      <section className="in-sec in-alist" id="all-areas" aria-labelledby="list-h">
+        <Container>
+          <p className="in-eyebrow">Every area, as a list</p>
+          <h2 id="list-h" className="in-h2">All boroughs by region</h2>
+          {finderRegions.map((region) => (
+            <section key={region.id} id={`region-${region.id}`} aria-labelledby={`region-${region.id}-h`}>
+              <h3 id={`region-${region.id}-h`} className="in-alist__h">{region.name}</h3>
+              <ul className="in-alist__ul">
+                {region.rows.map((row) => (
+                  <li key={row.slug}>
+                    <Link href={`/areas/${row.slug}`} className="in-alist__a">
+                      <span>EPC in {row.name}</span><small className="num">{row.atoC} A to C</small>
+                    </Link>
+                    {row.places.length > 0 && <p className="in-alist__places">{row.places.join(', ')}</p>}
+                    <p className="in-alist__pcs">{row.districts.join(' · ')}</p>
+                    {row.child && (
+                      <p className="in-alist__child">
+                        <Link href={`/areas/${row.child.slug}`} className="in-link">EPC in {row.child.name}</Link> ({row.child.districts.join(', ')}), where we are based
+                      </p>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))}
 
-          <p className="in-src" style={{ marginTop: 24 }}>
+          <p className="in-src" style={{ marginTop: 32 }}>
             Regions follow the London Plan sub-regions; town centres are the Plan&rsquo;s major centres. Postcode districts with at
             least {boroughStats.thresholds.districtMin} certificates are listed. &ldquo;Rated A to C&rdquo; is the share of EPCs for existing
             homes lodged {ukDate(statsSource.from)} to {ukDate(statsSource.to)}, from the GOV.UK register.

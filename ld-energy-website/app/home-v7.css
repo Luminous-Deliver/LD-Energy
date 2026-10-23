@@ -481,6 +481,8 @@ body:has(.hp) .dock { display: none !important; }
   .hp .btn:active, .hp .bf__go:active { transform: none; }
 }
 
+.hp .areas-links { display: grid; gap: 8px; justify-items: start; margin-top: 4px; }
+
 /* hero B (23/10), after every other hero rule so it wins. Desktop: the picture never grows taller than the space under
    the header (the roof stays clear of the nav on short screens), sits against the right edge, and its left edge fades
    into the paper; the copy keeps a paper fade at every height */

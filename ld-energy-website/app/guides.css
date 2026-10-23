@@ -2,7 +2,7 @@
    board (projects/ld-energy-redesign-2026-10/scrollcraft/builds/inner-options): guide hero A (the question, the short
    answer, the A to G scale), hub B (topic chips and a clean list) with A's pictures and C's numbered reading order.
    Paper ground, ink type, sage for links and the one action; no blue-grey panels. Tokens from shared-parts.css. */
-.gd { --gd-card: #fff; --gd-sage-1: #E7F1EB; --gd-g: 16px; --gd-sec: 56px;
+.gd { --gd-card: #fff; --gd-warm: #FAF4EB; --gd-sage-1: #E7F1EB; --gd-g: 16px; --gd-sec: 56px;
   background: var(--ground); color: var(--ink); font: 400 17px/1.6 var(--font-sans); }
 @media (min-width: 760px) { .gd { --gd-g: 48px; --gd-sec: 96px; font-size: 18px; } }
 .gd :where(h1, h2, h3) { margin: 0; font-family: var(--font-serif); font-weight: 400; line-height: 1.12; color: var(--ink); text-wrap: balance; }
@@ -71,7 +71,8 @@
 .gd-scale--art .gd-scale__bar span { font-size: 12px; }
 
 /* "In short" card, in the hero of guides that have no scale */
-.gd-short { display: grid; gap: 12px; padding: 20px; background: var(--gd-card); border: 1px solid var(--hair); border-radius: 12px; }
+/* warm paper tint (Abdul 23/10, ideas board 1) */
+.gd-short { display: grid; gap: 12px; padding: 20px; background: var(--gd-warm); border: 1px solid var(--hair); border-radius: 12px; }
 .gd-short ul { list-style: none; padding: 0; display: grid; gap: 0; border-top: 1px solid var(--hair); }
 .gd-short li { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--hair); font-size: 16px; line-height: 1.5; }
 .gd-short li svg { margin-top: 4px; color: var(--sage-700); }

@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { preload } from 'react-dom'
 import { site, priceFrom, maxBundleSaving, insurance, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE } from '@/lib/site'
 import { boroughList } from '@/lib/boroughs'
+import { DATA_PAGE_PATH } from '@/lib/borough-ratings'
 import { whatsappQuoteHref } from '@/lib/area-page'
 import { homeBookingFaqs } from '@/lib/homepage-content'
 import { quoteHref } from '@/lib/quote-context'
@@ -376,6 +377,11 @@ function Proof() {
               <summary>See every area <Ico name="arrow-right" /></summary>
               <ul className="boroughs">{areas.map((b) => <li key={b.slug}><Link prefetch={false} href={`/areas/${b.slug}`}>{b.name}</Link></li>)}</ul>
             </details>
+            {/* the map index and the borough figures (Abdul 19/10 picks; the 23/10 audit found the homepage linked neither) */}
+            <div className="areas-links">
+              <Link prefetch={false} className="link arrow-link" href="/areas">Map of the areas we cover <Ico name="arrow-right" /></Link>
+              <Link prefetch={false} className="link arrow-link" href={DATA_PAGE_PATH}>EPC ratings in every borough <Ico name="arrow-right" /></Link>
+            </div>
           </div>
         </div>
       </div>

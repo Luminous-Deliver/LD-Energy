@@ -209,7 +209,7 @@ function buildConfirmation(data: ParsedInput) {
 
   const intro = isBulkEnquiry
     ? `Thanks for your enquiry with L&D Energy. We've received it. Abdul will be in touch during our opening hours (${OPENING_HOURS}) with volume rates for your portfolio.`
-    : `Thanks for your quote request with L&D Energy. We've received it. Abdul will be in touch during our opening hours (${OPENING_HOURS}) with your exact price and an available appointment.`
+    : `Thanks for your quote request with L&D Energy. We've received it. Abdul will reply the same working day with your exact price and an available appointment (opening hours ${OPENING_HOURS}).`
   const preheader = isBulkEnquiry
     ? 'Abdul will reply with volume rates for your portfolio.'
     : 'Abdul will reply with your exact price and available times.'
