@@ -468,6 +468,10 @@ export default function PreparingPage() {
                   or lender relying on it.
                 </p>
                 <p>
+                  <strong>That includes us.</strong> We can’t change your rating, before or after the visit, and we
+                  can’t lodge a different one because it was expected or needed for a sale, a let or a mortgage.
+                </p>
+                <p>
                   What we can do is make sure everything that’s really there gets recorded and backed by evidence.
                   That’s what the <a href="#documents-and-evidence">documents section</a> is for.
                 </p>
@@ -518,11 +522,32 @@ export default function PreparingPage() {
 
                 <h4 id="rdsap-10">The method changed in June 2025: RdSAP 10</h4>
                 <p>
-                  Existing homes have been assessed under RdSAP 10 since {govUk.rdsap10EffectiveFrom}. It’s a more
-                  detailed method, so a new EPC shouldn’t be expected to match an older one exactly, even if the home
-                  hasn’t changed much. That doesn’t mean the older one was wrong, and RdSAP 10 doesn’t always raise or
-                  lower a score. An older certificate can also hold different assumptions, so if one looks wrong,
-                  compare what was recorded rather than the rating alone.{' '}
+                  Existing homes have been assessed under the updated RdSAP 10 method since {govUk.rdsap10EffectiveFrom},
+                  replacing the approach used for older EPCs. RdSAP is a reduced-data version of the full SAP
+                  calculation. It’s used for existing homes because the complete construction data a new-build
+                  assessment relies on is rarely available for a home that’s already standing.
+                </p>
+                <p>
+                  Older and newer EPCs may differ because the method, the data it needs, the evidence for the home and
+                  the technologies it considers have all changed. That’s a change in how a home is assessed and
+                  recorded. It isn’t a judgement that older homes or older building standards are now “bad”, and it
+                  isn’t a requirement to modernise anything.
+                </p>
+                <p>
+                  So a new EPC shouldn’t be expected to reproduce an older certificate exactly, even if the home itself
+                  hasn’t changed much. An older EPC reflects the method and information available at the time; a
+                  current EPC assesses the home using today’s approved method.
+                </p>
+                <p>
+                  That doesn’t mean an older EPC was automatically wrong, or that RdSAP 10 will always produce a higher
+                  or lower rating. The result depends on the home, the features present, the evidence available and
+                  the method used. RdSAP 10 is the approved method for existing homes in England and Wales under the
+                  current GOV.UK notice of approval.
+                </p>
+                <p>
+                  Older EPCs can also hold different assumptions or recorded information. If an older certificate
+                  looks inconsistent with the home, compare the property details on it rather than the letter alone.
+                  Genuine errors are possible, though they shouldn’t be presumed.{' '}
                   <Link href="/blog/rdsap-10-what-changed-2025">What changed in RdSAP 10</Link>
                   {' · '}
                   <a href={govUk.methodologyNotice} target="_blank" rel="noopener noreferrer">
