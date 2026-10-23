@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState, type ReactNode, type RefObject } from 'react'
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent, type ReactNode, type RefObject } from 'react'
 import { usePathname } from 'next/navigation'
 import { Controller, useForm, type FieldErrors } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -37,6 +37,49 @@ const QUOTE_FIELDS: (keyof ContactInput)[] = ['customerType', 'services', 'dwell
 const TITLES = ['Your guide price', 'Timing and access', 'Your details']
 const GATES: (keyof ContactInput)[][] = [QUOTE_FIELDS, ['speed', 'preferredDate', 'notes']]
 const LAST = TITLES.length
+
+/**
+ * Phones: system C, "Answers fold away" (Abdul 23/10/2026: "C is perfect for mobile"). The same form and the same
+ * react-hook-form state, drawn as a numbered rail: one question open at a time, each answer folding into one line with
+ * its own Change. The three desktop steps still run underneath (Turnstile, submit, step events), so `step` follows
+ * whichever rail question is open. Desktop is unchanged.
+ */
+type RailId = 'who' | 'service' | 'dwelling' | 'size' | 'price' | 'timing' | 'details'
+const RAIL_LABELS: Record<RailId, string> = {
+  who: 'You', service: 'Service', dwelling: 'Property type', size: 'Size', price: 'Guide price', timing: 'Timing and access', details: 'Your details',
+}
+// the accessible name of each Change button; "Change you" would read badly
+const RAIL_CHANGE: Record<RailId, string> = {
+  who: 'Change which best describes you', service: 'Change service', dwelling: 'Change property type', size: 'Change size',
+  price: 'Change guide price options', timing: 'Change timing and access', details: 'Change your details',
+}
+const RAIL_STEP: Record<RailId, number> = { who: 1, service: 1, dwelling: 1, size: 1, price: 1, timing: 2, details: LAST }
+const RAIL_GATES: Record<RailId, (keyof ContactInput)[]> = {
+  who: ['customerType'], service: ['services'], dwelling: ['dwellingType'], size: ['areaBand', 'floorArea'], price: GATES[0], timing: GATES[1], details: [],
+}
+const FIELD_RAIL: Partial<Record<keyof ContactInput, RailId>> = {
+  customerType: 'who', services: 'service', dwellingType: 'dwelling', areaBand: 'size', floorArea: 'size', floorAreaUnknown: 'size',
+  improvementPlan: 'price', energyReport: 'price', speed: 'timing', preferredDate: 'timing', notes: 'timing',
+}
+/** A portfolio skips the size and the timing, as the desktop form skips step 2. */
+function railOrder(bulk: boolean): RailId[] {
+  return bulk ? ['who', 'service', 'price', 'details'] : ['who', 'service', 'dwelling', 'size', 'price', 'timing', 'details']
+}
+/** The next question that still needs an answer: after `from` first, then from the top, else the details. */
+function railNext(list: RailId[], seen: ReadonlySet<RailId>, from: RailId | null, answers: { dwellingType?: string; areaBand?: string }): RailId {
+  const needs = (id: RailId) => !seen.has(id) || (id === 'dwelling' && !answers.dwellingType) || (id === 'size' && !answers.areaBand)
+  return list.slice(from ? list.indexOf(from) + 1 : 0).find(needs) || list.find(needs) || 'details'
+}
+const PHONE_QUERY = '(max-width: 759px)'
+function subscribePhone(onChange: () => void) {
+  const query = window.matchMedia(PHONE_QUERY)
+  query.addEventListener('change', onChange)
+  return () => query.removeEventListener('change', onChange)
+}
+/** The phone layout follows the CSS breakpoint. The server renders desktop; booking-v7.css hides that until hydration. */
+function usePhone() {
+  return useSyncExternalStore(subscribePhone, () => window.matchMedia(PHONE_QUERY).matches, () => false)
+}
 
 const controlClass = 'inline-flex min-h-[48px] items-center justify-center rounded-lg px-4 py-3 text-base font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-700 disabled:opacity-60'
 const badgeClass: Record<BadgeTone, string> = { green: 'bg-accent-600', navy: 'bg-primary-700' }
@@ -234,6 +277,17 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
   // The shared floor-area field. "Over 115 m²" opens it; any other band opens it on request. Once
   // the customer types, it stays open even when their figure moves them to a smaller band.
   const [areaOpen, setAreaOpen] = useState(false)
+  // phones (C): the open question, the answered ones, and a tick that asks for the open one to be scrolled to and focused
+  const phone = usePhone()
+  const [railOpen, setRailOpen] = useState<RailId>('who')
+  const [railSeen, setRailSeen] = useState<ReadonlySet<RailId>>(() => new Set())
+  const [railTick, setRailTick] = useState(0)
+  const [railMode, setRailMode] = useState(false)
+  const [railPick, setRailPick] = useState<object | null>(null)
+  const [railPicked, setRailPicked] = useState<object | null>(null)
+  // a tap folds the question and opens the next; a key press never does (arrow keys only move the choice, Enter moves on)
+  const tapped = useRef(false)
+  const railTimer = useRef<number | undefined>(undefined)
   const headingRef = useRef<HTMLHeadingElement>(null)
   const successRef = useRef<HTMLDivElement>(null)
   const formRef = useRef<HTMLFormElement>(null)
@@ -244,7 +298,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
   const serviceTouched = useRef(false)
   const quietReset = useRef(false)
   const defaultCta: CtaId = variant === 'hero' ? 'hero-form' : dedicated ? 'direct' : 'embedded'
-  const { register, handleSubmit, control, reset, watch, getValues, setValue, trigger, clearErrors, formState: { errors } } = useForm<ContactInput>({
+  const { register, handleSubmit, control, reset, watch, getValues, setValue, trigger, clearErrors, getFieldState, formState: { errors } } = useForm<ContactInput>({
     resolver: zodResolver(contactSchema),
     shouldFocusError: false,
     defaultValues: {
@@ -288,13 +342,28 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
     // The same rules as choosing a tab: no hidden add-on survives a change of service.
     if (request.service !== 'epc' && request.service !== 'bundle') { setValue('speed', 'Standard (72 hours)'); setValue('improvementPlan', false) }
     setValue('energyReport', false)   // the homepage's buttons never pick the Pre-Assessment
-    if (status !== 'success') { moveFocus.current = true; setStep(1) }
+    if (status !== 'success') { moveFocus.current = true; setStep(1); setRailPick(request) }
   }, [request, variant, setValue, status])
 
   useEffect(() => {
     if (moveFocus.current) { focusBookingElement(headingRef.current); moveFocus.current = false }
   }, [step])
   useEffect(() => { if (status === 'success') focusBookingElement(successRef.current) }, [status])
+  // phones: the question that just opened comes into view and takes focus (smooth, or a jump under reduced motion)
+  useEffect(() => {
+    if (!railTick) return
+    const item = formRef.current?.querySelector<HTMLElement>('.bf-st.is-open')
+    if (!item) return
+    // whatever is pinned over the top: the dialog's bar, or on a page the header and an area page's On this page bar
+    const dialog = item.closest('dialog')
+    const bars = dialog ? [dialog.querySelector('[data-dialog-bar]')] : [document.querySelector('header'), document.querySelector('.in-secbar')]
+    const cover = Math.max(0, ...bars.map(bar => bar && ['sticky', 'fixed'].includes(getComputedStyle(bar).position)
+      ? Math.max(0, parseFloat(getComputedStyle(bar).top) || 0) + bar.getBoundingClientRect().height : 0))
+    item.style.scrollMarginTop = `${cover + 12}px`
+    item.scrollIntoView({ block: 'start', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })
+    item.querySelector<HTMLElement>('[data-rail-q]')?.focus({ preventScroll: true })
+  }, [railTick])
+  useEffect(() => () => window.clearTimeout(railTimer.current), [])
 
   const { containerRef: turnstileRef, token: turnstileToken, isLoading: turnstileLoading, error: turnstileError, reset: resetTurnstile } = useTurnstile({
     enabled: !FORM_DRAFT && step === LAST && status !== 'success',
@@ -309,6 +378,21 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
   const stepCount = portfolio ? 2 : LAST
   const stepAt = portfolio && step === LAST ? 2 : step
   const dateNote = visitDateNote(values.preferredDate, values.speed === NEXT_DAY_VISIT_SPEED)
+
+  // phones: arriving on the phone layout (first render after hydration, or a resize) opens the question matching the step
+  if (phone !== railMode) {
+    setRailMode(phone); setRailPicked(railPick)
+    if (phone) {
+      const list = railOrder(portfolio)
+      const at: RailId = step === LAST ? 'details' : step === 2 ? 'timing' : 'who'
+      setRailSeen(new Set(list.slice(0, list.indexOf(at)))); setRailOpen(at)
+    }
+  } else if (phone && railPick !== railPicked) {
+    // a "See my price" button on the homepage has picked the service: that question counts as answered
+    setRailPicked(railPick)
+    const seen = new Set(railSeen).add('service')
+    setRailSeen(seen); setRailOpen(railNext(railOrder(portfolio), seen, null, values)); setRailTick(tick => tick + 1)
+  }
 
   // The plan's box pulses three times as it comes into view (v7: "a little subtle blinking animation"); never under
   // reduced motion, never once ticked.
@@ -365,6 +449,55 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
     }
   }
 
+  /* ------------------------------------------------------------- phones: the rail */
+  /** Opens one rail question (the others fold) and keeps the desktop step in line with it. */
+  function railGo(id: RailId, seen?: ReadonlySet<RailId>) {
+    window.clearTimeout(railTimer.current)
+    if (seen) setRailSeen(seen)
+    setRailOpen(id); setStep(RAIL_STEP[id]); setRailTick(tick => tick + 1)
+  }
+
+  /** Folds the open question once its gate passes, then opens the next that still needs an answer. */
+  async function railAdvance(from: RailId) {
+    window.clearTimeout(railTimer.current)
+    start()
+    const gate = RAIL_GATES[from]
+    if (!(await trigger(gate))) {
+      // the price's gate is the whole of desktop step 1, so its first problem may sit on an earlier question
+      const field = gate.find(name => getFieldState(name).invalid)
+      const owner = field && FIELD_RAIL[field]
+      if (owner && owner !== from) { railGo(owner); return }
+      requestAnimationFrame(() => {
+        const invalid = formRef.current?.querySelector<HTMLElement>('.bf-st.is-open [aria-invalid="true"]')
+        focusBookingElement(invalid?.querySelector<HTMLElement>('input') || invalid || null)
+      })
+      return
+    }
+    // the same step events as the desktop's Continue: leaving the price is step 1, leaving the timing step 2
+    if (from === 'price' || from === 'timing') conversionEvent('form_step_complete', { ...quoteContextFromForm(getValues()), step: RAIL_STEP[from] })
+    const seen = new Set(railSeen).add(from)
+    railGo(railNext(railOrder(getValues('services').includes(BULK)), seen, from, getValues()), seen)
+  }
+
+  /** A tapped answer folds after a beat, so the choice is seen landing; keyboard choices wait for Enter. */
+  function railTap(from: RailId) {
+    if (!tapped.current) return
+    window.clearTimeout(railTimer.current)
+    railTimer.current = window.setTimeout(() => void railAdvance(from), 240)
+  }
+  const railEnter = (from: RailId) => (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') { event.preventDefault(); void railAdvance(from) }
+  }
+
+  /** After a refused send on a phone: the first problem on a folded question reopens it, else the usual focus. */
+  function railError(errorFields: FieldErrors<ContactInput>) {
+    const list = railOrder(getValues('services').includes(BULK))
+    const owners = new Set(Object.keys(errorFields).map(name => FIELD_RAIL[name as keyof ContactInput]).filter(Boolean))
+    const first = list.find(id => owners.has(id))
+    if (first) railGo(first)
+    else focusError(errorFields)
+  }
+
   /** A fresh challenge after a failed send. The notice explains it, so the empty token is not also flagged as a field error. */
   function retryChallenge() { quietReset.current = true; resetTurnstile(); quietReset.current = false }
 
@@ -401,6 +534,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
     <div className={shell}>
       <RequestSent data={sent.data} confirmationSent={sent.confirmationSent} focusRef={successRef} idPrefix={idPrefix} onReset={() => {
         reset(); started.current = false; serviceTouched.current = false; setAreaOpen(false); setSent(null); setStatus('idle'); moveFocus.current = true; setStep(1)
+        setRailOpen('who'); setRailSeen(new Set()); setRailTick(tick => tick + 1)
         rememberCustomerType('', window.history)
         if (dedicated) window.history.replaceState(window.history.state, '', quoteHref())
       }} />
@@ -427,6 +561,11 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
     if (value !== TOP_BAND) setValue('floorAreaUnknown', false)
     else clearErrors('floorArea')
     rememberSelection(); conversionEvent('estimator_use', quoteContextFromForm(getValues()))
+  }
+  const whoChosen = (value: string) => {
+    rememberCustomerType(value as ContactInput['customerType'], window.history)
+    // An agent instructing on a sale usually needs the floor plan too; only a default.
+    if (!serviceTouched.current && value === 'Estate agent') chooseService('Both (Bundle)')
   }
   const sizeNote = errors.floorArea?.message || ((parseExactArea(floorArea) ?? 0) > 300 ? 'That is a very large home. If your figure is in square feet, divide it by 10.76 to get m².' : '')
   const baseTotal = (band: string) => guideEstimate({ services: values.services, areaBand: band })
@@ -489,6 +628,50 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
     </div>
   )
 
+  /** The estimate panel's parts: the desktop panel shows them in this order, the phone's price question moves the
+   *  extras up under the price, as prototype C. */
+  const estHead = <>
+    <p className="bf__est-label">Estimated guide price</p>
+    {isBulk ? (
+      <><p className="bf__price"><b>Quote</b></p><p className="bf__for">Several properties are quoted individually.</p></>
+    ) : estimate.state === 'priced' && band && estimate.total !== null ? (
+      <>
+        <p className="bf__price">{estimate.isStartingPrice && <small>From</small>}<b data-price className="tabular-nums">£{formatPrice(estimate.total)}</b><span>{isLodged || productKind === 'preAssessment' ? 'inc. assessment' : 'inc. on-site measuring'}{isLodged ? ' and GOV.UK lodgement' : ''}</span></p>
+        <p className="bf__for">{areaLabel(values.areaBand, values.floorArea)}</p>
+        {estimate.isStartingPrice && <p className="bf__for">Final price depends on property size and complexity. We&rsquo;ll confirm your exact quote before booking.</p>}
+        {estimate.saving > 0 && <p className="bf__save">Save £{estimate.saving} compared with booking separately.</p>}
+        <dl className="bf__rows">{guideEstimateRows(estimate).map(([label, amount]) => <div key={label}><dt>{label}</dt><dd className="tabular-nums">{amount}</dd></div>)}</dl>
+      </>
+    ) : estimate.state === 'manual-quote' ? (
+      <>
+        <p className="bf__price bf__price--text"><b data-price>Price to be confirmed</b></p>
+        <p className="bf__for">We&rsquo;ll confirm the size and price from your property details.</p>
+        <dl className="bf__rows">{guideEstimateRows(estimate).map(([label, amount]) => <div key={label}><dt>{label}</dt><dd className="tabular-nums">{amount}</dd></div>)}</dl>
+      </>
+    ) : (
+      <><p className="bf__price"><small>From</small><b data-price className="tabular-nums">£{formatPrice(estimate.fromTotal ?? 0)}</b></p><p className="bf__for">Pick a size for your guide price.</p></>
+    )}
+  </>
+  const estGet = <>
+    {whatYouGet(productKind).length > 0 && <>
+      <p className="bf__est-label bf__get-h">What you get</p>
+      <ul className="bf__ticks bf__get">{whatYouGet(productKind).map(item => <li key={item}><Check aria-hidden="true" className="h-4 w-4 shrink-0" />{item}</li>)}</ul>
+    </>}
+    <details className="bf__incl"><summary><span>What’s included in the price</span><ArrowRight aria-hidden="true" className="h-5 w-5" /></summary>
+      <ul>{includedList(productKind).map(item => <li key={item}>{item}</li>)}</ul></details>
+  </>
+  const estExtras = <>
+    {(planChoice || reportChoice) && <div className="bf__extras">
+      {planChoice}
+      {reportChoice}
+    </div>}
+  </>
+  const estFine = <>
+    {planIncluded && estimate.state === 'awaiting-area' && <p className="bf__note mt-3">Your personalised written improvement plan is included in the price.</p>}
+    <p className="bf__fine"><Check aria-hidden="true" className="h-4 w-4 shrink-0 text-[#386B59]" />No upfront payment. You pay once the assessment is done.</p>
+    <p className="bf__fine bf__fine--quiet">Exact price and appointment confirmed before booking.</p>
+  </>
+
   const quoteStep = (
     <div className="bf__quote">
       <Controller control={control} name="customerType" render={({ field }) => (
@@ -502,12 +685,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
                 <label key={option.value} className="bf-tile bf-tile--who" data-checked={checked || undefined}>
                   <input type="radio" name="customerType" value={option.value} checked={checked} required className="bf-radio"
                     ref={index === 0 ? field.ref : undefined} aria-label={option.label} aria-describedby={fid(`customerType-d-${index}`)}
-                    onChange={() => {
-                      field.onChange(option.value)
-                      rememberCustomerType(option.value as ContactInput['customerType'], window.history)
-                      // An agent instructing on a sale usually needs the floor plan too; only a default.
-                      if (!serviceTouched.current && option.value === 'Estate agent') chooseService('Both (Bundle)')
-                    }} />
+                    onChange={() => { field.onChange(option.value); whoChosen(option.value) }} />
                   <span aria-hidden="true" className="bf-tile__ico"><Ico name={icon} /></span>
                   <span className="min-w-0"><b>{option.label}</b><span id={fid(`customerType-d-${index}`)} className="bf-tile__d">{option.description}</span></span>
                   {checked && <Check aria-hidden="true" strokeWidth={3} className="bf-tile__check" />}
@@ -609,39 +787,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
         </div>
 
         <div className="bf__est" data-estimate>
-          <p className="bf__est-label">Estimated guide price</p>
-          {isBulk ? (
-            <><p className="bf__price"><b>Quote</b></p><p className="bf__for">Several properties are quoted individually.</p></>
-          ) : estimate.state === 'priced' && band && estimate.total !== null ? (
-            <>
-              <p className="bf__price">{estimate.isStartingPrice && <small>From</small>}<b data-price className="tabular-nums">£{formatPrice(estimate.total)}</b><span>{isLodged || productKind === 'preAssessment' ? 'inc. assessment' : 'inc. on-site measuring'}{isLodged ? ' and GOV.UK lodgement' : ''}</span></p>
-              <p className="bf__for">{areaLabel(values.areaBand, values.floorArea)}</p>
-              {estimate.isStartingPrice && <p className="bf__for">Final price depends on property size and complexity. We&rsquo;ll confirm your exact quote before booking.</p>}
-              {estimate.saving > 0 && <p className="bf__save">Save £{estimate.saving} compared with booking separately.</p>}
-              <dl className="bf__rows">{guideEstimateRows(estimate).map(([label, amount]) => <div key={label}><dt>{label}</dt><dd className="tabular-nums">{amount}</dd></div>)}</dl>
-            </>
-          ) : estimate.state === 'manual-quote' ? (
-            <>
-              <p className="bf__price bf__price--text"><b data-price>Price to be confirmed</b></p>
-              <p className="bf__for">We&rsquo;ll confirm the size and price from your property details.</p>
-              <dl className="bf__rows">{guideEstimateRows(estimate).map(([label, amount]) => <div key={label}><dt>{label}</dt><dd className="tabular-nums">{amount}</dd></div>)}</dl>
-            </>
-          ) : (
-            <><p className="bf__price"><small>From</small><b data-price className="tabular-nums">£{formatPrice(estimate.fromTotal ?? 0)}</b></p><p className="bf__for">Pick a size for your guide price.</p></>
-          )}
-          {whatYouGet(productKind).length > 0 && <>
-            <p className="bf__est-label bf__get-h">What you get</p>
-            <ul className="bf__ticks bf__get">{whatYouGet(productKind).map(item => <li key={item}><Check aria-hidden="true" className="h-4 w-4 shrink-0" />{item}</li>)}</ul>
-          </>}
-          <details className="bf__incl"><summary><span>What’s included in the price</span><ArrowRight aria-hidden="true" className="h-5 w-5" /></summary>
-            <ul>{includedList(productKind).map(item => <li key={item}>{item}</li>)}</ul></details>
-          {(planChoice || reportChoice) && <div className="bf__extras">
-            {planChoice}
-            {reportChoice}
-          </div>}
-          {planIncluded && estimate.state === 'awaiting-area' && <p className="bf__note mt-3">Your personalised written improvement plan is included in the price.</p>}
-          <p className="bf__fine"><Check aria-hidden="true" className="h-4 w-4 shrink-0 text-[#386B59]" />No upfront payment. You pay once the assessment is done.</p>
-          <p className="bf__fine bf__fine--quiet">Exact price and appointment confirmed before booking.</p>
+          {estHead}{estGet}{estExtras}{estFine}
         </div>
       </div>
       {values.customerType === 'Landlord (tenanted)' && <p className="bf__note">Please let your tenants know about the visit and include any access arrangements in the notes.</p>}
@@ -649,17 +795,18 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
   )
 
   /* ------------------------------------------------------------- timing and details */
-  const timingFields = <>
-    {isLodged ? <Controller control={control} name="speed" render={({ field }) => <Choices name="speed" idPrefix={idPrefix} legend="How quickly do you need the certificate?"
-      value={field.value} inputRef={field.ref} error={errors.speed?.message} onChange={value => {
-        field.onChange(value); rememberSelection()
-        // a next-day visit means tomorrow: it fills in tomorrow's date when none is set (v7)
-        if (value === NEXT_DAY_VISIT_SPEED && !getValues('preferredDate')) setValue('preferredDate', londonYmd(1))
-      }} options={[
-        { value: 'Standard (72 hours)', label: 'Standard lodgement', description: 'Lodged on the GOV.UK register within 72 hours of the visit.' },
-        { value: SAME_DAY_LODGEMENT_SPEED, label: `Same-day lodgement (+\u2060£${SAME_DAY_LODGEMENT_SURCHARGE})`, description: 'Lodged on the GOV.UK register on the day of the visit.' },
-        { value: NEXT_DAY_VISIT_SPEED, label: `Next-day visit and lodgement (+\u2060£${NEXT_DAY_VISIT_SURCHARGE})`, description: 'We visit the next day and lodge your EPC that day. Availability confirmed before booking.' },
-      ]} />} /> : <p className="text-base text-secondary-700">{turnaroundCopy(productKind)}</p>}
+  // the phone shows the surcharge on the right of the row, so it keeps the name and the amount apart as well
+  const speedOptions: (ChoiceOption & { name: string; surcharge?: string })[] = [
+    { value: 'Standard (72 hours)', label: 'Standard lodgement', name: 'Standard lodgement', description: 'Lodged on the GOV.UK register within 72 hours of the visit.' },
+    { value: SAME_DAY_LODGEMENT_SPEED, label: `Same-day lodgement (+\u2060£${SAME_DAY_LODGEMENT_SURCHARGE})`, name: 'Same-day lodgement', surcharge: `+£${SAME_DAY_LODGEMENT_SURCHARGE}`, description: 'Lodged on the GOV.UK register on the day of the visit.' },
+    { value: NEXT_DAY_VISIT_SPEED, label: `Next-day visit and lodgement (+\u2060£${NEXT_DAY_VISIT_SURCHARGE})`, name: 'Next-day visit and lodgement', surcharge: `+£${NEXT_DAY_VISIT_SURCHARGE}`, description: 'We visit the next day and lodge your EPC that day. Availability confirmed before booking.' },
+  ]
+  const speedChosen = (value: string) => {
+    rememberSelection()
+    // a next-day visit means tomorrow: it fills in tomorrow's date when none is set (v7)
+    if (value === NEXT_DAY_VISIT_SPEED && !getValues('preferredDate')) setValue('preferredDate', londonYmd(1))
+  }
+  const visitFields = (
     <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">
       {!isBulk && <Field label="Preferred visit date" htmlFor={fid('preferredDate')} hint="Optional. A requested date is not a confirmed appointment." error={errors.preferredDate?.message}>
         <Input id={fid('preferredDate')} type="date" min={londonYmd(0)} aria-describedby={dateNote.text && !errors.preferredDate ? fid('preferredDate-note') : undefined}
@@ -671,6 +818,12 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
         <Textarea id={fid('notes')} rows={2} {...register('notes')} />
       </Field>
     </div>
+  )
+  const timingFields = <>
+    {isLodged ? <Controller control={control} name="speed" render={({ field }) => <Choices name="speed" idPrefix={idPrefix} legend="How quickly do you need the certificate?"
+      value={field.value} inputRef={field.ref} error={errors.speed?.message} onChange={value => { field.onChange(value); speedChosen(value) }}
+      options={speedOptions} />} /> : <p className="text-base text-secondary-700">{turnaroundCopy(productKind)}</p>}
+    {visitFields}
   </>
 
   const detailFields = <>
@@ -720,6 +873,224 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
   const stepBody: ReactNode = step === 1 ? quoteStep
     : step === 2 ? <div className="bf__details">{timingFields}</div>
       : <div className="bf__details">{detailFields}{sendFields}</div>
+
+  /* ------------------------------------------------------------- phones: the rail (C, approved 23/10/2026) */
+  const railList = railOrder(isBulk)
+  const railGuide = estimate.state === 'priced' && estimate.total !== null ? guidePrice(estimate, estimate.total) : ''
+  const railQ = (text: string) => <h3 className="bf-q" tabIndex={-1} data-rail-q>{text}</h3>
+  const railLegend = (text: string) => <legend className="bf-q" tabIndex={-1} data-rail-q>{text}</legend>
+  const railGoButton = (from: RailId, label: string) => (
+    <div className="bf-st__go"><button type="button" className="bf__go" onClick={() => void railAdvance(from)}>{label}<ArrowRight aria-hidden="true" className="h-4 w-4" /></button></div>
+  )
+  const speedOption = speedOptions.find(option => option.value === speed)
+  const railValue = (id: RailId): string => {
+    switch (id) {
+      case 'who': return customerType || ''
+      case 'service': return serviceTabLabels[selectedService] || serviceLabel(selectedService)
+      case 'dwelling': return values.dwellingType || ''
+      case 'size': return areaLabel(areaBand, floorArea)
+      case 'price': return railGuide || (isBulk ? 'Quoted individually' : 'Price to be confirmed')
+      case 'timing': return [isLodged ? speedOption?.name : '', values.preferredDate ? formatPreferredDate(values.preferredDate) : ''].filter(Boolean).join(' · ') || 'No date requested'
+      default: return ''
+    }
+  }
+  const railBody = (id: RailId): ReactNode => {
+    switch (id) {
+      case 'who': return (
+        <Controller control={control} name="customerType" render={({ field }) => (
+          <fieldset className="min-w-0" aria-invalid={!!errors.customerType} aria-describedby={errors.customerType ? fid('customerType-error') : undefined}>
+            {railLegend('Which best describes you?')}
+            <div className="bf-ruled">
+              {customerTypeChoices(isBulk).map((option, index) => {
+                const checked = field.value === option.value
+                return (
+                  <label key={option.value} className="bf-rr" data-checked={checked || undefined}>
+                    <input type="radio" name="customerType" value={option.value} checked={checked} required className="bf-radio"
+                      ref={index === 0 ? field.ref : undefined} aria-label={option.label} aria-describedby={fid(`customerType-d-${index}`)}
+                      onChange={() => { field.onChange(option.value); whoChosen(option.value) }} onClick={() => railTap('who')} onKeyDown={railEnter('who')} />
+                    <b>{option.label}</b><span id={fid(`customerType-d-${index}`)} className="bf-rr__d">{option.description}</span>
+                    <span aria-hidden="true" className="bf-rr__ico"><Ico name={customerIcons[option.value] || 'house'} /></span>
+                  </label>
+                )
+              })}
+            </div>
+            {errors.customerType && <p id={fid('customerType-error')} role="alert" className="bf-st__err">{errors.customerType.message}</p>}
+          </fieldset>
+        )} />
+      )
+      // the service has a default and descriptions to read, so it keeps a Continue
+      case 'service': return (
+        <fieldset className="min-w-0" aria-invalid={!!errors.services} aria-describedby={errors.services ? fid('services-error') : undefined}>
+          {railLegend('Which service?')}
+          <div className="bf-ruled">
+            {serviceChoices.map((option, index) => {
+              const checked = selectedService === option.value
+              return (
+                <label key={option.value} className="bf-rr" data-checked={checked || undefined}>
+                  <input type="radio" name="services" value={option.value} checked={checked} required className="bf-radio"
+                    aria-label={option.label} aria-describedby={checked ? fid(`services-d-${index}`) : undefined}
+                    onChange={() => chooseService(option.value)} onKeyDown={railEnter('service')} />
+                  <b>{serviceTabLabels[option.value] || option.label}</b>
+                  {option.badge && <span className={cn('bf-rr__badge', option.badgeTone === 'green' ? 'is-save' : 'is-tag')}>{option.badge}</span>}
+                  {checked && <span id={fid(`services-d-${index}`)} className="bf-rr__d">{option.description}</span>}
+                </label>
+              )
+            })}
+          </div>
+          {errors.services && <p id={fid('services-error')} role="alert" className="bf-st__err">{errors.services.message}</p>}
+          {railGoButton('service', 'Continue')}
+        </fieldset>
+      )
+      case 'dwelling': return (
+        <Controller control={control} name="dwellingType" render={({ field }) => (
+          <fieldset className="min-w-0" aria-invalid={!!errors.dwellingType} aria-describedby={[fid('dwellingType-hint'), errors.dwellingType ? fid('dwellingType-error') : ''].filter(Boolean).join(' ')}>
+            {railLegend('What type of property is it?')}
+            <p id={fid('dwellingType-hint')} className="bf-st__sub">It helps us confirm your exact price.</p>
+            <div className="bf-ruled bf-ruled--two">
+              {dwellingChoices.map((option, index) => {
+                const checked = field.value === option.value
+                return (
+                  <label key={option.value} className="bf-rr" data-checked={checked || undefined}>
+                    <input type="radio" name="dwellingType" value={option.value} checked={checked} required className="bf-radio"
+                      ref={index === 0 ? field.ref : undefined} aria-label={option.value} aria-describedby={fid(`dwellingType-d-${index}`)}
+                      onChange={() => { field.onChange(option.value); rememberSelection() }} onClick={() => railTap('dwelling')} onKeyDown={railEnter('dwelling')} />
+                    <b>{option.value}</b><span id={fid(`dwellingType-d-${index}`)} className="bf-rr__d">{option.description}</span>
+                  </label>
+                )
+              })}
+            </div>
+            {errors.dwellingType && <p id={fid('dwellingType-error')} role="alert" className="bf-st__err">{errors.dwellingType.message}</p>}
+          </fieldset>
+        )} />
+      )
+      case 'size': return (
+        <fieldset className="min-w-0" aria-invalid={!!errors.areaBand} aria-describedby={[fid('areaBand-hint'), errors.areaBand ? fid('areaBand-error') : ''].filter(Boolean).join(' ')}>
+          {railLegend('How big is the property?')}
+          <p id={fid('areaBand-hint')} className="bf-st__sub">Choose the approximate internal floor area. Bedrooms are only a rough guide. Not sure? We can confirm it from your property details.</p>
+          <div className="bf-ruled">
+            {areaBands.map((b, i) => {
+              const checked = values.areaBand === b
+              const row = baseTotal(b)
+              const price = row.baseGuide !== null ? guidePrice(row, row.baseGuide) : ''
+              return (
+                <div key={b} className="contents">
+                  <label className="bf-rr" data-checked={checked || undefined}>
+                    <input type="radio" name="areaBand" value={b} checked={checked} required className="bf-radio"
+                      aria-label={`${pricing[i].areaLabel}, ${pricing[i].typicalLabel}${price ? `, ${price}` : ''}`}
+                      onChange={() => {
+                        chooseArea(b)
+                        // over 115 m² opens the floor-area field, with its own Continue
+                        if (b === TOP_BAND) requestAnimationFrame(() => document.getElementById(fid('floorArea'))?.focus())
+                      }}
+                      onClick={() => { if (b !== TOP_BAND) railTap('size') }} onKeyDown={railEnter('size')} />
+                    <b>{pricing[i].areaLabel}</b><span className="bf-rr__d">{pricing[i].typicalLabel}</span>
+                    {price && <span className="bf-rr__p">{row.isStartingPrice ? <><small>From</small>£{row.baseGuide}</> : price}</span>}
+                  </label>
+                  {b === TOP_BAND && showArea && <div className="bf-st__area">{areaField}{railGoButton('size', 'Continue')}</div>}
+                </div>
+              )
+            })}
+            <label className="bf-rr" data-checked={values.areaBand === 'unknown' || undefined}>
+              <input type="radio" name="areaBand" value="unknown" checked={values.areaBand === 'unknown'} required className="bf-radio"
+                aria-label="Not sure of floor area" onChange={() => chooseArea('unknown')} onClick={() => railTap('size')} onKeyDown={railEnter('size')} />
+              <b>Not sure of the size?</b><span className="bf-rr__d">We&rsquo;ll confirm the size and price from your property details.</span>
+            </label>
+          </div>
+          {!showArea && (
+            <button type="button" className="bf__more"
+              onClick={() => { setAreaOpen(true); requestAnimationFrame(() => document.getElementById(fid('floorArea'))?.focus()) }}>
+              Know the exact size? Enter it in m²
+            </button>
+          )}
+          {errors.areaBand && <p id={fid('areaBand-error')} role="alert" className="bf-st__err">{errors.areaBand.message}</p>}
+        </fieldset>
+      )
+      case 'price': return <>
+        {railQ('Your guide price')}
+        <div className="bf__est bf__est--rail" data-estimate>
+          {estHead}{estExtras}{estGet}{estFine}
+          {values.customerType === 'Landlord (tenanted)' && <p className="bf__note">Please let your tenants know about the visit and include any access arrangements in the notes.</p>}
+        </div>
+        {railGoButton('price', isBulk ? 'Continue to your details' : 'Continue to timing')}
+      </>
+      case 'timing': return <>
+        {isLodged ? <Controller control={control} name="speed" render={({ field }) => (
+          <fieldset className="min-w-0" aria-invalid={!!errors.speed} aria-describedby={errors.speed ? fid('speed-error') : undefined}>
+            {railLegend('How quickly do you need the certificate?')}
+            <div className="bf-ruled">
+              {speedOptions.map((option, index) => {
+                const checked = field.value === option.value
+                return (
+                  <label key={option.value} className="bf-rr" data-checked={checked || undefined}>
+                    <input type="radio" name="speed" value={option.value} checked={checked} required className="bf-radio"
+                      ref={index === 0 ? field.ref : undefined} aria-label={option.label} aria-describedby={fid(`speed-description-${index}`)}
+                      onChange={() => { field.onChange(option.value); speedChosen(option.value) }} onKeyDown={railEnter('timing')} />
+                    <b>{option.name}</b><span id={fid(`speed-description-${index}`)} className="bf-rr__d">{option.description}</span>
+                    {option.surcharge && <span className="bf-rr__p bf-rr__p--small">{option.surcharge}</span>}
+                  </label>
+                )
+              })}
+            </div>
+            {errors.speed && <p id={fid('speed-error')} role="alert" className="bf-st__err">{errors.speed.message}</p>}
+          </fieldset>
+        )} /> : <>{railQ('When it’s ready')}<p className="bf-st__copy">{turnaroundCopy(productKind)}</p></>}
+        <div className="bf-st__fields">{visitFields}</div>
+        {railGoButton('timing', 'Continue to your details')}
+      </>
+      case 'details': return <>
+        {railQ('Where should we send your exact price?')}
+        <div className="bf__details bf-st__fields">{detailFields}{sendFields}</div>
+        <div className="bf-st__go">
+          <button key="send" type="submit" disabled={status === 'submitting' || (!FORM_DRAFT && !turnstileToken)} className="bf__go">{status === 'submitting' ? 'Sending…' : 'Send my quote request'}</button>
+        </div>
+        <p className="bf__reply"><b>Same working-day reply</b>, with your exact price and available times.</p>
+      </>
+    }
+  }
+  const railStep = (id: RailId, index: number) => {
+    const isOpen = id === railOpen
+    const isDone = !isOpen && railSeen.has(id)
+    return (
+      <li key={id} className={cn('bf-st', isOpen && 'is-open', isDone && 'is-done')} aria-current={isOpen ? 'step' : undefined}>
+        <span className="bf-st__n" aria-hidden="true">{isDone ? <Check strokeWidth={2.25} className="h-4 w-4" /> : index + 1}</span>
+        <div className="bf-st__body">
+          {isOpen ? <div className="bf-st__open">{railBody(id)}</div>
+            : isDone ? (
+              <div className="bf-fold">
+                <span className="bf-fold__k">{RAIL_LABELS[id]}</span>
+                <span className={id === 'price' && railGuide ? 'bf-fold__price' : 'bf-fold__v'}>{railValue(id)}</span>
+                <button type="button" className="bf-fold__change" aria-label={RAIL_CHANGE[id]} onClick={() => railGo(id)}>Change</button>
+              </div>
+            ) : <p className="bf-later">{RAIL_LABELS[id]}</p>}
+        </div>
+      </li>
+    )
+  }
+
+  if (phone) return (
+    <form ref={formRef} noValidate aria-label="Exact quote enquiry" aria-busy={status === 'submitting'}
+      onChangeCapture={start} onPointerDownCapture={() => { tapped.current = true }} onKeyDownCapture={() => { tapped.current = false }}
+      onKeyDown={event => {
+        // Enter in a field of an open question moves on (the floor area, the visit date); this form has no submit
+        // button until the details, so the browser would not submit it on Enter by itself
+        if (event.key !== 'Enter' || event.defaultPrevented || step === LAST || !(event.target instanceof HTMLInputElement)) return
+        event.preventDefault(); void railAdvance(railOpen)
+      }}
+      onSubmit={event => {
+        // Enter in a field moves on (WCAG 3.2.2); only the details send
+        if (step < LAST) { event.preventDefault(); void railAdvance(railOpen); return }
+        void handleSubmit(onSubmit, invalid => { setShowErrors(true); requestAnimationFrame(() => railError(invalid)) })(event)
+      }} className={cn(shell, 'bf--rail')} data-step={step} data-rail="">
+      {/* Keep this node mounted and empty before the first estimate. Only its text changes. */}
+      <p data-estimate-announcement className="sr-only" aria-live="polite" aria-atomic="true">{estimateText}</p>
+      <div className="hidden" aria-hidden="true"><label>Website<input type="text" tabIndex={-1} autoComplete="off" {...register('website')} /></label></div>
+      <p className="bf__rail-intro">Tap an answer and the next question opens. Your guide price shows after the size.</p>
+      <ol className="bf-rail">{railList.map(railStep)}</ol>
+      <div className="bf__foot">
+        <p>Questions first? <a href={formWhatsappHref(values, railGuide || undefined)} target="_blank" rel="noopener noreferrer">Message us on WhatsApp</a>, and what you’ve chosen so far comes with it.</p>
+      </div>
+    </form>
+  )
 
   return (
     <form ref={formRef} noValidate aria-label="Exact quote enquiry" aria-busy={status === 'submitting'}
