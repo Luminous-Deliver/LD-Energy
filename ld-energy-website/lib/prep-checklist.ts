@@ -38,7 +38,7 @@ export const prepGroups: PrepGroup[] = [
     title: 'Loft',
     items: [
       // rdsap 3.04: hatch unusable on the day = "access, loft insulation unknown"
-      { id: 'loft-hatch', title: 'Loft hatch opens', note: 'Not painted shut, and nothing stacked underneath it.' },
+      { id: 'loft-hatch', title: 'Loft hatch opens', note: 'If you have one: not painted shut, and nothing stacked underneath it.' },
       // Abdul 23/10: the customer provides access
       { id: 'loft-ladder', title: 'A loft ladder or steps ready', note: 'Please have these ready, as we rely on yours to get up there.' },
       // rdsap 3.03b, 3.04: boarded loft needs boards lifted, evidence at multiple locations, or documents

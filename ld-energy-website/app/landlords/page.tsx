@@ -339,7 +339,7 @@ export default function LandlordsPage() {
           <div>
             <p className="in-eyebrow">On the day</p>
             <h2 className="in-h2" id="visit-h">How the visit works</h2>
-            <p className="in-lede">Your tenant doesn&apos;t need to move out or clear anything. We need to reach every room, the loft hatch, the boiler and the meters.</p>
+            <p className="in-lede">Your tenant doesn&apos;t need to move out or clear anything. We need to reach every room, the loft hatch (if there is one), the boiler and the meters.</p>
             {/* eslint-disable-next-line @next/next/no-img-element -- WebP from the homepage; next/image is unoptimised on Pages */}
             <img className="lp-visit__img" src="/home/assessor-visit-900.webp" width={900} height={600} loading="lazy" decoding="async"
               alt="An assessor in a sage jacket measures a London front room with a laser measure, beside a sash window and a column radiator" />

@@ -71,7 +71,7 @@ export function nextSteps(kind: ProductKind, speed?: string, energyReport?: bool
   ]
   // what to have ready, in the FAQ's wording (v7: the confirmation stopped at opening hours)
   const prep = kind === 'floorPlan' ? 'Before the visit, make sure every room is easy to reach.'
-    : 'Before the visit, make sure every room, the loft hatch, the boiler and the meters are easy to reach.'
+    : 'Before the visit, make sure every room, the loft hatch (if there is one), the boiler and the meters are easy to reach.'
   switch (kind) {
     case 'epc':
       return [...steps, prep, `After the visit, your EPC is lodged on the GOV.UK register ${lodgedWhen} and we send you the certificate link.`]
@@ -97,7 +97,7 @@ export const PREP_PATH = '/preparing-for-your-epc#please-read'
 
 /** Condensed from the "What to have ready" section of /preparing-for-your-epc. */
 export const prepChecklist = [
-  'Access to every room, including the loft hatch, outbuildings and any locked or storage rooms.',
+  'Access to every room, including the loft hatch (if there is one), outbuildings and any locked or storage rooms.',
   'Your boiler, cylinder and heating controls, plus the manual or model number if you have it.',
   'Clear access to windows, radiators, light fittings and the electricity meter.',
 ]

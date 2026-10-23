@@ -112,7 +112,7 @@ const localBusinessSchema = {
   areaServed: areaServedLondon,
   priceRange: '££',
   currenciesAccepted: 'GBP',
-  paymentAccepted: 'Credit Card, Bank Transfer',
+  paymentAccepted: 'Cash, Credit Card, Bank Transfer',
   // No aggregateRating. Google's review-snippet policy disallows self-serving
   // review markup — content a business publishes about itself — and the rating
   // was emitted on all 72 URLs while being visible on one. Star ratings in the

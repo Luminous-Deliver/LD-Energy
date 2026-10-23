@@ -125,7 +125,7 @@ export default function TermsPage() {
 
       <h2>6. Payment</h2>
       <p>
-        Payment is due on completion of the assessment unless otherwise agreed in writing. We accept bank transfer and card payments.
+        Payment is due on completion of the assessment unless otherwise agreed in writing. We accept cash, bank transfer and card payments.
       </p>
 
       <h2>7. Cancellation</h2>

@@ -182,3 +182,16 @@
   html[data-print="checklist"] .gd-body { padding-top: 0; }
   html[data-print="checklist"] .pp-print-head { display: block; margin-bottom: 10pt; padding-bottom: 6pt; border-bottom: 1px solid #000; font-size: 10pt; }
 }
+
+/* Documents in four plain groups (Abdul 23/10/2026): numbered heads, short lists, two columns from 760 px; the
+   older what-it-changes table folds away under them */
+.pp-docs { display: grid; gap: 28px; margin-top: 22px; border-top: 1px solid var(--ink); padding-top: 22px; }
+.pp-docs__g h3 { font: 400 22px/1.25 var(--font-serif); color: var(--ink); }
+.pp-docs__g h3 .num { color: var(--sage-700); margin-right: 4px; }
+.pp-docs__g ul { list-style: disc; margin: 10px 0 0; padding: 0 0 0 20px; display: grid; gap: 6px; }
+.pp-docs__g li { font-size: 16px; line-height: 1.55; color: var(--ink-quiet); }
+.pp-docs__g li::marker { color: var(--sage-700); }
+@media (min-width: 760px) { .pp-docs { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 36px 48px; } .pp-docs__g li { font-size: 17px; } }
+.pp-ev-more { margin-top: 20px; border-top: 1px solid var(--hair); padding-top: 12px; }
+.pp-ev-more > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 500; color: var(--sage-700); }
+.pp-ev-more[open] > summary { margin-bottom: 8px; }

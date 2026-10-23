@@ -58,6 +58,7 @@ const toc = [
   { id: 'what-to-have-ready', text: 'What to have ready', level: 2 },
   { id: 'documents-and-evidence', text: 'Documents that may help', level: 2 },
   { id: 'important', text: 'Quotes, ratings and older EPCs', level: 2 },
+  { id: 'what-counts', text: 'What counts towards your rating', level: 3 },
   { id: 'on-the-day', text: 'On the day', level: 2 },
   { id: 'who-needs-to-be-there', text: 'Who needs to be there', level: 2 },
   { id: 'after-the-visit', text: 'After the visit', level: 2 },
@@ -81,9 +82,9 @@ const breadcrumbSchema = {
 const inShort = [
   { Icon: Clock, text: 'Most visits take 45 to 60 minutes. A large home with 5 or more bedrooms takes around 2 hours.' },
   { Icon: KeyRound, text: 'You or your representative lets us in at the booked time.' },
-  { Icon: Home, text: 'Every room, the loft hatch, the boiler and the meters easy to reach.' },
+  { Icon: Home, text: 'Every room, the loft hatch (if there is one), the boiler and the meters easy to reach.' },
   { Icon: FileText, text: 'Any paperwork for improvements out ready.' },
-  { Icon: CreditCard, text: 'Payment when the visit is done, by bank transfer or card.' },
+  { Icon: CreditCard, text: 'Payment when the visit is done, by cash, bank transfer or card.' },
   { Icon: CalendarClock, text: 'Change or cancel free with at least 24 hours’ notice.' },
 ]
 
@@ -91,12 +92,12 @@ const inShort = [
 const prepare = [
   {
     title: 'Access',
-    text: 'Every room, radiator and window, the loft hatch, the boiler and hot water cylinder, the heating controls and the meters. Anything locked or blocked on the day can’t be recorded.',
+    text: 'Every room, radiator and window, the loft hatch (if there is one), the boiler and hot water cylinder, the heating controls and the meters. Anything locked or blocked on the day can’t be recorded.',
   },
   {
     title: 'Insulation evidence',
     // rdsap 9.02, 3.03a, 3.03b
-    text: 'If insulation is hidden, inside a wall, under a floor or under a boarded loft, your assessor can only record it from paperwork. Have the original insulation certificate or guarantee ready, with its certificate or guarantee number. It needs to show it’s for your home and, where possible, how thick the insulation is. Without it, the method has to use the default for the age of the home.',
+    text: 'If insulation is hidden, inside a wall, under a floor or under a boarded loft, your assessor can only record it from paperwork. Have the original insulation certificate or guarantee ready, with its certificate or guarantee number. It must show it’s for your home and how thick the insulation is: without the thickness it can’t be used. You can also send it to us by WhatsApp or email before the visit. Without it, the method has to use the default for the age of the home.',
   },
   {
     title: 'Other paperwork, if you have it',
@@ -122,9 +123,15 @@ const notes = [
   },
   {
     title: 'Different from next door, or your old EPC?',
-    text: 'Existing homes have used RdSAP 10, a more detailed method, since June 2025, so an older EPC may not match. A neighbour’s can differ too, because each home’s floor area, insulation and heating are recorded as they are.',
+    text: 'Existing homes have used RdSAP 10, a more detailed method, since June 2025, so an older EPC may not match. A neighbour’s can differ too, even in an identical home: their paperwork, when it was assessed, an end or mid terrace, or a different boiler can all change it.',
     href: '#why-your-epc-may-differ',
     link: 'Why your EPC may differ',
+  },
+  {
+    title: 'Planning work to reach a rating?',
+    text: 'Not everything that saves energy raises an EPC rating, and some upgrades count for much less than people expect. Ask us before you spend. We record the home as it is, so we can’t promise a rating before the visit.',
+    href: '#what-counts',
+    link: 'What counts towards your rating',
   },
   {
     title: 'When your EPC is ready',
@@ -145,8 +152,50 @@ const differs = [
   'The boiler, heating controls and hot water cylinder',
   'Heat pumps, solar panels and batteries',
   'Lighting',
-  'The evidence available on the day',
+  'Paperwork: one home had evidence of its insulation or windows, the other didn’t',
+  'When it was assessed: before RdSAP 10 in June 2025, or before a later update to the method’s rules',
   'The method used, and what was recorded at the last assessment',
+  'Occasionally, a mistake on one of the certificates',
+]
+
+/* Abdul 23/10/2026: the documents in four plain groups. The table below is kept for the blog's reference only. */
+const docGroups = [
+  {
+    title: 'Windows and doors',
+    items: [
+      'Installation certificates, such as FENSA or CERTASS', // rdsap 3.12a
+      'Invoices from the installer',
+      'Anything showing the installation date or the specification fitted, such as a window energy rating', // rdsap 3.10
+      'Paperwork for an insulated door, with its U-value or product reference', // rdsap 3.09
+    ],
+  },
+  {
+    title: 'Insulation and building fabric',
+    items: [
+      'Loft, wall or floor insulation records showing what was installed, with the certificate or guarantee number', // rdsap 9.02, 3.03a
+      'The insulation thickness: without it, insulation paperwork can’t be used', // rdsap 3.03b, 3.04
+      'Building Control completion paperwork for an extension or loft conversion. Planning papers alone aren’t enough.', // rdsap 3.05b
+    ],
+  },
+  {
+    title: 'Heating and hot water',
+    items: [
+      'Boiler make and model: a photo of the data plate is usually enough',
+      'Boiler installation or service paperwork',
+      'Hot water cylinder details, including insulation type and thickness',
+      'Heat pump installation or commissioning documents',
+      'Design or flow temperature information, where you have it', // rdsap 4.01b
+    ],
+  },
+  {
+    title: 'Solar and renewables',
+    items: [
+      'MCS documentation, where you have it', // rdsap 9.05
+      'Commissioning or installation paperwork',
+      'System details, such as panel capacity in kWp or inverter details',
+      'Home battery make, model and usable capacity in kWh', // rdsap 9.05
+    ],
+  },
 ]
 
 /* Each row: what to look out for, what it lets your assessor record, what happens without it. */
@@ -214,7 +263,7 @@ const day = [
   { t: 'Room by room', d: 'Measuring each room and photographing the windows, radiators, heating controls and lights.' },
   { t: 'Loft, boiler, cylinder and meters', d: 'Insulation depth in the loft, the label on the boiler, the meters.' }, // rdsap 3.04
   { t: 'A few quick questions', d: 'Such as whether the EPC is for a sale or a let, and anything about the home we can’t see.' }, // rdsap 9.11, 9.12
-  { t: 'Payment', d: 'Due when the assessment is done, by bank transfer or card.' }, // terms §6
+  { t: 'Payment', d: 'Due when the assessment is done, by cash, bank transfer or card.' }, // terms §6
 ]
 
 const changes = [
@@ -228,11 +277,11 @@ const changes = [
   },
   {
     q: 'How do I pay?',
-    a: 'Payment is due when the assessment is done, unless we’ve agreed otherwise in writing. We take bank transfer and card.', // terms §6
+    a: 'Payment is due when the assessment is done, unless we’ve agreed otherwise in writing. We take cash, bank transfer and card.', // terms §6
   },
   {
     q: 'Do I need to tidy up?',
-    a: 'No. We only need to reach things: rooms, radiators, windows, the loft hatch, the boiler and the meters.',
+    a: 'No. We only need to reach things: rooms, radiators, windows, the loft hatch (if there is one), the boiler and the meters.',
   },
 ]
 
@@ -250,7 +299,7 @@ export default function PreparingPage() {
               <div className="gd-answer">
                 <p className="gd-eyebrow">The short answer</p>
                 <p>
-                  Most visits take 45 to 60 minutes. Your assessor needs to reach every room, the loft hatch, the
+                  Most visits take 45 to 60 minutes. Your assessor needs to reach every room, the loft hatch (if there is one), the
                   boiler and the meters. Put out any paperwork for improvements you’ve made and make sure someone can
                   let us in. Payment is due when the visit is done.
                 </p>
@@ -339,8 +388,24 @@ export default function PreparingPage() {
                   Your assessor records what they can see and measure. Anything hidden, like insulation inside a wall
                   or under floorboards, can only be recorded from paperwork that clearly relates to your home. None
                   of it is compulsory. Put out what you have, and the originals if you can: they are preferred to photos
-                  or copies.
+                  or copies. It falls into four groups.
                 </p>
+                <div className="pp-docs">
+                  {docGroups.map((g, i) => (
+                    <div key={g.title} className="pp-docs__g">
+                      <h3><span className="num" aria-hidden="true">{i + 1}.</span> {g.title}</h3>
+                      <ul>
+                        {g.items.map((it) => <li key={it}>{it}</li>)}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+                <p className="pp-after">
+                  You can also send paperwork ahead by WhatsApp or email. Originals on the day are still best, and
+                  insulation paperwork must show the thickness.
+                </p>
+                <details className="pp-ev-more">
+                  <summary>What each document lets us record</summary>
                 <div className="pp-ev" role="region" aria-label="Paperwork and what it changes">
                   <table>
                     <thead>
@@ -361,6 +426,7 @@ export default function PreparingPage() {
                     </tbody>
                   </table>
                 </div>
+                </details>
                 <div id="why-evidence-matters" className="gd-note pp-note">
                   <Info width={20} height={20} aria-hidden="true" />
                   <div>
@@ -406,6 +472,35 @@ export default function PreparingPage() {
                   That’s what the <a href="#documents-and-evidence">documents section</a> is for.
                 </p>
 
+                <h3 id="what-counts">What counts towards your rating</h3>
+                <p>
+                  Many homeowners renovate and then find the rating hasn’t moved as far as they hoped. The EPC
+                  measures a fixed set of things, so it helps to know which upgrades count and by how much before you
+                  spend. Some examples:
+                </p>
+                <ul className="pp-reasons">
+                  <li>
+                    Loft insulation at both the floor of the loft (the joists) and the roof slope (the rafters): only the
+                    joist insulation is counted, so the rafter insulation adds nothing to the rating.
+                  </li>
+                  <li>
+                    Underfloor heating run from the same boiler as your radiators: the rating follows the boiler far more
+                    than how the heat is delivered, so it rarely changes the score. With a heat pump, if radiators heat
+                    half the floor area or more, only the radiators are counted.
+                  </li>
+                  <li>
+                    Going from C to B is much harder than moving between the lower bands. It usually needs solar panels.
+                  </li>
+                  <li>Hidden insulation only counts with paperwork that shows the thickness.</li>
+                </ul>
+                <p>
+                  These rules are set by the government’s method, not by us, and we can’t change them, so we can’t
+                  promise a particular rating before the visit. If you want to know where you stand first, an{' '}
+                  <Link href="/services/epc-pre-assessment">EPC Pre-Assessment</Link> gives you the rating without
+                  lodging it, and the <Link href="/services/epc-improvement-plan">EPC Improvement Plan</Link> puts the
+                  upgrades in order for your home.
+                </p>
+
                 <h3 id="why-your-epc-may-differ">Why your EPC may differ</h3>
                 <p>
                   Ratings are specific to each home. Two homes that look the same from the street can score
@@ -438,6 +533,10 @@ export default function PreparingPage() {
 
               <section id="on-the-day" className="pp-sec" aria-labelledby="on-the-day-h">
                 <h2 id="on-the-day-h">On the day</h2>
+                <p className="pp-lede">
+                  Your assessor photographs and measures each room, records the heating system, insulation, glazing
+                  and lighting, and reads the meters. There is no testing, no mess and nothing invasive.
+                </p>
                 <ol className="pp-day">
                   {day.map((s, i) => (
                     <li key={s.t}>
@@ -474,8 +573,8 @@ export default function PreparingPage() {
               <section id="after-the-visit" className="pp-sec" aria-labelledby="after-the-visit-h">
                 <h2 id="after-the-visit-h">After the visit</h2>
                 <p className="pp-lede">
-                  We send you a draft of your EPC to check. Once you’re happy with it, we lodge it on the official
-                  GOV.UK register and send you the link.
+                  We send you a draft of your EPC to check. Once you’re happy with it, we lodge the certificate on the
+                  official GOV.UK EPC register and send you the link as soon as it’s live.
                 </p>
                 <ul className="pp-when">
                   <li>
@@ -488,7 +587,7 @@ export default function PreparingPage() {
                   </li>
                 </ul>
                 <p className="pp-after">
-                  A lodged certificate can’t be edited, so the draft is the time to tell us if anything looks wrong.
+                  A lodged certificate can’t be edited, so the draft is your chance to flag anything that looks wrong.
                 </p>
               </section>
 

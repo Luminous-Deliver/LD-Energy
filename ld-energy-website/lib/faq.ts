@@ -34,7 +34,7 @@ export const homepageFaq: FaqItem[] = [
   },
   {
     q: 'How long does an EPC assessment take?',
-    a: 'Most assessments take 45–60 minutes for a flat or standard house, rising to around 2 hours for a large 5+ bedroom property. It goes fastest when every room, the loft hatch, the boiler and the meters are accessible. We’ll give you an accurate time estimate when you book.',
+    a: 'Most assessments take 45–60 minutes for a flat or standard house, rising to around 2 hours for a large 5+ bedroom property. It goes fastest when every room, the loft hatch (if there is one), the boiler and the meters are accessible. We’ll give you an accurate time estimate when you book.',
   },
   {
     q: 'How quickly will I receive my EPC certificate?',
@@ -249,7 +249,7 @@ export const fullFaq: FaqCategory[] = [
       },
       {
         q: 'What do I need to prepare?',
-        a: 'Mostly access. Every room, the loft hatch, the boiler, hot water cylinder, heating controls and meters need to be reachable, and someone needs to be there to let the assessor in. Paperwork is not compulsory, but hidden insulation can only be recorded from documents: have the insulation certificate or guarantee ready, with its certificate or guarantee number. Without evidence, the method uses the default for the age of the home. A heating system that is fitted but cannot be inspected, with no paperwork for it, means the EPC cannot be finished until access is given.',
+        a: 'Mostly access. Every room, the loft hatch (if there is one), the boiler, hot water cylinder, heating controls and meters need to be reachable, and someone needs to be there to let the assessor in. Paperwork is not compulsory, but hidden insulation can only be recorded from documents: have the insulation certificate or guarantee ready, with its certificate or guarantee number. Without evidence, the method uses the default for the age of the home. A heating system that is fitted but cannot be inspected, with no paperwork for it, means the EPC cannot be finished until access is given.',
         links: [{ label: 'What to prepare', href: '/preparing-for-your-epc#what-to-prepare' }, { label: 'What to have ready', href: '/preparing-for-your-epc#what-to-have-ready' }],
       },
       {
