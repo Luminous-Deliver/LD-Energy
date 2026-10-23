@@ -148,13 +148,15 @@ export async function AreaPageV2({ slug }: { slug: string }) {
     },
   ]
 
+  // labels are the sections' H2 text, so the list and the bar name what the reader sees; `heading` is the H2's id
   const sections = [
-    { id: 'ratings', label: `How do homes in ${name} rate?` },
-    { id: 'letting', label: `If you let in ${name}` },
-    { id: 'homes', label: `Why homes in ${name} rate as they do` },
-    { id: 'coverage', label: 'Areas and postcodes we cover' },
-    ...(otherCouncil.length ? [{ id: 'council', label: 'Council rules on improvement work' }] : []),
-    { id: 'faq', label: `EPC questions for ${name}` },
+    { id: 'ratings', heading: 'ratings-h', label: `How do homes in ${name} rate?` },
+    { id: 'letting', heading: 'letting-h', label: `If you let in ${name}` },
+    { id: 'homes', heading: 'homes-h', label: `Why homes in ${name} rate as they do` },
+    { id: 'coverage', heading: 'coverage-h', label: `Areas and postcodes we cover in ${name}` },
+    ...(otherCouncil.length ? [{ id: 'council', heading: 'council-h', label: `Council rules that affect improvement work in ${name}` }] : []),
+    { id: 'faq', heading: 'faq-h', label: `EPC questions for ${name}` },
+    { id: 'contact', heading: 'contact-title', label: 'Get my exact quote' },
   ]
 
   return (

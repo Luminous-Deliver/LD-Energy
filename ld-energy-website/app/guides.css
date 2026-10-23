@@ -98,6 +98,24 @@
 .gd-toc ol a:hover { color: var(--sage-700); }
 .gd-toc li.is-sub a { padding-left: 14px; }
 .gd-toc__rail { display: none; }
+/* the section being read (23/10): named in the phone summary, marked in the list and the rail */
+.gd-toc__now { display: grid; min-width: 0; line-height: 1.25; }
+.gd-toc__lbl { font-weight: 500; }
+.gd-toc__cur { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 400; color: var(--sage-700); }
+.gd-toc li.is-on > a { color: var(--ink); font-weight: 500; }
+@media (max-width: 1099px) {
+  /* phones and tablets: the disclosure stays under the top edge (under the sticky header from 760 px) while reading */
+  .gd-toc { position: sticky; top: 0; z-index: 20; margin-inline: -4px; }
+  .gd-toc details { box-shadow: 0 8px 20px -16px rgba(51, 56, 79, .5); }
+  /* the open list floats over the article, so closing it after a jump moves nothing */
+  .gd-toc details { position: relative; }
+  .gd-toc details[open] { border-radius: 8px 8px 0 0; }
+  .gd-toc details[open] ol { position: absolute; left: -1px; right: -1px; top: 100%; max-height: min(60vh, 420px); overflow-y: auto; overscroll-behavior: contain;
+    background: var(--gd-card); border: 1px solid var(--hair-strong); border-top: 1px solid var(--hair); border-radius: 0 0 8px 8px; box-shadow: 0 16px 32px -20px rgba(51, 56, 79, .55); }
+  .gd-toc li.is-on > a { box-shadow: inset 2px 0 0 var(--sage-700); padding-left: 10px; }
+  .gd-toc li.is-sub.is-on > a { padding-left: 24px; }
+}
+@media (min-width: 760px) and (max-width: 1099px) { .gd-toc { top: calc(var(--head-h) + 8px); } }
 @media (min-width: 1100px) {
   .gd-toc { position: sticky; top: calc(var(--head-h) + 24px); align-self: start; max-height: calc(100vh - var(--head-h) - 48px); overflow-y: auto; }
   .gd-toc details { display: none; }
@@ -107,6 +125,8 @@
   .gd-toc__rail ol a { padding: 6px 0 6px 16px; margin-left: -1px; border-top: 0; border-left: 2px solid transparent; }
   .gd-toc__rail ol a:hover { border-left-color: var(--sage-300); }
   .gd-toc__rail li.is-sub a { padding-left: 28px; font-size: 14px; }
+  .gd-toc__rail li.is-on > a { border-left-color: var(--sage-700); color: var(--ink); font-weight: 500; }
+  .gd-toc__rail ol a { transition: color .15s, border-color .15s; }
 }
 
 /* key takeaways */
@@ -364,3 +384,19 @@
   .gd-feat__art .gd-scale__bar b { font-size: 17px; }
   .gd-feat__art .gd-scale__bar span { font-size: 14px; }
 }
+
+/* Was this guide useful? (23/10): text buttons, no faces; the thanks is announced, a No offers WhatsApp and email */
+.gd-fb { margin-top: 40px; padding: 22px 0 4px; border-top: 1px solid var(--hair-strong); display: grid; gap: 14px; }
+.gd-fb__h { font: 400 24px/1.2 var(--font-serif); color: var(--ink); }
+.gd-fb__acts { display: flex; flex-wrap: wrap; gap: 10px; }
+.gd-fb__btn { min-width: 96px; min-height: 48px; padding: 0 22px; border: 1px solid var(--ink); border-radius: 6px; background: transparent; color: var(--ink);
+  font: 500 17px/1 var(--font-sans); cursor: pointer; transition: background-color .15s, color .15s; }
+.gd-fb__btn:hover { background: var(--ink); color: #fff; }
+.gd-fb__btn:focus-visible { outline: 2px solid var(--sage-700); outline-offset: 3px; }
+.gd-fb__btn:active { transform: translateY(1px); }
+.gd-fb__live:empty { display: none; }
+.gd-fb__no { display: grid; gap: 10px; }
+.gd-fb__thanks { font-size: 17px; line-height: 1.55; color: var(--ink); }
+.gd-fb__ways { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: 16px; color: var(--ink-quiet); }
+.gd-fb__wa, .gd-fb__mail { color: var(--sage-700); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; overflow-wrap: anywhere; }
+@media (prefers-reduced-motion: reduce) { .gd-fb__btn { transition: none; } .gd-fb__btn:active { transform: none; } }

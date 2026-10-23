@@ -3,6 +3,7 @@ import { HomePage as HomeBody } from '@/components/sections/home/HomePage'
 import { site, priceFrom, defaultOgImage } from '@/lib/site'
 import { homeBookingFaqs } from '@/lib/homepage-content'
 import './home-v7.css'
+import './booking-v7.css'
 
 export const metadata: Metadata = {
   title: { absolute: `EPC London from £${priceFrom.epc} | Elmhurst Accredited | L&D Energy` },

@@ -1,0 +1,198 @@
+/* The booking form v7 look (approved 22/10/2026), moved out of home-v7.css (23/10) so the area pages use the same
+   form as the homepage (Abdul 23/10: the old card on /areas/newham was "massive and ugly"). Every rule is scoped to
+   :is(.hp, .bk7), so the homepage is unchanged and only an element wrapped in .bk7 takes the look. Unlayered on
+   purpose, like home-v7.css, so it beats the form's own styles in globals.css's components layer. Import it after
+   home-v7.css. */
+.bk7 {
+  --sage-50: #F1F9F5; --sage-100: #E7F1EB; --sage-600: #4F7A64;
+  --slate-100: #EBECF4; --slate-300: #B9BDCD;
+  --stone-100: #F1EFE8; --stone-300: #CFCECA;
+  --white: #FFFFFF; --error: #A83630; --epc-d: #FFD500;
+  color: var(--ink); font: 400 18px/1.6 var(--font-sans);
+  letter-spacing: -.005em; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+@media (min-width: 760px) { .bk7 { font-size: 19px; } }
+.bk7 p { margin: 0; }
+.bk7 a { color: inherit; }
+.bk7 :is(h1, h2, h3, h4) { margin: 0; font-family: var(--font-serif); font-weight: 400; font-optical-sizing: auto; color: var(--ink); text-wrap: balance; }
+@media (prefers-reduced-motion: reduce) {
+  .bk7 *, .bk7 *::before, .bk7 *::after { transition-duration: 0s !important; }
+  .bk7 .bf__go:active { transform: none; }
+}
+
+/* ============================================ the live booking form, restyled === */
+/* The one booking form (BookingCard + ContactForm, shared with /contact and the area pages) is unchanged; here it
+   only takes the prototype's look: no card, a top rule, serif headings, ruled rows instead of tiles, underline tabs
+   for the service, the estimate set by rules and sticky beside the sizes, sage actions. The card's assessor bar is
+   hidden here because the Prices head above it already carries the rating and the register link. */
+:is(.hp, .bk7) .qc { margin-top: 48px; background: none; border: 0; border-top: 1px solid var(--hair-strong); border-radius: 0; box-shadow: none; overflow: visible; color: var(--ink); }
+:is(.hp, .bk7) .qc__bar { display: none; }
+:is(.hp, .bk7) .bf { padding: 0; color: var(--ink); container-type: normal; }
+:is(.hp, .bk7) .bf__head { padding: 22px 0 14px; align-items: baseline; }
+:is(.hp, .bk7) .bf__h { font: 400 clamp(28px, 2.6vw, 36px)/1.1 var(--font-serif); letter-spacing: 0; color: var(--ink); }
+:is(.hp, .bk7) .bf__count { font: 500 12px/1 var(--font-sans); letter-spacing: .14em; color: var(--ink-quiet); }
+:is(.hp, .bk7) .bf__progress { margin-top: 0; height: 2px; border-radius: 0; overflow: hidden; background: linear-gradient(var(--hair), var(--hair)) 0 100% / 100% 1px no-repeat; }
+:is(.hp, .bk7) .bf__progress > div { height: 2px; border-radius: 0; background: var(--sage-700); }
+:is(.hp, .bk7) .bf__body { margin-top: 8px; }
+:is(.hp, .bk7) .bf__quote, :is(.hp, .bk7) .bf__details { gap: 40px; }
+:is(.hp, .bk7) .bf__legend { float: left; width: 100%; margin-bottom: 14px; font: 400 24px/1.2 var(--font-serif); color: var(--ink); }
+:is(.hp, .bk7) .bf__legend + * { clear: both; }
+:is(.hp, .bk7) .bf__sub { clear: both; margin-top: -6px; margin-bottom: 14px; font-size: 15px; line-height: 1.5; color: var(--ink-quiet); }
+:is(.hp, .bk7) .bf__note { border-radius: 0; background: none; border-top: 1px solid var(--hair); border-bottom: 1px solid var(--hair); padding: 18px 0; font-size: 17px; color: var(--ink); }
+:is(.hp, .bk7) .bf-tile:has(.bf-radio:focus-visible), :is(.hp, .bk7) .bf-pill:has(.bf-radio:focus-visible) { outline: 2px solid var(--sage-700); outline-offset: -2px; }
+:is(.hp, .bk7) .bf-tile { border-radius: 0; border: 0; background: none; box-shadow: none; transition: background-color .2s var(--ease-out); }
+:is(.hp, .bk7) .bf-tile:hover { border: 0; }
+@media (hover: hover) and (pointer: fine) { :is(.hp, .bk7) .bf-tile:hover { background: var(--stone-100); } :is(.hp, .bk7) .bf-tile[data-checked]:hover { background: var(--sage-50); } }
+:is(.hp, .bk7) .bf-tile__check { display: none; }
+:is(.hp, .bk7) .bf-tile__d { margin-top: 2px; font-size: 16px; line-height: 1.45; color: var(--ink-quiet); }
+:is(.hp, .bk7) .bf-tile b, :is(.hp, .bk7) .bf-size__top b { font-weight: 500; }
+/* who: a ruled row of four, a top rule marks the choice; a radio dot on every choice, as the prototype */
+:is(.hp, .bk7) .bf__who { margin-top: 0; gap: 0; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--hair); border-bottom: 1px solid var(--hair); }
+:is(.hp, .bk7) .bf-tile--who { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 4px 12px; align-content: start; min-height: 48px; padding: 18px 44px 20px 18px; }
+:is(.hp, .bk7) .bf-tile--who + .bf-tile--who { border-left: 1px solid var(--hair); }
+:is(.hp, .bk7) .bf-tile--who b { font-size: 17px; line-height: 1.35; }
+:is(.hp, .bk7) .bf-tile--who .bf-tile__ico { position: absolute; right: 14px; top: 16px; width: auto; height: auto; background: none; color: var(--ink-quiet); border-radius: 0; }
+:is(.hp, .bk7) .bf-tile--who[data-checked] .bf-tile__ico { background: none; color: var(--sage-700); }
+:is(.hp, .bk7) :is(.bf-tile--who, .bf-tile--size, .bf-tile--unsure)::before { content: ""; box-sizing: border-box; width: 18px; height: 18px; margin-top: 3px; border-radius: 50%; border: 1px solid var(--slate-500); background: var(--white);
+  background-image: radial-gradient(circle, var(--sage-700) 0 3.6px, transparent 4px); background-size: 0 0; background-position: center; background-repeat: no-repeat;
+  transition: background-size .2s var(--ease-out), border-color .2s var(--ease-out); }
+:is(.hp, .bk7) :is(.bf-tile--who, .bf-tile--size, .bf-tile--unsure)[data-checked]::before { border-color: var(--sage-700); background-size: 100% 100%; }
+:is(.hp, .bk7) .bf-tile[data-checked] { background: var(--sage-50); border: 0; box-shadow: inset 0 2px 0 var(--sage-700); }
+/* service: underline tabs over the price list */
+:is(.hp, .bk7) .bf__tabs { margin-top: 0; gap: 0 28px; border-bottom: 1px solid var(--hair); }
+:is(.hp, .bk7) .bf-pill { min-height: 52px; padding: 8px 0; gap: 10px; border: 0; border-radius: 0; background: none; box-shadow: none; font-size: 17px; font-weight: 400; color: var(--ink-quiet); }
+:is(.hp, .bk7) .bf-pill::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--ink); transform: scaleX(0); transform-origin: left; transition: transform .25s var(--ease-out); }
+:is(.hp, .bk7) .bf-pill:hover { color: var(--ink); border: 0; }
+:is(.hp, .bk7) .bf-pill[data-checked] { color: var(--ink); font-weight: 500; background: none; box-shadow: none; }
+:is(.hp, .bk7) .bf-pill[data-checked]::after { transform: none; }
+:is(.hp, .bk7) .bf-pill__dot { display: none; }
+:is(.hp, .bk7) :is(.bf-pill__save, .bf-pill__tag) { font: 500 13px/1 var(--font-sans); letter-spacing: 0; text-transform: none; padding: 5px 7px; border-radius: 3px; }
+:is(.hp, .bk7) .bf-pill__save { color: var(--sage-800); background: var(--sage-100); }
+:is(.hp, .bk7) .bf-pill__tag { color: var(--slate-700); background: var(--slate-100); }
+:is(.hp, .bk7) .bf__tabs + .bf__sub { margin-top: 12px; font-size: 16px; }
+/* size and estimate side by side */
+:is(.hp, .bk7) .bf__calc { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 40px 64px; }
+:is(.hp, .bk7) .bf__sizes { margin-top: 0; display: block; border-top: 1px solid var(--hair); }
+:is(.hp, .bk7) .bf-tile--size { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 2px 14px; align-items: baseline; min-height: 64px; padding: 14px 16px 14px 14px; border-bottom: 1px solid var(--hair); }
+:is(.hp, .bk7) .bf-tile--size::before { align-self: center; grid-row: 1 / span 2; margin-top: 0; }
+:is(.hp, .bk7) .bf-tile--size[data-checked], :is(.hp, .bk7) .bf-tile--unsure[data-checked] { box-shadow: inset 2px 0 0 var(--sage-700); }
+:is(.hp, .bk7) .bf-size__top { display: flex; justify-content: space-between; align-items: baseline; gap: 2px 14px; font-size: 17px; line-height: 1.3; }
+:is(.hp, .bk7) .bf-size__top span { font: 400 26px/1 var(--font-serif); font-variant-numeric: lining-nums tabular-nums; color: var(--ink); }
+:is(.hp, .bk7) .bf-tile--size .bf-tile__d { grid-column: 2; font-size: 16px; line-height: 1.35; }
+:is(.hp, .bk7) .bf-tile--unsure { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 2px 14px; align-items: center; min-height: 64px; padding: 14px 16px 14px 14px; border-bottom: 1px solid var(--hair); color: var(--ink); }
+:is(.hp, .bk7) .bf-tile--unsure::before { margin-top: 0; }
+:is(.hp, .bk7) .bf-tile--unsure > svg { display: none; }   /* the prototype's row has the dot only */
+:is(.hp, .bk7) .bf-tile--unsure .bf-size__top span { font: 400 18px/1.3 var(--font-sans); color: var(--ink-quiet); }
+:is(.hp, .bk7) .bf-tile--unsure b { font-size: 17px; font-weight: 500; color: var(--ink); }
+:is(.hp, .bk7) .bf__area { border-radius: 0; border: 0; border-bottom: 1px solid var(--hair); background: var(--sage-50); padding: 16px 16px 18px 48px; }
+:is(.hp, .bk7) .bf__area-label { font-size: 17px; font-weight: 500; color: var(--ink); }
+:is(.hp, .bk7) .bf__more { margin-top: 10px; font: 500 16px var(--font-sans); color: var(--sage-700); text-decoration-color: var(--hair-strong); }
+/* the estimate: set by rules, not a card; it stays beside the size list while that scrolls */
+:is(.hp, .bk7) .bf__est { padding: 18px 0 0; border-radius: 0; background: none; box-shadow: none; border-top: 1px solid var(--hair-strong); display: grid; gap: 12px; }
+@media (min-width: 760px) { :is(.hp, .bk7) .bf__est { position: sticky; top: calc(var(--head-h) + 24px); } }
+:is(.hp, .bk7) .bf__est-label { font: 500 12px/1.4 var(--font-sans); letter-spacing: .14em; color: var(--ink-quiet); }
+:is(.hp, .bk7) .bf__price { margin-top: 0; min-height: 76px; gap: 6px 14px; }
+:is(.hp, .bk7) .bf__price b { font: 400 clamp(52px, 5vw, 68px)/1 var(--font-serif); letter-spacing: 0; font-variant-numeric: lining-nums tabular-nums; }
+:is(.hp, .bk7) .bf__price small { font-size: 17px; color: var(--ink-quiet); align-self: center; }
+:is(.hp, .bk7) .bf__price span { font-size: 15px; color: var(--ink-quiet); line-height: 1.4; max-width: 22ch; }
+:is(.hp, .bk7) .bf__price--text b { font-size: clamp(30px, 2.6vw, 36px); line-height: 1.1; }
+:is(.hp, .bk7) .bf__for { margin-top: 0; font-size: 15px; color: var(--ink-quiet); }
+:is(.hp, .bk7) .bf__save { margin-top: 0; font-size: 15px; font-weight: 500; color: var(--sage-800); }
+:is(.hp, .bk7) .bf__rows { margin-top: 0; border-top: 1px solid var(--hair); }
+:is(.hp, .bk7) .bf__rows > div { padding: 10px 0; border-bottom: 1px solid var(--hair); font-size: 16px; }
+:is(.hp, .bk7) .bf__rows dt { color: var(--ink); }
+:is(.hp, .bk7) .bf__rows dd { font-weight: 500; }
+:is(.hp, .bk7) .bf__extras { margin-top: 0; }
+:is(.hp, .bk7) .bf-check { border-radius: 0; border: 0; border-bottom: 1px solid var(--hair); background: none; padding: 14px 0; gap: 12px; }
+:is(.hp, .bk7) .bf-check:has(:checked) { background: none; }
+:is(.hp, .bk7) .bf-check__box { accent-color: var(--sage-700); }
+:is(.hp, .bk7) .bf-check__t { font-size: 16px; font-weight: 500; }
+:is(.hp, .bk7) .bf-check__d { font-size: 14px; line-height: 1.5; color: var(--ink-quiet); }
+/* the plan's offer: a sage-edged box */
+:is(.hp, .bk7) .bf-check--offer { border: 1px solid var(--sage-300); border-radius: var(--r-sm); background: var(--sage-50); padding: 14px; }
+:is(.hp, .bk7) .bf-check--offer:has(:checked) { border-color: var(--sage-700); background: var(--sage-50); }
+:is(.hp, .bk7) .bf__fine { margin-top: 0; font-size: 15px; color: var(--ink); }
+:is(.hp, .bk7) .bf__fine svg { color: var(--sage-700); }
+:is(.hp, .bk7) .bf__fine--quiet { color: var(--ink-quiet); padding-left: 24px; }
+/* steps 2 and 3 */
+:is(.hp, .bk7) .bf__summary { margin-top: 0; border-radius: 0; background: none; border-bottom: 1px solid var(--hair); padding: 14px 84px 14px 0; font-size: 16px; color: var(--ink); }
+:is(.hp, .bk7) .bf__summary b { color: var(--ink); font-weight: 500; }
+:is(.hp, .bk7) .bf__summary p + p { color: var(--ink-quiet); font-size: 15px; }
+:is(.hp, .bk7) .bf__change { color: var(--sage-700); font-weight: 500; }
+:is(.hp, .bk7) .bf input:not([type="checkbox"]):not([type="radio"]), :is(.hp, .bk7) .bf textarea { min-height: 48px; border: 1px solid var(--slate-500); border-radius: var(--r-sm); background: var(--white); color: var(--ink); font-size: 17px; }
+:is(.hp, .bk7) .bf input:not([type="checkbox"]):not([type="radio"]):focus-visible, :is(.hp, .bk7) .bf textarea:focus-visible { outline: 2px solid var(--sage-700); outline-offset: 2px; border-color: var(--sage-700); box-shadow: none; }
+:is(.hp, .bk7) .bf input[aria-invalid="true"], :is(.hp, .bk7) .bf textarea[aria-invalid="true"] { border-color: var(--error); }
+:is(.hp, .bk7) .bf label:not(.bf-tile):not(.bf-pill):not(.bf-check) { color: var(--ink); }
+:is(.hp, .bk7) .bf__nav { margin-top: 32px; padding-top: 28px; border-top: 1px solid var(--hair); }
+:is(.hp, .bk7) .bf__nav > button:not(.bf__go) { min-height: 52px; padding: 0 26px; border-radius: var(--r-sm); border-color: var(--slate-500); color: var(--ink); font: 500 17px/1 var(--font-sans); }
+:is(.hp, .bk7) .bf__go { min-height: 52px; min-width: 200px; padding: 0 26px; border-radius: var(--r-sm); background: var(--sage-700); color: var(--white); font: 500 17px/1 var(--font-sans); letter-spacing: .01em;
+  transition: transform 160ms var(--ease-out), background-color .2s var(--ease-out); }
+:is(.hp, .bk7) .bf__go:hover { background: var(--sage-800); }
+:is(.hp, .bk7) .bf__go:active { transform: scale(.97); }
+:is(.hp, .bk7) .bf__foot { margin-top: 12px; font-size: 15px; color: var(--ink-quiet); }
+:is(.hp, .bk7) .bf__foot a { color: var(--sage-700); font-weight: 500; }
+:is(.hp, .bk7) .bf__foot summary { color: var(--ink); font-weight: 500; }
+:is(.hp, .bk7) .bf__sent h2 { font-family: var(--font-serif); font-weight: 400; }
+@media (max-width: 759px) {
+  :is(.hp, .bk7) .bf__who { grid-template-columns: 1fr; }
+  :is(.hp, .bk7) .bf-tile--who + .bf-tile--who { border-left: 0; border-top: 1px solid var(--hair); }
+  :is(.hp, .bk7) .bf-tile--who .bf-tile__ico { display: none; }
+  :is(.hp, .bk7) .bf-tile--who { padding-right: 18px; }
+  /* phones: the services read as choices, with the same radio dot as every other question */
+  :is(.hp, .bk7) .bf__tabs { display: grid; grid-template-columns: 1fr; gap: 0; border-bottom: 0; border-top: 1px solid var(--hair); }
+  :is(.hp, .bk7) .bf-pill { border-bottom: 1px solid var(--hair); min-height: 52px; padding: 10px 4px; justify-content: flex-start; gap: 12px; }
+  :is(.hp, .bk7) .bf-pill::before { content: ""; box-sizing: border-box; flex: none; width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--slate-500); background: var(--white);
+    background-image: radial-gradient(circle, var(--sage-700) 0 3.6px, transparent 4px); background-size: 0 0; background-position: center; background-repeat: no-repeat; }
+  :is(.hp, .bk7) .bf-pill[data-checked]::before { border-color: var(--sage-700); background-size: 100% 100%; }
+  :is(.hp, .bk7) .bf-pill :is(.bf-pill__save, .bf-pill__tag) { margin-left: auto; }
+  :is(.hp, .bk7) .bf-pill::after { top: 0; bottom: 0; left: -1px; right: auto; width: 2px; height: auto; transform: scaleY(0); }
+  :is(.hp, .bk7) .bf-pill[data-checked]::after { transform: none; }
+  :is(.hp, .bk7) .bf__calc { grid-template-columns: 1fr; gap: 28px; }
+  :is(.hp, .bk7) .bf-tile--size { padding-right: 10px; }
+  :is(.hp, .bk7) .bf-size__top { flex-wrap: wrap; }
+  :is(.hp, .bk7) .bf-tile--unsure { grid-template-columns: 20px minmax(0, 1fr); }
+  :is(.hp, .bk7) .bf-tile--unsure > svg { display: none; }
+  :is(.hp, .bk7) .bf-tile--unsure .bf-size__top { display: grid; gap: 2px; }
+  :is(.hp, .bk7) .bf__sub, :is(.hp, .bk7) .bf__fine, :is(.hp, .bk7) .bf__foot, :is(.hp, .bk7) .bf-check__d { font-size: 16px; }
+  :is(.hp, .bk7) .bf__area { padding-left: 16px; }
+  :is(.hp, .bk7) .bf__go { min-width: 0; flex: 1 1 auto; }
+}
+
+/* the form's v7 parts (approved 22/10/2026), the prototype's look */
+:is(.hp, .bk7) .bf__body { margin-top: 28px; }
+/* a size row as the prototype's: the m² label over its caption, the price centred across both lines on the right */
+:is(.hp, .bk7) .bf-tile--size { grid-template-columns: 20px minmax(0, 1fr) auto; }
+:is(.hp, .bk7) .bf-tile--size .bf-size__top { display: contents; }
+:is(.hp, .bk7) .bf-tile--size .bf-size__top b { grid-column: 2; grid-row: 1; }
+:is(.hp, .bk7) .bf-tile--size .bf-size__top span { grid-column: 3; grid-row: 1 / span 2; align-self: center; }
+:is(.hp, .bk7) .bf-tile--size .bf-tile__d { grid-column: 2; grid-row: 2; }
+:is(.hp, .bk7) .bf__qn { min-width: 1.5em; margin-right: 6px; color: var(--sage-700); }
+:is(.hp, .bk7) .bf__dwelling .bf-tile--dwelling { padding-right: 18px; }
+:is(.hp, .bk7) .bf__get-h { margin-top: 6px; }
+:is(.hp, .bk7) .bf__ticks { margin: 0; gap: 8px; }
+:is(.hp, .bk7) .bf__ticks li { gap: 8px; font-size: 16px; line-height: 1.45; color: var(--ink); }
+:is(.hp, .bk7) .bf__ticks svg { color: var(--sage-700); margin-top: 3px; }
+:is(.hp, .bk7) .bf__incl { margin-top: 0; border-top: 1px solid var(--hair); border-bottom: 1px solid var(--hair); }
+:is(.hp, .bk7) .bf__incl summary { font-size: 16px; color: var(--ink); }
+:is(.hp, .bk7) .bf__incl summary:hover { color: var(--sage-700); }
+:is(.hp, .bk7) .bf__incl summary:focus-visible { outline: 2px solid var(--sage-700); outline-offset: 2px; }
+:is(.hp, .bk7) .bf__incl ul { font-size: 15px; color: var(--ink-quiet); }
+:is(.hp, .bk7) .bf__date-note { font-size: 15px; color: var(--ink-quiet); border-left-color: var(--epc-d); }
+:is(.hp, .bk7) .bf__date-note.is-bad { color: var(--error); border-left-color: var(--error); }
+:is(.hp, .bk7) .bf__reply { padding-top: 12px; margin-top: 0; font-size: 16px; }
+:is(.hp, .bk7) .bf__reply b { font-weight: 500; }
+:is(.hp, .bk7) .bf__foot { display: block; padding-top: 12px; margin-top: 0; }
+:is(.hp, .bk7) .bf__foot a { color: var(--sage-700); font-weight: 500; }
+:is(.hp, .bk7) .bf__sent { padding-top: 28px; gap: 20px; max-width: 760px; }
+:is(.hp, .bk7) .bf__sent-h { font: 400 clamp(30px, 3vw, 40px)/1.1 var(--font-serif); color: var(--ink); }
+:is(.hp, .bk7) .bf__sent-h:focus, :is(.hp, .bk7) .bf__sent:focus { outline: none; }
+:is(.hp, .bk7) .bf__sent .bf__est-label { margin-bottom: 10px; }
+:is(.hp, .bk7) .bf__sent-next { margin: 0; border-top: 1px solid var(--hair); }
+:is(.hp, .bk7) .bf__sent-next li { grid-template-columns: 36px minmax(0, 1fr); gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--hair); font-size: 17px; }
+:is(.hp, .bk7) .bf__sent-next li::before { font-size: 22px; }
+:is(.hp, .bk7) .bf__sent-call { font-size: 17px; }
+:is(.hp, .bk7) .bf__sent-call a { color: var(--sage-700); font-weight: 500; }
+:is(.hp, .bk7) .bf__again { font: 500 16px var(--font-sans); color: var(--sage-700); }
+@media (max-width: 759px) {
+  :is(.hp, .bk7) .bf__date-note, :is(.hp, .bk7) .bf__incl ul { font-size: 16px; }
+}

@@ -2,10 +2,12 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { PostHeader, showsScale } from '@/components/blog/PostHeader'
 import { KeyTakeaways } from '@/components/blog/KeyTakeaways'
-import { TableOfContents, extractToc } from '@/components/blog/TableOfContents'
+import { TableOfContents } from '@/components/blog/TableOfContents'
+import { extractToc } from '@/lib/heading-text'
 import { PostContent } from '@/components/blog/PostContent'
 import { PostFaq } from '@/components/blog/PostFaq'
 import { AuthorBox } from '@/components/blog/AuthorBox'
+import { GuideFeedback } from '@/components/blog/GuideFeedback'
 import { PostSources } from '@/components/blog/PostSources'
 import { InYourArea } from '@/components/blog/InYourArea'
 import { WhatItCosts } from '@/components/blog/WhatItCosts'
@@ -206,6 +208,7 @@ export default async function BlogPostPage({ params }: PageProps) {
               <InYourArea slugs={guideAreas(post.category, post.areas)} />
               <PostSources sources={post.sources} />
               <AuthorBox author={post.author} />
+              <GuideFeedback slug={post.slug} waHref={`${site.whatsappHref}?text=${encodeURIComponent(`Hi, I read your guide "${post.title}". It didn't cover: `)}`} email={site.email} emailHref={site.emailHref} />
             </article>
           </div>
         </div>

@@ -3,6 +3,7 @@ import { ChevronDown, ShieldCheck } from 'lucide-react'
 import { Container } from '@/components/ui/Container'
 import { Ico } from '@/components/sections/home/HomeIcon'
 import { FiguresDrawer } from '@/components/inner/FiguresDrawer'
+import { OnThisPage, type PageSection } from '@/components/inner/OnThisPage'
 import { TERRACE_SVG } from '@/components/inner/terrace-svg'
 import { boroughMeta } from '@/lib/boroughs'
 import type { AreaSummary, RatingGroup } from '@/lib/borough-stats-types'
@@ -51,7 +52,7 @@ const linkCls = 'in-link'
    title-block price list under the answer, and On this page beside it. Title and H1 are unchanged (frozen until 14/12). */
 export function AreaHeroD({ slug, name, s, parent, sections }: {
   slug: string; name: string; s: AreaSummary; parent?: { slug: string; name: string }
-  sections: { id: string; label: string }[]
+  sections: PageSection[]
 }) {
   const band = s.commonestBand
   const common = pricing[bandIndex(band.id)]
@@ -156,10 +157,7 @@ export function AreaHeroD({ slug, name, s, parent, sections }: {
           </div>
         </aside>
 
-        <nav className="in-otp" aria-label="On this page">
-          <p className="in-eyebrow">On this page</p>
-          <ol>{sections.map((x) => <li key={x.id}><a href={`#${x.id}`}>{x.label}</a></li>)}</ol>
-        </nav>
+        <OnThisPage sections={sections} />
       </Container>
     </section>
   )
