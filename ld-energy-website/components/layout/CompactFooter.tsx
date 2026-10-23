@@ -10,13 +10,14 @@ type FooterLink = [label: string, href: string]
 
 const services: FooterLink[] = [
   ['Domestic EPC', '/services/domestic-epc'],
-  ['Floor plans', '/services/floor-plans'],
+  ['Floor Plans', '/services/floor-plans'],
   ['EPC Pre-Assessment', '/services/epc-pre-assessment'],
   ['EPC Improvement Plan', '/services/epc-improvement-plan'],
   ['Guide prices', '/pricing'],
+  // one name per page, as in the header and phone menu; portfolio landlords are on /landlords (23/10/2026)
   ['Landlords', '/landlords'],
+  ['Agents', '/estate-agents'],
   ['Sellers', '/sellers'],
-  ['Agencies and portfolios', '/estate-agents'],
 ]
 const useful: FooterLink[] = [
   ['London service areas', '/areas'],

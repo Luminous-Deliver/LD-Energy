@@ -35,7 +35,7 @@ export const metadata: Metadata = {
 
 const breadcrumbs = [
   { href: '/', label: 'Home' },
-  { href: '/estate-agents', label: 'For Agents' },
+  { href: '/estate-agents', label: 'Agents' },
 ]
 
 const whyAgents = [

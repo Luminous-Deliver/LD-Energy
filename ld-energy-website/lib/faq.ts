@@ -224,7 +224,7 @@ export const fullFaq: FaqCategory[] = [
       {
         q: 'What if my property is below an E rating?',
         a: 'If the property is covered by domestic MEES, you must improve it to E or register a valid exemption before letting or continuing to let it. Your standard recommendation report helps identify relevant measures.',
-        links: [{ label: 'How to improve your EPC rating', href: '/blog/how-to-improve-epc-rating' }, { label: 'EPC Improvement Plan', href: '/services/epc-improvement-plan' }],
+        links: [{ label: 'How to improve your EPC rating', href: '/blog/how-to-improve-epc-rating' }, { label: 'EPC Improvement Plan', href: '/services/epc-improvement-plan' }, { label: 'EPC Pre-Assessment', href: '/services/epc-pre-assessment' }],
       },
       {
         q: 'Are there any exemptions?',
@@ -286,7 +286,7 @@ export const fullFaq: FaqCategory[] = [
       {
         q: 'Can I get a discount for multiple properties?',
         a: 'Yes. We offer portfolio rates for landlords and letting agents with multiple properties. Contact us directly for a quote.',
-        links: [{ label: 'Agencies and portfolios', href: '/estate-agents' }],
+        links: [{ label: 'Landlords with several homes', href: '/landlords#portfolio' }, { label: 'Agents', href: '/estate-agents' }],
       },
       {
         q: 'What are the faster options?',

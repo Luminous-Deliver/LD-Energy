@@ -173,7 +173,11 @@ export default function EpcImprovementPlanPage() {
               Standard recommendations come from the assessment software. Abdul&apos;s additional
               plan puts them in context for your property and explains the priorities in writing.
               It costs <strong className="text-secondary-900">{PLAN_PRICE}</strong> on top of
-              your EPC and is already included in an EPC Pre-Assessment.
+              your EPC and is already included in an{' '}
+              <Link href="/services/epc-pre-assessment" className="text-primary-700 underline underline-offset-2 hover:text-primary-800">
+                EPC Pre-Assessment
+              </Link>
+              .
             </p>
 
             <h3 className="mt-10 text-xl font-bold text-secondary-900">What it covers</h3>
