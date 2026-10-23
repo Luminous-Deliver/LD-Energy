@@ -26,6 +26,9 @@ export function LogoLockup() {
     <Link prefetch={false} href="/" className="lg">
       {/* eslint-disable-next-line @next/next/no-img-element -- a 16 KB vector; next/image would add nothing */}
       <img className="lg__mark" src="/brand/ld-energy-mark-nav.svg" alt="" width={72} height={38} fetchPriority="high" />
+      {/* the footer's reversed colours, his traced geometry unchanged; display:none elsewhere, so it only loads on dark */}
+      {/* eslint-disable-next-line @next/next/no-img-element -- as above */}
+      <img className="lg__mark lg__mark--rev" src="/brand/ld-energy-mark-nav-reversed.svg" alt="" width={72} height={38} loading="lazy" />
       <span className="lg__words">
         <span className="lg__name">L&amp;D Energy</span>
         <span className="lg__tag">EPC · Floor plans</span>
@@ -47,8 +50,9 @@ export function Header({ waHref }: { waHref: string }) {
     return () => window.removeEventListener('scroll', update)
   }, [])
 
+  // the homepage's dusk hero sits under the bar: it goes light-on-dark until the page moves (data-dark)
   return (
-    <header className="sh" data-solid={solid}>
+    <header className="sh" data-solid={solid} data-dark={pathname === '/' && !solid}>
       <Container className="sh__in">
         <LogoLockup />
         <nav aria-label="Primary" className="sh__nav">

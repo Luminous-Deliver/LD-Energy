@@ -163,3 +163,14 @@ html { font-synthesis-weight: none; }
   .sh, .mnav__scrim, .mnav__panel, .ld-btn { transition-duration: 0s; }
   .ld-btn:active { transform: none; }
 }
+
+/* dusk (23/10): the bar over the homepage hero, light on dark until the page moves */
+.lg__mark--rev { display: none; }
+.sh[data-dark="true"] { color: #F4F1EA; }
+.sh[data-dark="true"] .lg__mark:not(.lg__mark--rev) { display: none; }
+.sh[data-dark="true"] .lg__mark--rev { display: block; }
+.sh[data-dark="true"] .lg__name, .sh[data-dark="true"] .sh__nav a, .sh[data-dark="true"] .sh__wa { color: #F4F1EA; }
+.sh[data-dark="true"] .lg__tag { color: #A9C7AE; }
+.sh[data-dark="true"] .sh__quote { color: #F4F1EA; border-color: rgba(244, 241, 234, .65); background: transparent; }
+.sh[data-dark="true"] .sh__quote:hover { background: rgba(244, 241, 234, .1); }
+.sh[data-dark="true"] .mnav__toggle, .sh[data-dark="true"] button { color: #F4F1EA; }

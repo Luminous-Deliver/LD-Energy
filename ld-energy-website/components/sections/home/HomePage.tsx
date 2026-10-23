@@ -9,6 +9,7 @@ import { quoteHref } from '@/lib/quote-context'
 import { HomeQuoteProvider } from './HomeQuoteContext'
 import { HomeQuoteCard } from './HomeQuoteCard'
 import { HomeV7Motion } from './HomeV7Motion'
+import { HeroSky } from './HeroSky'
 import { PickService } from './PickService'
 import { HomeQuoteBar } from './HomeQuoteBar'
 import { Ico } from './HomeIcon'
@@ -48,21 +49,23 @@ function Facts() {
 function Hero() {
   const wa = whatsappQuoteHref()
   return (
-    <section id="top" className="hp-hero" aria-labelledby="home-h1">
+    <section id="top" className="hp-hero hp-hero--dusk" aria-labelledby="home-h1">
       <div className="hero__stage">
         <div className="scene-wrap">
           <div className="scene" aria-hidden="true">
-            {/* hero B, redrawn wider (Abdul 23/10: "looks very good i love it"): one 21:9 plane on desktop, a crop
-                round the cut-open house on phones. The motion script still writes the far, glow and mist planes,
+            {/* hero B-wide at dusk (Abdul 23/10: "Dusk. New picture, reversed logo, light text"): one 21:9 plane on
+                desktop, a taller crop round the cut-open house on phones that fades into the night at its top edge;
+                HeroSky draws the stars and the rooms lighting up over it. The motion script still writes the far, glow and mist planes,
                 so they stay as empty boxes */}
             <div className="pl pl--far" />
             <div className="pl pl--glow" />
             <div className="pl pl--mid">
               {/* eslint-disable-next-line @next/next/no-img-element -- next/image is unoptimised on Pages */}
               <picture>
-                <source media="(max-width: 759px)" srcSet="/home/hero-wide-phone-800.webp 800w, /home/hero-wide-phone-1200.webp 1200w" sizes="100vw" width={1200} height={674} />
-                <img src="/home/hero-wide-1600.webp" srcSet="/home/hero-wide-900.webp 900w, /home/hero-wide-1600.webp 1600w, /home/hero-wide-2560.webp 2560w" sizes="100vw" alt="" width={1600} height={689} fetchPriority="high" />
+                <source media="(max-width: 759px)" srcSet="/home/hero-dusk-phone-800.webp 800w, /home/hero-dusk-phone-1200.webp 1200w" sizes="100vw" width={1200} height={743} />
+                <img src="/home/hero-dusk-1600.webp" srcSet="/home/hero-dusk-900.webp 900w, /home/hero-dusk-1600.webp 1600w, /home/hero-dusk-2560.webp 2560w" sizes="100vw" alt="" width={1600} height={689} fetchPriority="high" />
               </picture>
+              <HeroSky />
             </div>
             <div className="pl pl--mist" />
           </div>
@@ -252,7 +255,6 @@ function Services() {
             <div className="offer__top"><span className="offer__ico"><Ico name="document" /></span></div>
             <h3>Domestic EPC</h3>
             <p className="offer__for">For lettings, sales and your own home</p>
-            <p className="offer__price"><small>from</small>£{priceFrom.epc}</p>
             <div className="offer__groups">
               <div><p className="offer__g">On the visit</p><Ticks items={['On-site assessment by an accredited Domestic Energy Assessor']} /></div>
               <div><p className="offer__g">You receive</p><Ticks items={['Your EPC, lodged on the official GOV.UK EPC Register', 'A certificate link once it is live on the register', 'The standard recommendation report, where applicable', 'A certificate valid for 10 years']} /></div>
@@ -260,6 +262,8 @@ function Services() {
                 <ul className="ticks"><li><span className="plus" aria-hidden="true" />£{site.addOns.improvementPlan} Improvement Plan: your priorities, with the full Energy Report</li></ul></div>
             </div>
             <div className="offer__foot">
+              {/* price by the button (Abdul 23/10): the three line up on one baseline, the hero strip already leads with "from" */}
+              <div className="offer__cost"><p className="offer__price"><small>from</small>£{priceFrom.epc}</p><p className="offer__note">Exact price confirmed before booking</p></div>
               <PickService service="epc" className="btn btn-line">See my EPC price</PickService>
               <Link prefetch={false} className="link arrow-link" href="/services/domestic-epc">Domestic EPC details <Ico name="arrow-right" /></Link>
             </div>
@@ -268,13 +272,13 @@ function Services() {
             <div className="offer__top"><span className="offer__ico"><Ico name="floor-plan" /></span><span className="offer__flag">One visit · save up to £{maxBundleSaving}</span></div>
             <h3>EPC + Floor Plan</h3>
             <p className="offer__for">For sellers, re-lets and agents preparing a listing</p>
-            <p className="offer__price"><small>from</small>£{priceFrom.bundle}</p>
             <div className="offer__groups">
               <div><p className="offer__g">Everything in the Domestic EPC</p><Ticks items={['Assessment, lodged EPC, certificate link and recommendation report']} /></div>
               <div><p className="offer__g">Plus the floor plan</p><Ticks items={['Laser-measured plan for Rightmove, Zoopla and OnTheMarket', 'Total floor area, approximate room dimensions and labels', 'High-resolution JPEG and PDF files']} /></div>
               <div><p className="offer__g">Why together</p><Ticks items={['Both surveys are completed during the same property visit']} /></div>
             </div>
             <div className="offer__foot">
+              <div className="offer__cost"><p className="offer__price"><small>from</small>£{priceFrom.bundle}</p><p className="offer__note">Exact price confirmed before booking</p></div>
               <PickService service="bundle" className="btn btn-primary">See my EPC + Floor Plan price</PickService>
               <Link prefetch={false} className="link arrow-link" href="/pricing">EPC and floor plan pricing <Ico name="arrow-right" /></Link>
             </div>
@@ -283,12 +287,12 @@ function Services() {
             <div className="offer__top"><span className="offer__ico"><Ico name="dimension" /></span></div>
             <h3>Floor Plan</h3>
             <p className="offer__for">For sellers, estate agents, rental listings and property licence applications</p>
-            <p className="offer__price"><small>from</small>£{priceFrom.floorPlan}</p>
             <div className="offer__groups">
               <div><p className="offer__g">On the visit</p><Ticks items={['Every room laser-measured on site']} /></div>
               <div><p className="offer__g">You receive</p><Ticks items={['Total floor area, as gross internal area', 'Approximate room dimensions and room labels', 'High-resolution JPEG and PDF files', 'A plan suitable for Rightmove, Zoopla and OnTheMarket']} /></div>
             </div>
             <div className="offer__foot">
+              <div className="offer__cost"><p className="offer__price"><small>from</small>£{priceFrom.floorPlan}</p><p className="offer__note">Exact price confirmed before booking</p></div>
               <PickService service="floor-plan" className="btn btn-line">See my Floor Plan price</PickService>
               <Link prefetch={false} className="link arrow-link" href="/services/floor-plans">Floor plan details <Ico name="arrow-right" /></Link>
             </div>
@@ -465,8 +469,8 @@ function Close() {
 
 export function HomePage() {
   // The LCP image: the wide cut from 760 px, the crop round the house on phones (media keeps it to one download).
-  preload('/home/hero-wide-1600.webp', { as: 'image', fetchPriority: 'high', media: '(min-width: 760px)', imageSrcSet: '/home/hero-wide-900.webp 900w, /home/hero-wide-1600.webp 1600w, /home/hero-wide-2560.webp 2560w', imageSizes: '100vw' })
-  preload('/home/hero-wide-phone-800.webp', { as: 'image', fetchPriority: 'high', media: '(max-width: 759px)', imageSrcSet: '/home/hero-wide-phone-800.webp 800w, /home/hero-wide-phone-1200.webp 1200w', imageSizes: '100vw' })
+  preload('/home/hero-dusk-1600.webp', { as: 'image', fetchPriority: 'high', media: '(min-width: 760px)', imageSrcSet: '/home/hero-dusk-900.webp 900w, /home/hero-dusk-1600.webp 1600w, /home/hero-dusk-2560.webp 2560w', imageSizes: '100vw' })
+  preload('/home/hero-dusk-phone-800.webp', { as: 'image', fetchPriority: 'high', media: '(max-width: 759px)', imageSrcSet: '/home/hero-dusk-phone-800.webp 800w, /home/hero-dusk-phone-1200.webp 1200w', imageSizes: '100vw' })
   return (
     <div className="hp">
       {/* the service cards and the booking form share one state: "See my price" picks the service in the form */}
