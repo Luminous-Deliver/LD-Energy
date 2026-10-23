@@ -160,6 +160,12 @@ export const ratingQuestions: (FaqItem & { id: string })[] = [
     links: [{ label: 'Documents that may help', href: '/preparing-for-your-epc#documents-and-evidence' }],
   },
   {
+    id: 'wall-insulation-evidence',
+    q: 'I sent photos and documents. Why can’t they be used for my wall insulation?',
+    a: 'Insulation inside a wall can’t be seen, so it’s recorded from evidence that clearly relates to your home, to those walls, and to the work being done, and that shows how thick the insulation is. Documents about other work, such as the loft or the windows, can’t be used for the walls, and a photo with no measurement can’t show the thickness. An extension is recorded separately from the main building, so it needs its own evidence too. What helps: a Building Control completion certificate, the installer’s guarantee or specification stating the thickness, or photos taken during the work showing the insulation with a tape measure against it. Your assessor has to be able to rely on it, so we’ll tell you if something can’t be used.',
+    links: [{ label: 'Documents that may help', href: '/preparing-for-your-epc#documents-and-evidence' }],
+  },
+  {
     id: 'joist-and-rafter-insulation',
     q: 'I have insulation at the loft floor and in the roof slope. Why does only one count?',
     a: 'Where a loft is insulated at both the joists (the loft floor) and the rafters (the roof slope), the method counts the joist insulation only. We can photograph and note what we see, but the rafter insulation won’t change the rating.',
