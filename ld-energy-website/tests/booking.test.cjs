@@ -286,7 +286,7 @@ test('contact API security, recalculation and both email representations with de
       assert.match(body, /What happens next/)
       assert.match(body, /on the day of the visit/)
       assert.match(body, /Before your visit/)
-      assert.match(body, /preparing-for-your-epc#what-to-have-ready/)
+      assert.match(body, /preparing-for-your-epc#please-read/)
       assert.match(body, /Booking as/)
     }
     assert.doesNotMatch(messages[1].html, /&#128222;/)

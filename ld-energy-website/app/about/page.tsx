@@ -178,7 +178,7 @@ export default function AboutPage() {
               <p className="ab-p">
                 L&amp;D Energy is led by Abdul M Taher, an Elmhurst and Quidos accredited Domestic Energy Assessor based in
                 Stratford, East London. Abdul carries out the assessments himself. If he is ill or unable to make a visit, he
-                sometimes sends a trusted, experienced colleague in his place.
+                sometimes sends a trusted, experienced colleague in his place, and lets you know in advance.
               </p>
               <p className="ab-p">
                 The service was set up because too many landlords and sellers told us the same story. So we do the opposite:

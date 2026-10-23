@@ -223,7 +223,7 @@ function buildConfirmation(data: ParsedInput) {
     (delivered.length ? `\n\nWhat you receive:\n${delivered.map(item => `  - ${item}`).join('\n')}` : '') +
     `\n\nWhat happens next:\n` +
     steps.map((step, i) => `  ${i + 1}. ${step}`).join('\n') +
-    (showPrep ? `\n\nBefore your visit:\n${prepChecklist.map(item => `  - ${item}`).join('\n')}\n  Full checklist: ${prepUrl}` : '') +
+    (showPrep ? `\n\nBefore your visit:\n${prepChecklist.map(item => `  - ${item}`).join('\n')}\n  Please read before your visit: ${prepUrl}` : '') +
     (tenanted ? `\n\nTenanted property? ${TENANT_NOTICE}` : '') +
     `\n\nNeed us sooner, or want to change something? Reply to this email, call or text ${PHONE}, or message us on WhatsApp.\n\n` +
     `L&D Energy, Elmhurst and Quidos accredited Domestic Energy Assessor\n` +
@@ -262,7 +262,7 @@ function buildConfirmation(data: ParsedInput) {
                   <ul style="margin:0 0 12px;padding:0 0 0 18px;font-size:14px;line-height:1.55;color:${INK}">
                     ${prepChecklist.map(item => `<li style="margin:0 0 6px">${escapeHtml(item)}</li>`).join('')}
                   </ul>
-                  <a href="${prepUrl}" style="font-size:14px;font-weight:700;color:${NAVY}">See the full checklist</a>
+                  <a href="${prepUrl}" style="font-size:14px;font-weight:700;color:${NAVY}">Please read before your visit</a>
                 </td></tr>
               </table>` : ''
 

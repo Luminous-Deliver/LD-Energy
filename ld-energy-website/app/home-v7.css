@@ -510,6 +510,8 @@ body:has(.hp) .dock { display: none !important; }
 .hp-hero--dusk .hero__cta .link { color: #EADFC8; text-decoration-color: rgba(234, 223, 200, .6); }
 .hp-hero--dusk .hero__credit { color: #9DA3B8; }
 .hp-hero--dusk .hero__sky { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.hp-hero .hero__night { display: none; }
+@media (max-width: 759px) { .hp-hero--dusk .hero__night { display: block; position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; pointer-events: none; } }
 @media (min-width: 760px) {
   .hp-hero--dusk .hero__scrim { background: linear-gradient(90deg, rgba(17, 20, 38, .55) 0, rgba(17, 20, 38, .3) 34%, rgba(17, 20, 38, 0) 55%); }
 }

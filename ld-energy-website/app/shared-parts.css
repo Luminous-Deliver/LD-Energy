@@ -153,6 +153,7 @@ html { font-synthesis-weight: none; }
     transition: transform .3s var(--ease-out), visibility 0s linear .3s; }
   .dock[data-on="true"] { transform: none; visibility: visible; transition: transform .3s var(--ease-out), visibility 0s; }
   .dock .ld-btn { width: 100%; padding: 0 12px; font-size: 16px; }
+  .dock--one { grid-template-columns: minmax(0, 1fr); }
   /* the dock never covers the end of a page: the last content clears it (the homepage close runs into the footer) */
   main { padding-bottom: calc(var(--dock-h) + env(safe-area-inset-bottom, 0px)); }
   body:has(.hc-close) main { padding-bottom: 0; }

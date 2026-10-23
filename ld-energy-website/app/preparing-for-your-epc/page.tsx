@@ -96,7 +96,7 @@ const prepare = [
   {
     title: 'Insulation evidence',
     // rdsap 9.02, 3.03a, 3.03b
-    text: 'If insulation is hidden, inside a wall, under a floor or under a boarded loft, your assessor can only record it from paperwork. Have the insulation certificate or guarantee ready, with its certificate or guarantee number. It needs to show it’s for your home and, where possible, how thick the insulation is. Without it, the method has to use the default for the age of the home.',
+    text: 'If insulation is hidden, inside a wall, under a floor or under a boarded loft, your assessor can only record it from paperwork. Have the original insulation certificate or guarantee ready, with its certificate or guarantee number. It needs to show it’s for your home and, where possible, how thick the insulation is. Without it, the method has to use the default for the age of the home.',
   },
   {
     title: 'Other paperwork, if you have it',
@@ -338,7 +338,8 @@ export default function PreparingPage() {
                 <p className="pp-lede">
                   Your assessor records what they can see and measure. Anything hidden, like insulation inside a wall
                   or under floorboards, can only be recorded from paperwork that clearly relates to your home. None
-                  of it is compulsory. Put out what you have.
+                  of it is compulsory. Put out what you have, and the originals if you can: they are preferred to photos
+                  or copies.
                 </p>
                 <div className="pp-ev" role="region" aria-label="Paperwork and what it changes">
                   <table>

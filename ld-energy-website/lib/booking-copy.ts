@@ -93,7 +93,7 @@ export function hasPrepChecklist(kind: ProductKind): boolean {
   return kind === 'epc' || kind === 'bundle' || kind === 'preAssessment'
 }
 
-export const PREP_PATH = '/preparing-for-your-epc#what-to-have-ready'
+export const PREP_PATH = '/preparing-for-your-epc#please-read'
 
 /** Condensed from the "What to have ready" section of /preparing-for-your-epc. */
 export const prepChecklist = [

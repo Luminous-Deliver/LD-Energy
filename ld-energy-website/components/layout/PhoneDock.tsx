@@ -5,6 +5,11 @@ import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { quoteTargetFor } from '@/lib/quote-target'
 import { WhatsAppIcon } from '@/components/ui/BrandIcons'
+import { site } from '@/lib/site'
+
+// Pages read by customers who have usually already booked: one WhatsApp button, no quote (Abdul 23/10/2026).
+const BOOKED_PATHS = ['/preparing-for-your-epc']
+const BOOKED_WA = `${site.whatsappHref}?text=${encodeURIComponent('Hi, I have a question about my EPC visit.')}`
 
 // Covered by the dock rules: a booking form (the shared form's card, the contact page's form, any form in main),
 // the footer and its street drawing, and a cookie banner if one is ever added (mark it data-cookie-banner).
@@ -60,8 +65,15 @@ export function PhoneDock({ waHref }: { waHref: string }) {
     }
   }, [pathname])
 
+  const booked = BOOKED_PATHS.includes(pathname)
   return (
-    <div className="dock" data-dock data-on={on} role="group" aria-label="Quick contact" aria-hidden={on ? undefined : true} inert={!on}>
+    <div className={booked ? 'dock dock--one' : 'dock'} data-dock data-on={on} role="group" aria-label="Quick contact" aria-hidden={on ? undefined : true} inert={!on}>
+      {booked ? (
+        <a className="ld-btn ld-btn--primary" href={BOOKED_WA} target="_blank" rel="noopener noreferrer">
+          <WhatsAppIcon />
+          Message us on WhatsApp
+        </a>
+      ) : (<>
       <a className="ld-btn ld-btn--line" href={waHref} target="_blank" rel="noopener noreferrer">
         <WhatsAppIcon />
         WhatsApp
@@ -69,6 +81,7 @@ export function PhoneDock({ waHref }: { waHref: string }) {
       <Link prefetch={false} className="ld-btn ld-btn--primary" href={quoteTargetFor(pathname, 'mobile-bar')}>
         Get my exact quote
       </Link>
+      </>)}
     </div>
   )
 }

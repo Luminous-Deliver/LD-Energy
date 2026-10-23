@@ -9,7 +9,7 @@ import { quoteHref } from '@/lib/quote-context'
 import { HomeQuoteProvider } from './HomeQuoteContext'
 import { HomeQuoteCard } from './HomeQuoteCard'
 import { HomeV7Motion } from './HomeV7Motion'
-import { HeroSky } from './HeroSky'
+import { HeroNight, HeroSky } from './HeroSky'
 import { PickService } from './PickService'
 import { HomeQuoteBar } from './HomeQuoteBar'
 import { Ico } from './HomeIcon'
@@ -70,6 +70,8 @@ function Hero() {
             <div className="pl pl--mist" />
           </div>
           <span className="hero__scrim" aria-hidden="true" />
+          {/* phones: stars in the open night above the picture, beside the headline (Abdul 23/10) */}
+          <HeroNight />
           <div className="hero__copy wrap">
             {/* H1 option C (Abdul 23/10): the page's one H1 keeps the frozen live wording (references/local-seo.md, until
                 14/12) as the kicker; the big line is the prototype's headline, set as a paragraph, not a heading */}
