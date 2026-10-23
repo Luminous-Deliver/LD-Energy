@@ -211,7 +211,7 @@ const evidence = [
     without: 'Standard values for that type of glazing',
   },
   {
-    doc: 'Insulation certificate or guarantee for walls, floors or the loft, with its certificate or guarantee number, showing it’s for your home and ideally the thickness. A cavity wall insulation guarantee counts.',
+    doc: 'Insulation certificate or guarantee for walls, floors or the loft, with its certificate or guarantee number, showing it’s for your home and the thickness. A cavity wall insulation guarantee counts.',
     lets: 'Insulation that can’t be seen on the day', // rdsap 9.02, 3.03a, 3.03b
     without: 'Treated as it was when the house was built, or as unknown for a boarded loft',
   },
@@ -387,8 +387,8 @@ export default function PreparingPage() {
                 <p className="pp-lede">
                   Your assessor records what they can see and measure. Anything hidden, like insulation inside a wall
                   or under floorboards, can only be recorded from paperwork that clearly relates to your home. None
-                  of it is compulsory. Put out what you have, and the originals if you can: they are preferred to photos
-                  or copies. It falls into four groups.
+                  of it is compulsory. Put out what you have, and the originals if you can: they are preferred to
+                  photos or copies.
                 </p>
                 <div className="pp-docs">
                   {docGroups.map((g, i) => (
@@ -404,8 +404,8 @@ export default function PreparingPage() {
                   You can also send paperwork ahead by WhatsApp or email. Originals on the day are still best, and
                   insulation paperwork must show the thickness.
                 </p>
-                <details className="pp-ev-more">
-                  <summary>What each document lets us record</summary>
+                <h3 id="what-each-document-records" className="pp-ev-h">What each document lets us record</h3>
+                <p className="pp-after pp-ev-lede">More detail for each kind of paperwork, and what happens without it.</p>
                 <div className="pp-ev" role="region" aria-label="Paperwork and what it changes">
                   <table>
                     <thead>
@@ -426,7 +426,6 @@ export default function PreparingPage() {
                     </tbody>
                   </table>
                 </div>
-                </details>
                 <div id="why-evidence-matters" className="gd-note pp-note">
                   <Info width={20} height={20} aria-hidden="true" />
                   <div>
@@ -473,7 +472,8 @@ export default function PreparingPage() {
                 </p>
                 <p>
                   What we can do is make sure everything that’s really there gets recorded and backed by evidence.
-                  That’s what the <a href="#documents-and-evidence">documents section</a> is for.
+                  Have your paperwork out on the day, or send it to us before the visit: the{' '}
+                  <a href="#documents-and-evidence">documents section</a> shows what helps.
                 </p>
 
                 <h3 id="what-counts">What counts towards your rating</h3>
