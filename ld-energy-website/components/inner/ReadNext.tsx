@@ -8,9 +8,10 @@ import '@/app/inner.css'
  * cards (picture, topic label, title, one line, reading time), then option C's last card only, the ready-to-book
  * quote card (`go`), with no picture. Used by area pages and guides.
  */
-export type NextStep = { kicker?: string; title: string; text: string; href: string; img?: string; meta?: string; go?: boolean }
+export type NextStep = { kicker?: string; title: string; text: string; href: string; img?: string; meta?: string; go?: boolean; cta?: string }
 
 function linkLabel(s: NextStep): string {
+  if (s.cta) return s.cta
   if (s.meta) return s.meta
   if (s.href.startsWith('/blog')) return 'Read the guide'
   if (s.href.startsWith('/epc-ratings-by-borough')) return 'See the figures'
@@ -22,9 +23,10 @@ function Card({ s }: { s: NextStep }) {
     return (
       <>
         <span className="in-ncard__b">
+          {s.kicker && <span className="in-ncard__k">{s.kicker}</span>}
           <b>{s.title}</b>
           <span className="in-ncard__t">{s.text}</span>
-          <span className="in-ncard__l">Get my exact quote <Ico name="arrow-right" size={18} /></span>
+          <span className="in-ncard__l">{s.cta ?? 'Get my exact quote'} <Ico name="arrow-right" size={18} /></span>
         </span>
       </>
     )

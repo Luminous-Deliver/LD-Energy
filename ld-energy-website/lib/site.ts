@@ -130,9 +130,9 @@ export const navLinks = [
   { href: '/services/domestic-epc', label: 'Domestic EPC' },
   { href: '/domestic-energy-assessor-london', label: 'Energy Assessor' },
   { href: '/services/floor-plans', label: 'Floor Plans' },
-  { href: '/landlords', label: 'For Landlords' },
-  { href: '/sellers', label: 'For Sellers' },
-  { href: '/estate-agents', label: 'For Agents' },
+  { href: '/landlords', label: 'Landlords' },
+  { href: '/estate-agents', label: 'Agents' },
+  { href: '/sellers', label: 'Sellers' },
   { href: '/areas', label: 'Areas' },
   { href: '/pricing', label: 'Pricing' },
   { href: '/faq', label: 'FAQ' },
@@ -157,17 +157,18 @@ export const servicesMenu = [
     heading: 'Services',
     links: [
       { href: '/services/domestic-epc', label: 'Domestic EPC', desc: 'Lodged on the GOV.UK register' },
-      { href: '/services/floor-plans', label: 'Floor Plans', desc: 'Laser-measured, portal-ready' },
-      { href: '/services/epc-pre-assessment', label: 'EPC Pre-Assessment', desc: 'Your score, without lodging it' },
-      { href: '/services/epc-improvement-plan', label: 'EPC Improvement Plan', desc: `£${site.addOns.improvementPlan} personal plan and Energy Report` },
+      { href: '/services/floor-plans', label: 'Floor Plans', desc: 'Laser-measured, JPG and PDF' },
+      { href: '/services/epc-pre-assessment', label: 'EPC Pre-Assessment', desc: 'Your rating, kept off the register' },
+      { href: '/services/epc-improvement-plan', label: 'EPC Improvement Plan', desc: `£${site.addOns.improvementPlan} add-on: what to fix first` },
     ],
   },
   {
-    heading: 'Who we help',
+    // One name per page, as in the header, in market order (audience-pages board, approved 23/10/2026).
+    heading: 'Who it’s for',
     links: [
-      { href: '/landlords', label: 'For Landlords', desc: 'Stay compliant & avoid fines' },
-      { href: '/sellers', label: 'For Sellers', desc: 'Boost your listing appeal' },
-      { href: '/estate-agents', label: 'For Agents', desc: 'EPC partner for new instructions' },
+      { href: '/landlords', label: 'Landlords', desc: 'One let or a portfolio' },
+      { href: '/estate-agents', label: 'Agents', desc: 'EPCs and floor plans, one home or a list' },
+      { href: '/sellers', label: 'Sellers', desc: 'Ready before you list' },
     ],
   },
 ] as const
@@ -183,6 +184,18 @@ export const servicesMenu = [
  */
 export const SAME_DAY_LODGEMENT_SURCHARGE = 15
 export const NEXT_DAY_VISIT_SURCHARGE = 35
+
+/**
+ * The floor plan disclaimer, shown wherever a floor plan is offered. Abdul's two wordings combined (23/10/2026).
+ */
+export const floorPlanDisclaimer =
+  'Illustrative only and not to scale. Measurements are approximate and for guidance only, following RICS guidance; floor areas are calculated in accordance with RICS Property Measurement Standards. Do not rely on them for valuation, flooring or furnishing.'
+
+/**
+ * From this many homes in one enquiry, a landlord's list is quoted as a portfolio: each home priced by its size,
+ * visits grouped by area and a lower price per home. No portfolio figures are published until Abdul sets them.
+ */
+export const portfolioMinHomes = 3
 
 /**
  * CANONICAL PRICING SOURCE.
@@ -340,6 +353,9 @@ export const govUk = {
   getCertificate: 'https://www.gov.uk/get-new-energy-certificate',
   meesLandlordGuidance:
     'https://www.gov.uk/guidance/domestic-private-rented-property-minimum-energy-efficiency-standard-landlord-guidance',
+  /** January 2026 government response: C from 1 October 2030, £10,000 cap, £30,000 maximum fine, all needing legislation. Read 23/10/2026. */
+  prsResponse2026:
+    'https://www.gov.uk/government/consultations/improving-the-energy-performance-of-privately-rented-homes-2025-update/outcome/improving-the-energy-performance-of-privately-rented-homes-government-response-html',
   /** Date RdSAP 10 became the approved methodology for existing dwellings. */
   rdsap10EffectiveFrom: '15 June 2025',
 } as const

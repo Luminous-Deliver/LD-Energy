@@ -19,17 +19,19 @@ const END_BAND_IMAGE: string | null = '/inner/end-band'
  * borough ratings page). Replaces the blue "Need an EPC? Get your exact quote." band.
  */
 export function InnerEnding({
-  variant, heading, text, eyebrow, quote, source,
+  variant, heading, text, eyebrow, quote, source, whatsapp,
 }: {
   variant: 'a' | 'b'
   heading?: string
   text?: string
   /** Optional small line above the heading (A only). */
-  eyebrow?: string
+  eyebrow?: React.ReactNode
   /** Where the quote button goes; defaults to the quote page. Area pages pass '#contact' (their form). */
   quote?: string
   /** Attribution for the quote links. */
   source?: SourcePage
+  /** A's WhatsApp link and label, when the page asks for something other than one quote (landlords: a list). */
+  whatsapp?: { href: string; label: string }
 }) {
   const quoteLink = quote ?? quoteHref({ service: 'epc', sourcePage: source, ctaId: 'bottom' })
   if (variant === 'b') {
@@ -86,8 +88,8 @@ export function InnerEnding({
         <p className="in-end-a__p">{text ?? 'Send the address and the size. We confirm your exact price and a visit time before you book.'}</p>
         <div className="in-end-a__acts">
           <a className="ld-btn ld-btn--light" href={quoteLink} data-enquiry-cta="bottom">Get my exact quote</a>
-          <a className="in-end-a__wa" href={whatsappQuoteHref()} target="_blank" rel="noopener noreferrer">
-            <Ico name="message" size={18} /> Or WhatsApp a quote request
+          <a className="in-end-a__wa" href={whatsapp?.href ?? whatsappQuoteHref()} target="_blank" rel="noopener noreferrer">
+            <Ico name="message" size={18} /> {whatsapp?.label ?? 'Or WhatsApp a quote request'}
           </a>
         </div>
         <p className="in-end-a__tel">Prefer to call? <a className="num" href={site.phoneHref}>{site.phone}</a>, {site.hours.replace('Monday–Sunday, ', '').replace('–', ' to ')}, every day</p>

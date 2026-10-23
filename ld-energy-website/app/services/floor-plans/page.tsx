@@ -1,12 +1,13 @@
 import { quoteHref } from '@/lib/quote-context'
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { CheckCircle2, Sparkles } from 'lucide-react'
 import { Section } from '@/components/ui/Section'
 import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { StepList } from '@/components/ui/StepList'
 import { PageHero } from '@/components/sections/PageHero'
 import { CtaStrip } from '@/components/sections/CtaStrip'
-import { pricing, formatPrice, bundleSaving, maxBundleSaving, priceFrom, defaultOgImage } from '@/lib/site'
+import { pricing, formatPrice, bundleSaving, maxBundleSaving, priceFrom, defaultOgImage, floorPlanDisclaimer } from '@/lib/site'
 import { site } from '@/lib/site'
 import { areaServedLondon } from '@/lib/boroughs'
 
@@ -127,6 +128,13 @@ export default function FloorPlansPage() {
           <p className="mt-5 text-lg text-secondary-700 leading-relaxed">
             Floor plans help buyers and tenants understand the layout before viewing. They show room dimensions, floor area and key features to support a property listing.
           </p>
+          <p className="mt-4 text-secondary-700 leading-relaxed">
+            Booking for a branch? See{' '}
+            <Link href="/estate-agents" className="text-primary-700 underline underline-offset-2 hover:text-primary-800">EPCs and floor plans for agents</Link>.
+            Letting a home your council licenses? Landlords can add a{' '}
+            <Link href="/landlords#portfolio" className="text-primary-700 underline underline-offset-2 hover:text-primary-800">floor plan for a licence application</Link>{' '}
+            to the EPC visit.
+          </p>
         </div>
       </Section>
 
@@ -145,10 +153,9 @@ export default function FloorPlansPage() {
               Every floor plan we produce is measured on-site with laser tools and drawn in professional software.
             </p>
             <p className="mt-4 text-secondary-700 leading-relaxed">
-              Plans are for marketing and illustration. Dimensions and areas are approximate,
-              not architectural measurements or legal boundaries. EPC floor area may differ
-              because EPC measurement conventions differ. Check dimensions independently before
-              relying on them for a purchase, fit-out or building work.
+              {floorPlanDisclaimer} Plans are not architectural drawings or legal boundaries, and
+              EPC floor area may differ because EPC measurement conventions differ. Check dimensions
+              independently before relying on them for a purchase, fit-out or building work.
             </p>
             <ul className="mt-6 space-y-2.5">
               {included.map((item) => (

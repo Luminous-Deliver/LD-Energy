@@ -286,7 +286,7 @@ function Services() {
           <li className="offer" id="offer-fp">
             <div className="offer__top"><span className="offer__ico"><Ico name="dimension" /></span></div>
             <h3>Floor Plan</h3>
-            <p className="offer__for">For sellers, estate agents, rental listings and property licence applications</p>
+            <p className="offer__for">For sellers, <Link prefetch={false} className="link" href="/estate-agents">estate agents</Link>, rental listings and property licence applications</p>
             <div className="offer__groups">
               <div><p className="offer__g">On the visit</p><Ticks items={['Every room laser-measured on site']} /></div>
               <div><p className="offer__g">You receive</p><Ticks items={['Total floor area, as gross internal area', 'Approximate room dimensions and room labels', 'High-resolution JPEG and PDF files', 'A plan suitable for Rightmove, Zoopla and OnTheMarket']} /></div>
