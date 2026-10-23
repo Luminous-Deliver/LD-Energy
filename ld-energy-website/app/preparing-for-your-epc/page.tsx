@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { CalendarClock, Clock, CreditCard, FileText, Home, Info, KeyRound, Mail, Phone } from 'lucide-react'
+import { ArrowDown, CalendarClock, Clock, CreditCard, FileText, Home, Info, KeyRound, Mail, Phone } from 'lucide-react'
 import { GuideCrumbs } from '@/components/blog/GuideCrumbs'
 import { TableOfContents } from '@/components/blog/TableOfContents'
 import { PrepChecklist } from '@/components/prep/PrepChecklist'
@@ -23,6 +23,13 @@ import './prep.css'
  * Every id that existed before the rebuild is kept, because links already sent to customers point at them:
  * please-read, what-to-have-ready, tenanted-properties, documents-and-evidence, why-evidence-matters, important,
  * quote-and-property-complexity, how-your-epc-rating-is-calculated, why-your-epc-may-differ, rdsap-10.
+ * Added 23/10 night: what-to-prepare, important-notes. Never rename an id: Abdul sends single sections to customers.
+ *
+ * Order (Abdul 23/10 night): "Please read" first, as on the old live page: What to prepare (the insulation certificate
+ * or guarantee number, then "See which documents may be useful"), then Important notes, whose first three entries
+ * carry the homepage's "Three things worth knowing first" titles and wording (components/sections/home/HomePage.tsx
+ * worthKnowing) and link down to the full answers. The insulation number is Abdul's stated requirement; it serves
+ * rdsap 9.02 (paperwork must be shown to relate to this property and to work carried out).
  */
 
 const PATH = '/preparing-for-your-epc'
@@ -45,13 +52,15 @@ export const metadata: Metadata = {
 const waBooked = `${site.whatsappHref}?text=${encodeURIComponent('Hi, it’s about my booked EPC visit.\nAddress:\n')}`
 
 const toc = [
-  { id: 'please-read', text: 'The three things that matter', level: 2 },
-  { id: 'what-to-have-ready', text: 'Your checklist', level: 2 },
-  { id: 'documents-and-evidence', text: 'Paperwork that helps', level: 2 },
+  { id: 'please-read', text: 'Please read first', level: 2 },
+  { id: 'what-to-prepare', text: 'What to prepare', level: 3 },
+  { id: 'important-notes', text: 'Important notes', level: 3 },
+  { id: 'what-to-have-ready', text: 'What to have ready', level: 2 },
+  { id: 'documents-and-evidence', text: 'Documents that may help', level: 2 },
+  { id: 'important', text: 'Quotes, ratings and older EPCs', level: 2 },
   { id: 'on-the-day', text: 'On the day', level: 2 },
   { id: 'who-needs-to-be-there', text: 'Who needs to be there', level: 2 },
   { id: 'after-the-visit', text: 'After the visit', level: 2 },
-  { id: 'important', text: 'Worth knowing', level: 2 },
   { id: 'fees-and-changes', text: 'Changes, fees and payment', level: 2 },
 ]
 
@@ -78,19 +87,66 @@ const inShort = [
   { Icon: CalendarClock, text: 'Change or cancel free with at least 24 hours’ notice.' },
 ]
 
-const three = [
+/* What to prepare: the old page's two points, kept short, with the insulation rule Abdul asked to be explicit */
+const prepare = [
   {
     title: 'Access',
-    text: 'Every room, the loft hatch, the boiler and cylinder, the heating controls and the meters. Anything locked or blocked on the day can’t be recorded.',
+    text: 'Every room, radiator and window, the loft hatch, the boiler and hot water cylinder, the heating controls and the meters. Anything locked or blocked on the day can’t be recorded.',
   },
   {
-    title: 'Paperwork',
-    text: 'Hidden insulation, window age and solar panel details can only be recorded from evidence. Without it, the method uses cautious defaults.',
+    title: 'Insulation evidence',
+    // rdsap 9.02, 3.03a, 3.03b
+    text: 'If insulation is hidden, inside a wall, under a floor or under a boarded loft, your assessor can only record it from paperwork. Have the insulation certificate or guarantee ready, with its certificate or guarantee number. It needs to show it’s for your home and, where possible, how thick the insulation is. Without it, the method has to use the default for the age of the home.',
   },
   {
-    title: 'Someone there',
-    text: 'You or your representative, at the booked time: an adult who can open every part of the home.',
+    title: 'Other paperwork, if you have it',
+    // rdsap 3.12a, 4.01b, 9.05
+    text: 'Window certificates such as FENSA or CERTASS, heat pump paperwork showing the flow temperature, and solar panel or MCS documents. None of it is compulsory.',
   },
+]
+
+/* Important notes: the homepage's "Three things worth knowing first", same titles, wording and order, each linking to
+   the full answer further down; then turnaround, as on the old page. */
+const notes = [
+  {
+    title: 'Tell us about every floor',
+    text: 'Your price is based on the details you send. A flat on two floors (a maisonette), an extension or a loft room can change it, so mention them. Anything different on the day is agreed before the assessment begins.',
+    href: '#quote-and-property-complexity',
+    link: 'More about quotes and property complexity',
+  },
+  {
+    title: 'We can’t add a point or two',
+    text: 'We record the property and the approved software works out the score. Nobody can adjust it by hand. Evidence of improvements you’ve made does count, so have it ready.',
+    href: '#how-your-epc-rating-is-calculated',
+    link: 'How your EPC rating is calculated',
+  },
+  {
+    title: 'Different from next door, or your old EPC?',
+    text: 'Existing homes have used RdSAP 10, a more detailed method, since June 2025, so an older EPC may not match. A neighbour’s can differ too, because each home’s floor area, insulation and heating are recorded as they are.',
+    href: '#why-your-epc-may-differ',
+    link: 'Why your EPC may differ',
+  },
+  {
+    title: 'When your EPC is ready',
+    // booking-copy.ts lodgedWhen
+    text: 'Within 72 hours of the visit, or on the day of the visit if you chose same-day lodgement or a next-day visit.',
+    href: '#after-the-visit',
+    link: 'What happens after the visit',
+  },
+]
+
+/* Why two similar homes, or an old and a new EPC, can differ: the old live page's list, trimmed */
+const differs = [
+  'Position in the terrace: a mid-terrace home has fewer outside walls than an end-terrace or a semi',
+  'Floor area, layout, extensions and loft conversions',
+  'How the walls, roof and floor are built and insulated',
+  'Loft insulation depth, and whether the loft can be inspected',
+  'The age and type of the windows',
+  'The boiler, heating controls and hot water cylinder',
+  'Heat pumps, solar panels and batteries',
+  'Lighting',
+  'The evidence available on the day',
+  'The method used, and what was recorded at the last assessment',
 ]
 
 /* Each row: what to look out for, what it lets your assessor record, what happens without it. */
@@ -106,7 +162,7 @@ const evidence = [
     without: 'Standard values for that type of glazing',
   },
   {
-    doc: 'Insulation certificates, guarantees or invoices for walls, floors or the loft, ideally showing the thickness. A cavity wall insulation guarantee counts.',
+    doc: 'Insulation certificate or guarantee for walls, floors or the loft, with its certificate or guarantee number, showing it’s for your home and ideally the thickness. A cavity wall insulation guarantee counts.',
     lets: 'Insulation that can’t be seen on the day', // rdsap 9.02, 3.03a, 3.03b
     without: 'Treated as it was when the house was built, or as unknown for a boarded loft',
   },
@@ -204,8 +260,8 @@ export default function PreparingPage() {
                   <WhatsAppIcon />
                   Reschedule or ask a question
                 </a>
-                <a className="gd-link pp-acts__alt" href="#what-to-have-ready">
-                  Go to the checklist
+                <a className="gd-link pp-acts__alt" href="#what-to-prepare">
+                  What to prepare
                 </a>
               </div>
             </div>
@@ -230,31 +286,55 @@ export default function PreparingPage() {
             <TableOfContents items={toc} />
             <article className="gd-art pp-art">
               <section id="please-read" className="pp-sec pp-sec--first" aria-labelledby="please-read-h">
-                <h2 id="please-read-h">The three things that matter most</h2>
-                <ol className="pp-three">
-                  {three.map((x, i) => (
-                    <li key={x.title}>
-                      <span className="pp-three__n num" aria-hidden="true">{i + 1}</span>
-                      <div>
-                        <h3>{x.title}</h3>
+                <h2 id="please-read-h">Please read before your EPC</h2>
+                <p className="pp-lede">
+                  These points help the visit run to time, and explain how quotes and EPC ratings work.
+                </p>
+
+                <div id="what-to-prepare" className="pp-sub">
+                  <h3>What to prepare</h3>
+                  <ul className="pp-list">
+                    {prepare.map((x) => (
+                      <li key={x.title}>
+                        <b>{x.title}</b>
                         <p>{x.text}</p>
-                      </div>
-                    </li>
-                  ))}
-                </ol>
+                      </li>
+                    ))}
+                  </ul>
+                  <a className="gd-link pp-more" href="#documents-and-evidence">
+                    See which documents may be useful
+                    <ArrowDown width={16} height={16} aria-hidden="true" />
+                  </a>
+                </div>
+
+                <div id="important-notes" className="pp-sub">
+                  <h3>Important notes</h3>
+                  <ul className="pp-list">
+                    {notes.map((n) => (
+                      <li key={n.title}>
+                        <b>{n.title}</b>
+                        <p>{n.text}</p>
+                        <a className="gd-link pp-more" href={n.href}>
+                          {n.link}
+                          <ArrowDown width={16} height={16} aria-hidden="true" />
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </section>
 
               <section id="what-to-have-ready" className="pp-sec" aria-labelledby="what-to-have-ready-h">
                 <div className="pp-print-head" aria-hidden="true">
                   <b>L&amp;D Energy</b> · EPC visit checklist · WhatsApp or call {site.phone}
                 </div>
-                <h2 id="what-to-have-ready-h">Your checklist</h2>
+                <h2 id="what-to-have-ready-h">What to have ready</h2>
                 <p className="pp-lede">Grouped by where things are, so you can walk round once. Tick things off as you go.</p>
                 <PrepChecklist groups={prepGroups} />
               </section>
 
               <section id="documents-and-evidence" className="pp-sec" aria-labelledby="documents-and-evidence-h">
-                <h2 id="documents-and-evidence-h">Paperwork that helps</h2>
+                <h2 id="documents-and-evidence-h">Documents and evidence that may help</h2>
                 <p className="pp-lede">
                   Your assessor records what they can see and measure. Anything hidden, like insulation inside a wall
                   or under floorboards, can only be recorded from paperwork that clearly relates to your home. None
@@ -298,6 +378,61 @@ export default function PreparingPage() {
                     </p>
                   </div>
                 </div>
+              </section>
+
+              <section id="important" className="pp-sec pp-prose" aria-labelledby="important-h">
+                <h2 id="important-h">Quotes, ratings and older EPCs</h2>
+                <p className="pp-lede">The full answers to the questions we’re asked most.</p>
+
+                <h3 id="quote-and-property-complexity">Your quote and property complexity</h3>
+                <p>
+                  We price from the details you send before the visit. If the home turns out to be materially
+                  different, for example a bigger floor area, a different property type, or an extension or loft
+                  conversion that wasn’t mentioned, we’ll tell you before we start. We then agree a revised price with
+                  you or reschedule, and you’re free to cancel at no charge at that point. We never change an agreed
+                  price without speaking to you first, so there’s no surprise on the invoice afterwards.
+                </p>
+
+                <h3 id="how-your-epc-rating-is-calculated">How your EPC rating is calculated</h3>
+                <p>
+                  Your assessor surveys the home, records how it’s built and heated, checks the evidence and enters
+                  it. Approved software then calculates the rating using the government’s method. No assessor can raise
+                  or lower a score to order. If they could, the certificate would be worth nothing to the buyer, tenant
+                  or lender relying on it.
+                </p>
+                <p>
+                  What we can do is make sure everything that’s really there gets recorded and backed by evidence.
+                  That’s what the <a href="#documents-and-evidence">documents section</a> is for.
+                </p>
+
+                <h3 id="why-your-epc-may-differ">Why your EPC may differ</h3>
+                <p>
+                  Ratings are specific to each home. Two homes that look the same from the street can score
+                  differently, for good reasons:
+                </p>
+                <ul className="pp-reasons">
+                  {differs.map((d) => (
+                    <li key={d}>{d}</li>
+                  ))}
+                </ul>
+                <p>
+                  Comparing EPCs? Compare the property details on each certificate, not just the letter.{' '}
+                  <Link href="/blog/why-is-my-epc-different">Why EPC ratings differ between similar homes</Link>
+                </p>
+
+                <h4 id="rdsap-10">The method changed in June 2025: RdSAP 10</h4>
+                <p>
+                  Existing homes have been assessed under RdSAP 10 since {govUk.rdsap10EffectiveFrom}. It’s a more
+                  detailed method, so a new EPC shouldn’t be expected to match an older one exactly, even if the home
+                  hasn’t changed much. That doesn’t mean the older one was wrong, and RdSAP 10 doesn’t always raise or
+                  lower a score. An older certificate can also hold different assumptions, so if one looks wrong,
+                  compare what was recorded rather than the rating alone.{' '}
+                  <Link href="/blog/rdsap-10-what-changed-2025">What changed in RdSAP 10</Link>
+                  {' · '}
+                  <a href={govUk.methodologyNotice} target="_blank" rel="noopener noreferrer">
+                    GOV.UK notice of approval
+                  </a>
+                </p>
               </section>
 
               <section id="on-the-day" className="pp-sec" aria-labelledby="on-the-day-h">
@@ -353,44 +488,6 @@ export default function PreparingPage() {
                 </ul>
                 <p className="pp-after">
                   A lodged certificate can’t be edited, so the draft is the time to tell us if anything looks wrong.
-                </p>
-              </section>
-
-              <section id="important" className="pp-sec pp-prose" aria-labelledby="important-h">
-                <h2 id="important-h">Worth knowing</h2>
-
-                <h3 id="quote-and-property-complexity">Your price is based on the details you gave us</h3>
-                <p>
-                  If the home turns out to be materially different, for example a bigger floor area or an extension
-                  that wasn’t mentioned, we’ll tell you before we start. We then agree a revised price with you or
-                  reschedule, and you’re free to cancel at no charge at that point. We never change an agreed price
-                  without speaking to you first.
-                </p>
-
-                <h3 id="how-your-epc-rating-is-calculated">Your assessor doesn’t choose the rating</h3>
-                <p>
-                  We record the home and the evidence. The rating is then calculated by approved software using the
-                  government’s method. No assessor can raise or lower a score to order.
-                </p>
-
-                <h3 id="why-your-epc-may-differ">Why it may differ from a neighbour’s</h3>
-                <p>
-                  Ratings are specific to each home. Two homes that look the same from the street can differ because
-                  of their position in the terrace, extensions, insulation, glazing, heating and the evidence
-                  available on the day.{' '}
-                  <Link href="/blog/why-is-my-epc-different">Why EPC ratings differ between similar homes</Link>
-                </p>
-
-                <h3 id="rdsap-10">Why it may differ from an older EPC</h3>
-                <p>
-                  Existing homes have been assessed under RdSAP 10 since {govUk.rdsap10EffectiveFrom}. It’s a more
-                  detailed method, so a new EPC shouldn’t be expected to match an older one exactly. That doesn’t
-                  mean the older one was wrong, and the change doesn’t always raise or lower a score.{' '}
-                  <Link href="/blog/rdsap-10-what-changed-2025">What changed in RdSAP 10</Link>
-                  {' · '}
-                  <a href={govUk.methodologyNotice} target="_blank" rel="noopener noreferrer">
-                    GOV.UK notice of approval
-                  </a>
                 </p>
               </section>
 
