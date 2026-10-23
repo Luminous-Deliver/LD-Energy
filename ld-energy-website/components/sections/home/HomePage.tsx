@@ -10,7 +10,7 @@ import { HomeV7Motion } from './HomeV7Motion'
 import { PickService } from './PickService'
 import { HomeQuoteBar } from './HomeQuoteBar'
 import { Ico } from './HomeIcon'
-import { HERO_PLAN_SVG, SECTION_ART_SVG } from './v7-assets'
+import { HERO_PLAN_SVG } from './v7-assets'
 
 /*
  * The homepage body, ported from the approved prototype v7.2 (Abdul 22/10/2026): the rooftop hero with the rating
@@ -220,6 +220,29 @@ function PhotoBreak() {
   )
 }
 
+// what the assessor checks, on the AI-polished terrace (scene 1B, 23/10): numbered markers on the drawing, the key as
+// live text underneath so the house stays clear at phone width; x/y are % of the 1600x900 image
+const CUTAWAY_POINTS = [
+  { t: 'Loft', s: 'insulation depth', x: 43.8, y: 25.3 },
+  { t: 'Walls', s: 'solid brick or cavity', x: 29.3, y: 62.2 },
+  { t: 'Windows', s: 'glazing and frames', x: 70.5, y: 43.6 },
+  { t: 'Heating', s: 'boiler and controls', x: 58.4, y: 58.2 },
+] as const
+
+function TerraceCutaway() {
+  return (
+    <figure className="pre__art tc">
+      <div className="tc__pic">
+        {/* eslint-disable-next-line @next/next/no-img-element -- next/image is unoptimised on Pages */}
+        <img src="/home/terrace-cutaway-900.webp" srcSet="/home/terrace-cutaway-900.webp 900w, /home/terrace-cutaway-1600.webp 1600w" sizes="(max-width: 899px) 92vw, 42vw" alt="A London terrace house with its front wall cut away, showing the loft, bedrooms, front room with fireplace and the kitchen boiler" width={1600} height={900} loading="lazy" decoding="async" />
+        {CUTAWAY_POINTS.map(({ t, x, y }, i) => <span key={t} className="tc__m" style={{ left: `${x}%`, top: `${y}%` }} aria-hidden="true">{i + 1}</span>)}
+      </div>
+      <ol className="tc__key">{CUTAWAY_POINTS.map(({ t, s }, i) => <li key={t}><i aria-hidden="true">{i + 1}</i><b>{t}</b><span>{s}</span></li>)}</ol>
+      <figcaption className="tc__cap">What the assessor checks. An AI-generated illustration.</figcaption>
+    </figure>
+  )
+}
+
 function Ticks({ items }: { items: string[] }) {
   return <ul className="ticks">{items.map((t) => <li key={t}><Ico name="check" />{t}</li>)}</ul>
 }
@@ -282,7 +305,7 @@ function Services() {
 
         {/* the Pre-Assessment as a strip under the three services, with the first L&D drawing beside it */}
         <div className="pre" id="pre-assessment">
-          <figure className="pre__art" aria-hidden="true" dangerouslySetInnerHTML={{ __html: SECTION_ART_SVG }} />
+          <TerraceCutaway />
           <div className="pre__body">
             <p className="eyebrow">Your score, privately</p>
             <h3>An EPC Pre-Assessment</h3>
