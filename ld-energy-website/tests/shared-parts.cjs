@@ -84,12 +84,12 @@ const pages = ['/', '/pricing', '/areas/newham', '/blog/how-long-does-epc-last',
         await page.evaluate(() => scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' })); await settle()
         ok((await state()).on === 'false', `${w}/${reducedMotion}: hidden over the footer`)
 
-        // over a booking form (the area page's shared form)
-        await page.goto(base + '/areas/newham', { waitUntil: 'networkidle' })
-        await page.evaluate(() => scrollTo({ top: 1600, behavior: 'instant' })); await settle()
-        await page.locator('#contact form').evaluate((f) => f.scrollIntoView({ block: 'center', behavior: 'instant' })); await settle()
+        // over a booking form (/quote's), and on an area page (no form since 23/10) the quote carries the area page
+        await page.goto(base + '/quote', { waitUntil: 'networkidle' })
+        await page.locator('main form').evaluate((f) => f.scrollIntoView({ block: 'center', behavior: 'instant' })); await settle()
         ok((await state()).on === 'false', `${w}/${reducedMotion}: hidden over the booking form`)
-        ok((await dock.locator('a').nth(1).getAttribute('href')) === '#contact', `${w}: on an area page the quote goes to its own form`)
+        await page.goto(base + '/areas/newham', { waitUntil: 'networkidle' })
+        ok((await dock.locator('a').nth(1).getAttribute('href')) === '/quote?service=epc&source=area&cta=mobile-bar&page=newham', `${w}: on an area page the quote goes to the quote journey with the area page`)
 
         // the menu: dialog, focus to Close, Tab trapped, Escape returns focus, dock steps aside while open
         await page.goto(base + '/pricing', { waitUntil: 'networkidle' })

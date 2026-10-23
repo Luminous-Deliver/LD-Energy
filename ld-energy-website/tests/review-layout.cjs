@@ -14,7 +14,7 @@ const out = path.resolve(process.env.BOOKING_EVIDENCE_DIR || '../../../audits/we
   try {
     for (const [width,height] of [[320,568],[360,800],[375,812],[390,844],[412,915],[430,932],[768,1024],[1440,900]]) {
       await page.setViewportSize({ width, height })
-      await page.goto(base + '/contact', { waitUntil: 'networkidle' })
+      await page.goto(base + '/quote', { waitUntil: 'networkidle' })
       await page.evaluate(() => document.fonts.ready)
       const y = (await page.locator('form input[name="customerType"]').first().boundingBox()).y
       if (width === 390) assert.ok(y <= 450)
@@ -22,16 +22,16 @@ const out = path.resolve(process.env.BOOKING_EVIDENCE_DIR || '../../../audits/we
       assert.equal(await page.locator('form [name="customerType"]:checked').count(), 0)
       assert.equal(await page.locator('form [data-estimate-summary]').count(), 0)
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth))
-      await page.screenshot({ path: path.join(out, `production-contact-${width}.png`) })
+      await page.screenshot({ path: path.join(out, `production-quote-${width}.png`) })
       measurements.push({ width, height, firstControlTop: y })
     }
     for (const route of ['/services/domestic-epc','/services/floor-plans','/services/epc-pre-assessment','/services/epc-improvement-plan','/blog','/landlords','/sellers','/estate-agents','/areas/stratford','/about','/areas','/faq','/domestic-energy-assessor-london']) {
       await page.goto(base + route, { waitUntil: 'networkidle' })
-      const labels = await page.locator('a[href*="/contact"], a[href="#contact"]').allTextContents()
+      const labels = await page.locator('a[href*="/contact"], a[href*="/quote"], a[href="#contact"]').allTextContents()
       for (const label of labels) assert.doesNotMatch(label, /\bbook(?:ing)?\b/i, route)
       copy.push({ route, enquiryLabels: labels.map(label => label.trim()), passed: true })
     }
-    await page.goto(base + '/contact', { waitUntil: 'networkidle' })
+    await page.goto(base + '/quote', { waitUntil: 'networkidle' })
     assert.match(await page.locator('form').innerText(), /A written explanation of what is affecting your rating and which improvements to consider first\. Your standard EPC recommendations are included whether or not you choose this extra\./)
     assert.doesNotMatch(await page.locator('form').innerText(), /Recommendations remain on your EPC|Who are you booking as/)
     fs.writeFileSync(path.join(out, 'production-layout-copy.json'), JSON.stringify({ measurements, copy }, null, 2))

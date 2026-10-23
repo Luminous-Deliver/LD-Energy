@@ -24,7 +24,7 @@ const KEEP = [
   '/services/domestic-epc', '/pricing', '/services/floor-plans', '/services/epc-pre-assessment', '/services/epc-improvement-plan',
   '/preparing-for-your-epc', '/preparing-for-your-epc#quote-and-property-complexity', '/preparing-for-your-epc#how-your-epc-rating-is-calculated',
   '/preparing-for-your-epc#rdsap-10', '/blog/epc-c-by-2030', '/blog/mees-timeline-2026-2030', '/landlords', '/estate-agents',
-  '/contact?service=bulk&source=home&cta=inline#booking-form', '/areas', '/faq', '/blog', '/blog/what-happens-during-epc-assessment',
+  '/quote?service=bulk&source=home&cta=inline', '/areas', '/faq', '/blog', '/blog/what-happens-during-epc-assessment',
   '/blog/why-is-my-epc-different', '/blog/epc-vs-floor-plan-vs-survey',
   ...['stratford', 'newham', 'tower-hamlets', 'hackney', 'waltham-forest', 'redbridge'].map((s) => `/areas/${s}`),
 ]

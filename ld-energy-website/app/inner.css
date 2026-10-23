@@ -249,6 +249,11 @@
 .in-ncard--go b, .in-ncard--go .in-ncard__t, .in-ncard--go .in-ncard__l, .in-ncard--go .in-ncard__k { color: #fff; }
 .in-ncard--go .in-ncard__k { opacity: .8; }
 @media (min-width: 640px) { .in-ncards { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1100px) { .in-ncards { grid-template-columns: repeat(4, 1fr); } }
+/* the quote card (option C's last card): no picture, its line sits at the foot */
+.in-ncard--go { grid-template-rows: 1fr; }
+.in-ncard--go .in-ncard__b { align-content: stretch; grid-template-rows: auto auto 1fr; padding: 22px; }
+.in-ncard--go .in-ncard__l { align-self: end; }
 @media (min-width: 760px) { .in-rn h2 { font-size: 40px; } .in-ncards { margin-top: 44px; gap: 18px; } }
 @media (min-width: 1100px) { .in-ncards { grid-template-columns: repeat(4, 1fr); } }
 

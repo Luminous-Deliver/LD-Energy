@@ -101,11 +101,13 @@ html { font-synthesis-weight: none; }
    his traced geometry untouched (public/brand/ld-energy-mark-full.svg). Name .07em, tagline .17em, 10 px to the
    house: about 197 px on desktop, 174 px on phones. The two text lines share one measure. */
 .lg { display: inline-flex; align-items: center; flex: none; min-height: 44px; color: var(--ink); text-decoration: none; }
-.lg__mark { display: block; height: 38px; width: auto; flex: none; }
-.lg__words { display: grid; justify-items: start; gap: 8px; margin-left: 11px; }   /* 14 + 8 + 8 = 30: (38 - 30) / 2 is whole */
+/* L1 (Abdul 23/10/2026, "Quieter, same lockup"): house 32 px, name 16 px on desktop so the nav reads as its equal;
+   phones keep their size. */
+.lg__mark { display: block; height: 32px; width: auto; flex: none; }
+.lg__words { display: grid; justify-items: start; gap: 7px; margin-left: 10px; }   /* 12 + 7 + 7 = 26: (32 - 26) / 2 is whole */
 .lg__name, .lg__tag { text-transform: uppercase; white-space: nowrap; }
-.lg__name { --t: .06em; font: 600 19px/14px var(--font-sans); letter-spacing: var(--t); margin-right: calc(-1 * var(--t)); color: var(--ink); }
-.lg__tag { --t: .17em; font: 600 10.5px/8px var(--font-sans); letter-spacing: var(--t); margin-right: calc(-1 * var(--t)); color: var(--sage-700); }
+.lg__name { --t: .06em; font: 600 16px/12px var(--font-sans); letter-spacing: var(--t); margin-right: calc(-1 * var(--t)); color: var(--ink); }
+.lg__tag { --t: .17em; font: 600 9px/7px var(--font-sans); letter-spacing: var(--t); margin-right: calc(-1 * var(--t)); color: var(--sage-700); }
 @media (max-width: 759px) {
   .lg__mark { height: 33px; }
   .lg__words { gap: 6px; margin-left: 10px; }

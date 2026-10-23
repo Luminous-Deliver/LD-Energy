@@ -102,7 +102,7 @@ export function AreaHeroD({ slug, name, s, parent, sections }: {
             </p>
           )}
           <div className="in-hd__acts">
-            <a className="ld-btn ld-btn--primary" href="#contact" data-enquiry-cta="hero">Get my exact quote</a>
+            <a className="ld-btn ld-btn--primary" href={quoteHref({ service: 'epc', sourcePage: 'area', areaPage: slug, ctaId: 'hero' })} data-enquiry-cta="hero">Get my exact quote</a>
             <a className="in-wa" href={whatsappQuoteHref()} target="_blank" rel="noopener noreferrer"><Ico name="message" size={18} /> WhatsApp a quote request</a>
           </div>
           <p className="in-by">
@@ -166,7 +166,7 @@ export function AreaHeroD({ slug, name, s, parent, sections }: {
               const sh = share(b.id)
               return (
                 <li key={b.id}>
-                  <a className={b.id === band.id ? 'is-common' : undefined} href={quoteHref({ service: 'epc', area: b.id as AreaChoice, sourcePage: 'area', ctaId: 'pricing' })}>
+                  <a className={b.id === band.id ? 'is-common' : undefined} href={quoteHref({ service: 'epc', area: b.id as AreaChoice, sourcePage: 'area', areaPage: slug, ctaId: 'pricing' })}>
                     <span className="in-tb__s">{b.areaLabel}<small>{b.typicalLabel}</small>{b.id === band.id && <span className="in-tb__tag">Most common in {name}</span>}</span>
                     <span className="in-tb__sh num">{sh !== undefined ? pct(sh) : '–'}</span>
                     <span className="in-tb__p num">{b.startingPrice && <small>from</small>}£{b.epc}</span>
@@ -176,7 +176,7 @@ export function AreaHeroD({ slug, name, s, parent, sections }: {
               )
             })}
             <li>
-              <a href={quoteHref({ service: 'epc', area: 'unknown', sourcePage: 'area', ctaId: 'pricing' })}>
+              <a href={quoteHref({ service: 'epc', area: 'unknown', sourcePage: 'area', areaPage: slug, ctaId: 'pricing' })}>
                 <span className="in-tb__s">Not sure of the size<small>We confirm it from your property details</small></span>
                 <span className="in-tb__sh">–</span>
                 <span className="in-tb__p in-tb__p--tbc">Confirmed before booking</span>
@@ -185,7 +185,7 @@ export function AreaHeroD({ slug, name, s, parent, sections }: {
             </li>
           </ol>
           <div className="in-tb__foot">
-            <a className="ld-btn ld-btn--primary ld-btn--block" href="#contact" data-enquiry-cta="pricing">Get my exact quote for {name}</a>
+            <a className="ld-btn ld-btn--primary ld-btn--block" href={quoteHref({ service: 'epc', sourcePage: 'area', areaPage: slug, ctaId: 'pricing' })} data-enquiry-cta="pricing">Get my exact quote for {name}</a>
             <p className="in-tb__other">
               For {bandPhrase(band.id)}: floor plan {common.startingPrice ? 'from ' : ''}<b className="num">£{common.floorPlan}</b>, EPC and
               floor plan on one visit {common.startingPrice ? 'from ' : ''}<b className="num">£{common.bundle}</b>. Pre-Assessment from{' '}

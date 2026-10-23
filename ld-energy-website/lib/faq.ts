@@ -96,7 +96,7 @@ export const homepageFaqFeatured: FaqItem[] = [
     a: 'No — the figures shown are guide prices, based mainly on internal floor area (m²). Extensions, loft conversions, layout and access can change the final figure, so we confirm your exact quote before you book. That applies to urgent and same-day jobs too: we confirm availability and any surcharge before accepting the booking.',
     links: [
       { href: '/pricing', label: 'How our guide pricing works' },
-      { href: '/contact', label: 'Get an exact quote for your property' },
+      { href: '/quote?source=faq&cta=inline', label: 'Get an exact quote for your property' },
     ],
   },
   {
@@ -240,7 +240,7 @@ export const fullFaq: FaqCategory[] = [
       {
         q: 'How do I book an EPC?',
         a: `Call us on ${site.phone}, send a WhatsApp message, email ${site.email}, or use our online booking form. Phone, WhatsApp and email all reach the assessor directly, and we reply during our opening hours (${site.hours}).`,
-        links: [{ label: 'Get your exact quote', href: '/contact#booking-form' }],
+        links: [{ label: 'Get your exact quote', href: '/quote?source=faq&cta=inline' }],
       },
       {
         q: 'How long does the assessment take?',

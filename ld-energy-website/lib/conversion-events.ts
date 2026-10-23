@@ -1,7 +1,7 @@
 import { areaChoices } from '@/lib/floor-area'
 import { quoteServices, type QuoteService } from '@/lib/quote-context'
 
-type FunnelEvent = 'form_start' | 'form_step_complete' | 'enquiry_submitted' | 'service_selection' | 'estimator_use' | 'guide_feedback'
+type FunnelEvent = 'form_start' | 'form_step_complete' | 'enquiry_submitted' | 'service_selection' | 'estimator_use' | 'guide_feedback' | 'quote_dialog_open'
 interface EventContext { service?: QuoteService; area?: string; step?: number; guide?: string; answer?: 'yes' | 'no' }
 
 /** Collector-independent boundary. No network, storage, identifiers or customer data.

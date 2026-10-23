@@ -1,0 +1,171 @@
+/* /preparing-for-your-epc (23/10/2026): the booked customer's briefing, on the guide system (guides.css).
+   Paper ground, ink type, sage for links and the one action; hairline rules, not cards. The checklist is the one
+   interactive part; it prints on its own from its button (html[data-print="checklist"]). */
+
+.pp-hero .gd-eyebrow:first-of-type { color: var(--sage-700); }
+.pp-acts { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; }
+.pp-acts .ld-btn { white-space: normal; text-align: center; }
+.pp-acts__alt { display: inline-flex; align-items: center; min-height: 44px; }
+@media (max-width: 559px) { .pp-acts .ld-btn { width: 100%; } }
+
+/* "In short" on warm paper, so it reads as the booking's facts rather than another answer box */
+.pp-short { background: var(--stone-100); border-color: transparent; }
+.pp-short ul { border-top-color: var(--hair-strong); }
+
+/* ------------------------------------------------------------------ sections */
+.pp-sec { padding-top: 48px; margin-top: 48px; border-top: 1px solid var(--hair); scroll-margin-top: calc(var(--head-h) + 20px); }
+.pp-sec--first { padding-top: 0; margin-top: 0; border-top: 0; }
+.pp-sec h2 { font-size: 28px; line-height: 1.15; }
+.pp-sec h3 { font-family: var(--font-serif); font-weight: 400; }
+.pp-lede { margin-top: 12px; font-size: 17px; line-height: 1.65; color: var(--ink); max-width: 64ch; }
+.pp-after { margin-top: 18px; font-size: 16px; line-height: 1.6; color: var(--ink-quiet); }
+@media (min-width: 760px) { .pp-sec { padding-top: 56px; margin-top: 56px; } .pp-sec h2 { font-size: 34px; } .pp-lede { font-size: 18px; } }
+@media (max-width: 1099px) { .pp-sec { scroll-margin-top: 84px; } }
+@media (min-width: 760px) and (max-width: 1099px) { .pp-sec { scroll-margin-top: calc(var(--head-h) + 84px); } }
+
+/* the three things: numbered, hairline-ruled */
+.pp-three { list-style: none; padding: 0; margin-top: 20px; border-top: 1px solid var(--ink); }
+.pp-three li { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 12px; padding: 18px 0; border-bottom: 1px solid var(--hair); }
+.pp-three li:last-child { border-bottom: 0; }
+.pp-three__n { font: 400 30px/1 var(--font-serif); color: var(--sage-700); }
+.pp-three h3 { font-size: 22px; line-height: 1.2; }
+.pp-three p { margin-top: 6px; font-size: 16px; line-height: 1.6; color: var(--ink-quiet); }
+@media (min-width: 760px) { .pp-three li { grid-template-columns: 56px minmax(0, 1fr); padding: 22px 0; } .pp-three__n { font-size: 36px; } .pp-three h3 { font-size: 24px; } .pp-three p { font-size: 17px; } }
+
+/* ------------------------------------------------------------------ the checklist */
+.pp-check { margin-top: 24px; }
+.pp-check__bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 16px; padding: 12px 0; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--hair); }
+.pp-check__count { display: grid; gap: 8px; font-size: 15px; color: var(--ink-quiet); min-width: 160px; }
+.pp-check__meter { display: block; width: 160px; height: 3px; background: var(--hair); border-radius: 2px; overflow: hidden; }
+.pp-check__meter span { display: block; height: 100%; background: var(--sage-700); transform-origin: left; transition: transform .25s var(--ease-out); }
+.pp-check__acts { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+.pp-check__clear { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 4px; border: 0; background: none; color: var(--ink-quiet);
+  font: 500 15px/1 var(--font-sans); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.pp-check__clear:hover { color: var(--ink); }
+.pp-check__saved { margin-top: 14px; font-size: 14px; color: var(--slate-500); }
+
+.pp-grp { margin: 0; padding: 0; border: 0; min-width: 0; }
+.pp-grp + .pp-grp { margin-top: 8px; }
+.pp-grp__h { padding: 22px 0 6px; font: 400 21px/1.2 var(--font-serif); color: var(--ink); }
+.pp-grp ul { list-style: none; padding: 0; margin: 0; }
+.pp-grp li { border-bottom: 1px solid var(--hair); }
+.pp-item { position: relative; display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 14px; align-items: start; min-height: 52px; padding: 13px 4px 13px 0; cursor: pointer; }
+.pp-item input { position: absolute; opacity: 0; width: 26px; height: 26px; margin: 13px 0 0; top: 0; left: 0; cursor: pointer; }
+.pp-box { display: grid; place-items: center; width: 26px; height: 26px; margin-top: 1px; border: 1.5px solid var(--slate-500); border-radius: 6px; background: #fff; color: #fff;
+  transition: background-color .15s var(--ease-out), border-color .15s var(--ease-out); }
+.pp-box svg { opacity: 0; transform: scale(.6); transition: opacity .16s var(--ease-out), transform .16s var(--ease-out); }
+.pp-item:hover .pp-box { border-color: var(--ink); }
+.pp-item input:checked + .pp-box { background: var(--sage-700); border-color: var(--sage-700); }
+.pp-item input:checked + .pp-box svg { opacity: 1; transform: scale(1); }
+.pp-item input:focus-visible + .pp-box { outline: 2px solid var(--sage-700); outline-offset: 3px; }
+.pp-item__t { display: grid; gap: 2px; min-width: 0; }
+.pp-item__t b { font-weight: 500; font-size: 17px; line-height: 1.4; color: var(--ink); }
+.pp-item__t span { font-size: 15px; line-height: 1.5; color: var(--ink-quiet); }
+.pp-item[data-on] .pp-item__t b { color: var(--ink-quiet); }
+@media (min-width: 760px) { .pp-item__t b { font-size: 18px; } .pp-item__t span { font-size: 16px; } }
+
+.pp-print-head { display: none; }
+
+/* ------------------------------------------------------------------ paperwork table: rows on wide, stacked on phones */
+.pp-ev { margin-top: 24px; }
+.pp-ev table { width: 100%; border-collapse: collapse; font-size: 16px; line-height: 1.5; }
+.pp-ev thead th { text-align: left; padding: 10px 16px 10px 0; font: 500 12px/1.3 var(--font-sans); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-quiet); border-bottom: 1px solid var(--ink); }
+.pp-ev tbody th, .pp-ev td { text-align: left; vertical-align: top; padding: 14px 16px 14px 0; border-bottom: 1px solid var(--hair); }
+.pp-ev tbody th { font-weight: 500; color: var(--ink); width: 44%; }
+.pp-ev td { color: var(--ink-quiet); }
+.pp-ev td:last-child { padding-right: 0; }
+@media (max-width: 679px) {
+  .pp-ev thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .pp-ev table, .pp-ev tbody, .pp-ev tr, .pp-ev tbody th, .pp-ev td { display: block; width: auto; }
+  .pp-ev table { border-top: 1px solid var(--ink); }
+  .pp-ev tr { padding: 14px 0; border-bottom: 1px solid var(--hair); }
+  .pp-ev tbody th, .pp-ev td { padding: 0; border: 0; }
+  .pp-ev td { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 10px; margin-top: 8px; font-size: 15px; }
+  .pp-ev td::before { content: attr(data-label); font: 500 11px/1.6 var(--font-sans); letter-spacing: .08em; text-transform: uppercase; color: var(--slate-500); }
+}
+
+.pp-note { margin-block: 28px 0; scroll-margin-top: calc(var(--head-h) + 20px); }
+.pp-note h3 { font-size: 20px; line-height: 1.2; margin-bottom: 6px; }
+.pp-note p { font-size: 16px; }
+.pp-note strong { font-weight: 500; }
+@media (max-width: 1099px) { .pp-note { scroll-margin-top: 84px; } }
+
+/* ------------------------------------------------------------------ on the day: a ruled timeline */
+.pp-day { list-style: none; padding: 0; margin-top: 22px; position: relative; }
+.pp-day li { position: relative; display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 14px; padding-bottom: 20px; }
+.pp-day li:not(:last-child)::before { content: ""; position: absolute; left: 17px; top: 34px; bottom: 2px; border-left: 1px solid var(--hair-strong); }
+.pp-day__n { display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid var(--sage-700); border-radius: 50%; font: 400 17px/1 var(--font-serif); color: var(--sage-700); background: var(--ground); }
+.pp-day b { display: block; padding-top: 5px; font-weight: 500; font-size: 17px; line-height: 1.35; }
+.pp-day p { margin-top: 3px; font-size: 16px; line-height: 1.55; color: var(--ink-quiet); }
+
+/* who needs to be there */
+.pp-tenant { margin-top: 22px; padding: 18px 20px; border-left: 2px solid var(--sage-700); background: var(--gd-card); border-radius: 0 10px 10px 0; scroll-margin-top: calc(var(--head-h) + 20px); }
+.pp-tenant h3 { font-size: 20px; line-height: 1.2; }
+.pp-tenant p { margin-top: 6px; font-size: 16px; line-height: 1.6; color: var(--ink-quiet); }
+@media (max-width: 1099px) { .pp-tenant { scroll-margin-top: 84px; } }
+
+/* after the visit */
+.pp-when { list-style: none; padding: 0; margin-top: 20px; border-top: 1px solid var(--ink); }
+.pp-when li { display: grid; gap: 2px 24px; padding: 14px 0; border-bottom: 1px solid var(--hair); }
+.pp-when span { font-size: 15px; color: var(--ink-quiet); }
+.pp-when b { font: 400 21px/1.25 var(--font-serif); color: var(--ink); }
+@media (min-width: 760px) { .pp-when li { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); align-items: baseline; } }
+
+/* worth knowing: prose with stable sub-anchors */
+.pp-prose h3 { margin-top: 28px; font-size: 22px; line-height: 1.2; scroll-margin-top: calc(var(--head-h) + 20px); }
+.pp-prose h3 + p { margin-top: 8px; }
+.pp-prose p { font-size: 17px; line-height: 1.65; }
+.pp-prose a { color: var(--sage-700); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.pp-prose a:hover { color: var(--sage-800); text-decoration-thickness: 2px; }
+@media (max-width: 1099px) { .pp-prose h3 { scroll-margin-top: 84px; } }
+
+/* changes, fees and payment: plain, nothing folded away */
+.pp-qa { margin: 20px 0 0; border-top: 1px solid var(--ink); }
+.pp-qa div { padding: 16px 0; border-bottom: 1px solid var(--hair); }
+.pp-qa dt { font: 400 20px/1.3 var(--font-serif); color: var(--ink); }
+.pp-qa dd { margin: 6px 0 0; font-size: 16px; line-height: 1.6; color: var(--ink-quiet); }
+
+/* ending */
+.pp-end { margin-top: 56px; }
+.pp-end__more { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 20px; font-size: 15px; }
+.pp-end__more a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; }
+.pp-end .ld-btn { white-space: normal; text-align: center; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pp-box, .pp-box svg, .pp-check__meter span { transition: none; }
+}
+
+/* ------------------------------------------------------------------ print */
+@media print {
+  @page { margin: 14mm 14mm 16mm; }
+  html, body { background: #fff !important; }
+  header.sh, footer, .site-skyline, [data-dock], .mnav, .gd-toc, .pp-acts, .pp-check__bar, .pp-check__saved, .pp-end,
+  .gd-crumbs, [data-cookie-banner] { display: none !important; }
+  .gd { background: #fff; color: #000; font-size: 11pt; }
+  .gd-w { padding-inline: 0; max-width: none; }
+  .gd-hero { padding-block: 0 12pt; }
+  .gd-hero__in, .gd-body__in { display: block; }
+  .gd-hero__aside { margin-top: 10pt; }
+  .gd-hero h1 { font-size: 24pt; }
+  .gd-answer, .pp-short { padding: 10pt 12pt; border: 1px solid #999; background: #fff; }
+  .gd-body { padding-block: 12pt 0; }
+  .gd-art { max-width: none; }
+  .pp-sec { padding-top: 14pt; margin-top: 14pt; break-inside: auto; }
+  .pp-sec h2 { font-size: 17pt; break-after: avoid; }
+  .pp-grp, .pp-three li, .pp-day li, .pp-qa div, .pp-ev tr, .pp-when li { break-inside: avoid; }
+  .pp-grp__h { break-after: avoid; }
+  .pp-item { min-height: 0; padding: 6pt 0; }
+  .pp-box { border: 1.5px solid #000; }
+  .pp-item input:checked + .pp-box { background: #000; border-color: #000; }
+  .pp-item[data-on] .pp-item__t b { color: #000; }
+  .pp-ev table { font-size: 10pt; }
+  a { color: inherit !important; text-decoration: none !important; }
+  .gd-note, .pp-tenant { border-left: 2px solid #000; background: #fff; }
+
+  /* the Print checklist button: the checklist alone, with a one-line header */
+  html[data-print="checklist"] .gd-hero,
+  html[data-print="checklist"] .pp-art > :not(#what-to-have-ready) { display: none !important; }
+  html[data-print="checklist"] #what-to-have-ready { padding-top: 0; margin-top: 0; border-top: 0; }
+  html[data-print="checklist"] .gd-body { padding-top: 0; }
+  html[data-print="checklist"] .pp-print-head { display: block; margin-bottom: 10pt; padding-bottom: 6pt; border-bottom: 1px solid #000; font-size: 10pt; }
+}

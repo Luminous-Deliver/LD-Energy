@@ -129,3 +129,24 @@ export const contactSchema = z
   })
 
 export type ContactInput = z.infer<typeof contactSchema>
+
+/**
+ * The general enquiry on /contact (Abdul 23/10/2026: "one route for buying a service, another for asking a question").
+ * A price request never comes this way: choosing "Quote for a property" on the form sends the visitor to the quote
+ * journey instead, so that option is not a value the API accepts.
+ */
+export const enquiryTypes = ['Existing booking', 'General question', 'Agency or business enquiry'] as const
+export const QUOTE_ENQUIRY_TYPE = 'Quote for a property'
+export const enquirySchema = z.object({
+  kind: z.literal('enquiry'),
+  enquiryType: z.enum(enquiryTypes, { errorMap: () => ({ message: 'Please choose what your message is about' }) }),
+  name: z.string().trim().min(2, 'Please enter your name').max(120),
+  email: z.string().trim().toLowerCase().email('Please enter a valid email address').max(200),
+  phone: z.string().trim().max(30).regex(/^[\d\s+()-]*$/, 'Phone number contains invalid characters').optional().or(z.literal('')),
+  message: z.string().trim().min(10, 'Please write a little more so we can help').max(3000, 'Please keep your message under 3,000 characters'),
+  consent: z.boolean().refine(value => value, 'Please confirm you agree to be contacted'),
+  /** Honeypot, must remain empty */
+  website: z.string().max(0).optional().or(z.literal('')),
+  turnstileToken: z.string().min(1, 'Please complete the security check'),
+})
+export type EnquiryInput = z.infer<typeof enquirySchema>

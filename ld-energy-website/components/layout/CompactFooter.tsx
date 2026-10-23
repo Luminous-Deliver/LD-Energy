@@ -26,7 +26,8 @@ const useful: FooterLink[] = [
   ['Before your visit', '/preparing-for-your-epc'],
   ['EPC questions', '/faq'],
   ['Expert guides', '/blog'],
-  ['Contact and exact quote', '/contact#booking-form'],
+  ['Get an exact quote', '/quote'],
+  ['Contact us', '/contact'],
 ]
 // Site-wide links to the area pages with the most search impressions (lib/boroughs.ts).
 const popularAreas: FooterLink[] = priorityBoroughs.map((b) => [b.name, `/areas/${b.slug}`])

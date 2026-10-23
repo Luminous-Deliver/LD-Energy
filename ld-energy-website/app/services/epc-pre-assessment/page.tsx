@@ -83,7 +83,7 @@ const serviceSchema = {
       priceCurrency: 'GBP',
     },
     availability: 'https://schema.org/InStock',
-    url: `${site.url}/contact`,
+    url: `${site.url}/quote`,
   },
 }
 

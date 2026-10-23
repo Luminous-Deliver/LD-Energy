@@ -18,9 +18,9 @@ import {
 import { londonYmd } from '@/lib/booking-options'
 import { whatsappQuoteText } from '@/lib/area-page'
 import { Ico } from '@/components/sections/home/HomeIcon'
-import { parseQuoteContext, quoteContextFromForm, quoteHref, quoteServices } from '@/lib/quote-context'
+import { parseQuoteContext, quoteContextFromForm, quoteHref, quoteServices, QUOTE_PATH, type QuoteContext } from '@/lib/quote-context'
 import { conversionEvent } from '@/lib/conversion-events'
-import { ctaIds, customerTypeForSource, sourcePageForPath, type SourcePage, type CtaId } from '@/lib/enquiry-attribution'
+import { customerTypeForSource, sourcePageForPath, type SourcePage, type CtaId } from '@/lib/enquiry-attribution'
 import { restoredCustomerType, rememberCustomerType } from '@/lib/customer-type-history'
 import { useTurnstile } from '@/lib/useTurnstile'
 import { usePublishQuote } from '@/components/forms/QuoteSummary'
@@ -71,15 +71,18 @@ interface ChoiceProps {
   name: string; legend: string; value: string; onChange: (value: string) => void
   options: ChoiceOption[]
   error?: string; hint?: string; inputRef?: (element: HTMLInputElement | null) => void
+  /** Prefix for element ids, so a second copy of the form on the page (the quote dialog) never repeats an id. */
+  idPrefix?: string
 }
 
 /**
  * Native radio group drawn as cards. The radio covers its card invisibly, so keyboard,
  * screen-reader and click behaviour stay native while the dot itself is not drawn.
  */
-function Choices({ name, legend, value, onChange, options, error, hint, inputRef }: ChoiceProps) {
-  const hintId = hint ? `${name}-hint` : ''
-  const errorId = error ? `${name}-error` : ''
+function Choices({ name, legend, value, onChange, options, error, hint, inputRef, idPrefix = '' }: ChoiceProps) {
+  const base = idPrefix + name
+  const hintId = hint ? `${base}-hint` : ''
+  const errorId = error ? `${base}-error` : ''
   return (
     <fieldset className="min-w-0" aria-invalid={!!error} aria-describedby={[hintId, errorId].filter(Boolean).join(' ') || undefined}>
       <legend className="bf__legend">{legend}</legend>
@@ -90,16 +93,16 @@ function Choices({ name, legend, value, onChange, options, error, hint, inputRef
           return (
             <label key={option.value} className={cn('bf-tile bf-tile--row', option.fullRow && 'col-span-full')} data-checked={selected || undefined}>
               <input type="radio" name={name} value={option.value} checked={selected}
-                id={`${name}-${index}`} ref={index === 0 ? inputRef : undefined}
+                id={`${base}-${index}`} ref={index === 0 ? inputRef : undefined}
                 onChange={() => onChange(option.value)} required
-                aria-label={option.label} aria-describedby={[hintId, option.description ? `${name}-description-${index}` : '', errorId].filter(Boolean).join(' ') || undefined}
+                aria-label={option.label} aria-describedby={[hintId, option.description ? `${base}-description-${index}` : '', errorId].filter(Boolean).join(' ') || undefined}
                 className="bf-radio" />
               {selected && <Check aria-hidden="true" strokeWidth={3} className="bf-tile__check" />}
               <span className="flex flex-wrap items-center gap-x-2 gap-y-1 pr-4 text-[15px] font-semibold leading-snug text-secondary-900">
                 {option.label}
                 {option.badge && <span className={cn('rounded px-1.5 py-1 text-[11px] font-bold uppercase leading-none tracking-wide text-white', badgeClass[option.badgeTone || 'green'])}>{option.badge}</span>}
               </span>
-              {option.description && <span id={`${name}-description-${index}`} className="mt-0.5 block text-sm leading-snug text-secondary-600">{option.description}</span>}
+              {option.description && <span id={`${base}-description-${index}`} className="mt-0.5 block text-sm leading-snug text-secondary-600">{option.description}</span>}
             </label>
           )
         })}
@@ -147,8 +150,8 @@ function SendProblemNotice({ problem, summary }: { problem: SendProblem; summary
   )
 }
 
-function RequestSent({ data, confirmationSent, focusRef, onReset }: {
-  data: ContactInput; confirmationSent: boolean; focusRef: RefObject<HTMLDivElement | null>; onReset: () => void
+function RequestSent({ data, confirmationSent, focusRef, onReset, idPrefix = '' }: {
+  data: ContactInput; confirmationSent: boolean; focusRef: RefObject<HTMLDivElement | null>; onReset: () => void; idPrefix?: string
 }) {
   const estimate = guideEstimate(data)
   const kind = estimate.productKind
@@ -168,9 +171,9 @@ function RequestSent({ data, confirmationSent, focusRef, onReset }: {
     ...(data.preferredDate && !estimate.isBulk ? [['Preferred date', formatPreferredDate(data.preferredDate)] as [string, string]] : []),
   ]
   return (
-    <div ref={focusRef} tabIndex={-1} aria-labelledby="request-sent-heading" className="bf__sent">
+    <div ref={focusRef} tabIndex={-1} aria-labelledby={`${idPrefix}request-sent-heading`} className="bf__sent">
       {FORM_DRAFT && <p className="bf__draft">Draft preview: nothing was sent. On the live site this is where the customer lands.</p>}
-      <h2 id="request-sent-heading" className="bf__sent-h">Request sent. Thanks, {firstName}.</h2>
+      <h2 id={`${idPrefix}request-sent-heading`} className="bf__sent-h">Request sent. Thanks, {firstName}.</h2>
       {confirmationSent && <p className="bf__sent-copy">We’ve emailed a copy to <strong>{data.email}</strong>.</p>}
 
       <div>
@@ -200,18 +203,28 @@ function RequestSent({ data, confirmationSent, focusRef, onReset }: {
 /** Focus with an offset measured from the actual floating header, including when enlarged. */
 function focusBookingElement(element: HTMLElement | null) {
   if (!element) return
-  const header = document.querySelector('header')
-  const offset = (header?.getBoundingClientRect().height || 80) + 16
+  // inside the quote dialog the page header is not over the form; the dialog's own bar is
+  const dialog = element.closest('dialog')
+  const header = dialog ? dialog.querySelector('[data-dialog-bar]') : document.querySelector('header')
+  const offset = (header?.getBoundingClientRect().height || (dialog ? 0 : 80)) + 16
   element.style.scrollMarginTop = `${offset}px`
   element.focus({ preventScroll: true })
   element.scrollIntoView({ block: 'start', behavior: 'instant' })
 }
 
-export type FormVariant = 'hero' | 'page' | 'area'
+export type FormVariant = 'hero' | 'page' | 'area' | 'dialog'
 
-export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPage?: string; sourcePage?: SourcePage; variant?: FormVariant }) {
+export function ContactForm({ areaPage, sourcePage, variant = 'page', context, idPrefix = '' }: {
+  areaPage?: string; sourcePage?: SourcePage; variant?: FormVariant
+  /** Selections to start from: the quote dialog passes the clicked link's; /quote reads its own URL. */
+  context?: QuoteContext
+  /** Prefix for every element id, so the dialog's copy never repeats the homepage form's ids. */
+  idPrefix?: string
+}) {
   const pathname = usePathname()
-  const dedicated = pathname === '/contact'
+  // /quote is the form's own page: it reads its URL and keeps the URL in step with the choices
+  const dedicated = pathname === QUOTE_PATH && variant === 'page'
+  const fid = (id: string) => idPrefix + id
   const home = useOptionalHomeQuote()
   const [step, setStep] = useState(1)
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
@@ -246,23 +259,25 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
     if (initialised.current) return
     initialised.current = true
     let initialSource = sourcePage || sourcePageForPath(pathname)
-    if (dedicated) {
-      const context = parseQuoteContext(new URLSearchParams(window.location.search))
-      setValue('services', [quoteServices[context.service || 'epc']])
-      if (context.service) serviceTouched.current = true
-      setValue('areaBand', context.area || '')
-      setValue('speed', context.speed === 'next-day' ? NEXT_DAY_VISIT_SPEED : context.speed === 'same-day' ? SAME_DAY_LODGEMENT_SPEED : 'Standard (72 hours)')
-      setValue('improvementPlan', !!context.plan)
-      initialSource = context.sourcePage || initialSource
+    const seed = context ?? (dedicated ? parseQuoteContext(new URLSearchParams(window.location.search)) : undefined)
+    if (seed) {
+      setValue('services', [quoteServices[seed.service || 'epc']])
+      if (seed.service) serviceTouched.current = true
+      setValue('areaBand', seed.area || '')
+      setValue('speed', seed.speed === 'next-day' ? NEXT_DAY_VISIT_SPEED : seed.speed === 'same-day' ? SAME_DAY_LODGEMENT_SPEED : 'Standard (72 hours)')
+      setValue('improvementPlan', !!seed.plan)
+      initialSource = seed.sourcePage || initialSource
       setValue('sourcePage', initialSource)
-      setValue('ctaId', context.ctaId || 'direct')
+      setValue('ctaId', seed.ctaId || (dedicated ? 'direct' : defaultCta))
+      // the area page a quote started on rides along in the link, now that area pages have no form of their own
+      if (!areaPage && seed.areaPage) setValue('areaPage', seed.areaPage)
     }
     const customerType = restoredCustomerType(window.history.state) ?? customerTypeForSource(initialSource)
     // Homeowner is not offered on a portfolio enquiry, so it must not arrive pre-selected either.
     setValue('customerType', getValues('services').includes(BULK) && customerType === 'Homeowner' ? '' : customerType)
     if (dedicated && window.location.hash === '#booking-form') focusBookingElement(document.getElementById('booking-form'))
     // URL context seeds a new form only. Browser history must never overwrite edits.
-  }, [dedicated, pathname, sourcePage, setValue, getValues])
+  }, [dedicated, pathname, sourcePage, setValue, getValues, context, areaPage, defaultCta])
 
   // A "See my price" button further down the homepage picks a service in this card.
   const request = home?.request
@@ -275,17 +290,6 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
     setValue('energyReport', false)   // the homepage's buttons never pick the Pre-Assessment
     if (status !== 'success') { moveFocus.current = true; setStep(1) }
   }, [request, variant, setValue, status])
-
-  useEffect(() => {
-    if (dedicated) return
-    const captureCta = (event: MouseEvent) => {
-      const anchor = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>('a[data-enquiry-cta]') : null
-      const ctaId = anchor?.dataset.enquiryCta as CtaId
-      if (anchor?.getAttribute('href') === '#contact' && ctaIds.includes(ctaId)) setValue('ctaId', ctaId)
-    }
-    document.addEventListener('click', captureCta)
-    return () => document.removeEventListener('click', captureCta)
-  }, [dedicated, setValue])
 
   useEffect(() => {
     if (moveFocus.current) { focusBookingElement(headingRef.current); moveFocus.current = false }
@@ -345,7 +349,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
     const names = new Set(Object.keys(errorFields))
     const input = Array.from(formRef.current?.querySelectorAll<HTMLElement>('input, textarea, button') || [])
       .find(element => names.has(element.getAttribute('name') || '') && element.getClientRects().length > 0)
-    focusBookingElement(input || document.getElementById('security-check'))
+    focusBookingElement(input || document.getElementById(fid('security-check')))
   }
 
   async function next() {
@@ -391,11 +395,11 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
     } finally { submitting.current = false }
   }
 
-  const shell = cn('bf', variant === 'hero' ? 'bf--hero' : 'bf--page')
+  const shell = cn('bf', variant === 'hero' ? 'bf--hero' : 'bf--page', variant === 'dialog' && 'bf--dialog')
 
   if (status === 'success' && sent) return (
     <div className={shell}>
-      <RequestSent data={sent.data} confirmationSent={sent.confirmationSent} focusRef={successRef} onReset={() => {
+      <RequestSent data={sent.data} confirmationSent={sent.confirmationSent} focusRef={successRef} idPrefix={idPrefix} onReset={() => {
         reset(); started.current = false; serviceTouched.current = false; setAreaOpen(false); setSent(null); setStatus('idle'); moveFocus.current = true; setStep(1)
         rememberCustomerType('', window.history)
         if (dedicated) window.history.replaceState(window.history.state, '', quoteHref())
@@ -451,12 +455,12 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
   /** One shared floor-area field (spec 2, 22/10/2026): under the top band's row, labelled for the band it serves. */
   const areaField = (
     <div className="bf__area">
-      <label htmlFor="floorArea" className="bf__area-label">{onTopBand ? 'Approximate internal floor area' : 'Internal floor area'}</label>
-      <p id="floorArea-help" className="bf__sub">{onTopBand ? 'Include all floors. An estimate is fine.' : 'Enter the size if known. An estimate is fine.'}</p>
+      <label htmlFor={fid('floorArea')} className="bf__area-label">{onTopBand ? 'Approximate internal floor area' : 'Internal floor area'}</label>
+      <p id={fid('floorArea-help')} className="bf__sub">{onTopBand ? 'Include all floors. An estimate is fine.' : 'Enter the size if known. An estimate is fine.'}</p>
       <div className="bf__area-row">
         <div className="relative w-36">
-          <Input id="floorArea" inputMode="decimal" autoComplete="off" maxLength={10} placeholder={onTopBand ? 'e.g. 145' : 'e.g. 84'}
-            aria-invalid={!!errors.floorArea} aria-describedby={['floorArea-help', sizeNote ? 'floorArea-note' : ''].filter(Boolean).join(' ')} hasError={!!errors.floorArea} className="pr-10"
+          <Input id={fid('floorArea')} inputMode="decimal" autoComplete="off" maxLength={10} placeholder={onTopBand ? 'e.g. 145' : 'e.g. 84'}
+            aria-invalid={!!errors.floorArea} aria-describedby={[fid('floorArea-help'), sizeNote ? fid('floorArea-note') : ''].filter(Boolean).join(' ')} hasError={!!errors.floorArea} className="pr-10"
             {...register('floorArea', {
               onChange: event => {
                 setAreaOpen(true)
@@ -481,14 +485,14 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
           I don&rsquo;t know the floor area
         </label>
       )}
-      {sizeNote && <p id="floorArea-note" role={errors.floorArea ? 'alert' : undefined} className={cn('mt-1.5 text-sm', errors.floorArea ? 'text-red-700' : 'text-secondary-600')}>{sizeNote}</p>}
+      {sizeNote && <p id={fid('floorArea-note')} role={errors.floorArea ? 'alert' : undefined} className={cn('mt-1.5 text-sm', errors.floorArea ? 'text-red-700' : 'text-secondary-600')}>{sizeNote}</p>}
     </div>
   )
 
   const quoteStep = (
     <div className="bf__quote">
       <Controller control={control} name="customerType" render={({ field }) => (
-        <fieldset className="min-w-0" aria-invalid={!!errors.customerType} aria-describedby={errors.customerType ? 'customerType-error' : undefined}>
+        <fieldset className="min-w-0" aria-invalid={!!errors.customerType} aria-describedby={errors.customerType ? fid('customerType-error') : undefined}>
           <legend className="bf__legend"><Qn n={1} />Which best describes you?</legend>
           <div className="bf__who">
             {customerTypeChoices(isBulk).map((option, index) => {
@@ -497,7 +501,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
               return (
                 <label key={option.value} className="bf-tile bf-tile--who" data-checked={checked || undefined}>
                   <input type="radio" name="customerType" value={option.value} checked={checked} required className="bf-radio"
-                    ref={index === 0 ? field.ref : undefined} aria-label={option.label} aria-describedby={`customerType-d-${index}`}
+                    ref={index === 0 ? field.ref : undefined} aria-label={option.label} aria-describedby={fid(`customerType-d-${index}`)}
                     onChange={() => {
                       field.onChange(option.value)
                       rememberCustomerType(option.value as ContactInput['customerType'], window.history)
@@ -505,17 +509,17 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
                       if (!serviceTouched.current && option.value === 'Estate agent') chooseService('Both (Bundle)')
                     }} />
                   <span aria-hidden="true" className="bf-tile__ico"><Ico name={icon} /></span>
-                  <span className="min-w-0"><b>{option.label}</b><span id={`customerType-d-${index}`} className="bf-tile__d">{option.description}</span></span>
+                  <span className="min-w-0"><b>{option.label}</b><span id={fid(`customerType-d-${index}`)} className="bf-tile__d">{option.description}</span></span>
                   {checked && <Check aria-hidden="true" strokeWidth={3} className="bf-tile__check" />}
                 </label>
               )
             })}
           </div>
-          {errors.customerType && <p id="customerType-error" role="alert" className="mt-2 text-sm text-red-700">{errors.customerType.message}</p>}
+          {errors.customerType && <p id={fid('customerType-error')} role="alert" className="mt-2 text-sm text-red-700">{errors.customerType.message}</p>}
         </fieldset>
       )} />
 
-      <fieldset className="min-w-0" aria-invalid={!!errors.services} aria-describedby={errors.services ? 'services-error' : undefined}>
+      <fieldset className="min-w-0" aria-invalid={!!errors.services} aria-describedby={errors.services ? fid('services-error') : undefined}>
         <legend className="bf__legend"><Qn n={2} />Which service?</legend>
         <div className="bf__tabs">
           {serviceChoices.map(option => {
@@ -533,29 +537,29 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
           })}
         </div>
         <p className="bf__sub">{serviceChoices.find(choice => choice.value === selectedService)?.description}</p>
-        {errors.services && <p id="services-error" role="alert" className="mt-2 text-sm text-red-700">{errors.services.message}</p>}
+        {errors.services && <p id={fid('services-error')} role="alert" className="mt-2 text-sm text-red-700">{errors.services.message}</p>}
       </fieldset>
 
       {/* v7, approved 22/10/2026: the kind of home (a maisonette on two floors changes the survey). Not on a portfolio. */}
       {!isBulk && <Controller control={control} name="dwellingType" render={({ field }) => (
-        <fieldset className="min-w-0" aria-invalid={!!errors.dwellingType} aria-describedby={['dwellingType-hint', errors.dwellingType ? 'dwellingType-error' : ''].filter(Boolean).join(' ')}>
+        <fieldset className="min-w-0" aria-invalid={!!errors.dwellingType} aria-describedby={[fid('dwellingType-hint'), errors.dwellingType ? fid('dwellingType-error') : ''].filter(Boolean).join(' ')}>
           <legend className="bf__legend"><Qn n={3} />What type of property is it?</legend>
-          <p id="dwellingType-hint" className="bf__sub">It helps us confirm your exact price.</p>
+          <p id={fid('dwellingType-hint')} className="bf__sub">It helps us confirm your exact price.</p>
           <div className="bf__who bf__dwelling">
             {dwellingChoices.map((option, index) => {
               const checked = field.value === option.value
               return (
                 <label key={option.value} className="bf-tile bf-tile--who bf-tile--dwelling" data-checked={checked || undefined}>
                   <input type="radio" name="dwellingType" value={option.value} checked={checked} required className="bf-radio"
-                    ref={index === 0 ? field.ref : undefined} aria-label={option.value} aria-describedby={`dwellingType-d-${index}`}
+                    ref={index === 0 ? field.ref : undefined} aria-label={option.value} aria-describedby={fid(`dwellingType-d-${index}`)}
                     onChange={() => { field.onChange(option.value); rememberSelection() }} />
-                  <span className="min-w-0"><b>{option.value}</b><span id={`dwellingType-d-${index}`} className="bf-tile__d">{option.description}</span></span>
+                  <span className="min-w-0"><b>{option.value}</b><span id={fid(`dwellingType-d-${index}`)} className="bf-tile__d">{option.description}</span></span>
                   {checked && <Check aria-hidden="true" strokeWidth={3} className="bf-tile__check" />}
                 </label>
               )
             })}
           </div>
-          {errors.dwellingType && <p id="dwellingType-error" role="alert" className="mt-2 text-sm text-red-700">{errors.dwellingType.message}</p>}
+          {errors.dwellingType && <p id={fid('dwellingType-error')} role="alert" className="mt-2 text-sm text-red-700">{errors.dwellingType.message}</p>}
         </fieldset>
       )} />}
 
@@ -564,9 +568,9 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
           {isBulk ? (
             <p className="bf__note">A single floor area does not apply to several properties. We&rsquo;ll ask roughly how many on the next step, and quote them individually.</p>
           ) : (
-            <fieldset className="min-w-0" aria-invalid={!!errors.areaBand} aria-describedby={['areaBand-hint', errors.areaBand ? 'areaBand-error' : ''].filter(Boolean).join(' ')}>
+            <fieldset className="min-w-0" aria-invalid={!!errors.areaBand} aria-describedby={[fid('areaBand-hint'), errors.areaBand ? fid('areaBand-error') : ''].filter(Boolean).join(' ')}>
               <legend className="bf__legend"><Qn n={4} />How big is the property?</legend>
-              <p id="areaBand-hint" className="bf__sub">Choose the approximate internal floor area. Bedrooms are only a rough guide. Not sure? We can confirm it from your property details.</p>
+              <p id={fid('areaBand-hint')} className="bf__sub">Choose the approximate internal floor area. Bedrooms are only a rough guide. Not sure? We can confirm it from your property details.</p>
               <div className="bf__sizes">
                 {areaBands.map((b, i) => {
                   const checked = values.areaBand === b
@@ -595,11 +599,11 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
               </div>
               {!showArea && (
                 <button type="button" className="bf__more"
-                  onClick={() => { setAreaOpen(true); requestAnimationFrame(() => document.getElementById('floorArea')?.focus()) }}>
+                  onClick={() => { setAreaOpen(true); requestAnimationFrame(() => document.getElementById(fid('floorArea'))?.focus()) }}>
                   Know the exact size? Enter it in m²
                 </button>
               )}
-              {errors.areaBand && <p id="areaBand-error" role="alert" className="mt-2 text-sm text-red-700">{errors.areaBand.message}</p>}
+              {errors.areaBand && <p id={fid('areaBand-error')} role="alert" className="mt-2 text-sm text-red-700">{errors.areaBand.message}</p>}
             </fieldset>
           )}
         </div>
@@ -646,7 +650,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
 
   /* ------------------------------------------------------------- timing and details */
   const timingFields = <>
-    {isLodged ? <Controller control={control} name="speed" render={({ field }) => <Choices name="speed" legend="How quickly do you need the certificate?"
+    {isLodged ? <Controller control={control} name="speed" render={({ field }) => <Choices name="speed" idPrefix={idPrefix} legend="How quickly do you need the certificate?"
       value={field.value} inputRef={field.ref} error={errors.speed?.message} onChange={value => {
         field.onChange(value); rememberSelection()
         // a next-day visit means tomorrow: it fills in tomorrow's date when none is set (v7)
@@ -657,14 +661,14 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
         { value: NEXT_DAY_VISIT_SPEED, label: `Next-day visit and lodgement (+\u2060£${NEXT_DAY_VISIT_SURCHARGE})`, description: 'We visit the next day and lodge your EPC that day. Availability confirmed before booking.' },
       ]} />} /> : <p className="text-base text-secondary-700">{turnaroundCopy(productKind)}</p>}
     <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">
-      {!isBulk && <Field label="Preferred visit date" htmlFor="preferredDate" hint="Optional. A requested date is not a confirmed appointment." error={errors.preferredDate?.message}>
-        <Input id="preferredDate" type="date" min={londonYmd(0)} aria-describedby={dateNote.text && !errors.preferredDate ? 'preferredDate-note' : undefined}
+      {!isBulk && <Field label="Preferred visit date" htmlFor={fid('preferredDate')} hint="Optional. A requested date is not a confirmed appointment." error={errors.preferredDate?.message}>
+        <Input id={fid('preferredDate')} type="date" min={londonYmd(0)} aria-describedby={dateNote.text && !errors.preferredDate ? fid('preferredDate-note') : undefined}
           {...register('preferredDate', { onChange: () => { if (errors.preferredDate) void trigger('preferredDate') } })} />
         {/* never in the past; today and tomorrow say what they depend on; a next-day visit means tomorrow */}
-        {dateNote.text && !errors.preferredDate && <p id="preferredDate-note" role="status" className={cn('bf__date-note', dateNote.blocking && 'is-bad')}>{dateNote.text}</p>}
+        {dateNote.text && !errors.preferredDate && <p id={fid('preferredDate-note')} role="status" className={cn('bf__date-note', dateNote.blocking && 'is-bad')}>{dateNote.text}</p>}
       </Field>}
-      <Field label="Access notes or other instructions" htmlFor="notes" hint="Optional. Access, parking or anything about the property." error={errors.notes?.message} className={isBulk ? 'sm:col-span-2' : undefined}>
-        <Textarea id="notes" rows={2} {...register('notes')} />
+      <Field label="Access notes or other instructions" htmlFor={fid('notes')} hint="Optional. Access, parking or anything about the property." error={errors.notes?.message} className={isBulk ? 'sm:col-span-2' : undefined}>
+        <Textarea id={fid('notes')} rows={2} {...register('notes')} />
       </Field>
     </div>
   </>
@@ -674,40 +678,40 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page' }: { areaPa
     <p className="text-sm text-secondary-700">Fields marked * are required.</p>
     {showErrors && Object.keys(errors).length > 0 && <div role="alert" className="rounded-lg border border-danger p-3 text-sm text-red-700">
       <p className="font-semibold">Please check the following:</p>
-      <ul>{Object.entries(errors).map(([name, error]) => <li key={name}><a href={`#${name === 'turnstileToken' ? 'security-check' : name}`} className="inline-block py-2 underline" onClick={event => {
-        event.preventDefault(); focusBookingElement(document.getElementById(name === 'turnstileToken' ? 'security-check' : name))
+      <ul>{Object.entries(errors).map(([name, error]) => <li key={name}><a href={`#${fid(name === 'turnstileToken' ? 'security-check' : name)}`} className="inline-block py-2 underline" onClick={event => {
+        event.preventDefault(); focusBookingElement(document.getElementById(fid(name === 'turnstileToken' ? 'security-check' : name)))
       }}>{error?.message}</a></li>)}</ul>
     </div>}
     <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">
-      <Field label="Full name" htmlFor="name" required error={errors.name?.message}><Input id="name" autoComplete="name" {...register('name')} /></Field>
-      <Field label="Phone number" htmlFor="phone" required error={errors.phone?.message}><Input id="phone" type="tel" inputMode="tel" autoComplete="tel" {...register('phone')} /></Field>
-      <Field label="Email address" htmlFor="email" required error={errors.email?.message} className="sm:col-span-2"><Input id="email" type="email" inputMode="email" autoComplete="email" {...register('email')} /></Field>
-      {isBulk && <Field label="How many properties?" htmlFor="propertyCount" required error={errors.propertyCount?.message} hint="A rough number is fine." className="sm:col-span-2"><Input id="propertyCount" placeholder="e.g. 12, or 20+" {...register('propertyCount')} /></Field>}
-      <Field label={isBulk ? 'Properties and postcodes' : 'Property address'} htmlFor="address" required={!isBulk} error={errors.address?.message}
+      <Field label="Full name" htmlFor={fid('name')} required error={errors.name?.message}><Input id={fid('name')} autoComplete="name" {...register('name')} /></Field>
+      <Field label="Phone number" htmlFor={fid('phone')} required error={errors.phone?.message}><Input id={fid('phone')} type="tel" inputMode="tel" autoComplete="tel" {...register('phone')} /></Field>
+      <Field label="Email address" htmlFor={fid('email')} required error={errors.email?.message} className="sm:col-span-2"><Input id={fid('email')} type="email" inputMode="email" autoComplete="email" {...register('email')} /></Field>
+      {isBulk && <Field label="How many properties?" htmlFor={fid('propertyCount')} required error={errors.propertyCount?.message} hint="A rough number is fine." className="sm:col-span-2"><Input id={fid('propertyCount')} placeholder="e.g. 12, or 20+" {...register('propertyCount')} /></Field>}
+      <Field label={isBulk ? 'Properties and postcodes' : 'Property address'} htmlFor={fid('address')} required={!isBulk} error={errors.address?.message}
         hint={isBulk ? 'Optional. Paste a list if you have one, or supply it later.' : undefined} className="sm:col-span-2">
-        <Textarea id="address" rows={isBulk ? 5 : 2} autoComplete={isBulk ? 'off' : 'street-address'} {...register('address')} />
+        <Textarea id={fid('address')} rows={isBulk ? 5 : 2} autoComplete={isBulk ? 'off' : 'street-address'} {...register('address')} />
       </Field>
-      {!isBulk && <Field label="Postcode" htmlFor="postcode" required error={errors.postcode?.message}><Input id="postcode" autoComplete="postal-code" {...register('postcode')} /></Field>}
+      {!isBulk && <Field label="Postcode" htmlFor={fid('postcode')} required error={errors.postcode?.message}><Input id={fid('postcode')} autoComplete="postal-code" {...register('postcode')} /></Field>}
       {/* a portfolio skips step 2, so its notes come here */}
-      {isBulk && <Field label="Access notes or other instructions" htmlFor="notes" hint="Optional. Access, parking or anything about the properties." error={errors.notes?.message} className="sm:col-span-2">
-        <Textarea id="notes" rows={2} {...register('notes')} />
+      {isBulk && <Field label="Access notes or other instructions" htmlFor={fid('notes')} hint="Optional. Access, parking or anything about the properties." error={errors.notes?.message} className="sm:col-span-2">
+        <Textarea id={fid('notes')} rows={2} {...register('notes')} />
       </Field>}
     </div>
   </>
 
   const sendFields = <>
     <label className="flex min-h-[48px] cursor-pointer items-start gap-3 py-2 text-base">
-      <input id="consent" type="checkbox" required aria-invalid={!!errors.consent} aria-describedby={errors.consent ? 'consent-error' : undefined} className="mt-1 h-5 w-5 shrink-0 accent-primary-700" {...register('consent')} />
+      <input id={fid('consent')} type="checkbox" required aria-invalid={!!errors.consent} aria-describedby={errors.consent ? fid('consent-error') : undefined} className="mt-1 h-5 w-5 shrink-0 accent-primary-700" {...register('consent')} />
       <span>I agree to be contacted about my enquiry. We only use your details for this request. Read our <a href="/privacy-policy" className="underline">privacy policy</a>.</span>
     </label>
-    {errors.consent && <p id="consent-error" role="alert" className="text-sm text-red-700">{errors.consent.message}</p>}
+    {errors.consent && <p id={fid('consent-error')} role="alert" className="text-sm text-red-700">{errors.consent.message}</p>}
     {FORM_DRAFT ? <p className="bf__draft">Draft preview: the security check is skipped and nothing is sent.</p> : (
-      <div id="security-check" tabIndex={-1} aria-describedby={errors.turnstileToken ? 'turnstileToken-error' : undefined}>
+      <div id={fid('security-check')} tabIndex={-1} aria-describedby={errors.turnstileToken ? fid('turnstileToken-error') : undefined}>
         <p className="mb-2 text-sm font-semibold">Security check</p>
         <div ref={turnstileRef} className="min-w-0" />
         {turnstileLoading && <p role="status" className="text-sm">Loading security check…</p>}
         {turnstileError && <div role="alert" className="text-sm text-red-700"><p>The security check could not complete. Check your connection and try again.</p><button type="button" className={`${controlClass} underline`} onClick={resetTurnstile}>Retry security check</button></div>}
-        {errors.turnstileToken && <p id="turnstileToken-error" role="alert" className="text-sm text-red-700">{errors.turnstileToken.message}</p>}
+        {errors.turnstileToken && <p id={fid('turnstileToken-error')} role="alert" className="text-sm text-red-700">{errors.turnstileToken.message}</p>}
       </div>
     )}
     {problem && <SendProblemNotice problem={problem} summary={enquirySummaryText(values)} />}

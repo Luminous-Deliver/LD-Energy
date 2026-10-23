@@ -6,9 +6,10 @@ import { Section } from '@/components/ui/Section'
 import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { PageHero } from '@/components/sections/PageHero'
 import { LocalPricingSummary } from '@/components/sections/LocalPricingSummary'
+import { ContactSection } from '@/components/sections/ContactSection'
+import { quoteHref } from '@/lib/quote-context'
 import { InnerEnding } from '@/components/inner/InnerEnding'
 import { Accordion } from '@/components/ui/Accordion'
-import { ContactSection } from '@/components/sections/ContactSection'
 import { boroughMeta, boroughIntent, type BoroughIntent } from '@/lib/boroughs'
 import { site, topBand, pricing, priceFrom, formatPrice, maxBundleSaving, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE, defaultOgImage } from '@/lib/site'
 import type { FaqItem } from '@/lib/faq'
@@ -238,7 +239,7 @@ export default async function BoroughPage({ params }: PageProps) {
         eyebrow={`EPC Certificates · ${data.name}`}
         heading={`EPC Certificates in ${data.name}`}
         subheading={`Elmhurst and Quidos accredited Domestic Energy Assessor based in Stratford E15 and serving ${data.name}. Guide prices from £${priceFrom.epc}, with your exact quote and available appointment confirmed before booking.`}
-        primaryCta={{ label: 'Get my exact quote', href: '#contact', ctaId: 'hero' }}
+        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'area', areaPage: data.slug, ctaId: 'hero' }), ctaId: 'hero' }}
         secondaryCta={{ label: `Call ${site.phone}`, href: site.phoneHref }}
       />
 

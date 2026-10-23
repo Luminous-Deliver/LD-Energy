@@ -1,0 +1,121 @@
+/* /quote and /contact (Abdul's brief, 23/10/2026): the inner pages' paper, ink and sage (app/inner.css tokens under
+   .in), serif 400 headings, hairlines, one filled sage button per screen. /quote reuses .in-contact from inner.css for
+   its head; /contact's parts are here. The general enquiry form (.eq) is secondary in weight: a line button, no card. */
+
+/* ------------------------------------------------------------------ /quote */
+.qp__sec { padding-block: 20px 72px; }
+.qp__head { margin-top: 20px; }
+.qp__h1 { font-size: 40px; line-height: 1.05; letter-spacing: -.014em; }
+.qp__h1:focus { outline: none; }
+.qp__other { margin-top: 40px; padding-top: 18px; border-top: 1px solid var(--hair); font-size: 16px; color: var(--ink-quiet); }
+.qp__other a { color: var(--sage-700); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+/* phones: the form is the page, so the head stays short and the first question lands in the first screen; the lede's
+   promise is repeated under the price panel, so only the credential stays */
+@media (max-width: 759px) {
+  .qp__sec { padding-top: 12px; }
+  .qp__head { margin-top: 12px; gap: 8px; }
+  .qp__h1 { font-size: 34px; }
+  .qp .in-contact__side p { display: none; }
+  .qp .in-contact__acc { font-size: 14px; }
+  .qp .in-contact .bk7 .qc, .qp .bk7 .qc { margin-top: 18px; }
+}
+@media (min-width: 760px) {
+  .qp__sec { padding-block: 28px 112px; }
+  .qp__h1 { font-size: 60px; }
+}
+
+/* ------------------------------------------------------------------ /contact: hero */
+.cp-hero { padding-block: 20px 32px; }
+.cp-hero__eyebrow { margin-top: 24px; }
+.cp-hero h1 { margin-top: 12px; font-size: 40px; line-height: 1.05; letter-spacing: -.014em; }
+.cp-hero__lede { margin-top: 16px; max-width: 52ch; font-size: 18px; line-height: 1.6; }
+@media (min-width: 760px) {
+  .cp-hero { padding-block: 28px 48px; }
+  .cp-hero h1 { font-size: 64px; }
+  .cp-hero__lede { font-size: 20px; }
+}
+
+/* ------------------------------------------------------------------ the two routes, not equal */
+.cp-routes { padding-bottom: 56px; }
+.cp-routes__grid { display: grid; gap: 40px; }
+@media (min-width: 960px) {
+  .cp-routes { padding-bottom: 96px; }
+  .cp-routes__grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 72px; align-items: start; }
+}
+
+/* primary: the price route, on a sage-tinted panel with the page's one filled button */
+.cp-price { display: grid; gap: 18px; align-content: start; padding: 28px 22px; border-radius: 10px; background: var(--sage-50); border: 1px solid rgba(58, 98, 78, .22); }
+.cp-price__h { font-size: 32px; line-height: 1.1; }
+.cp-price__p { max-width: 50ch; font-size: 18px; line-height: 1.6; }
+.cp-price__go { justify-self: start; min-height: 52px; padding: 0 26px; font-size: 17px; }
+.cp-price__ticks { display: grid; gap: 10px; margin-top: 4px; padding: 0; list-style: none; font-size: 16px; color: var(--ink-quiet); }
+.cp-price__ticks li { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 10px; align-items: start; }
+.cp-price__ticks svg { margin-top: 4px; color: var(--sage-700); }
+@media (min-width: 760px) {
+  .cp-price { padding: 44px 44px 40px; gap: 22px; }
+  .cp-price__h { font-size: 44px; }
+  .cp-price__p { font-size: 20px; }
+}
+@media (max-width: 479px) { .cp-price__go { justify-self: stretch; } }
+
+/* secondary: the question route, plain on paper, ruled rows */
+.cp-ask { display: grid; gap: 14px; align-content: start; min-width: 0; }
+.cp-ask__h { font-size: 26px; line-height: 1.15; }
+.cp-ask__p { font-size: 17px; line-height: 1.55; }
+@media (min-width: 760px) { .cp-ask__h { font-size: 30px; } }
+.cp-lines { margin: 6px 0 0; border-top: 1px solid var(--hair); }
+.cp-lines > div { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--hair); }
+.cp-lines dt { display: inline-flex; align-items: center; gap: 8px; align-self: start; min-height: 26px; font: 500 12px/1.4 var(--font-sans); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-quiet); }
+.cp-lines dt svg { color: var(--sage-700); }
+.cp-lines dd { display: grid; gap: 2px; min-width: 0; margin: 0; }
+.cp-lines dd a, .cp-lines__v { font-size: 17px; font-weight: 500; color: var(--ink); overflow-wrap: break-word; }
+.cp-lines dd a { text-decoration: underline; text-decoration-color: var(--hair-strong); text-underline-offset: 4px; text-decoration-thickness: 1px; }
+.cp-lines dd a:hover { text-decoration-color: var(--sage-700); color: var(--sage-700); }
+.cp-lines dd span:not(.cp-lines__v) { font-size: 14px; color: var(--ink-quiet); }
+.cp-ask__more a { display: inline-flex; align-items: center; min-height: 44px; color: var(--sage-700); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.cp-ask__by { font-size: 15px; line-height: 1.5; color: var(--ink-quiet); }
+.cp-ask__by a, .cp-ask__area a { color: var(--sage-700); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.cp-ask__area { font-size: 15px; line-height: 1.5; color: var(--ink-quiet); }
+
+/* ------------------------------------------------------------------ the general enquiry form, further down */
+.cp-form { padding-block: 56px 72px; background: var(--stone-100); border-top: 1px solid var(--hair); scroll-margin-top: calc(var(--head-h) + 8px); }
+.cp-form__in { display: grid; gap: 28px; max-width: 760px; }
+.cp-form__head { display: grid; gap: 10px; }
+.cp-form__h { font-size: 28px; line-height: 1.15; }
+.cp-form__head p:last-child { font-size: 17px; line-height: 1.55; max-width: 60ch; }
+@media (min-width: 760px) {
+  .cp-form { padding-block: 88px 112px; }
+  .cp-form__h { font-size: 36px; }
+}
+
+.eq { display: grid; gap: 20px; }
+.eq__grid { display: grid; gap: 20px; }
+@media (min-width: 640px) { .eq__grid { grid-template-columns: 1fr 1fr; } .eq__grid > :first-child { grid-column: 1 / -1; } }
+.eq__field { display: grid; gap: 6px; min-width: 0; }
+.eq__field label { font-size: 16px; font-weight: 500; color: var(--ink); }
+.eq__field label span[aria-hidden] { color: var(--error, #A83630); }
+.eq__opt { margin-left: 6px; font-size: 14px; font-weight: 400; color: var(--ink-quiet); }
+.eq__control {
+  box-sizing: border-box; width: 100%; min-height: 48px; padding: 10px 12px; border: 1px solid var(--slate-500); border-radius: var(--r-sm);
+  background: #fff; color: var(--ink); font: 400 17px/1.5 var(--font-sans);
+}
+select.eq__control { padding-right: 36px; }
+textarea.eq__control { resize: vertical; }
+.eq__control:focus-visible { outline: 2px solid var(--sage-700); outline-offset: 2px; border-color: var(--sage-700); }
+.eq__control[aria-invalid="true"] { border-color: #A83630; }
+.eq__hint { font-size: 14px; line-height: 1.5; color: var(--ink-quiet); }
+.eq__error { font-size: 14px; line-height: 1.5; color: #A83630; }
+.eq__consent { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 12px; align-items: start; min-height: 48px; font-size: 16px; line-height: 1.5; cursor: pointer; }
+.eq__consent input { width: 20px; height: 20px; margin-top: 2px; accent-color: var(--sage-700); }
+.eq__consent a { text-decoration: underline; text-underline-offset: 3px; }
+.eq__draft { padding-left: 12px; border-left: 2px solid #FFD500; font-size: 14px; color: var(--ink-quiet); }
+.eq__send { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+.eq__send .ld-btn { background: #fff; }
+.eq__retry { min-height: 44px; text-decoration: underline; }
+.eq__problem { display: grid; gap: 8px; padding: 14px 16px; border-left: 3px solid #A83630; background: #fff; font-size: 16px; }
+.eq__alt { display: flex; flex-wrap: wrap; gap: 8px 20px; }
+.eq__alt a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-weight: 500; text-decoration: underline; text-underline-offset: 3px; }
+.eq__route { display: grid; gap: 16px; justify-items: start; padding: 20px; border-left: 3px solid var(--sage-700); background: #fff; font-size: 17px; line-height: 1.55; }
+.eq--done { padding: 24px; border-left: 3px solid var(--sage-700); background: #fff; outline: none; }
+.eq__done-h { font-size: 26px; line-height: 1.15; }
+.eq--done p { font-size: 17px; line-height: 1.55; }

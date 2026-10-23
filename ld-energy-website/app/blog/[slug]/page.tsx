@@ -60,12 +60,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 /** The question a reader in each group is usually asking, for the Read next cards (board option C). */
-const GROUP_QUESTION: Record<string, string> = {
-  'understand-your-epc': 'Want the basics first?',
-  'before-and-on-the-day': 'Booking a visit?',
-  'letting-and-mees': 'Letting a home?',
-  'improving-your-rating': 'Planning improvements?',
-  'selling-buying-and-floor-plans': 'Selling or buying?',
+/* Read next option A: one picture per guide group (the board's A images). */
+const GROUP_IMAGE: Record<string, string> = {
+  'understand-your-epc': '/inner/rn-scale.svg',
+  'before-and-on-the-day': '/guides/assessor-room-720.webp',
+  'letting-and-mees': '/inner/rn-landlord.svg',
+  'improving-your-rating': '/guides/house-section-720.webp',
+  'selling-buying-and-floor-plans': '/inner/rn-seller.svg',
 }
 
 function groupOf(slug: string) {
@@ -101,24 +102,26 @@ export default async function BlogPostPage({ params }: PageProps) {
     ...related.map((r) => {
       const g = groupOf(r.slug)
       return {
-        kicker: (g && GROUP_QUESTION[g.group.id]) ?? 'Read next',
+        kicker: g?.group.heading ?? 'Guide',
         title: r.title,
         text: g?.summary ?? r.description,
         href: `/blog/${r.slug}`,
+        img: g ? GROUP_IMAGE[g.group.id] : undefined,
+        meta: `${r.readingTime} min read`,
       }
     }),
     ...(BOROUGH_DATA_PAGE.live
       ? [{
-          kicker: 'Comparing areas?',
+          kicker: 'Borough figures',
           title: 'EPC ratings in every London borough',
           text: 'How homes in each borough rate, from EPCs on the GOV.UK register.',
           href: BOROUGH_DATA_PAGE.href,
+          img: '/inner/rn-boroughs.svg',
         }]
       : []),
     {
-      kicker: 'Ready for a price?',
-      title: 'Get your exact price',
-      text: 'Tell us the address and the size. We confirm your exact price and a visit time first.',
+      title: 'Ready to book?',
+      text: 'Tell us the address and size. We confirm your exact price before you book.',
       href: quoteHref({ service: 'epc', sourcePage: 'blog', ctaId: 'inline' }),
       go: true,
     },
@@ -212,7 +215,7 @@ export default async function BlogPostPage({ params }: PageProps) {
             </article>
           </div>
         </div>
-        <ReadNext title="Where next?" steps={steps} />
+        <ReadNext steps={steps} />
       </div>
       <InnerEnding variant="a" source="blog" />
     </>

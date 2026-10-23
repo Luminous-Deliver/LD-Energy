@@ -57,25 +57,25 @@ function sharedFaqs(name: string): FaqItem[] {
 }
 
 /**
- * Read next, by intent (option C): the question this area's certificates suggest a reader has, then why ratings
- * differ, the borough comparison, and the ready-to-book step. Guide titles and descriptions come from the posts.
+ * Read next (option A cards, C's quote card last): the guide this area's certificates point to, why ratings differ,
+ * the borough comparison, then the ready-to-book card. Guide titles and descriptions come from the posts.
  */
 async function readNextSteps(name: string, s: AreaSummary): Promise<NextStep[]> {
   const guide = async (slug: string, kicker: string, img: string): Promise<NextStep | null> => {
     const p = await getPostBySlug(slug)
-    return p ? { kicker, title: p.title, text: p.description, href: `/blog/${slug}`, img } : null
+    return p ? { kicker, title: p.title, text: p.description, href: `/blog/${slug}`, img, meta: `${p.readingTime} min read` } : null
   }
   const first = s.pctLettings >= s.pctSales
-    ? await guide('epc-for-landlords-2026', `Letting in ${name}?`, '/inner/rn-landlord.svg')
-    : await guide('epc-for-selling-house', `Selling in ${name}?`, '/inner/rn-seller.svg')
-  const second = await guide('why-is-my-epc-different', 'Rating lower than you expected?', '/inner/rn-two-houses.svg')
+    ? await guide('epc-for-landlords-2026', 'Letting and MEES', '/inner/rn-landlord.svg')
+    : await guide('epc-for-selling-house', 'Selling and buying', '/inner/rn-seller.svg')
+  const second = await guide('why-is-my-epc-different', 'Understand your EPC', '/inner/rn-two-houses.svg')
   const steps: (NextStep | null)[] = [
     first,
     second,
-    { kicker: 'Comparing boroughs?', title: 'EPC ratings in every London borough', href: DATA_PAGE_PATH, img: '/inner/rn-boroughs.svg',
+    { kicker: 'Borough figures', title: 'EPC ratings in every London borough', href: DATA_PAGE_PATH, img: '/inner/rn-boroughs.svg',
       text: `${name}'s ${pct(s.ratings.pct.AtoC)} rated A to C, against ${pct(london.ratings.pct.AtoC)} across London and the other councils.` },
-    { kicker: 'Ready to book?', title: `Your ${name} EPC`, href: '#contact', img: '/inner/rn-book.svg', go: true,
-      text: 'Tell us the address and size. We confirm your exact price and a visit time before you book.' },
+    { title: 'Ready to book?', href: '#contact', go: true,
+      text: 'Tell us the address and size. We confirm your exact price before you book.' },
   ]
   return steps.filter((x): x is NextStep => x !== null)
 }

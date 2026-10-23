@@ -3,6 +3,7 @@ import localFont from 'next/font/local'
 import { Header } from '@/components/layout/Header'
 import { CompactFooter } from '@/components/layout/CompactFooter'
 import { PhoneDock } from '@/components/layout/PhoneDock'
+import { QuoteDialog } from '@/components/forms/QuoteDialog'
 import { WebAnalytics } from '@/components/layout/WebAnalytics'
 import { LondonSkyline } from '@/components/ui/LondonSkyline'
 import { site, pricing, priceFrom, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE } from '@/lib/site'
@@ -196,6 +197,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <LondonSkyline className="site-skyline text-night -mb-1" />
         <CompactFooter />
         <PhoneDock waHref={waHref} />
+        {/* every quote link opens this over the page when it can; /quote is the page it falls back to */}
+        <QuoteDialog />
         <WebAnalytics token={cfBeaconToken} />
       </body>
     </html>

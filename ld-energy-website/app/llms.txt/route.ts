@@ -86,7 +86,7 @@ For domestic rentals covered by MEES in England and Wales, the current minimum i
 New dwellings normally need an on-construction EPC, which uses a different assessment method. Our service is domestic assessment of existing homes.
 
 ## Request an exact quote
-Use ${site.url}/contact#booking-form. Call ${site.phone} or WhatsApp for support. We confirm your exact
+Use ${site.url}/quote. Call ${site.phone} or WhatsApp for support. We confirm your exact
 quote before booking.
 
 ## Website structure
@@ -106,7 +106,8 @@ quote before booking.
 - FAQ: ${site.url}/faq
 - Blog and guides: ${site.url}/blog
 - About: ${site.url}/about
-- Enquiry form: ${site.url}/contact
+- Exact quote: ${site.url}/quote
+- Contact and general questions: ${site.url}/contact
 
 ## Area pages
 We have dedicated pages for every London borough we cover: ${areaNames.join(', ')}.

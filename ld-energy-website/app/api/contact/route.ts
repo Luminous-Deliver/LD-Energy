@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getRequestContext } from '@cloudflare/next-on-pages'
-import { contactSchema } from '@/lib/validators'
+import { contactSchema, enquirySchema, type EnquiryInput } from '@/lib/validators'
 import { site } from '@/lib/site'
 import { areaLabel, legacyArea, TOP_BAND } from '@/lib/floor-area'
 import { bookingPriceRows, guideEstimate, guideEstimateLine, guidePrice, PLAN_LABEL, ENERGY_REPORT_LABEL } from '@/lib/pricing-estimate'
@@ -368,6 +368,78 @@ ${prepBlock}${tenantBlock}
   return { text, html }
 }
 
+/** The general enquiry's notification: who, what about and the message; replying answers the sender. No customer confirmation. */
+function buildEnquiryEmail(data: EnquiryInput) {
+  const rows: Array<[string, string]> = [
+    ['Enquiry type', data.enquiryType],
+    ['Name', data.name],
+    ['Email', data.email],
+    ['Phone', data.phone || '—'],
+    ['Message', data.message],
+  ]
+  const text = rows.map(([k, v]) => `${k}: ${v}`).join('\n')
+  const html = `<!doctype html><html><body style="font-family:Inter,Arial,sans-serif;color:#1E293B;line-height:1.5">
+<h2 style="margin:0 0 16px;color:#0F172A">New website enquiry: ${escapeHtml(data.enquiryType)}</h2>
+<table cellpadding="8" cellspacing="0" border="0" style="border-collapse:collapse;width:100%;max-width:560px">
+${rows.map(([k, v]) => `<tr><td style="background:#F8FAFC;border:1px solid #E2E8F0;font-weight:600;width:32%">${escapeHtml(k)}</td><td style="border:1px solid #E2E8F0">${escapeHtml(v).replace(/\n/g, '<br>')}</td></tr>`).join('')}
+</table>
+<p style="margin-top:16px;font-size:12px;color:#64748B">Sent from the contact page on epc.luminousanddeliver.co.uk. Reply to this email to answer.</p>
+</body></html>`
+  return { text, html }
+}
+
+/**
+ * A general enquiry from /contact: the same checks as a quote request (size, origin, schema, honeypot, Turnstile) and
+ * the same Resend sender, but its own subject, prefixed with the enquiry type. Never "EPC booking:", which the
+ * booking follow-up scripts match on.
+ */
+async function handleEnquiry(req: Request, payload: unknown) {
+  const parsed = enquirySchema.safeParse(payload)
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Validation failed', issues: parsed.error.flatten() }, { status: 400 })
+  }
+  if (parsed.data.website) return NextResponse.json({ ok: true })
+
+  let cfEnv: Record<string, string> = {}
+  try { cfEnv = getRequestContext().env as Record<string, string> } catch { /* process.env when running locally */ }
+
+  const turnstileSecret = cfEnv.TURNSTILE_SECRET_KEY || process.env.TURNSTILE_SECRET_KEY
+  if (!turnstileSecret && process.env.NODE_ENV === 'production') {
+    console.error('[contact] TURNSTILE_SECRET_KEY is not configured in production.')
+    return NextResponse.json({ error: 'Messages are temporarily unavailable. Please call or WhatsApp us instead.' }, { status: 503 })
+  }
+  if (turnstileSecret) {
+    const clientIP = req.headers.get('CF-Connecting-IP') || req.headers.get('X-Forwarded-For')?.split(',')[0]?.trim() || ''
+    if (!(await verifyTurnstile(parsed.data.turnstileToken, turnstileSecret, clientIP))) {
+      return NextResponse.json({ error: 'Security verification failed. Please refresh and try again.', code: 'security' }, { status: 400 })
+    }
+  }
+
+  const apiKey = cfEnv.RESEND_API_KEY || process.env.RESEND_API_KEY
+  if (!apiKey) {
+    console.error('[contact] RESEND_API_KEY is not configured.')
+    return NextResponse.json({ error: 'Messages are temporarily unavailable. Please call or WhatsApp us instead.' }, { status: 503 })
+  }
+  const from = (cfEnv.RESEND_FROM || process.env.RESEND_FROM || FROM_DEFAULT).replace('@epc.luminousanddeliver.co.uk', '@luminousanddeliver.co.uk')
+  const to = cfEnv.RESEND_TO || process.env.RESEND_TO || NOTIFY_TO
+  const { text, html } = buildEnquiryEmail(parsed.data)
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from, to, reply_to: parsed.data.email, subject: `${parsed.data.enquiryType}: website enquiry from ${parsed.data.name}`, text, html }),
+    })
+    if (!res.ok) {
+      console.error('[contact] Resend error (enquiry)', res.status, await res.text())
+      return NextResponse.json({ error: 'We could not send your message right now. Please call us on 07492 575 396.' }, { status: 502 })
+    }
+  } catch (err) {
+    console.error('[contact] Resend fetch failed (enquiry)', err)
+    return NextResponse.json({ error: 'Network error. Please try again or call us on 07492 575 396.' }, { status: 502 })
+  }
+  return NextResponse.json({ ok: true, delivered: true })
+}
+
 const MAX_BODY_BYTES = 10_000
 const ALLOWED_ORIGINS = [
   'https://epc.luminousanddeliver.co.uk',
@@ -393,6 +465,11 @@ export async function POST(req: Request) {
     payload = JSON.parse(raw)
   } catch {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+  }
+
+  // a general enquiry from /contact carries kind: 'enquiry'; everything else is a quote request
+  if (typeof payload === 'object' && payload !== null && (payload as { kind?: unknown }).kind === 'enquiry') {
+    return handleEnquiry(req, payload)
   }
 
   const parsed = contactSchema.safeParse(payload)

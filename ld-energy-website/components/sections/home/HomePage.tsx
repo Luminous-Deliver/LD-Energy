@@ -4,6 +4,7 @@ import { site, priceFrom, maxBundleSaving, insurance, SAME_DAY_LODGEMENT_SURCHAR
 import { boroughList } from '@/lib/boroughs'
 import { whatsappQuoteHref } from '@/lib/area-page'
 import { homeBookingFaqs } from '@/lib/homepage-content'
+import { quoteHref } from '@/lib/quote-context'
 import { HomeQuoteProvider } from './HomeQuoteContext'
 import { HomeQuoteCard } from './HomeQuoteCard'
 import { HomeV7Motion } from './HomeV7Motion'
@@ -50,13 +51,17 @@ function Hero() {
       <div className="hero__stage">
         <div className="scene-wrap">
           <div className="scene" aria-hidden="true">
-            {/* hero B (Abdul 23/10): the AI terrace cut open replaces the rooftop photo; one plane carries it, the
-                motion script still writes the far, glow and mist planes, so they stay as empty boxes */}
+            {/* hero B, redrawn wider (Abdul 23/10: "looks very good i love it"): one 21:9 plane on desktop, a crop
+                round the cut-open house on phones. The motion script still writes the far, glow and mist planes,
+                so they stay as empty boxes */}
             <div className="pl pl--far" />
             <div className="pl pl--glow" />
             <div className="pl pl--mid">
               {/* eslint-disable-next-line @next/next/no-img-element -- next/image is unoptimised on Pages */}
-              <img src="/home/hero-cutaway-1600.webp" srcSet="/home/hero-cutaway-900.webp 900w, /home/hero-cutaway-1600.webp 1600w, /home/hero-cutaway-2560.webp 2560w" sizes="(max-width: 759px) 135vw, 100vw" alt="" width={1600} height={900} fetchPriority="high" />
+              <picture>
+                <source media="(max-width: 759px)" srcSet="/home/hero-wide-phone-800.webp 800w, /home/hero-wide-phone-1200.webp 1200w" sizes="100vw" width={1200} height={674} />
+                <img src="/home/hero-wide-1600.webp" srcSet="/home/hero-wide-900.webp 900w, /home/hero-wide-1600.webp 1600w, /home/hero-wide-2560.webp 2560w" sizes="100vw" alt="" width={1600} height={689} fetchPriority="high" />
+              </picture>
             </div>
             <div className="pl pl--mist" />
           </div>
@@ -70,7 +75,8 @@ function Hero() {
             </div>
             <p className="hero__sub">One accredited visit for London landlords and letting agents. Your exact price is confirmed before you book.</p>
             <div className="hero__cta">
-              <a className="btn btn-primary" id="hero-quote" href="#prices">Get my exact quote</a>
+              {/* opens the quote dialog over the page (Abdul 23/10: "cross it off and continue to scroll"); /quote without JS */}
+              <a className="btn btn-primary" id="hero-quote" href={quoteHref({ sourcePage: 'home', ctaId: 'hero' })}>Get my exact quote</a>
               <a className="link arrow-link" href={wa} {...ext}>Or message us on WhatsApp</a>
             </div>
           </div>
@@ -452,8 +458,9 @@ function Close() {
 }
 
 export function HomePage() {
-  // The LCP image: the rooftop plane, the wide cut from 760 px and the portrait cut on phones.
-  preload('/home/hero-cutaway-1600.webp', { as: 'image', fetchPriority: 'high', imageSrcSet: '/home/hero-cutaway-900.webp 900w, /home/hero-cutaway-1600.webp 1600w, /home/hero-cutaway-2560.webp 2560w', imageSizes: '(max-width: 759px) 135vw, 100vw' })
+  // The LCP image: the wide cut from 760 px, the crop round the house on phones (media keeps it to one download).
+  preload('/home/hero-wide-1600.webp', { as: 'image', fetchPriority: 'high', media: '(min-width: 760px)', imageSrcSet: '/home/hero-wide-900.webp 900w, /home/hero-wide-1600.webp 1600w, /home/hero-wide-2560.webp 2560w', imageSizes: '100vw' })
+  preload('/home/hero-wide-phone-800.webp', { as: 'image', fetchPriority: 'high', media: '(max-width: 759px)', imageSrcSet: '/home/hero-wide-phone-800.webp 800w, /home/hero-wide-phone-1200.webp 1200w', imageSizes: '100vw' })
   return (
     <div className="hp">
       {/* the service cards and the booking form share one state: "See my price" picks the service in the form */}
