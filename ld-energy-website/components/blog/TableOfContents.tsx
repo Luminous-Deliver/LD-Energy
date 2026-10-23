@@ -11,13 +11,16 @@ interface TableOfContentsProps {
   share?: { id: string; label: string }[]
 }
 
-/** One copy-link row per section; the full address with its #section, so it can be pasted into WhatsApp or email. */
-function Share({ share }: { share: NonNullable<TableOfContentsProps['share']> }) {
+/** One copy-link row per section: copies the full address with its #section, for WhatsApp or email, then goes there. */
+function Share({ share, onPick }: { share: NonNullable<TableOfContentsProps['share']>; onPick?: () => void }) {
   const [copied, setCopied] = useState<string | null>(null)
   const copy = async (id: string) => {
     const url = `${window.location.origin}${window.location.pathname}#${id}`
     try { await navigator.clipboard.writeText(url) } catch { window.prompt('Copy this link', url) }
     setCopied(id)
+    // and go there, so the reader sees what they are sending (Abdul 24/10/2026)
+    onPick?.()
+    jumpTo(id)
     window.setTimeout(() => setCopied((c) => (c === id ? null : c)), 2000)
   }
   return (
@@ -78,7 +81,7 @@ export function TableOfContents({ items, share }: TableOfContentsProps) {
           <ChevronDown className="chev" width={18} height={18} aria-hidden="true" />
         </summary>
         <Items items={items} active={active} onPick={() => { if (details.current) details.current.open = false }} />
-        {share && share.length > 0 && <Share share={share} />}
+        {share && share.length > 0 && <Share share={share} onPick={() => { if (details.current) details.current.open = false }} />}
       </details>
       <div className="gd-toc__rail">
         <p className="gd-eyebrow">On this page</p>
