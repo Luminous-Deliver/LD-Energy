@@ -431,9 +431,22 @@
   transition-duration: 120ms; transition-timing-function: var(--ease-in); }
 @starting-style { .in-secbar__list:not([hidden]) { opacity: 0; transform: translateY(-6px); } }
 
+/* section reveals (components/inner/RevealOnScroll.tsx): hidden only once the script has run and only below the
+   fold, so no JavaScript, reduced motion, print and find-in-page see every block. Plays once; list children
+   stagger 60 ms, capped at 4 steps. */
+html[data-motion="on"] [data-reveal]:not([data-reveal="list"]):not([data-revealed]),
+html[data-motion="on"] [data-reveal="list"]:not([data-revealed]) > * { opacity: 0; transform: translateY(12px); }
+[data-reveal]:not([data-reveal="list"])[data-revealed="in"],
+[data-reveal="list"][data-revealed="in"] > * { animation: in-reveal var(--t-reveal) var(--ease-out) calc(var(--i, 0) * 60ms) backwards; }
+[data-reveal="list"] > :nth-child(2) { --i: 1; }
+[data-reveal="list"] > :nth-child(3) { --i: 2; }
+[data-reveal="list"] > :nth-child(n+4) { --i: 3; }
+@keyframes in-reveal { from { opacity: 0; transform: translateY(12px); } }
+@media print { [data-reveal], [data-reveal] > * { opacity: 1 !important; transform: none !important; animation: none !important; } }
 
 @media (prefers-reduced-motion: reduce) {
   .in-tb__rows a:hover .i, .in-prow:hover .i, .in-ncard:hover .in-ncard__l .i, .in .in-arrow:hover .i, .in-ncard:hover .in-ncard__img img { transform: none; }
   .in-faq details::details-content, .in-faq details .in-faq__a, .in-secbar__list, .in-secbar__list[hidden] { transition: none !important; }
   .in-faq details:not([open]) .in-faq__a { opacity: 1; }
+  [data-reveal], [data-reveal] > * { animation: none !important; }
 }
