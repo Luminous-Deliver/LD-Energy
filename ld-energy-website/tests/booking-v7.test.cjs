@@ -62,7 +62,7 @@ test('What you get (step 1) and What you receive (confirmation) follow the servi
   assert.equal(deliveredList('floorPlan', { improvementPlan: true }).some((l) => /Improvement Plan/.test(l)), false, 'no plan on a floor plan')
   assert.deepEqual(deliveredList('preAssessment', { energyReport: true }), ['Property energy assessment', 'Personalised written improvement plan', 'Separate energy report'])
   assert.deepEqual(deliveredList('bulk'), [])
-  assert.ok(nextSteps('epc').includes('Before the visit, make sure every room, the loft hatch, the boiler and the meters are easy to reach.'))
+  assert.ok(nextSteps('epc').includes('Before the visit, make sure every room, the loft hatch (if there is one), the boiler and the meters are easy to reach.'))
   assert.ok(nextSteps('floorPlan').includes('Before the visit, make sure every room is easy to reach.'))
 })
 

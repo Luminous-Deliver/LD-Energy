@@ -51,6 +51,7 @@ export function AreasMap({ boroughs, regions, initial }: {
   const [query, setQuery] = useState('')
   /* The last pointer press: a focus that follows a press is not keyboard focus. */
   const press = useRef({ touch: false, at: 0 })
+  const card = useRef<HTMLDivElement>(null)
 
   const v = query.trim().toLowerCase()
   const hits = useMemo(() => {
@@ -60,6 +61,14 @@ export function AreasMap({ boroughs, regions, initial }: {
   }, [boroughs, v, region])
 
   const select = (slug: string) => { setSelected(slug); setShown(slug) }
+  /* Phones (Abdul 24/10, "selecting from the map is not really user friendly"): the card sits below the map, out of
+     sight, so a pick brings it into view; on a wide screen it is already beside the map. */
+  const reveal = () => {
+    if (!window.matchMedia('(max-width: 959px)').matches) return
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    requestAnimationFrame(() => card.current?.scrollIntoView({ block: 'center', behavior: reduce ? 'instant' : 'smooth' }))
+  }
+  const inRegion = region ? boroughs.filter((x) => x.region === region).sort((a, z) => a.name.localeCompare(z.name)) : []
   const b = bySlug[shown]
 
   return (
@@ -86,7 +95,7 @@ export function AreasMap({ boroughs, regions, initial }: {
                 onFocus={() => { if (Date.now() - press.current.at > 600) select(s.slug) }}
                 onClick={(e) => {
                   /* On touch, the first tap shows the card; a second tap on the same borough opens its page. */
-                  if (press.current.touch && Date.now() - press.current.at < 1500 && selected !== s.slug) { e.preventDefault(); select(s.slug) }
+                  if (press.current.touch && Date.now() - press.current.at < 1500 && selected !== s.slug) { e.preventDefault(); select(s.slug); reveal() }
                 }}
               >
                 <path d={s.d} />
@@ -120,6 +129,17 @@ export function AreasMap({ boroughs, regions, initial }: {
             </button>
           ))}
         </div>
+        {/* a region's boroughs as buttons: the easy way to pick on a phone, where some boroughs are a few pixels wide */}
+        {inRegion.length > 0 && (
+          <ul className="in-amap__pick" aria-label={`Boroughs in ${regions.find((r) => r.id === region)?.name}`}>
+            {inRegion.map((x) => (
+              <li key={x.slug}>
+                <button type="button" aria-pressed={x.slug === selected} onClick={() => { select(x.slug); reveal() }}>{x.name}</button>
+              </li>
+            ))}
+          </ul>
+        )}
+        <p className="in-amap__tip">Tap a region to list its boroughs, or tap the map: once to see a borough, twice to open it.</p>
       </div>
 
       <div className="in-amap__side">
@@ -146,7 +166,7 @@ export function AreasMap({ boroughs, regions, initial }: {
               : hits.length === 1 ? bySlug[hits[0]].name : `${hits.length} boroughs match: ${hits.map((h) => bySlug[h].name).join(', ')}`)}
           </p>
         </div>
-        <div className="in-amap__card" aria-live="polite">
+        <div ref={card} className="in-amap__card" aria-live="polite">
           <p className="in-amap__reg">{b.regionName}</p>
           <h3>{b.name}</h3>
           <p className="in-amap__ac"><b className="num">{b.atoC}</b><span>of EPCs here are rated A to C</span></p>

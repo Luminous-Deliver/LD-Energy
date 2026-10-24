@@ -40,7 +40,7 @@ export function GuideList({ groups }: { groups: GuideListGroup[] }) {
         <section key={g.id} id={g.id} className="gd-grp" aria-labelledby={`${g.id}-h`} hidden={on !== 'all' && on !== g.id}>
           <header className="gd-grp__h">
             <p className="gd-eyebrow">
-              <span className="num">{g.guides.length}</span> {g.guides.length === 1 ? 'guide' : 'guides'}
+              Topic · <span className="num">{g.guides.length}</span> {g.guides.length === 1 ? 'guide' : 'guides'}
             </p>
             <h3 id={`${g.id}-h`}>{g.heading}</h3>
             <p>{g.intro}</p>

@@ -206,6 +206,10 @@
 @media (max-width: 759px) { :is(.hp, .bk7) form.bf:not([data-rail]) { visibility: hidden; } }
 :is(.hp, .bk7) .bf--rail { padding-top: 18px; }
 :is(.hp, .bk7) .bf__rail-intro { font-size: 16px; line-height: 1.5; color: var(--ink-quiet); }
+.bf__rail-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.bf__restart { flex: none; min-height: 44px; margin: -11px -4px 0 0; padding: 0 4px; background: none; border: 0; font: 500 15px/1 var(--font-sans);
+  color: var(--sage-700); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.bf__restart:hover { color: var(--sage-800); }
 :is(.hp, .bk7) .bf-rail { list-style: none; margin: 0; padding: 8px 0 20px; }
 :is(.hp, .bk7) .bf-st { position: relative; display: grid; grid-template-columns: 32px minmax(0, 1fr); column-gap: 14px; }
 :is(.hp, .bk7) .bf-st::before { content: ""; position: absolute; left: 15.5px; top: 0; bottom: 0; width: 1px; background: var(--hair); }

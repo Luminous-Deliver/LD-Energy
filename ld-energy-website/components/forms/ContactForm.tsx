@@ -457,6 +457,15 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
     setRailOpen(id); setStep(RAIL_STEP[id]); setRailTick(tick => tick + 1)
   }
 
+  /** Start again (Abdul 24/10: on a phone there was no way back to a blank form short of changing every answer). */
+  function railStartOver() {
+    window.clearTimeout(railTimer.current)
+    reset(); clearErrors(); setShowErrors(false); started.current = false; serviceTouched.current = false; setAreaOpen(false)
+    rememberCustomerType('', window.history)
+    railGo('who', new Set())
+    requestAnimationFrame(() => formRef.current?.scrollIntoView({ block: 'start', behavior: 'instant' }))
+  }
+
   /** Folds the open question once its gate passes, then opens the next that still needs an answer. */
   async function railAdvance(from: RailId) {
     window.clearTimeout(railTimer.current)
@@ -710,6 +719,8 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
                 {serviceTabLabels[option.value] || option.label}
                 {option.value === 'Both (Bundle)' && <span className="bf-pill__save">Save up to £{maxBundleSaving}</span>}
                 {option.value === PRE_ASSESSMENT && <span className="bf-pill__tag">Not lodged</span>}
+                {/* Abdul 24/10: say who the several-properties route is for, in the phone list's word */}
+                {option.value === BULK && <span className="bf-pill__tag">Agencies</span>}
               </label>
             )
           })}
@@ -1085,7 +1096,10 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
       {/* Keep this node mounted and empty before the first estimate. Only its text changes. */}
       <p data-estimate-announcement className="sr-only" aria-live="polite" aria-atomic="true">{estimateText}</p>
       <div className="hidden" aria-hidden="true"><label>Website<input type="text" tabIndex={-1} autoComplete="off" {...register('website')} /></label></div>
-      <p className="bf__rail-intro">Tap an answer and the next question opens. Your guide price shows after the size.</p>
+      <div className="bf__rail-top">
+        <p className="bf__rail-intro">Tap an answer and the next question opens. Your guide price shows after the size.</p>
+        {railSeen.size > 0 && <button type="button" className="bf__restart" onClick={railStartOver}>Start again</button>}
+      </div>
       <ol className="bf-rail">{railList.map(railStep)}</ol>
       <div className="bf__foot">
         <p>Questions first? <a href={formWhatsappHref(values, railGuide || undefined)} target="_blank" rel="noopener noreferrer">Message us on WhatsApp</a>, and what you’ve chosen so far comes with it.</p>

@@ -53,6 +53,14 @@
 .in-amap__chip i[data-region="south"] { background: var(--r-south); }
 .in-amap__chip i[data-region="west"] { background: var(--r-west); box-shadow: inset 0 0 0 1px var(--hair); }
 .in-amap__chip[aria-pressed="true"] { border-color: var(--ink); background: var(--stone-100); }
+.in-amap__pick { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 14px 0 0; padding: 0; list-style: none; }
+@media (min-width: 640px) { .in-amap__pick { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.in-amap__pick button { width: 100%; min-height: 44px; padding: 8px 12px; text-align: left; font: 500 15px/1.25 var(--font-sans); color: var(--ink);
+  background: var(--card); border: 1px solid var(--hair); border-radius: 8px; cursor: pointer; transition: border-color .15s; }
+.in-amap__pick button:hover { border-color: var(--sage-700); }
+.in-amap__pick button[aria-pressed="true"] { border-color: var(--sage-700); color: var(--sage-700); box-shadow: inset 0 0 0 1px var(--sage-700); }
+.in-amap__tip { margin-top: 12px; font-size: 13px; color: var(--ink-quiet); }
+@media (hover: hover) and (pointer: fine) { .in-amap__tip { display: none; } }
 
 .in-amap__side { display: grid; gap: 16px; min-width: 0; }
 .in-amap__search { display: grid; gap: 6px; }

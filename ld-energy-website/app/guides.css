@@ -311,6 +311,12 @@
 .gd-grp__h { display: grid; gap: 4px; margin-bottom: 12px; }
 .gd-grp__h h3 { font-size: 26px; }
 .gd-grp__h p { font-size: 15px; color: var(--ink-quiet); max-width: 60ch; }
+/* phones (Abdul 24/10: the topic heading "looks like it's also a guide"): below the two-column layout the topic sits on
+   its own tinted panel with a sage edge, so it reads as the heading of the list under it, not a row in it */
+@media (max-width: 899px) {
+  .gd-grp__h { padding: 18px 18px 18px 16px; background: #EEF2EC; border-left: 3px solid var(--sage-700); border-radius: 0 8px 8px 0; margin-bottom: 4px; }
+  .gd-grp__h .gd-eyebrow { color: var(--sage-800); }
+}
 .gd-list { list-style: none; padding: 0; border-top: 1px solid var(--ink); }
 .gd-list li { border-bottom: 1px solid var(--hair); }
 .gd-row { display: grid; grid-template-columns: 34px minmax(0, 1fr) 18px; gap: 4px 12px; align-items: start; padding: 16px 4px; text-decoration: none; color: var(--ink); transition: background-color .15s; }
