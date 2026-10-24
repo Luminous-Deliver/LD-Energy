@@ -9,7 +9,7 @@ const fs = require('node:fs')
 const base = process.env.BOOKING_TEST_URL || 'http://localhost:3100'
 if (!['localhost', '127.0.0.1'].includes(new URL(base).hostname)) throw new Error('Local preview only')
 const dir = process.env.SHOTS_DIR || path.join(__dirname, '..', '.shots')
-const slugs = (process.argv[2] || 'stratford,newham,croydon').split(',')
+const slugs = (process.argv[2] || 'stratford,newham,croydon,wandsworth,waltham-forest,greenwich,lambeth,brent,tower-hamlets,camden,barking-dagenham').split(',')
 
 ;(async () => {
   fs.mkdirSync(dir, { recursive: true })

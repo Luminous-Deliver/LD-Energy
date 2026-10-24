@@ -358,10 +358,10 @@ function CouncilBlock({ section }: { section: CouncilSection }) {
 }
 
 /* 3. If you let here: the rental figures, then the council's own licensing rules. */
-export function LettingSection({ name, s, council }: { name: string; s: AreaSummary; council: CouncilSection[] }) {
+export function LettingSection({ name, s, council, band = true }: { name: string; s: AreaSummary; council: CouncilSection[]; band?: boolean }) {
   const prs = s.privateRented
   return (
-    <section className="in-sec in-sec--band" id="letting" aria-labelledby="letting-h">
+    <section className={band ? 'in-sec in-sec--band' : 'in-sec'} id="letting" aria-labelledby="letting-h">
       <Container>
         <div className="in-prose">
           <Eyebrow>Landlords</Eyebrow>
@@ -387,7 +387,7 @@ export function LettingSection({ name, s, council }: { name: string; s: AreaSumm
 }
 
 /* 4. Why homes here rate as they do: age, walls and heating, then the local notes. */
-export function StockSection({ name, s, local, reading }: { name: string; s: AreaSummary; local: string[]; reading: string }) {
+export function StockSection({ name, s, local, reading, band = false }: { name: string; s: AreaSummary; local: string[]; reading: string; band?: boolean }) {
   const rows: { label: string; own: number; ldn: number }[] = [
     { label: 'Built before 1930', own: s.age.pct.pre1930, ldn: london.age.pct.pre1930 },
     { label: 'Solid walls, no added insulation', own: s.walls.pct.solidUninsulated, ldn: london.walls.pct.solidUninsulated },
@@ -397,7 +397,7 @@ export function StockSection({ name, s, local, reading }: { name: string; s: Are
     { label: 'Electric heating', own: s.heating.pct.electric, ldn: london.heating.pct.electric },
   ]
   return (
-    <section className="in-sec" id="homes" aria-labelledby="homes-h">
+    <section className={band ? 'in-sec in-sec--band' : 'in-sec'} id="homes" aria-labelledby="homes-h">
       <Container>
         <div className="in-prose">
           <Eyebrow>Homes in {name}</Eyebrow>
