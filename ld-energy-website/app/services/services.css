@@ -116,11 +116,18 @@
 .sv-ptable .sv-ptable__p small { font: 400 11px/1 var(--font-sans); color: var(--slate-500); margin-right: 3px; }
 .sv-ptable .sv-ptable__s { margin-top: 5px; font-size: 13px; color: var(--sage-700); white-space: nowrap; }
 .sv-ptable .sv-ptable__sep { color: var(--ink-quiet); font-size: 15px; }
+/* phones: each band is a row of its own, its three prices side by side under it, each labelled */
 @media (max-width: 559px) {
-  .sv-ptable thead th, .sv-ptable tbody th { padding-inline: 10px; }
-  .sv-ptable td > a, .sv-ptable td > span { padding-inline: 10px; }
-  .sv-ptable .sv-ptable__p { font-size: 19px; }
-  .sv-ptable .sv-ptable__sep { display: none; }
+  .sv .sv-ptable, .sv-ptable tbody { display: block; }
+  .sv-ptable thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .sv-ptable tbody tr { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .sv-ptable tbody th { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; padding: 14px 12px 2px; }
+  .sv-ptable tbody th small { display: inline; }
+  .sv-ptable td { display: block; }
+  .sv-ptable td + td { border-left: 1px solid var(--hair); }
+  .sv-ptable td > a { align-items: flex-start; justify-content: flex-start; min-height: 64px; padding: 8px 12px 12px; }
+  .sv-ptable td > a::before { content: attr(data-label); margin-bottom: 6px; font: 500 10px/1.3 var(--font-sans); letter-spacing: .12em; text-transform: uppercase; color: var(--slate-500); }
+  .sv-ptable .sv-ptable__p { font-size: 21px; }
 }
 
 /* questions */
@@ -154,3 +161,26 @@
 
 /* read next: the cards fill evenly */
 .sv .in-ncard__b { padding: 22px; }
+.sv-gap { margin-top: 28px; }
+
+/* a plain list of conditions, each on a dash */
+.sv-dash { list-style: none; padding: 0; display: grid; gap: 12px; }
+.sv-dash li { position: relative; padding-left: 22px; font-size: 16px; line-height: 1.6; }
+.sv-dash li::before { content: ""; position: absolute; left: 0; top: .8em; width: 12px; height: 1px; background: var(--ink); }
+.sv-dash b { font-weight: 600; }
+
+/* lodging a held survey later: three steps in time, price hard right */
+.sv-later { list-style: none; padding: 0; display: grid; border-top: 1.5px solid var(--ink); }
+.sv-later li { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; gap: 6px 14px; align-items: baseline; padding: 20px 0; border-bottom: 1px solid var(--hair); }
+.sv-later__n { grid-row: span 2; font: 400 28px/1 var(--font-serif); color: var(--sage-700); }
+.sv-later__h { font: 400 22px/1.2 var(--font-serif); }
+.sv-later p { grid-column: 2 / -1; font-size: 16px; line-height: 1.55; max-width: 52ch; }
+.sv-later__p { grid-column: 3; grid-row: 1; font: 400 24px/1 var(--font-serif); white-space: nowrap; }
+.sv-later__p.is-muted { font: 500 14px/1.3 var(--font-sans); color: var(--ink-quiet); }
+@media (min-width: 900px) {
+  .sv-later { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 40px; border-top: 0; }
+  .sv-later li { border-top: 1.5px solid var(--ink); border-bottom: 0; padding-top: 22px; }
+}
+.sv-vs .sv-parts { margin-top: 0; border-top: 0; }
+.sv-vs .sv-parts li:first-child { padding-top: 4px; }
+.sv-vs .sv-parts li:last-child { border-bottom: 0; padding-bottom: 0; }
