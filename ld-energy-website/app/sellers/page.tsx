@@ -235,7 +235,7 @@ export default function SellersPage() {
                 <li>
                   <a href={quoteHref({ service: 'epc', area: 'unknown', sourcePage: 'sellers', ctaId: 'pricing' })}>
                     <span className="in-tb__s">Not sure of the size<small>We work it out from your property details</small></span>
-                    <span className="in-tb__p in-tb__p--tbc">Price confirmed first</span>
+                    <span className="in-tb__p in-tb__p--tbc">Exact quote</span>
                     <Ico name="arrow-right" size={16} />
                   </a>
                 </li>
