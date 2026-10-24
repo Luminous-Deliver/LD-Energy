@@ -1,5 +1,6 @@
 // The quote journey (Abdul's brief, 23/10/2026): /quote is the reliable page, the dialog an optional shortcut over any
-// page, /contact routes prices to the quote and questions to its own form, and area pages have no booking form.
+// page, /contact routes prices to the quote and questions to its own form, and area pages keep one form at #contact
+// (decisions/log.md 23/10/2026 late, "Correction: the area-page form stays", and that evening's "Pop-up rule").
 // Also saves the review screenshots when QUOTE_SHOTS is set. Run against a local server:
 //   BOOKING_TEST_URL=http://localhost:3220 node --require ./tests/register.cjs tests/quote-journey.cjs
 const assert = require('node:assert/strict')
@@ -26,13 +27,17 @@ const executablePath = process.env.PLAYWRIGHT_MCP_EXECUTABLE_PATH || undefined
       await page.exposeFunction('__ev', (name) => events.push(name))
       await page.addInitScript(() => window.addEventListener('ld-energy:conversion', (e) => window.__ev(e.detail.name)))
 
-      // ------------------------------------------------ an area page: no form; the hero CTA opens the dialog with the area
+      // ------------------------------------------------ an area page: one v7 form at #contact (23/10 late correction);
+      // buttons at the top or always on screen open the pop-up, only the buttons beside the form jump to it (23/10 Pop-up rule)
       await page.goto(base + '/areas/newham', { waitUntil: 'networkidle' })
-      ok(await page.locator('main form').count() === 0, `${w}: /areas/newham has no booking form`)
-      ok(await page.locator('#contact').count() === 1 && await page.locator('#contact').evaluate((s) => s.classList.contains('in-end-a')), `${w}: #contact is the closing band`)
-      // only the On this page list may name #contact (the closing band); every quote button goes to the quote journey
-      ok(await page.locator('main a[href="#contact"]').evaluateAll((as) => as.every((a) => a.closest('nav, .in-otp, .in-secbar'))), `${w}: no quote button still points at #contact`)
-      ok(await page.locator('main a.ld-btn--primary, main a.ld-btn--light').evaluateAll((as) => as.every((a) => a.getAttribute('href').startsWith('/quote'))), `${w}: every area quote button goes to /quote`)
+      ok(await page.locator('main form').count() === 1 && await page.locator('#contact form[aria-label="Exact quote enquiry"]').count() === 1, `${w}: /areas/newham has one booking form, at #contact`)
+      ok(await page.locator('#contact').count() === 1 && await page.locator('#contact').evaluate((s) => s.classList.contains('in-contact')), `${w}: #contact is the form's section`)
+      ok(await page.locator('main .in-ncard--go').getAttribute('href') === '#contact', `${w}: the Read next quote card jumps to the form`)
+      ok(await page.locator('main .in-end-a a.ld-btn').first().getAttribute('href') === '#contact', `${w}: the closing band jumps to the form`)
+      // besides those two, only the On this page list may name #contact
+      ok(await page.locator('main a[href="#contact"]').evaluateAll((as) => as.every((a) => a.closest('nav, .in-otp, .in-secbar, .in-ncard--go, .in-end-a'))), `${w}: no other button points at #contact`)
+      ok(await page.locator('main .in-hd a.ld-btn, main .in-hd .in-tb__rows a').evaluateAll((as) => as.length >= 9 && as.every((a) => a.getAttribute('href').startsWith('/quote'))), `${w}: the hero's button and price rows go to the quote pop-up`)
+      ok(await page.locator('header .sh__quote, [data-dock] a.ld-btn--primary, #mobile-nav-panel a.ld-btn--primary').evaluateAll((as) => as.length >= 3 && as.every((a) => a.getAttribute('href').startsWith('/quote'))), `${w}: header, phone menu and dock go to the quote pop-up`)
       ok(await noSideways(page), `${w}: area page, no sideways scroll`)
       if (w === 1440) {
         const hero = page.locator('.in-hd .in-hd__acts a.ld-btn--primary')
@@ -42,13 +47,21 @@ const executablePath = process.env.PLAYWRIGHT_MCP_EXECUTABLE_PATH || undefined
       await page.waitForTimeout(400)
       await shot(page, `area-bottom-${w}`)
 
-      const trigger = page.locator('#contact a.ld-btn').first()
+      // the closing band's button scrolls to the form on the page and opens no pop-up
+      await page.locator('main .in-end-a a.ld-btn').first().click()
+      await page.waitForFunction(() => location.hash === '#contact')
+      await page.waitForTimeout(400)
+      ok(!(await page.evaluate(() => document.querySelector('dialog.qd')?.open)) && await page.locator('#contact form').isVisible(), `${w}: the closing band scrolls to the form, no pop-up`)
+
+      const trigger = page.locator('.in-hd .in-hd__acts a.ld-btn--primary')
       await trigger.scrollIntoViewIfNeeded()
       await trigger.click()
       const dialog = page.locator('dialog.qd')
       await page.waitForFunction(() => document.querySelector('dialog.qd')?.open)
       ok(new URL(page.url()).pathname === '/areas/newham', `${w}: the click stayed on the page (dialog, not navigation)`)
       await dialog.locator('form[aria-label="Exact quote enquiry"]').waitFor({ timeout: 15000 })
+      // phones draw the form as a rail, one question open at a time (d72a832, 23/10/2026): the service shows once "you" is answered
+      if (w === 390) { await dialog.getByRole('radio', { name: 'Homeowner' }).check(); await dialog.locator('.bf-st.is-open input[name="services"]').first().waitFor() }
       ok(await dialog.locator('input[name="services"][value="EPC Certificate"]').isChecked(), `${w}: dialog form starts on the EPC`)
       ok(await page.evaluate(() => document.documentElement.classList.contains('qd-locked')), `${w}: page scroll locked while open`)
       ok(events.includes('quote_dialog_open'), `${w}: quote_dialog_open fired`)
@@ -64,7 +77,7 @@ const executablePath = process.env.PLAYWRIGHT_MCP_EXECUTABLE_PATH || undefined
       await page.keyboard.press('Escape')
       await page.waitForFunction(() => !document.querySelector('dialog.qd')?.open)
       ok(!(await page.evaluate(() => document.documentElement.classList.contains('qd-locked'))), `${w}: Escape closes and unlocks the page`)
-      ok(await page.evaluate(() => document.activeElement?.closest('#contact') !== null), `${w}: focus returns to the trigger`)
+      ok(await page.evaluate(() => document.activeElement?.closest('.in-hd__acts') !== null), `${w}: focus returns to the trigger`)
 
       await trigger.click()
       await page.waitForFunction(() => document.querySelector('dialog.qd')?.open)
@@ -99,9 +112,21 @@ const executablePath = process.env.PLAYWRIGHT_MCP_EXECUTABLE_PATH || undefined
       ok(await page.title() === 'EPC Quote London: Exact Price Before Booking | L&D Energy', `${w}: /quote title (${await page.title()})`)
       ok((await page.title()).length <= 60, `${w}: /quote title under 60 characters`)
       ok(await page.locator('link[rel="canonical"]').getAttribute('href') === 'https://epc.luminousanddeliver.co.uk/quote', `${w}: /quote canonical`)
-      ok(await page.locator('main input[name="services"][value="Both (Bundle)"]').isChecked(), `${w}: /quote pre-fills the service`)
-      ok(await page.locator('main input[name="areaBand"][value="55-75"]').isChecked(), `${w}: /quote pre-fills the size`)
-      ok(await page.locator('main input[type="checkbox"][name="improvementPlan"]').isChecked(), `${w}: /quote pre-fills the plan`)
+      if (w === 390) {
+        // phones: the rail shows one question at a time (d72a832), so each pre-filled answer is read as its question opens
+        const qf = page.locator('main form[aria-label="Exact quote enquiry"]'), open = qf.locator('.bf-st.is-open')
+        await qf.getByRole('radio', { name: 'Homeowner' }).check(); await open.locator('input[name="services"]').first().waitFor()
+        ok(await open.locator('input[name="services"][value="Both (Bundle)"]').isChecked(), `${w}: /quote pre-fills the service`)
+        await open.getByRole('button', { name: 'Continue', exact: true }).click(); await qf.getByRole('radio', { name: 'Flat', exact: true }).check()
+        await open.locator('input[name="areaBand"]').first().waitFor()
+        ok(await open.locator('input[name="areaBand"][value="55-75"]').isChecked(), `${w}: /quote pre-fills the size`)
+        await open.locator('input[name="areaBand"][value="55-75"]').click(); await open.locator('input[name="improvementPlan"]').waitFor()
+        ok(await open.locator('input[type="checkbox"][name="improvementPlan"]').isChecked(), `${w}: /quote pre-fills the plan`)
+      } else {
+        ok(await page.locator('main input[name="services"][value="Both (Bundle)"]').isChecked(), `${w}: /quote pre-fills the service`)
+        ok(await page.locator('main input[name="areaBand"][value="55-75"]').isChecked(), `${w}: /quote pre-fills the size`)
+        ok(await page.locator('main input[type="checkbox"][name="improvementPlan"]').isChecked(), `${w}: /quote pre-fills the plan`)
+      }
       ok(await noSideways(page), `${w}: /quote, no sideways scroll`)
       // a quote link on /quote itself navigates instead of opening the dialog
       await shot(page, `quote-${w}`, true)
@@ -185,5 +210,5 @@ const executablePath = process.env.PLAYWRIGHT_MCP_EXECUTABLE_PATH || undefined
       await ctx.close()
     }
   } finally { await browser.close() }
-  console.log(`PASS quote journey: ${passed} checks (area pages formless, dialog open/close by Esc, × and backdrop, focus return, scroll lock, full-screen on phones, /quote pre-fill and metadata, /contact routing and enquiry form, legacy /contact links, homepage hero dialog, reduced motion, no-JS fallback)`)
+  console.log(`PASS quote journey: ${passed} checks (area pages: one form at #contact, top buttons open the pop-up, closing band jumps to the form; dialog open/close by Esc, × and backdrop, focus return, scroll lock, full-screen on phones, /quote pre-fill and metadata, /contact routing and enquiry form, legacy /contact links, homepage hero dialog, reduced motion, no-JS fallback)`)
 })().catch((e) => { console.error(e); process.exitCode = 1 })
