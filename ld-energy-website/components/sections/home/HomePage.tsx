@@ -6,6 +6,7 @@ import { DATA_PAGE_PATH } from '@/lib/borough-ratings'
 import { whatsappQuoteHref } from '@/lib/area-page'
 import { homeBookingFaqs } from '@/lib/homepage-content'
 import { quoteHref } from '@/lib/quote-context'
+import { guideImages } from '@/lib/guide-images'
 import { HomeQuoteProvider } from './HomeQuoteContext'
 import { HomeQuoteCard } from './HomeQuoteCard'
 import { HomeV7Motion } from './HomeV7Motion'
@@ -441,7 +442,20 @@ function Guides() {
           <p className="lede-l">An EPC describes your home’s modelled energy performance. Your rating and recommendations depend on the assessed property; they do not predict your actual bills.</p>
         </div>
         <ul className="guides__list">
-          {guides.map((g) => <li key={g.slug}><Link prefetch={false} href={`/blog/${g.slug}`}><b>{g.title}</b><span>{g.line}</span></Link></li>)}
+          {/* each guide with its own picture (lib/guide-images.ts) and an arrow: on a phone the heading above read as one
+              more guide in the list (Abdul 24/10) */}
+          {guides.map((g, i) => {
+            const pics = guideImages(`/blog/${g.slug}`)
+            const img = pics.find((x) => !guides.slice(0, i).some((h) => guideImages(`/blog/${h.slug}`)[0] === x)) ?? pics[0]
+            return (
+              <li key={g.slug}><Link prefetch={false} href={`/blog/${g.slug}`}>
+                {/* eslint-disable-next-line @next/next/no-img-element -- decorative; next/image is unoptimised on Pages */}
+                {img && <span className="guides__img"><img src={img} alt="" width={640} height={360} loading="lazy" decoding="async" /></span>}
+                <span className="guides__t"><b>{g.title}</b><span>{g.line}</span></span>
+                <Ico name="arrow-right" />
+              </Link></li>
+            )
+          })}
         </ul>
         <p className="guides__more">
           <Link prefetch={false} className="link arrow-link" href="/blog">Browse all EPC guides <Ico name="arrow-right" /></Link>

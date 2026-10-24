@@ -43,6 +43,7 @@ export function Header({ waHref }: { waHref: string }) {
   const pathname = usePathname()
   const [solid, setSolid] = useState(false)
   const [pill, setPill] = useState(false)
+  const [hidden, setHidden] = useState(false)
   const line = useRef<HTMLDivElement>(null)
   const track = useRef<HTMLDivElement>(null)
   const head = useRef<HTMLDivElement>(null)
@@ -51,12 +52,18 @@ export function Header({ waHref }: { waHref: string }) {
   // about half a screen in (nateherk.com docks when the hero is 62% gone); one state change per crossing. The line
   // is written straight to the element, once per frame, so scrolling never re-renders the header.
   useEffect(() => {
-    let raf = 0
+    let raf = 0, lastY = window.scrollY
+    const phone = window.matchMedia('(max-width: 759px)')
     const paint = () => {
       raf = 0
       const y = window.scrollY, room = document.documentElement.scrollHeight - window.innerHeight
       setSolid(y > 0)
       setPill(y > window.innerHeight * 0.45)
+      // Phones (Abdul 24/10, "yes"): the bar stays pinned, slides away while reading down and comes back, menu button and
+      // all, the moment the reader scrolls up. A few pixels of jitter change nothing; near the top it always shows.
+      const dy = y - lastY
+      if (!phone.matches || y < 80) { setHidden(false); lastY = y }
+      else if (Math.abs(dy) > 8) { setHidden(dy > 0); lastY = y }
       const k = room > 0 ? Math.min(1, y / room) : 0
       if (line.current) line.current.style.transform = `scaleX(${k})`
       // the marker rides the line's tip, as the How it works line's head does
@@ -71,6 +78,9 @@ export function Header({ waHref }: { waHref: string }) {
     return () => { cancelAnimationFrame(raf); window.removeEventListener('scroll', update); window.removeEventListener('resize', update) }
   }, [])
 
+  // pinned things on phones (the On this page bar, a guide's contents) sit under the bar only while it shows
+  useEffect(() => { document.documentElement.dataset.head = hidden ? 'hidden' : 'shown' }, [hidden])
+
   const quoteHref = quoteTargetFor(pathname, 'header')
 
   // the homepage's dusk hero sits under the bar: it goes light-on-dark until the page moves (data-dark)
@@ -80,7 +90,7 @@ export function Header({ waHref }: { waHref: string }) {
     <div ref={track} className="sline-track" data-on="false" aria-hidden="true" />
     <div ref={line} className="sline" aria-hidden="true" />
     <div ref={head} className="sline-head" aria-hidden="true" />
-    <header className="sh" data-solid={solid} data-dark={pathname === '/' && !solid}>
+    <header className="sh" data-solid={solid} data-dark={pathname === '/' && !solid} data-hidden={hidden}>
       <Container className="sh__in">
         <LogoLockup />
         <nav aria-label="Primary" className="sh__nav">

@@ -199,9 +199,24 @@ export const floorPlanDisclaimer =
 
 /**
  * From this many homes in one enquiry, a landlord's list is quoted as a portfolio: each home priced by its size,
- * visits grouped by area and a lower price per home. No portfolio figures are published until Abdul sets them.
+ * visits grouped by area and a lower price per home.
  */
 export const portfolioMinHomes = 3
+
+/**
+ * Portfolio rates, approved by Abdul 24/10/2026 ("yes") after the research in Abdul-2
+ * projects/ld-energy-redesign-2026-10/research/portfolio-rates-2026-10-24.md: off the EPC price only, never stacked,
+ * never below the floor. `portfolioRatesText` is his approved wording; it is built from these numbers so the two
+ * cannot drift, and the test in tests/portfolio-rates.test.cjs holds it to the approved sentence.
+ */
+export const portfolioRates = { smallMin: 3, smallMax: 5, smallOff: 5, largeMin: 6, largeOff: 10, sameBuildingOff: 15, floor: 55 } as const
+const NUM: Record<number, string> = { 3: 'Three', 5: 'five', 6: 'Six' }
+export const portfolioRatesText =
+  `${NUM[portfolioRates.smallMin]} to ${NUM[portfolioRates.smallMax]} homes: £${portfolioRates.smallOff} off each EPC. ` +
+  `${NUM[portfolioRates.largeMin]} or more: £${portfolioRates.largeOff} off each. ` +
+  `Flats in the same building on the same day: £${portfolioRates.sameBuildingOff} off each after the first. ` +
+  `That replaces the other discount, it doesn't add to it. Never less than £${portfolioRates.floor} an EPC. ` +
+  'Floor plans and faster options stay full price.'
 
 /**
  * CANONICAL PRICING SOURCE.

@@ -29,6 +29,7 @@
 .lp-ways { margin-top: 36px; display: grid; gap: 14px; }
 .lp-way { display: grid; gap: 10px; align-content: start; padding: 24px; background: var(--card); border: 1px solid var(--hair-strong); border-radius: 10px; }
 .lp-way p { color: var(--ink); font-size: 16px; line-height: 1.6; }
+.lp-way .lp-way__rates { font-size: 15px; line-height: 1.55; color: var(--ink); padding: 12px 14px; background: #EEF2EC; border-left: 2px solid var(--sage-700); border-radius: 0 6px 6px 0; }
 .lp-way .lp-way__note { font-size: 13px; line-height: 1.5; color: var(--ink-quiet); }
 .lp-way__ico { color: var(--sage-700); margin-bottom: 6px; }
 .lp-way .in-arrow { margin-top: auto; display: inline-flex; align-items: center; gap: 6px; }

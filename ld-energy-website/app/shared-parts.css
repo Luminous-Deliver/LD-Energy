@@ -62,6 +62,16 @@ html { font-synthesis-weight: none; }
 .sh { position: relative; z-index: 40; height: var(--head-h); padding-top: 1px; background: transparent;
   border-bottom: 1px solid transparent; transition: background-color .3s var(--ease-out), border-color .3s var(--ease-out); }
 .sh[data-solid="true"] { background: var(--ground); border-bottom-color: var(--hair); }
+/* phones (Abdul 24/10): pinned, hidden while scrolling down, back on the first scroll up (Header.tsx sets data-hidden).
+   The dock at the foot is untouched. Pinned bars under it follow it via html[data-head]. */
+@media (max-width: 759px) {
+  .sh { position: sticky; top: 0; transition: background-color .3s var(--ease-out), border-color .3s var(--ease-out), transform .28s var(--ease-out); }
+  .sh[data-hidden="true"] { transform: translateY(-100%); }
+  html[data-head="shown"] .in-secbar[data-on="true"] { transform: translateY(var(--head-h)); }
+  html[data-head="shown"] .gd-toc { top: var(--head-h); }
+  .gd-toc { transition: top .28s var(--ease-out); }
+}
+@media (max-width: 759px) and (prefers-reduced-motion: reduce) { .sh { transition: none; } }
 /* From 760 px the bar scrolls away with the page and the pill (.pill, below) takes over once the reader is in. */
 .sh__in { height: 100%; display: flex; align-items: center; gap: 12px; }
 @media (min-width: 760px) { .sh__in { gap: 32px; } }
@@ -195,7 +205,7 @@ html { font-synthesis-weight: none; }
    (the dock is the phone's one floating bar), the line at every width. */
 .pill { display: none; }
 @media (min-width: 760px) {
-  .pill { display: flex; align-items: center; gap: 4px; position: fixed; z-index: 45; top: 14px; left: 50%; height: 52px;
+  .pill { display: flex; align-items: center; gap: 4px; position: fixed; z-index: 45; top: 14px; left: 50%; width: max-content; height: 52px;
     padding: 0 6px 0 16px; border-radius: 999px; border: 1px solid rgba(51, 56, 79, .1);
     background: rgba(252, 251, 248, .74); -webkit-backdrop-filter: blur(16px) saturate(1.3); backdrop-filter: blur(16px) saturate(1.3);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, .9), 0 8px 28px rgba(11, 21, 40, .1), 0 1px 3px rgba(11, 21, 40, .06);
@@ -203,7 +213,8 @@ html { font-synthesis-weight: none; }
     transition: transform .56s cubic-bezier(.23, 1, .32, 1), opacity .42s cubic-bezier(.23, 1, .32, 1), visibility 0s linear .56s; }
   .pill[data-on="true"] { transform: translate(-50%, 0); opacity: 1; visibility: visible;
     transition: transform .56s cubic-bezier(.23, 1, .32, 1), opacity .42s cubic-bezier(.23, 1, .32, 1), visibility 0s; }
-  .pill__home { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding-right: 10px; margin-right: 2px;
+  /* flex: none, so the name never shrinks under the links (at 1027 px "ENERGY" ran into Landlords, Abdul 24/10) */
+  .pill__home { flex: none; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding-right: 10px; margin-right: 2px;
     border-right: 1px solid var(--hair); color: var(--ink); text-decoration: none; }
   .pill__home img { display: block; height: 24px; width: auto; }
   .pill__home span { --t: .06em; font: 400 13px/1 var(--font-sans); letter-spacing: var(--t); text-transform: uppercase; white-space: nowrap; }

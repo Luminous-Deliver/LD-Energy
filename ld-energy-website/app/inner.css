@@ -388,4 +388,15 @@
 .in-secbar__list a:hover { color: var(--sage-700); }
 .in-secbar__list li.is-on > a { color: var(--ink); font-weight: 500; box-shadow: inset 2px 0 0 var(--sage-700); }
 @media (prefers-reduced-motion: reduce) { .in-secbar, .in-secbar__chev, .in-otp a { transition: none; } }
+/* from 760 px (Abdul 24/10, second pass: left-aligned, it still read as a box dropped over the text beside the pill):
+   centred straight under the scroll pill, in the pill's own frosted style, so the two read as one piece of navigation */
+@media (min-width: 760px) {
+  .in-secbar { top: 74px; }
+  .in-secbar__in { display: flex; flex-direction: column; align-items: center; }
+  .in-secbar__btn { min-height: 40px; padding: 0 12px 0 16px; gap: 10px; border: 1px solid rgba(51, 56, 79, .1); border-radius: 999px;
+    background: rgba(252, 251, 248, .8); -webkit-backdrop-filter: blur(16px) saturate(1.3); backdrop-filter: blur(16px) saturate(1.3);
+    box-shadow: 0 6px 20px rgba(11, 21, 40, .08), 0 1px 3px rgba(11, 21, 40, .05); }
+  .in-secbar__cur { font-size: 15px; }
+  .in-secbar__list { width: min(440px, calc(100vw - 32px)); }
+}
 .in-table th.r, .in-table td.r { padding-left: 14px; }

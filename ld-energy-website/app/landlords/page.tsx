@@ -8,7 +8,7 @@ import { OnThisPage, type PageSection } from '@/components/inner/OnThisPage'
 import { ReadNext, type NextStep } from '@/components/inner/ReadNext'
 import { InnerEnding } from '@/components/inner/InnerEnding'
 import {
-  site, pricing, priceFrom, defaultOgImage, govUk, insurance, floorPlanDisclaimer, portfolioMinHomes,
+  site, pricing, priceFrom, defaultOgImage, govUk, insurance, floorPlanDisclaimer, portfolioMinHomes, portfolioRatesText,
   SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE,
 } from '@/lib/site'
 import { areaServedLondon } from '@/lib/boroughs'
@@ -101,7 +101,7 @@ const faqs: Faq[] = [
   },
   {
     q: 'Can you do my whole portfolio?',
-    a: `Yes. Send the addresses in one message. We price each home by its size, at a lower price per home for ${portfolioWord} or more, and group the visits by area across London.`,
+    a: `Yes. Send the addresses in one message. We price each home by its size and group the visits by area across London. ${portfolioRatesText}`,
   },
 ]
 
@@ -309,9 +309,11 @@ export default function LandlordsPage() {
               <span className="lp-way__ico"><Ico name="flat" size={28} /></span>
               <h3 className="in-h3">{Portfolio} homes or more</h3>
               <p>
-                Send the addresses in one message. We price each home by its size, at a lower price per home, group the visits by area
+                Send the addresses in one message. We price each home by its size, group the visits by area
                 and send every certificate to you, or to your agent with your permission.
               </p>
+              {/* Abdul's approved portfolio rates (24/10), word for word from lib/site.ts */}
+              <p className="lp-way__rates">{portfolioRatesText}</p>
               <a className="in-arrow in-link" href={listHref} target="_blank" rel="noopener noreferrer">WhatsApp the list <Ico name="arrow-right" size={16} /></a>
             </article>
             <article className="lp-way">

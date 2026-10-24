@@ -9,7 +9,7 @@ import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
 import { PageHero } from '@/components/sections/PageHero'
 import { Pricing } from '@/components/sections/Pricing'
 import { CtaStrip } from '@/components/sections/CtaStrip'
-import { site, pricing, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE, defaultOgImage } from '@/lib/site'
+import { site, pricing, portfolioRatesText, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE, defaultOgImage } from '@/lib/site'
 import { areaServedLondon } from '@/lib/boroughs'
 import type { FaqItem } from '@/lib/faq'
 
@@ -51,8 +51,8 @@ const whyAgents = [
   },
   {
     Icon: BadgePercent,
-    title: 'Volume rates for agencies',
-    body: 'Regular instructions get agency pricing, not one-off consumer rates. The more properties you send, the better your rate.',
+    title: 'Portfolio rates, published',
+    body: portfolioRatesText,
   },
   {
     Icon: PhoneCall,
@@ -85,7 +85,7 @@ const agentFaq: FaqItem[] = [
   },
   {
     q: 'What are your rates for agents?',
-    a: `Guide prices start from £${pricing[0].epc} per EPC, and agencies sending regular instructions get volume pricing below our standard rates. Floor plans are better value when booked with an EPC in the same visit. Contact us with your typical monthly volume for a tailored rate card.`,
+    a: `Guide prices start from £${pricing[0].epc} per EPC. ${portfolioRatesText} An EPC and floor plan booked together for the same visit costs less than booking them separately.`,
   },
   {
     q: 'How quickly can you assess a new instruction?',
