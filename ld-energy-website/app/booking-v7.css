@@ -276,3 +276,35 @@
 :is(.hp, .bk7) .bf-st__go { display: flex; margin-top: 22px; }
 :is(.hp, .bk7) .bf-st__go .bf__go { width: 100%; margin-left: 0; }
 :is(.hp, .bk7) .bf--rail .bf__foot { padding-top: 0; }
+
+/* ---- prototype v7.2 parity (24/10/2026, research/prototype-parity-2026-10-24.md): what the 22/10 port dropped ---- */
+/* 1. each step arrives: the body is keyed by step in ContactForm, so this plays on every Continue and Back */
+:is(.hp, .bk7) .bf__body { animation: bf-step-in .32s var(--ease-out) both; }
+@keyframes bf-step-in { from { opacity: 0; transform: translateY(8px); } }
+@media (prefers-reduced-motion: reduce) { :is(.hp, .bk7) .bf__body { animation: none; } }
+@media (min-width: 760px) {
+  /* 5. a portfolio has three "who" options: three columns, no empty fourth cell */
+  :is(.hp, .bk7) .bf__who.is-three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  /* 6. the speeds: one ruled column with the radio dot every other question has */
+  :is(.hp, .bk7) .bf__choices--ruled { grid-template-columns: minmax(0, 1fr); gap: 0; border-top: 1px solid var(--hair); }
+  :is(.hp, .bk7) .bf__choices--ruled .bf-tile--row { position: relative; display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 4px 12px;
+    align-content: start; min-height: 48px; padding: 16px 18px 18px; border-bottom: 1px solid var(--hair); }
+  :is(.hp, .bk7) .bf__choices--ruled .bf-tile--row > span { grid-column: 2; }
+  :is(.hp, .bk7) .bf__choices--ruled .bf-tile--row > span:first-of-type { font-size: 17px; font-weight: 500; line-height: 1.35; color: var(--ink); padding-right: 0; }
+  :is(.hp, .bk7) .bf__choices--ruled .bf-tile--row > span + span { font-size: 16px; line-height: 1.45; color: var(--ink-quiet); }
+  :is(.hp, .bk7) .bf__choices--ruled .bf-tile--row::before { content: ""; grid-column: 1; grid-row: 1; box-sizing: border-box; width: 18px; height: 18px; margin-top: 3px;
+    border-radius: 50%; border: 1px solid var(--slate-500); background: var(--white);
+    background-image: radial-gradient(circle, var(--sage-700) 0 3.6px, transparent 4px); background-size: 0 0; background-position: center; background-repeat: no-repeat;
+    transition: background-size .2s var(--ease-out), border-color .2s var(--ease-out); }
+  :is(.hp, .bk7) .bf__choices--ruled .bf-tile--row[data-checked]::before { border-color: var(--sage-700); background-size: 100% 100%; }
+}
+/* 7. a portfolio's "Quote" sits at the text size, as "Price to be confirmed" does (globals .bf__price--text) */
+/* 8. the tenant note keeps its key */
+.bf__note--key { display: flex; gap: 12px; align-items: flex-start; }
+.bf__note-ico { flex: none; width: 20px; height: 20px; margin-top: 3px; color: var(--sage-700, #3A624E); }
+/* 10. the error summary: a red rule down its left, focused on a refused send so it is read first */
+:is(.hp, .bk7) .bf__errsum { border: 0; border-left: 2px solid var(--error, #A83630); border-radius: 0; padding: 10px 0 10px 16px; font-size: 16px; color: var(--ink); }
+:is(.hp, .bk7) .bf__errsum p { color: var(--error, #A83630); font-weight: 500; }
+:is(.hp, .bk7) .bf__errsum a { color: var(--error, #A83630); }
+:is(.hp, .bk7) .bf__errsum:focus { outline: none; }
+:is(.hp, .bk7) .bf__errsum:focus-visible { outline: 2px solid var(--error, #A83630); outline-offset: 4px; }

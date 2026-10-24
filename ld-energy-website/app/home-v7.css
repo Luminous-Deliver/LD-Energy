@@ -636,3 +636,13 @@ body:has(.hp) .dock { display: none !important; }
    gap below the promise matches the one above it */
 .hp .op + .sec { padding-top: 24px; }
 @media (max-width: 759px) { .hp .op + .sec { padding-top: 12px; } }
+/* second pass (Abdul 24/10, screenshot: the area right of "One visit, then the paperwork is done" still empty): the
+   promise's own foot comes down too, and on desktop the head runs in two columns, the statement left and its lede
+   right, on the same 7 : 4 split as the steps and the side panel below it */
+.hp .op:has(+ .sec) .op__in { padding-bottom: 40px; }
+@media (min-width: 1024px) {
+  .hp .how__head { grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); column-gap: 96px; align-items: end; }
+  .hp .how__head .eyebrow, .hp .how__head .statement { grid-column: 1; }
+  .hp .how__head .lede-l { grid-column: 2; grid-row: 2; margin: 0; padding-bottom: 6px; }
+  .hp .how__grid { margin-top: 56px; }
+}

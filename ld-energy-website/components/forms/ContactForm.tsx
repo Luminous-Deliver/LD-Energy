@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type Ke
 import { usePathname } from 'next/navigation'
 import { Controller, useForm, type FieldErrors } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowLeft, ArrowRight, Check, HelpCircle, Mail, MessageCircle, Phone, ShieldAlert, WifiOff } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, HelpCircle, KeyRound, Mail, MessageCircle, Phone, ShieldAlert, WifiOff } from 'lucide-react'
 import { Field, Input, Textarea } from '@/components/ui/Input'
 import { cn } from '@/lib/cn'
 import { pricing, site, maxBundleSaving, formatPrice, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE, promise } from '@/lib/site'
@@ -131,7 +131,7 @@ function Choices({ name, legend, value, onChange, options, error, hint, inputRef
     <fieldset className="min-w-0" aria-invalid={!!error} aria-describedby={[hintId, errorId].filter(Boolean).join(' ') || undefined}>
       <legend className="bf__legend">{legend}</legend>
       {hint && <p id={hintId} className="bf__sub">{hint}</p>}
-      <div className="bf__choices mt-2.5 grid gap-2.5 sm:grid-cols-2">
+      <div className="bf__choices bf__choices--ruled mt-2.5 grid gap-2.5 sm:grid-cols-2">
         {options.map((option, index) => {
           const selected = value === option.value
           return (
@@ -290,6 +290,11 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
   const tapped = useRef(false)
   const railTimer = useRef<number | undefined>(undefined)
   const headingRef = useRef<HTMLHeadingElement>(null)
+  const errSumRef = useRef<HTMLDivElement>(null)
+  // a refused send focuses the error summary, which lists and links every problem (prototype v7.2); after the commit
+  // that draws it, since the validation is async and the summary is not in the page until then
+  const [refusals, setRefusals] = useState(0)
+  useEffect(() => { if (refusals) focusBookingElement(errSumRef.current) }, [refusals])
   const successRef = useRef<HTMLDivElement>(null)
   const formRef = useRef<HTMLFormElement>(null)
   const started = useRef(false)
@@ -336,15 +341,23 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
 
   // A "See my price" button further down the homepage picks a service in this card.
   const request = home?.request
+  const handledPick = useRef(0)
   useEffect(() => {
-    if (!request || variant !== 'hero') return
+    if (!request || variant !== 'hero' || handledPick.current === request.n) return
+    handledPick.current = request.n
+    // after a sent request, a fresh one with this service picked (prototype v7.2)
+    if (status === 'success') startOver()
     serviceTouched.current = true
     setValue('services', [quoteServices[request.service]])
     // The same rules as choosing a tab: no hidden add-on survives a change of service.
     if (request.service !== 'epc' && request.service !== 'bundle') { setValue('speed', 'Standard (72 hours)'); setValue('improvementPlan', false) }
     setValue('energyReport', false)   // the homepage's buttons never pick the Pre-Assessment
-    if (status !== 'success') { moveFocus.current = true; setStep(1); setRailPick(request) }
-  }, [request, variant, setValue, status])
+    setRailPick(request)
+    // focus to the form's heading without a jump: the page glides to the Prices section (HomeQuoteContext). On step 1
+    // already, setStep changes nothing, so the step effect would never move focus (lost in the 22/10 port)
+    if (step === 1) headingRef.current?.focus({ preventScroll: true })
+    else { moveFocus.current = true; setStep(1) }
+  }, [request, variant, setValue, status]) // eslint-disable-line react-hooks/exhaustive-deps -- once per pick
 
   useEffect(() => {
     if (moveFocus.current) { focusBookingElement(headingRef.current); moveFocus.current = false }
@@ -427,6 +440,14 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
   function rememberSelection() {
     const context = quoteContextFromForm(getValues())
     if (dedicated) window.history.replaceState(window.history.state, '', quoteHref(context))
+  }
+
+  // a fresh request: "Send another request", and a "See my price" pick after a sent one
+  function startOver() {
+    reset(); started.current = false; serviceTouched.current = false; setAreaOpen(false); setSent(null); setStatus('idle'); moveFocus.current = true; setStep(1)
+    setRailOpen('who'); setRailSeen(new Set()); setRailTick(tick => tick + 1)
+    rememberCustomerType('', window.history)
+    if (dedicated) window.history.replaceState(window.history.state, '', quoteHref())
   }
 
   function focusError(errorFields: FieldErrors<ContactInput>) {
@@ -542,12 +563,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
 
   if (status === 'success' && sent) return (
     <div className={shell}>
-      <RequestSent data={sent.data} confirmationSent={sent.confirmationSent} focusRef={successRef} idPrefix={idPrefix} onReset={() => {
-        reset(); started.current = false; serviceTouched.current = false; setAreaOpen(false); setSent(null); setStatus('idle'); moveFocus.current = true; setStep(1)
-        setRailOpen('who'); setRailSeen(new Set()); setRailTick(tick => tick + 1)
-        rememberCustomerType('', window.history)
-        if (dedicated) window.history.replaceState(window.history.state, '', quoteHref())
-      }} />
+      <RequestSent data={sent.data} confirmationSent={sent.confirmationSent} focusRef={successRef} idPrefix={idPrefix} onReset={startOver} />
     </div>
   )
 
@@ -586,7 +602,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
 
   const planChoice = canHavePlan && !planIncluded && (
     <label ref={planBox} className="bf-check bf-check--offer" onAnimationEnd={event => event.currentTarget.classList.remove('is-pulsing')}>
-      <input type="checkbox" className="bf-check__box" {...register('improvementPlan', { onChange: rememberSelection })} />
+      <input type="checkbox" className="bf-check__box" {...register('improvementPlan', { onChange: event => { (event.target as HTMLElement).closest('label')?.classList.remove('is-pulsing'); rememberSelection() } })} />
       {/* Abdul's wording, 22/10/2026 pricing spec §7 */}
       <span className="min-w-0"><span className="bf-check__t">Add a personalised EPC Improvement Plan <span className="whitespace-nowrap">— £{site.addOns.improvementPlan}</span></span>
         <span className="bf-check__d">A written explanation of what is affecting your rating and which improvements to consider first. Your standard EPC recommendations are included whether or not you choose this extra.</span></span>
@@ -643,7 +659,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
   const estHead = <>
     <p className="bf__est-label">Estimated guide price</p>
     {isBulk ? (
-      <><p className="bf__price"><b>Quote</b></p><p className="bf__for">Several properties are quoted individually.</p></>
+      <><p className="bf__price bf__price--text"><b>Quote</b></p><p className="bf__for">Several properties are quoted individually.</p></>
     ) : estimate.state === 'priced' && band && estimate.total !== null ? (
       <>
         <p className="bf__price">{estimate.isStartingPrice && <small>From</small>}<b data-price className="tabular-nums"><RollingPrice text={`£${formatPrice(estimate.total)}`} /></b><span>{isLodged || productKind === 'preAssessment' ? 'inc. assessment' : 'inc. on-site measuring'}{isLodged ? ' and GOV.UK lodgement' : ''}</span></p>
@@ -687,7 +703,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
       <Controller control={control} name="customerType" render={({ field }) => (
         <fieldset className="min-w-0" aria-invalid={!!errors.customerType} aria-describedby={errors.customerType ? fid('customerType-error') : undefined}>
           <legend className="bf__legend"><Qn n={1} />Which best describes you?</legend>
-          <div className="bf__who">
+          <div className={cn('bf__who', isBulk && 'is-three')}>
             {customerTypeChoices(isBulk).map((option, index) => {
               const icon = customerIcons[option.value] || 'house'
               const checked = field.value === option.value
@@ -802,7 +818,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
           {estHead}{estGet}{estExtras}{estFine}
         </div>
       </div>
-      {values.customerType === 'Landlord (tenanted)' && <p className="bf__note">Please let your tenants know about the visit and include any access arrangements in the notes.</p>}
+      {values.customerType === 'Landlord (tenanted)' && <p className="bf__note bf__note--key"><KeyRound aria-hidden="true" className="bf__note-ico" />Please let your tenants know about the visit and include any access arrangements in the notes.</p>}
     </div>
   )
 
@@ -841,7 +857,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
   const detailFields = <>
     <p className="text-base text-secondary-700">{contactStepIntro(productKind)}</p>
     <p className="text-sm text-secondary-700">Fields marked * are required.</p>
-    {showErrors && Object.keys(errors).length > 0 && <div role="alert" className="rounded-lg border border-danger p-3 text-sm text-red-700">
+    {showErrors && Object.keys(errors).length > 0 && <div role="alert" ref={errSumRef} tabIndex={-1} className="bf__errsum rounded-lg border border-danger p-3 text-sm text-red-700">
       <p className="font-semibold">Please check the following:</p>
       <ul>{Object.entries(errors).map(([name, error]) => <li key={name}><a href={`#${fid(name === 'turnstileToken' ? 'security-check' : name)}`} className="inline-block py-2 underline" onClick={event => {
         event.preventDefault(); focusBookingElement(document.getElementById(fid(name === 'turnstileToken' ? 'security-check' : name)))
@@ -1021,7 +1037,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
         {railQ('Your guide price')}
         <div className="bf__est bf__est--rail" data-estimate>
           {estHead}{estExtras}{estGet}{estFine}
-          {values.customerType === 'Landlord (tenanted)' && <p className="bf__note">Please let your tenants know about the visit and include any access arrangements in the notes.</p>}
+          {values.customerType === 'Landlord (tenanted)' && <p className="bf__note bf__note--key"><KeyRound aria-hidden="true" className="bf__note-ico" />Please let your tenants know about the visit and include any access arrangements in the notes.</p>}
         </div>
         {railGoButton('price', isBulk ? 'Continue to your details' : 'Continue to timing')}
       </>
@@ -1112,7 +1128,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
     <form ref={formRef} noValidate aria-label="Exact quote enquiry" aria-busy={status === 'submitting'}
       onChangeCapture={start} onSubmit={event => {
         if (step < LAST) { event.preventDefault(); void next(); return }
-        void handleSubmit(onSubmit, invalid => { setShowErrors(true); requestAnimationFrame(() => focusError(invalid)) })(event)
+        void handleSubmit(onSubmit, () => { setShowErrors(true); setRefusals(n => n + 1) })(event)
       }} className={shell} data-step={step}>
       <div className="bf__head">
         <h2 ref={headingRef} tabIndex={-1} className="bf__h">{TITLES[step - 1]}</h2>
@@ -1130,7 +1146,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
 
       <div className="hidden" aria-hidden="true"><label>Website<input type="text" tabIndex={-1} autoComplete="off" {...register('website')} /></label></div>
 
-      <div className="bf__body">{stepBody}</div>
+      <div className="bf__body" key={step}>{stepBody}</div>
 
       <div className="bf__nav">
         {step > 1 && <button type="button" disabled={status === 'submitting'} className={`${controlClass} gap-1.5 border border-secondary-400 text-secondary-900`} onClick={() => { moveFocus.current = true; setStep(step === LAST && isBulk ? 1 : step - 1) }}><ArrowLeft aria-hidden="true" className="h-4 w-4" />Back</button>}
