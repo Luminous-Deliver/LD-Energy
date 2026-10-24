@@ -162,18 +162,7 @@ const escape = text => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
       await page.close()
       console.log(`ok ${width}px`)
     }
-    // The pricing page: the same table, From on the top band only, a muted caption under each band (no column), the guide-price sentence.
-    const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' })
-    await page.goto(`${base}/pricing`, { waitUntil: 'networkidle' })
-    const table = page.locator('#pricing-table table').first()
-    const rows = await table.locator('tbody tr').allInnerTexts()
-    eq(rows.length, 6, 'six bands on /pricing')
-    ok(rows[0].includes('Up to 40 m²') && rows[0].includes('£65') && rows[0].includes('£90') && !/From/.test(rows[0]), 'first row')
-    ok(/Over 115 m²[\s\S]*From[\s\S]*£120[\s\S]*From[\s\S]*£125[\s\S]*From[\s\S]*£145[\s\S]*From[\s\S]*£210/.test(rows[5]) && !/Save/.test(rows[5]), 'top row')
-    eq(await table.locator('thead th').count(), 5, 'no bedroom column')
-    ok(rows.every((row, i) => row.includes(captions[i])), 'each band row shows its caption')
-    ok(await page.getByText('Larger or unusually complex properties are quoted individually.', { exact: false }).first().isVisible(), 'guide-price sentence')
-    await page.locator('#pricing-table').screenshot({ path: path.join(out, 'pricing-table-1440.png') })
-    console.log(`ok /pricing · ${checks + 5} checks`)
+    // The /pricing page's checks moved to tests/pricing-page.cjs with its 24/10/2026 redesign.
+    console.log(`ok form · ${checks} checks`)
   } finally { await browser.close() }
 })().catch(error => { console.error(error); process.exit(1) })

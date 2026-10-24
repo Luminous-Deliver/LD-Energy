@@ -1,0 +1,116 @@
+/* /pricing, redesigned 24/10/2026 on the inner-page parts. Only what inner.css does not already have, scoped under .pr
+   so it wins over inner.css whatever order the bundles load in. The price table keeps the title-block line (1.5px ink
+   frame) of the area and landlords price lists. */
+
+/* hero: copy left; four facts and On this page right */
+.pr .pr-hd { margin-top: 18px; display: grid; gap: 28px; }
+.pr .pr-hd__side { order: 2; display: grid; gap: 28px; align-content: start; min-width: 0; }  /* after .in-hd__copy (order 1) */
+.pr .pr-hd__side > * { grid-column: auto; grid-row: auto; }  /* inner.css places .in-otp in the area hero's grid */
+.pr-facts { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--ink); }
+.pr-facts li { display: grid; gap: 4px; align-content: start; padding: 14px 12px 16px 0; border-bottom: 1px solid var(--hair); }
+.pr-facts li:nth-child(even) { padding-left: 14px; border-left: 1px solid var(--hair); }
+.pr-facts b { font: 400 30px/1.05 var(--font-serif); color: var(--sage-700); }
+.pr-facts span { font-size: 13px; line-height: 1.4; color: var(--ink-quiet); }
+@media (min-width: 900px) {
+  .pr .pr-hd { grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 48px 72px; }
+  .pr-facts b { font-size: 38px; }
+}
+
+/* section heads: heading left, lede right on desktop */
+.pr-head { display: grid; gap: 4px; margin-bottom: 28px; }
+.pr-head .in-lede { max-width: 52ch; }
+@media (min-width: 1024px) { .pr-head { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 72px; align-items: end; } .pr-head .in-lede { margin-top: 0; } }
+
+/* the price table */
+.pm__t { width: 100%; border-collapse: collapse; background: var(--card); border: 1.5px solid var(--ink); }
+.pm__t thead th { padding: 12px 16px; border-bottom: 1.5px solid var(--ink); font: 500 11px/1.35 var(--font-sans); letter-spacing: .14em; text-transform: uppercase; color: var(--slate-500); text-align: left; vertical-align: bottom; }
+.pm__t thead th small { display: block; margin-top: 3px; font-size: 12px; letter-spacing: 0; text-transform: none; color: var(--ink-quiet); }
+.pm__t tbody tr + tr { border-top: 1px solid var(--hair); }
+.pm__t tbody th { padding: 12px 16px; text-align: left; vertical-align: middle; font-weight: 500; font-size: 16px; line-height: 1.3; }
+.pm__t tbody th small { display: block; font-weight: 400; font-size: 13px; color: var(--slate-500); }
+.pm__t td { padding: 0; vertical-align: middle; }
+.pm__t td a { display: flex; align-items: baseline; justify-content: flex-end; flex-wrap: wrap; gap: 0 6px; min-height: 64px; padding: 12px 16px; text-decoration: none; transition: background-color .15s; }
+.pm__t td a:hover { background: var(--band); }
+.pm__t td small { font: 400 12px/1 var(--font-sans); color: var(--slate-500); }
+.pm__p { font: 400 26px/1 var(--font-serif); white-space: nowrap; }
+.pm__t .pm__save { flex-basis: 100%; text-align: right; margin-top: 6px; font-size: 13px; color: var(--sage-700); }
+.pm__one, .pm__tabs, .pm__sub { display: none; }
+
+@media (min-width: 760px) {
+  .pm__t { table-layout: fixed; }
+  .pm__t thead .pm__area { width: 28%; }
+  .pm__t thead .pm__svc { text-align: right; }
+  .pm__t .pm__svc { border-left: 1px solid var(--hair); }
+  .pm__t td.pm__svc a { flex-direction: row; align-content: center; }
+}
+
+/* phones: one service at a time, picked with the form's pills; the whole row opens the quote */
+@media (max-width: 759.98px) {
+  .pm__svc { display: none; }
+  .pm__one { display: table-cell; }
+  .pm__t thead .pm__one { text-align: right; }
+  .pm__tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .pm__tab { display: inline-flex; align-items: center; gap: 9px; min-height: 46px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--hair-strong);
+    background: var(--card); font: 500 15px/1.2 var(--font-sans); color: var(--ink); text-align: left; cursor: pointer; transition: border-color .16s, background-color .16s, box-shadow .16s; }
+  .pm__tab[aria-checked="true"] { border-color: var(--sage-700); background: var(--sage-50); box-shadow: inset 0 0 0 1px var(--sage-700); }
+  .pm__dot { position: relative; width: 18px; height: 18px; flex: none; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--slate-500); }
+  .pm__dot::after { content: ""; position: absolute; inset: 4px; border-radius: 50%; background: var(--sage-700); scale: 0; transition: scale .18s cubic-bezier(.22, 1, .36, 1); }
+  .pm__tab[aria-checked="true"] .pm__dot { box-shadow: inset 0 0 0 1.5px var(--sage-700); }
+  .pm__tab[aria-checked="true"] .pm__dot::after { scale: 1; }
+  .pm__sub { display: block; margin: 14px 0 10px; font-size: 14px; font-weight: 500; }
+  .pm__sub span { font-weight: 400; color: var(--ink-quiet); }
+  .pm__t tbody tr { position: relative; }
+  .pm__t tbody th { padding: 12px 0 12px 14px; font-size: 15px; }
+  .pm__t td.pm__one a { position: static; gap: 0 10px; align-items: center; min-height: 64px; padding: 10px 12px 10px 8px; }
+  .pm__t td.pm__one a::after { content: ""; position: absolute; inset: 0; }
+  .pm__t tbody tr:hover { background: var(--band); }
+  .pm__t td.pm__one a:hover { background: none; }
+  .pm__t .pm__one .pm__p { font-size: 24px; }
+  .pm__t .pm__one .pm__p small { margin-right: 4px; }
+  .pm__t .pm__one .pm__save { order: 3; margin-top: 4px; padding-right: 26px; }
+  .pm__t .pm__one .i { color: var(--slate-500); }
+  .pm__t thead th { padding: 10px 14px; }
+}
+@media (prefers-reduced-motion: reduce) { .pm__tab, .pm__dot::after { transition: none; } }
+
+.pr-notes { margin-top: 22px; display: grid; gap: 10px; max-width: 78ch; font-size: 15px; line-height: 1.6; color: var(--ink-quiet); }
+.pr-notes b { font-weight: 500; color: var(--ink); }
+
+/* extras: a ledger, item left and price hard right, plus one worked example */
+.pr .pr-extras { display: grid; gap: 36px; }
+@media (min-width: 900px) {
+  .pr .pr-extras { grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: 72px; align-items: start; }
+  .pr .pr-extras > div:first-child { position: sticky; top: 140px; }  /* clear of the scroll pill and On this page */
+}
+.pr-ledger__h { font: 500 12px/1.4 var(--font-sans); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-quiet); padding-bottom: 10px; border-bottom: 1px solid var(--ink); }
+.pr-ledger__g + .pr-ledger__g { margin-top: 32px; }
+.pr-ledger dl > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 20px; align-items: baseline; padding: 14px 0; border-bottom: 1px solid var(--hair); }
+.pr-ledger dt { font-weight: 500; font-size: 16px; line-height: 1.4; }
+.pr-ledger dt small { display: block; margin-top: 2px; font-weight: 400; font-size: 14px; color: var(--ink-quiet); }
+.pr-ledger dd { font: 400 22px/1 var(--font-serif); white-space: nowrap; text-align: right; }
+.pr-ledger dd.is-muted { font: 500 14px/1.3 var(--font-sans); color: var(--ink-quiet); }
+.pr-ledger .in-note { margin-top: 18px; }
+.pr-receipt { margin-top: 32px; max-width: 400px; padding: 18px 20px 16px; background: var(--card); border: 1px solid var(--hair-strong); border-radius: 8px; }
+.pr-receipt dl { margin-top: 10px; }
+.pr-receipt dl > div { display: flex; justify-content: space-between; gap: 16px; padding: 9px 0; border-bottom: 1px dashed var(--hair-strong); font-size: 15px; }
+.pr-receipt dd { font: 400 18px/1.2 var(--font-serif); white-space: nowrap; }
+.pr-receipt .pr-receipt__t { border-bottom: 0; border-top: 1.5px solid var(--ink); margin-top: -1px; padding-top: 12px; font-weight: 500; }
+.pr-receipt .pr-receipt__t dd { font-size: 26px; color: var(--sage-700); }
+
+/* portfolio */
+.pr .pr-port { display: grid; gap: 28px; }
+.pr-port__acts { margin-top: 22px; }
+.pr-port__rates { font-size: 17px; line-height: 1.65; color: var(--ink); padding: 22px 24px; background: var(--card); border: 1px solid var(--hair); border-left: 3px solid var(--sage-700); border-radius: 0 8px 8px 0; max-width: 62ch; }
+@media (min-width: 900px) { .pr .pr-port { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 72px; align-items: center; } .pr-port__rates { font-size: 18px; } }
+
+/* included and not */
+.pr-inc { margin-top: 32px; display: grid; gap: 36px; }
+.pr-inc .in-ticks { margin-top: 18px; }
+.pr-dash { width: 12px; height: 1px; margin: 13px 0 0 4px; background: var(--ink-quiet); }
+.pr-inc__far { margin-top: 22px; }
+@media (min-width: 900px) { .pr-inc { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 72px; } }
+
+/* questions */
+.pr .pr-faqwrap { display: grid; gap: 8px; }
+.pr-faqside { margin-top: 16px; }
+@media (min-width: 900px) { .pr .pr-faqwrap { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 72px; } .pr .pr-faqwrap .in-faq { margin-top: 0; } }
