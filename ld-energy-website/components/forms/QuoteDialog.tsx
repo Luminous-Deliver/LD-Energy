@@ -44,8 +44,10 @@ export function QuoteDialog() {
   // unlock and hand focus back; run straight after an animated close, since the dialog's own close event comes a task later
   const afterClose = useRef<() => void>(() => {})
 
-  // the exit (motion proposal 24/10 §2.8): 180 ms fade and 8 px drop, then the real close; a timeout guards a missed
-  // animationend. Reduced motion closes at once (its CSS has no animation to wait for).
+  // the exit (motion proposal 24/10 §2.8) for the × button and a backdrop press: 180 ms fade and 8 px drop, then the
+  // real close; a timeout guards a missed animationend. Reduced motion closes at once (its CSS has no animation to wait
+  // for). Escape is left to the browser and closes at once: a modal keeps the page inert until close(), so an animated
+  // Escape would swallow the next keystrokes meant for the page.
   const close = useCallback(() => {
     const dialog = dialogRef.current
     if (!dialog?.open || dialog.hasAttribute('data-closing')) return
@@ -92,8 +94,6 @@ export function QuoteDialog() {
       }
     }
     const warm = (event: Event) => { if (quoteLinkFrom(event)) void loadBody().catch(() => {}) }
-    // Escape leaves the same way as the × button
-    const onCancel = (event: Event) => { event.preventDefault(); close() }
     const onClose = () => {
       dialog.removeAttribute('data-closing')
       document.documentElement.classList.remove('qd-locked')
@@ -108,18 +108,16 @@ export function QuoteDialog() {
     document.addEventListener('pointerover', warm, { passive: true })
     document.addEventListener('focusin', warm)
     document.addEventListener('touchstart', warm, { passive: true })
-    dialog.addEventListener('cancel', onCancel)
     dialog.addEventListener('close', onClose)
     return () => {
       document.removeEventListener('click', onClick, true)
       document.removeEventListener('pointerover', warm)
       document.removeEventListener('focusin', warm)
       document.removeEventListener('touchstart', warm)
-      dialog.removeEventListener('cancel', onCancel)
       dialog.removeEventListener('close', onClose)
       onClose()
     }
-  }, [close])
+  }, [])
 
   return (
     <dialog
