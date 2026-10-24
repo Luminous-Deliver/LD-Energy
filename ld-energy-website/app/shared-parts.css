@@ -239,8 +239,8 @@ html { font-synthesis-weight: none; }
 .sline-track { position: fixed; z-index: 59; top: 0; left: 0; width: 100%; height: 4px; pointer-events: none;
   background: rgba(51, 56, 79, .12); opacity: 0; transition: opacity .3s var(--ease-out); }
 .sline-track[data-on="true"] { opacity: 1; }
-.sline-head { position: fixed; z-index: 61; top: -3px; left: -6px; width: 12px; height: 12px; border-radius: 50%; pointer-events: none;
-  background: var(--sage-700); box-shadow: 0 0 0 4px rgba(58, 98, 78, .18); transform: translateX(0); will-change: transform; }
+/* the round marker went 24/10: at the screen's top edge it was cut in half and sat on the logo as a dot (Abdul's phone
+   screenshot); a plain bar, as on nateherk.com */
 @media (prefers-reduced-motion: reduce) { .sline-track { transition: none; } }
 
 @media (prefers-reduced-motion: reduce) {

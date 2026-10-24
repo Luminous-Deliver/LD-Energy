@@ -46,7 +46,6 @@ export function Header({ waHref }: { waHref: string }) {
   const [hidden, setHidden] = useState(false)
   const line = useRef<HTMLDivElement>(null)
   const track = useRef<HTMLDivElement>(null)
-  const head = useRef<HTMLDivElement>(null)
 
   // The bar takes the paper ground and the hairline once the page moves, and the pill arrives once the reader is
   // about half a screen in (nateherk.com docks when the hero is 62% gone); one state change per crossing. The line
@@ -66,10 +65,7 @@ export function Header({ waHref }: { waHref: string }) {
       else if (Math.abs(dy) > 8) { setHidden(dy > 0); lastY = y }
       const k = room > 0 ? Math.min(1, y / room) : 0
       if (line.current) line.current.style.transform = `scaleX(${k})`
-      // the marker rides the line's tip, as the How it works line's head does
-      if (head.current) head.current.style.transform = `translateX(${k * window.innerWidth}px)`
       track.current?.setAttribute('data-on', String(y > 0))
-      if (head.current) head.current.style.opacity = y > 0 ? '1' : '0'
     }
     const update = () => { if (!raf) raf = requestAnimationFrame(paint) }
     paint()
@@ -86,10 +82,9 @@ export function Header({ waHref }: { waHref: string }) {
   // the homepage's dusk hero sits under the bar: it goes light-on-dark until the page moves (data-dark)
   return (
     <>
-    {/* Abdul 23/10/2026: "too subtle", make it like the How it works line: a visible track, a solid fill, a marker */}
+    {/* Abdul 23/10/2026: "too subtle", make it like the How it works line: a visible track, a solid fill (the marker went 24/10) */}
     <div ref={track} className="sline-track" data-on="false" aria-hidden="true" />
     <div ref={line} className="sline" aria-hidden="true" />
-    <div ref={head} className="sline-head" aria-hidden="true" />
     <header className="sh" data-solid={solid} data-dark={pathname === '/' && !solid} data-hidden={hidden}>
       <Container className="sh__in">
         <LogoLockup />

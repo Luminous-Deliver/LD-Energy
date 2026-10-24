@@ -39,6 +39,33 @@ const LIGHTS_START = 500, LIGHTS_GAP = 520
 // each slightly warm, white or cool. Drawn from pre-rendered sprites, so a frame is drawImage calls, not gradients.
 type Kind = 0 | 1 | 2
 interface Star { x: number; y: number; r: number; kind: Kind; tint: number; delay: number; speed: number; phase: number }
+/** A shooting star's run, in the stage's screen pixels: start, unit direction, tail length, distance the head travels. */
+interface ShotPath { x: number; y: number; ux: number; uy: number; L: number; D: number }
+const SHOT_MS = 1150
+
+/** The streak: a soft wide glow, a tapered bright core, a glowing head. Grows in, runs, burns out. */
+function drawShot(ctx: CanvasRenderingContext2D, s: ShotPath, p: number) {
+  const e = 1 - (1 - p) ** 3
+  const hx = s.x + s.ux * s.D * e, hy = s.y + s.uy * s.D * e
+  const len = s.L * Math.min(1, p * 3) * (1 - 0.4 * Math.max(0, (p - 0.6) / 0.4))
+  const tx = hx - s.ux * len, ty = hy - s.uy * len, nx = -s.uy, ny = s.ux
+  ctx.globalAlpha = p < 0.1 ? p / 0.1 : p > 0.7 ? (1 - p) / 0.3 : 1
+  const glow = ctx.createLinearGradient(tx, ty, hx, hy)
+  glow.addColorStop(0, 'rgba(176,192,255,0)'); glow.addColorStop(1, 'rgba(200,214,255,0.3)')
+  ctx.strokeStyle = glow; ctx.lineWidth = 7; ctx.lineCap = 'round'
+  ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(hx, hy); ctx.stroke()
+  const core = ctx.createLinearGradient(tx, ty, hx, hy)
+  core.addColorStop(0, 'rgba(255,248,230,0)'); core.addColorStop(0.7, 'rgba(255,248,230,0.55)'); core.addColorStop(1, 'rgba(255,253,244,1)')
+  ctx.fillStyle = core
+  ctx.beginPath(); ctx.moveTo(hx + nx * 1.7, hy + ny * 1.7); ctx.lineTo(tx, ty); ctx.lineTo(hx - nx * 1.7, hy - ny * 1.7); ctx.closePath(); ctx.fill()
+  const halo = ctx.createRadialGradient(hx, hy, 0, hx, hy, 12)
+  halo.addColorStop(0, 'rgba(255,251,238,0.95)'); halo.addColorStop(0.3, 'rgba(214,224,255,0.35)'); halo.addColorStop(1, 'rgba(214,224,255,0)')
+  ctx.fillStyle = halo
+  ctx.beginPath(); ctx.arc(hx, hy, 12, 0, 6.2832); ctx.fill()
+  ctx.fillStyle = '#FFFDF6'
+  ctx.beginPath(); ctx.arc(hx, hy, 2, 0, 6.2832); ctx.fill()
+  ctx.globalAlpha = 1
+}
 const TINTS = ['255,249,236', '228,236,255', '255,236,204']
 const SPRITE_CSS = [8, 18, 46]          // sprite box per kind, in screen px at r = SPRITE_R
 const SPRITE_R = [1, 1.6, 2.1]
@@ -119,12 +146,12 @@ function regionOf(img: HTMLImageElement): Region {
 }
 
 /** Stars only where the picture is open sky: dark, flat, in the top half of the master. */
-function findStars(img: HTMLImageElement, count: number): Star[] {
+function findStars(img: HTMLImageElement, count: number): { stars: Star[]; roof: (mx: number) => number } {
   const reg = regionOf(img)
   const sw = 312, sh = Math.round(312 * reg.h / reg.w)
   const c = document.createElement('canvas'); c.width = sw; c.height = sh
   const g = c.getContext('2d', { willReadFrequently: true })
-  if (!g) return []
+  if (!g) return { stars: [], roof: () => 0 }
   g.drawImage(img, 0, 0, sw, sh)
   const px = g.getImageData(0, 0, sw, sh).data
   const k = reg.w / sw
@@ -168,7 +195,12 @@ function findStars(img: HTMLImageElement, count: number): Star[] {
     stars.push({ x: sx, y: sy, ...starLook(rand) })
     n++
   }
-  return stars
+  // the roofline in master pixels, for the shooting star's path
+  const roof = (mx: number) => {
+    const x = Math.round((mx - reg.x) / k)
+    return x < 0 || x >= sw ? 0 : reg.y + close[x] * k
+  }
+  return { stars, roof }
 }
 
 /** Each floor's dark state, cut from the picture: lit pixels pulled down to night, everything else left clear. */
@@ -241,7 +273,7 @@ export function HeroSky() {
 
     let raf = 0, visible = true, t0 = 0, stars: Star[] = [], shades: (HTMLCanvasElement | null)[] = []
     let src = '', t0Set = false, nextShoot = LIGHTS_START + (FLOORS.length - 1) * LIGHTS_GAP + 610 + 500 /* 0.5 s after the last floor is fully lit (darkness() takes 610 ms; Abdul 24/10) */
-    let shot: { x: number; y: number; t: number; len: number } | null = null
+    let roof: (mx: number) => number = () => 0, lit = false
     let boxes: DOMRect[] = [], boxW = -1, boxH = -1
 
     // where the master sits inside the plane: object-fit cover at 70% 100% from 760 px, the crop at full width on phones
@@ -275,7 +307,9 @@ export function HeroSky() {
       copy.decoding = 'async'
       copy.onload = () => {
         if (copy.src !== src) return
-        stars = fx === 'lights' ? [] : findStars(copy, regionOf(copy) === PHONE_CROP ? 55 : 320)
+        const found = findStars(copy, regionOf(copy) === PHONE_CROP ? 55 : 320)
+        stars = fx === 'lights' ? [] : found.stars
+        roof = found.roof
         shades = fx === 'stars' ? [] : floorShades(copy)
         // the sequence starts once the shades exist, so the rooms never show lit before they switch on
         if (!t0Set) { t0 = 0; t0Set = true }
@@ -311,33 +345,57 @@ export function HeroSky() {
         ctx!.drawImage(shade, fl.x, fl.y, fl.w, fl.h)
       })
 
-      if (fx === 'all' && !still) {
-        if (!shot && t > nextShoot && stars.length) {
-          const reg = regionOf(img!)
-          // the open sky band between the nav and the headline, left of the house, on whichever picture is showing;
-          // a shallow path (below) so it never crosses the words
-          const left = Math.max(reg.x + 80, 600)
-          shot = { x: left + Math.random() * Math.max(200, 1500 - left), y: 165 + Math.random() * 45, t, len: 200 + Math.random() * 90 }
-          nextShoot = t + 8000 + Math.random() * 7000
-        }
-        if (shot) {
-          const p = (t - shot.t) / 1000
-          if (p >= 1) shot = null
-          else {
-            const e = 1 - (1 - p) * (1 - p)
-            const x = shot.x + e * 520, y = shot.y + e * 80
-            const dx = shot.len, dy = shot.len * 0.154
-            const grad = ctx!.createLinearGradient(x - dx, y - dy, x, y)
-            grad.addColorStop(0, 'rgba(247,241,224,0)'); grad.addColorStop(1, 'rgba(247,241,224,0.95)')
-            ctx!.globalAlpha = Math.sin(p * Math.PI)
-            ctx!.strokeStyle = grad; ctx!.lineWidth = 1.6 * px; ctx!.lineCap = 'round'
-            ctx!.beginPath(); ctx!.moveTo(x - dx, y - dy); ctx!.lineTo(x, y); ctx!.stroke()
-            ctx!.beginPath(); ctx!.arc(x, y, 1.4 * px, 0, 6.2832); ctx!.fillStyle = '#FFFBEF'; ctx!.fill()
-            ctx!.fillStyle = '#F7F1E0'
-          }
-        }
+      // the rooms are all on: the plane's warm bloom fades in (CSS, .pl--mid[data-lit])
+      if (!lit && shades.length && (still || t > LIGHTS_START + (FLOORS.length - 1) * LIGHTS_GAP + 300)) {
+        lit = true; plane!.dataset.lit = 'true'
+      }
+
+      // Abdul 24/10 ("make shooting star bigger better"): it was drawn here, inside the plane whose top fades into the
+      // night, so it flew at half strength, and its fixed band could pass the headline. This layer picks a clear path;
+      // HeroNight, unmasked and in screen pixels, draws it.
+      // once the sky is read (the phone crop can have no picture stars of its own, so not stars.length)
+      if (fx === 'all' && !still && t > nextShoot && t0Set) {
+        const path = shootPath(f)
+        // no clear run this time (a narrow window, the headline in the way): look again shortly
+        nextShoot = t + (path ? 7000 + Math.random() * 6000 : 1500)
+        plane!.dataset.shot = path ? 'ok' : 'miss' // for the tests
+        if (path) plane!.dispatchEvent(new CustomEvent('hero:shoot', { bubbles: true, detail: path }))
       }
       ctx!.globalAlpha = 1
+    }
+
+    // a straight path through open sky, in the stage's screen pixels: never across a word or button, never below the
+    // roofline (30 px clear of it), never under the menu
+    function shootPath(f: { s: number; ox: number; oy: number; w: number }): ShotPath | null {
+      const stage = plane!.closest('.hero__stage')
+      if (!stage) return null
+      const o = stage.getBoundingClientRect(), pr = plane!.getBoundingClientRect()
+      const W = o.width, phone = W < 760
+      const words = textBoxes(stage, o, phone ? 10 : 18)
+      const head = document.querySelector('header')?.getBoundingClientRect()
+      const top = Math.max(0, (head ? head.bottom - o.top : 0) + 14)
+      // a phone's open sky is one pocket, about 124 x 90 px beside the button and above the roofs at 360 wide (measured
+      // 24/10), so its streak is short and steeper
+      const L = phone ? 90 : Math.min(440, Math.max(300, W * 0.2))
+      const D = L * (phone ? 1.2 : 1.25)
+      const px0 = pr.left - o.left + f.ox, py0 = pr.top - o.top + f.oy
+      const clear = (x: number, y: number) => {
+        if (x < 8 || x > W - 8 || y < top || inBox(x, y, words)) return false
+        const r = roof((x - px0) / f.s)
+        return !r || y < py0 + r * f.s - 30
+      }
+      // over the house the open sky is only the band under the menu (measured 24/10: the roofline is 146-350 px down at
+      // 1856 wide), so shallow runs are allowed, either way across
+      for (let i = 0; i < 160; i++) {
+        const a = (phone ? 15 + Math.random() * 25 : 5 + Math.random() * 19) * Math.PI / 180, ux = Math.cos(a) * (Math.random() < 0.7 ? 1 : -1), uy = Math.sin(a)
+        const x = W * (0.06 + Math.random() * 0.88)
+        const y = top + Math.random() * Math.max(40, pr.top - o.top + pr.height * 0.45 - top)
+        let ok = true
+        // the head runs D from the start and the tail only trails it, so the run (and a little before it) must be clear
+        for (let k = 0; k <= 16 && ok; k++) { const d = -L * 0.2 + (D + L * 0.2) * (k / 16); ok = clear(x + ux * d, y + uy * d) }
+        if (ok) return { x, y, ux, uy, L, D }
+      }
+      return null
     }
 
     function loop(now: number) {
@@ -391,6 +449,7 @@ export function HeroNight() {
     const phone = window.matchMedia('(max-width: 759px)')
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     let stars: Star[] = [], raf = 0, t0 = 0, visible = true, laidW = -1
+    let shot: (ShotPath & { t: number }) | null = null
 
     function layout() {
       const w = stage!.clientWidth, h = stage!.clientHeight
@@ -438,17 +497,29 @@ export function HeroNight() {
         if (fade) drawStar(ctx!, st, fade * twinkle(st, t, still), 1)
       }
       ctx!.globalAlpha = 1
+      if (shot) {
+        const p = (now - shot.t) / SHOT_MS
+        if (p >= 1) shot = null
+        else drawShot(ctx!, shot, Math.max(0, p))
+      }
     }
 
     function loop(now: number) {
       if (!t0) t0 = now
       draw(now)
-      if (visible && !document.hidden && stars.length) raf = requestAnimationFrame(loop)
+      if (visible && !document.hidden && (stars.length || shot)) raf = requestAnimationFrame(loop)
     }
     const kick = () => { cancelAnimationFrame(raf); laidW = -1; if (still) draw(0); else raf = requestAnimationFrame(loop) }
 
     const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; if (visible && !still) { cancelAnimationFrame(raf); raf = requestAnimationFrame(loop) } })
     io.observe(stage)
+    // HeroSky picks the moment and the path (it knows the roofline); this layer draws it, unmasked
+    const onShoot = (ev: Event) => {
+      if (still || !visible) return
+      shot = { ...(ev as CustomEvent<ShotPath>).detail, t: performance.now() }
+      cancelAnimationFrame(raf); raf = requestAnimationFrame(loop)
+    }
+    stage.addEventListener('hero:shoot', onShoot)
     const onVis = () => { if (!document.hidden && visible && !still) { cancelAnimationFrame(raf); raf = requestAnimationFrame(loop) } }
     document.addEventListener('visibilitychange', onVis)
     phone.addEventListener('change', kick)
@@ -459,6 +530,7 @@ export function HeroNight() {
 
     return () => {
       cancelAnimationFrame(raf); io.disconnect()
+      stage.removeEventListener('hero:shoot', onShoot)
       document.removeEventListener('visibilitychange', onVis); phone.removeEventListener('change', kick); window.removeEventListener('resize', kick)
     }
   }, [])

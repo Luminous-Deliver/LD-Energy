@@ -163,9 +163,25 @@ export default function TermsPage() {
       </p>
 
       <h2>10. Complaints</h2>
+      {/* 24/10/2026: Quidos requires a stated policy that is free and keeps the complainant's recourse to law (Quidos T&Cs
+          §9.3, §9.5); the two scheme routes are from Elmhurst OP08 v15 (October 2025) and the Quidos Complaints,
+          Disciplinary & Appeals Procedure v2.1 (15/05/2026) */}
       <p>
-        Concerns should be raised with us in the first instance at <a href={site.emailHref}>{site.email}</a>. Complaints relating to the EPC itself can also be escalated through the formal complaints process of the accreditation scheme it was lodged under, Elmhurst Energy or Quidos.
+        If something isn&apos;t right, tell us first. Email <a href={site.emailHref}>{site.email}</a> or call <a href={site.phoneHref}>{site.phone}</a>. We keep a record of every complaint and will do all we can to put it right.
       </p>
+      <p>Making a complaint is free at every stage, with us and with the accreditation scheme.</p>
+      <p>
+        If you&apos;re not happy with our answer, a complaint about the EPC can go to the accreditation scheme it was lodged under. The scheme is named on the certificate.
+      </p>
+      <ul>
+        <li>
+          <strong>Elmhurst Energy:</strong> follow their <a href="https://www.elmhurstenergy.co.uk/app/uploads/2025/10/OP08_Complaints_Resolution_Process.pdf" rel="noopener">Complaints Resolution Process</a>. A member of their staff who hasn&apos;t been involved investigates, usually within six weeks, and the EPC may be audited. Send all your evidence at the start, as nothing can be added once the investigation begins.
+        </li>
+        <li>
+          <strong>Quidos:</strong> email <a href="mailto:complaints@quidos.co.uk">complaints@quidos.co.uk</a>. Their <a href="https://quidos.co.uk/wp-content/uploads/Complaints-Disciplinary-Appeals-Procedure.pdf" rel="noopener">Complaints, Disciplinary &amp; Appeals Procedure</a> sets out the steps. They reply within 3 working days and aim to resolve it within 10.
+        </li>
+      </ul>
+      <p>None of this affects your statutory rights, or stops you taking the matter to court.</p>
 
       <h2>11. Governing law</h2>
       <p>
