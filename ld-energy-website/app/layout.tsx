@@ -3,6 +3,7 @@ import localFont from 'next/font/local'
 import { Header } from '@/components/layout/Header'
 import { CompactFooter } from '@/components/layout/CompactFooter'
 import { PhoneDock } from '@/components/layout/PhoneDock'
+import { HashScroll } from '@/components/layout/HashScroll'
 import { QuoteDialog } from '@/components/forms/QuoteDialog'
 import { WebAnalytics } from '@/components/layout/WebAnalytics'
 import { LondonSkyline } from '@/components/ui/LondonSkyline'
@@ -197,6 +198,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <LondonSkyline className="site-skyline text-night -mb-1" />
         <CompactFooter />
         <PhoneDock waHref={waHref} />
+        <HashScroll />
         {/* every quote link opens this over the page when it can; /quote is the page it falls back to */}
         <QuoteDialog />
         <WebAnalytics token={cfBeaconToken} />

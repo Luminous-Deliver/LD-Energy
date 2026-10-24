@@ -128,9 +128,11 @@ export default function AreasPage() {
           <figure className="in-ah__art">
             {/* eslint-disable-next-line @next/next/no-img-element -- single WebP; next/image is unoptimised on Pages */}
             <img
-              src="/areas/hero-london.webp"
-              width={900}
-              height={506}
+              src="/areas/hero-london-1400.webp"
+              srcSet="/areas/hero-london-800.webp 800w, /areas/hero-london-1400.webp 1400w"
+              sizes="(min-width: 1024px) 52vw, 92vw"
+              width={1400}
+              height={1226}
               fetchPriority="high"
               alt="Illustration of an East London district from above, with streets, parks and the river"
             />

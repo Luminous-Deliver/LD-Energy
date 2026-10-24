@@ -264,7 +264,7 @@ function Services() {
             <p className="offer__for">For lettings, sales and your own home</p>
             <div className="offer__groups">
               <div><p className="offer__g">On the visit</p><Ticks items={['On-site assessment by an accredited Domestic Energy Assessor']} /></div>
-              <div><p className="offer__g">You receive</p><Ticks items={['Your EPC, lodged on the official GOV.UK EPC Register', 'A certificate link once it is live on the register', 'The standard recommendation report, where applicable', 'A certificate valid for 10 years']} /></div>
+              <div><p className="offer__g">You receive</p><Ticks items={['Your EPC, lodged on the official GOV.UK EPC Register within 72 hours, same day available', 'A certificate link once it is live on the register', 'The standard recommendation report, where applicable', 'A certificate valid for 10 years']} /></div>
               <div><p className="offer__g">Optional</p>
                 <ul className="ticks"><li><span className="plus" aria-hidden="true" />£{site.addOns.improvementPlan} Improvement Plan: your priorities, with the full Energy Report</li></ul></div>
             </div>
@@ -276,7 +276,7 @@ function Services() {
             </div>
           </li>
           <li className="offer offer--feature" id="offer-bundle">
-            <div className="offer__top"><span className="offer__ico"><Ico name="floor-plan" /></span><span className="offer__flag">One visit · save up to £{maxBundleSaving}</span></div>
+            <div className="offer__top"><span className="offer__ico"><Ico name="floor-plan" /></span><span className="offer__flag">Better value together</span></div>
             <h3>EPC + Floor Plan</h3>
             <p className="offer__for">For sellers, re-lets and agents preparing a listing</p>
             <div className="offer__groups">
@@ -285,7 +285,7 @@ function Services() {
               <div><p className="offer__g">Why together</p><Ticks items={['Both surveys are completed during the same property visit']} /></div>
             </div>
             <div className="offer__foot">
-              <div className="offer__cost"><p className="offer__price"><small>from</small>£{priceFrom.bundle}</p><p className="offer__note">Exact price confirmed before booking</p></div>
+              <div className="offer__cost"><p className="offer__price"><small>from</small>£{priceFrom.bundle}</p><p className="offer__save">One visit, save up to £{maxBundleSaving} against booking separately</p><p className="offer__note">Exact price confirmed before booking</p></div>
               <PickService service="bundle" className="btn btn-primary">See my EPC + Floor Plan price</PickService>
               <Link prefetch={false} className="link arrow-link" href="/pricing">EPC and floor plan pricing <Ico name="arrow-right" /></Link>
             </div>
@@ -293,7 +293,7 @@ function Services() {
           <li className="offer" id="offer-fp">
             <div className="offer__top"><span className="offer__ico"><Ico name="dimension" /></span></div>
             <h3>Floor Plan</h3>
-            <p className="offer__for">For sellers, <Link prefetch={false} className="link" href="/estate-agents">estate agents</Link>, rental listings and property licence applications</p>
+            <p className="offer__for">When the EPC is still valid: sellers, <Link prefetch={false} className="link" href="/estate-agents">estate agents</Link> and licences</p>
             <div className="offer__groups">
               <div><p className="offer__g">On the visit</p><Ticks items={['Every room laser-measured on site']} /></div>
               <div><p className="offer__g">You receive</p><Ticks items={['Total floor area, as gross internal area', 'Approximate room dimensions and room labels', 'High-resolution JPEG and PDF files', 'A plan suitable for Rightmove, Zoopla and OnTheMarket']} /></div>

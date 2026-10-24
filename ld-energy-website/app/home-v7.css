@@ -496,6 +496,15 @@ body:has(.hp) .dock { display: none !important; }
   .hp-hero .hero__credit { position: absolute; left: max(var(--gutter, 48px), calc((100% - var(--maxw, 1280px)) / 2 + var(--gutter, 32px))); bottom: calc(var(--strip-h) + 12px); z-index: 2; margin: 0; font-size: 12px; color: var(--ink-quiet); }
 }
 @media (min-width: 760px) and (prefers-reduced-motion: no-preference) { .hp-hero:not(.is-static) .pl--mid { bottom: 0; } }
+/* Abdul 24/10 on a PC: "feels so massive and not premium designed". Cover-filling the stage's height blew the 21:9
+   picture up past the screen's width (x1.32 at 1440 x 900, the house ran into the menu). Now the picture is never
+   wider than the screen: it rests on the price strip at its own 21:9, its top dissolves into the night, and the
+   open sky above holds the copy, with the phone star layer (HeroNight) running there too. The house is about a
+   quarter smaller at 1440 and the whole street reads, as an illustration placed on the page, not a crop of one. */
+@media (min-width: 760px) {
+  .hp-hero--dusk .pl--mid { top: auto; height: auto; aspect-ratio: 3120 / 1344;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 26%); mask-image: linear-gradient(180deg, transparent 0, #000 26%); }
+}
 /* phones: the landscape cut-away under the copy, shifted left so the cut-open house stays in frame */
 @media (max-width: 759px) {
   .hp-hero .pl--mid { width: 100vw; height: auto; aspect-ratio: 16 / 9; margin-left: 0; bottom: 0; }
@@ -511,7 +520,7 @@ body:has(.hp) .dock { display: none !important; }
 .hp-hero--dusk .hero__credit { color: #9DA3B8; }
 .hp-hero--dusk .hero__sky { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .hp-hero .hero__night { display: none; }
-@media (max-width: 759px) { .hp-hero--dusk .hero__night { display: block; position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; pointer-events: none; } }
+.hp-hero--dusk .hero__night { display: block; position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; pointer-events: none; }
 @media (min-width: 760px) {
   .hp-hero--dusk .hero__scrim { background: linear-gradient(90deg, rgba(17, 20, 38, .55) 0, rgba(17, 20, 38, .3) 34%, rgba(17, 20, 38, 0) 55%); }
 }
@@ -552,6 +561,14 @@ body:has(.hp) .dock { display: none !important; }
   .hp .offer--feature .offer__groups > :nth-child(3) { grid-column: 1; grid-row: 2; }
 }
 @media (max-width: 759px) { .hp .offer__foot { margin: auto -20px -18px; padding: 20px 20px 20px; } }
+
+/* round 2 (Abdul 24/10, "optimise my current cards", old cards beside them): what the old set did better, in this
+   set's language. The saving sits at the price, where the choice is made, not in a corner flag; the flag says why the
+   middle card is marked; the feature card gets a sage edge so it reads as the pick at a glance; the Domestic EPC
+   names the 72-hour lodgement. The old cards' Pre-Assessment box is the strip under the cards (.pre). */
+.hp .offer--feature { border-color: rgba(58, 98, 78, .55); }
+.hp .offer__flag { text-transform: uppercase; letter-spacing: .1em; font-size: 11px; font-weight: 600; padding: 6px 9px; }
+.hp .offer__save { font: 500 15px/1.4 var(--font-sans); color: var(--sage-800); }
 
 /* How it works step 3: the report illustration (24/10) */
 .hp .tl__art { display: block; width: 100%; max-width: 520px; height: auto; margin-top: 10px; border: 1px solid var(--hair); }

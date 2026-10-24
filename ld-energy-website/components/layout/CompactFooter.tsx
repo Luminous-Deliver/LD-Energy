@@ -61,7 +61,7 @@ export function CompactFooter() {
           <div className="cf-brand">
             <Link prefetch={false} href="/" aria-label="L&D Energy, home" className="inline-flex min-h-11 items-center">
               {/* eslint-disable-next-line @next/next/no-img-element -- the master compact lockup, reversed; matches the header logo */}
-              <img src="/brand/ld-energy-compact-reversed.svg" alt="" width={153} height={25} loading="lazy" decoding="async" />
+              <img src="/brand/ld-energy-compact-reversed.svg" alt="" width={151} height={25} loading="lazy" decoding="async" />
             </Link>
             <p className="mt-3 text-sm leading-6 text-stone-400">L&amp;D Energy · Stratford E15, London</p>
             <div className="cf-contact flex flex-wrap gap-x-5">

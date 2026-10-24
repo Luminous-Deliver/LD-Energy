@@ -116,7 +116,7 @@
   .gd-toc li.is-on > a { box-shadow: inset 2px 0 0 var(--sage-700); padding-left: 10px; }
   .gd-toc li.is-sub.is-on > a { padding-left: 24px; }
 }
-@media (min-width: 760px) and (max-width: 1099px) { .gd-toc { top: calc(var(--head-h) + 8px); } }
+@media (min-width: 760px) and (max-width: 1099px) { .gd-toc { top: 78px; } } /* under the scroll pill, as .in-secbar */
 @media (min-width: 1100px) {
   .gd-toc { position: sticky; top: calc(var(--head-h) + 24px); align-self: start; max-height: calc(100vh - var(--head-h) - 48px); overflow-y: auto; }
   .gd-toc details { display: none; }

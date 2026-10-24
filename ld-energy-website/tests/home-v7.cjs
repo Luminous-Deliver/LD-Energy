@@ -62,7 +62,7 @@ const KEEP = [
     for (const [id, v] of [['offer-epc', priceFrom.epc], ['offer-bundle', priceFrom.bundle], ['offer-fp', priceFrom.floorPlan]]) {
       ok((await text(`#${id} .offer__price`)).replace(/\s+/g, '') === `from£${v}`, `${id} price £${v}`)
     }
-    ok((await text('#offer-bundle .offer__flag')).includes(`save up to £${maxBundleSaving}`), 'bundle saving from maxBundleSaving')
+    ok((await text('#offer-bundle .offer__save')).includes(`save up to £${maxBundleSaving}`), 'bundle saving from maxBundleSaving, beside the price (24/10)')
     ok((await text('#offer-epc')).includes(`£${site.addOns.improvementPlan} Improvement Plan`), 'plan price from site.addOns')
     ok((await text('#pre-assessment')).includes(`from £${priceFrom.preAssessment}.`), 'Pre-Assessment from price')
     ok((await text('#how')).includes(`Same-day lodgement, £${SAME_DAY_LODGEMENT_SURCHARGE} more. Next-day visit and lodgement, £${NEXT_DAY_VISIT_SURCHARGE} more.`), 'speed surcharges')

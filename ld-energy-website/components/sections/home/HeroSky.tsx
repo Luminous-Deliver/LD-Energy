@@ -381,16 +381,17 @@ export function HeroNight() {
       canvas!.width = Math.round(w * dpr); canvas!.height = Math.round(h * dpr)
       laidW = w
       stars = []
-      if (!phone.matches) return
+      // phones since 23/10; desktop too since 24/10, when the picture stopped filling the stage's full height
       const o = stage!.getBoundingClientRect()
-      const boxes = textBoxes(stage!, o, 10)
+      const boxes = textBoxes(stage!, o, phone.matches ? 10 : 28)
       const pic = stage!.querySelector('.pl--mid')?.getBoundingClientRect()
       const head = document.querySelector('header')?.getBoundingClientRect()
       // from under the logo and menu to a third of the way into the picture, where its top edge has faded in
       const top = Math.max(0, (head ? head.bottom - o.top : 0) + 8)
       const bottom = pic ? pic.top - o.top + pic.height * 0.3 : h * 0.55
       const rand = seeded(11)
-      const count = Math.round((w * (bottom - top)) / 4200)
+      // a wide screen has five times a phone's open sky: the phone density there read as noise, so desktop is sparser
+      const count = Math.round((w * (bottom - top)) / (phone.matches ? 4200 : 15000))
       const gap = Math.sqrt((w * (bottom - top)) / Math.max(1, count)) * 0.62
       for (let tries = 0; stars.length < count && tries < count * 40; tries++) {
         const x = 6 + rand() * (w - 12), y = top + rand() * (bottom - top)
