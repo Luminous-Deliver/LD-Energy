@@ -206,7 +206,7 @@ html { font-synthesis-weight: none; }
 .pill { display: none; }
 @media (min-width: 760px) {
   .pill { display: flex; align-items: center; gap: 4px; position: fixed; z-index: 45; top: 14px; left: 50%; width: max-content; height: 52px;
-    padding: 0 6px 0 16px; border-radius: 999px; border: 1px solid rgba(51, 56, 79, .1);
+    padding: 0 6px; border-radius: 999px; border: 1px solid rgba(51, 56, 79, .1);
     background: rgba(252, 251, 248, .74); -webkit-backdrop-filter: blur(16px) saturate(1.3); backdrop-filter: blur(16px) saturate(1.3);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, .9), 0 8px 28px rgba(11, 21, 40, .1), 0 1px 3px rgba(11, 21, 40, .06);
     transform: translate(-50%, -76px); opacity: 0; visibility: hidden;
@@ -214,15 +214,19 @@ html { font-synthesis-weight: none; }
   .pill[data-on="true"] { transform: translate(-50%, 0); opacity: 1; visibility: visible;
     transition: transform .56s cubic-bezier(.23, 1, .32, 1), opacity .42s cubic-bezier(.23, 1, .32, 1), visibility 0s; }
   /* flex: none, so the name never shrinks under the links (at 1027 px "ENERGY" ran into Landlords, Abdul 24/10) */
-  .pill__home { flex: none; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding-right: 10px; margin-right: 2px;
-    border-right: 1px solid var(--hair); color: var(--ink); text-decoration: none; }
+  /* polish (Abdul 24/10, beside nateherk.com's pill): the name sits in its own white chip inside the frosted pill, an
+     even 6 px inset all round, instead of behind a divider; the page you are on gets a faint sage fill */
+  .pill__home { flex: none; display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 14px 0 10px; margin-right: 6px;
+    border-radius: 999px; background: #fff; box-shadow: 0 0 0 1px rgba(51, 56, 79, .08), 0 1px 2px rgba(11, 21, 40, .06);
+    color: var(--ink); text-decoration: none; transition: box-shadow .2s var(--ease-out); }
+  .pill__home:hover { box-shadow: 0 0 0 1px rgba(58, 98, 78, .35), 0 1px 2px rgba(11, 21, 40, .06); }
   .pill__home img { display: block; height: 24px; width: auto; }
   .pill__home span { --t: .06em; font: 400 13px/1 var(--font-sans); letter-spacing: var(--t); text-transform: uppercase; white-space: nowrap; }
   .pill ul { display: flex; margin: 0; padding: 0; list-style: none; }
   .pill ul a { display: inline-flex; align-items: center; min-height: 40px; padding: 0 12px; border-radius: 999px; font-size: 15px;
     color: var(--ink); text-decoration: none; transition: background-color .2s var(--ease-out), color .2s var(--ease-out); }
   .pill ul a:hover { background: rgba(51, 56, 79, .06); }
-  .pill ul a[aria-current="page"] { color: var(--sage-700); }
+  .pill ul a[aria-current="page"] { color: var(--sage-700); background: rgba(58, 98, 78, .08); }
   .pill .ld-btn { min-height: 40px; margin-left: 6px; padding: 0 18px; border-radius: 999px; font-size: 15px; }
   .pill :focus-visible { outline: 2px solid var(--sage-700); outline-offset: 2px; }
 }

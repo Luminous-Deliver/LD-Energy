@@ -160,7 +160,7 @@ function findStars(img: HTMLImageElement, count: number): Star[] {
   // spread out: a pick too close to an earlier star is redrawn (a few tries), so the sky never clumps
   // never closer than 80 master px, and no fallback that drops the gap: with the sky now ending at the roofline the old
   // last-resort picks piled the stars into clumps just above the roofs (Abdul 24/10)
-  const gap = Math.max(80, Math.sqrt((sky.length * k * k) / Math.max(1, count)) * 0.55)
+  const gap = Math.max(60, Math.sqrt((sky.length * k * k) / Math.max(1, count)) * 0.55)
   for (let n = 0, tries = 0; n < count && sky.length && tries < count * 12; tries++) {
     const [x, y] = sky[Math.floor(rand() * sky.length)]
     const sx = reg.x + (x + rand()) * k, sy = reg.y + (y + rand()) * k
@@ -240,7 +240,7 @@ export function HeroSky() {
     if (!ctx) return
 
     let raf = 0, visible = true, t0 = 0, stars: Star[] = [], shades: (HTMLCanvasElement | null)[] = []
-    let src = '', t0Set = false, nextShoot = LIGHTS_START + FLOORS.length * LIGHTS_GAP + 1800
+    let src = '', t0Set = false, nextShoot = LIGHTS_START + (FLOORS.length - 1) * LIGHTS_GAP + 610 + 500 /* 0.5 s after the last floor is fully lit (darkness() takes 610 ms; Abdul 24/10) */
     let shot: { x: number; y: number; t: number; len: number } | null = null
     let boxes: DOMRect[] = [], boxW = -1, boxH = -1
 
@@ -275,7 +275,7 @@ export function HeroSky() {
       copy.decoding = 'async'
       copy.onload = () => {
         if (copy.src !== src) return
-        stars = fx === 'lights' ? [] : findStars(copy, regionOf(copy) === PHONE_CROP ? 55 : 220)
+        stars = fx === 'lights' ? [] : findStars(copy, regionOf(copy) === PHONE_CROP ? 55 : 320)
         shades = fx === 'stars' ? [] : floorShades(copy)
         // the sequence starts once the shades exist, so the rooms never show lit before they switch on
         if (!t0Set) { t0 = 0; t0Set = true }
@@ -408,8 +408,9 @@ export function HeroNight() {
       // down to just inside the picture's faded top edge, never as far as its roofs (Abdul 24/10)
       const bottom = pic ? pic.top - o.top + pic.height * 0.1 : h * 0.55
       const rand = seeded(11)
-      // a wide screen has five times a phone's open sky: the phone density there read as noise, so desktop is sparser
-      const count = Math.round((w * (bottom - top)) / (phone.matches ? 4200 : 15000))
+      // a wide screen has five times a phone's open sky: phone density read as noise there, 15000 too bare (Abdul 24/10: "not
+      // enough proper stars"), 8500 between
+      const count = Math.round((w * (bottom - top)) / (phone.matches ? 4200 : 8500))
       const gap = Math.sqrt((w * (bottom - top)) / Math.max(1, count)) * 0.62
       for (let tries = 0; stars.length < count && tries < count * 40; tries++) {
         const x = 6 + rand() * (w - 12), y = top + rand() * (bottom - top)

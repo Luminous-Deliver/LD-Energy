@@ -457,6 +457,20 @@ html:has(.hp) { scroll-padding-top: calc(var(--head-h) + 24px); }
   .hp .guides__list a > .i { display: block; width: 18px; height: 18px; color: var(--sage-700); }
 }
 @media (prefers-reduced-motion: reduce) { .hp .guides__img img { transition: none; } .hp .guides__list a:hover .guides__img img { transform: none; } }
+/* from 900 px (Abdul 24/10, "polish this"): four equal cards in the Read next style. The open columns gave the first
+   one no left padding, so its picture ran wider and its title sat lower than the other three */
+@media (min-width: 900px) {
+  .hp .guides__list { gap: 18px; border-top: 0; margin-top: 40px; }
+  .hp .guides__list li + li { border-left: 0; }
+  .hp .guides__list a, .hp .guides__list li + li a { display: flex; flex-direction: column; gap: 0; padding: 0; overflow: hidden;
+    border: 1px solid var(--hair-strong); border-radius: 10px; background: var(--white); transition: border-color .15s; }
+  .hp .guides__list a:hover { border-color: var(--sage-700); }
+  .hp .guides__img { margin: 0; border-radius: 0; border-bottom: 1px solid var(--hair); }
+  .hp .guides__t { padding: 18px 20px 4px; }
+  .hp .guides__list a > .i { display: block; width: 18px; height: 18px; margin: auto 20px 18px; padding-top: 10px; box-sizing: content-box; color: var(--sage-700); transition: transform .15s; }
+  .hp .guides__list a:hover > .i { transform: translateX(3px); }
+  .hp .guides__more { margin-top: 24px; }
+}
 
 /* ===================================================================== close === */
 .hp .close__grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 40px 72px; align-items: start; }
@@ -588,3 +602,12 @@ body:has(.hp) .dock { display: none !important; }
 
 /* How it works step 3: the report illustration (24/10) */
 .hp .tl__art { display: block; width: 100%; max-width: 520px; height: auto; margin-top: 10px; border: 1px solid var(--hair); }
+
+/* trust columns, polish (Abdul 24/10): icon chip, links on a shared foot line, every link 16 px, tighter list */
+.hp .creds { margin-top: 64px; }
+.hp .creds > div { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding-bottom: 24px; }
+.hp .creds__ico { display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: #EEF2EC; color: var(--sage-700); margin-bottom: 4px; }
+.hp .creds__links { margin-top: auto; padding-top: 6px; display: grid; justify-items: start; gap: 0; }
+.hp .creds__links .arrow-link, .hp .creds__links .areas-more summary { font-size: 16px; min-height: 40px; }
+.hp .creds__links .arrow-link .i { transition: transform .15s; }
+.hp .creds__links .arrow-link:hover .i { transform: translateX(3px); }

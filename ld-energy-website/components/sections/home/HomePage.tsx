@@ -372,27 +372,37 @@ function Proof() {
             </figure>
           ))}
         </div>
+        {/* Abdul 24/10, "polish this too": each column an icon, a heading, a line and its links on one foot line, every
+            link the same size; the third column's three links are one list */}
         <div className="creds">
           <div>
+            <span className="creds__ico"><Ico name="document" size={22} /></span>
             <h3>{site.assessor.name}</h3>
             <p>Domestic Energy Assessor with {elmhurst.scheme} (<span className="acc">{elmhurst.number}</span>) and {quidos.scheme} (<span className="acc">{quidos.number}</span>). DBS checked.</p>
-            <a className="link arrow-link" href={site.assessor.verifyUrl} {...ext}>Check the GOV.UK register <Ico name="arrow-right" /></a>
+            <div className="creds__links">
+              <a className="link arrow-link" href={site.assessor.verifyUrl} {...ext}>Check the GOV.UK register <Ico name="arrow-right" /></a>
+            </div>
           </div>
           <div>
+            <span className="creds__ico"><Ico name="check" size={22} /></span>
             <h3>£5m cover, twice over</h3>
             <p>{insurance.full}</p>
+            <div className="creds__links">
+              <Link prefetch={false} className="link arrow-link" href="/terms#liability">How the cover works <Ico name="arrow-right" /></Link>
+            </div>
           </div>
           <div>
+            <span className="creds__ico"><Ico name="map-pin" size={22} /></span>
             <h3>All 32 boroughs and the City</h3>
             <p>Based in Stratford, E15. No travel charges anywhere we cover.</p>
-            <details className="areas-more">
-              <summary>See every area <Ico name="arrow-right" /></summary>
-              <ul className="boroughs">{areas.map((b) => <li key={b.slug}><Link prefetch={false} href={`/areas/${b.slug}`}>{b.name}</Link></li>)}</ul>
-            </details>
             {/* the map index and the borough figures (Abdul 19/10 picks; the 23/10 audit found the homepage linked neither) */}
-            <div className="areas-links">
+            <div className="creds__links">
               <Link prefetch={false} className="link arrow-link" href="/areas">Map of the areas we cover <Ico name="arrow-right" /></Link>
               <Link prefetch={false} className="link arrow-link" href={DATA_PAGE_PATH}>EPC ratings in every borough <Ico name="arrow-right" /></Link>
+              <details className="areas-more">
+                <summary>See every area <Ico name="arrow-right" /></summary>
+                <ul className="boroughs">{areas.map((b) => <li key={b.slug}><Link prefetch={false} href={`/areas/${b.slug}`}>{b.name}</Link></li>)}</ul>
+              </details>
             </div>
           </div>
         </div>

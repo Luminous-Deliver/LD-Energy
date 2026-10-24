@@ -152,7 +152,7 @@ export default function TermsPage() {
         </li>
       </ul>
 
-      <h2>8. Liability</h2>
+      <h2 id="liability">8. Liability</h2>
       <p>
         {insurance.legal} Our liability for any loss arising from the service is limited to the price paid for that service, except where liability cannot be limited by law (for example fraud or personal injury caused by negligence).
       </p>
