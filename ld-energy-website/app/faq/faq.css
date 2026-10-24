@@ -1,0 +1,51 @@
+/* /faq, redesigned 24/10/2026 on the inner-page parts. Only what inner.css does not already have, scoped under .fq so it
+   wins over inner.css whatever order the bundles load in. */
+
+/* hero: copy left, On this page right */
+.fq .fq-hd { margin-top: 18px; display: grid; gap: 28px; }
+.fq .fq-hd__side { order: 2; display: grid; align-content: start; min-width: 0; }  /* after .in-hd__copy (order 1) */
+.fq .fq-hd__side > * { grid-column: auto; grid-row: auto; }  /* inner.css places .in-otp in the area hero's grid */
+@media (min-width: 900px) {
+  .fq .fq-hd { grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: 48px 72px; }
+  .fq .fq-hd__side { padding-top: 6px; }
+}
+
+/* each group: its heading on the left (it stays in view while the questions scroll), the questions on the right */
+.fq .fq-wrap { display: grid; gap: 8px; }
+.fq-side .in-h2 { margin-top: 10px; }
+.fq-side .in-note { margin-top: 12px; max-width: 34ch; }
+@media (min-width: 900px) {
+  .fq .fq-wrap { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 72px; align-items: start; }
+  .fq .fq-wrap .in-faq { margin-top: 0; }
+  .fq .fq-side { position: sticky; top: 140px; }  /* clear of the scroll pill and the On this page bar */
+}
+.fq .in-faq { max-width: none; }
+.fq .in-faq details { scroll-margin-top: 140px; }
+@media (max-width: 759px) { .fq .in-faq details { scroll-margin-top: 96px; } }
+.fq .in-faq__a > p { max-width: 66ch; }
+
+/* the links under an answer: one per line on phones, side by side when there is room, each a full tap target */
+.fq-links { list-style: none; padding: 0; margin-top: 10px; display: flex; flex-wrap: wrap; gap: 0 22px; }
+.fq-links a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 15px; }
+.fq-links a .i { transition: transform .15s; }
+.fq-links a:hover .i { transform: translateX(2px); }
+
+/* still have a question */
+.fq .fq-more { display: grid; gap: 32px; }
+.fq-more__links { margin-top: 16px; font-size: 16px; line-height: 1.6; color: var(--ink-quiet); max-width: 56ch; }
+.fq-ways { list-style: none; padding: 0; border-top: 1px solid var(--ink); }
+.fq-ways li { border-bottom: 1px solid var(--hair); }
+.fq-ways a { display: grid; grid-template-columns: 22px minmax(0, 1fr) 16px; gap: 16px; align-items: center; min-height: 72px; padding: 12px 4px; text-decoration: none;
+  transition: background-color .15s; }
+.fq-ways a:hover { background: var(--band); }
+.fq-ways a > .i:first-child { color: var(--sage-700); }
+.fq-ways a > .i:last-child { color: var(--slate-500); transition: transform .15s, color .15s; }
+.fq-ways a:hover > .i:last-child { color: var(--sage-700); transform: translateX(2px); }
+.fq-ways span { display: grid; gap: 2px; min-width: 0; }
+.fq-ways b { font: 400 21px/1.25 var(--font-serif); overflow-wrap: anywhere; }
+.fq-ways b.fq-ways__em { font-size: clamp(14px, 4.3vw, 21px); }
+.fq-ways small { font-size: 14px; color: var(--ink-quiet); }
+@media (min-width: 900px) { .fq .fq-more { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 72px; align-items: start; } .fq-ways { margin-top: 30px; } }
+
+/* read next: picture cards and the quote card fill evenly */
+.fq .in-ncard--go .in-ncard__b { padding: 22px; }

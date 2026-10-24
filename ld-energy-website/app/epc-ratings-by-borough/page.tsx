@@ -1,17 +1,31 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
+import { ShieldCheck } from 'lucide-react'
 import { Container } from '@/components/ui/Container'
-import { Section } from '@/components/ui/Section'
+import { Ico } from '@/components/sections/home/HomeIcon'
+import { OurPromise } from '@/components/sections/OurPromise'
+import { FiguresDrawer } from '@/components/inner/FiguresDrawer'
+import { OnThisPage, type PageSection } from '@/components/inner/OnThisPage'
+import { ReadNext, type NextStep } from '@/components/inner/ReadNext'
 import { InnerEnding } from '@/components/inner/InnerEnding'
-import { MixBar, OGL, SourceLine, dataSource, period } from '@/components/sections/area/AreaBlocks'
+import { GROUPS, OGL, dataSource, period } from '@/components/sections/area/AreaBlocks'
 import { BoroughExplorer, type ExplorerTile } from '@/components/sections/ratings/BoroughExplorer'
 import { SortableTable, type SortColumn, type SortRow } from '@/components/sections/ratings/SortableTable'
 import type { AreaSummary } from '@/lib/borough-stats-types'
 import { bandEpcPrice, bandPhrase, boroughCount, fmt, london, pct, rankLabel, statsSource, ukDate } from '@/lib/area-page'
 import { DATA_PAGE_PATH, boroughsAtoZ, rankedByAtoC, ratingsFinding, ratingsHeadline, tileLabel, tilePosition } from '@/lib/borough-ratings'
 import { defaultOgImage, site } from '@/lib/site'
+import '@/app/inner.css'
+import './ratings.css'
 
+/*
+ * /epc-ratings-by-borough, the borough ratings data page (areas plan §6, slice C), redesigned 24/10/2026 on the
+ * inner-page parts: About these figures C in the hero (three London numbers, a source chip opens the method drawer),
+ * the tile map and its 33 crawlable panels, the London trend, the A to Z table (in-table) and ending B, the price list
+ * (Abdul 23/10, see components/inner/InnerEnding.tsx). Every figure still comes from lib/borough-stats via
+ * lib/area-page and lib/borough-ratings; tests/ratings-pages.cjs checks them against the built HTML. Metadata frozen
+ * until 14/12.
+ */
 const url = `${site.url}${DATA_PAGE_PATH}`
 const { top, bottom } = ratingsFinding()
 const firstYear = statsSource.from.slice(0, 4)
@@ -37,44 +51,68 @@ function stepFor(slug: string): number {
   return 4 - Math.floor((i * 5) / rankedByAtoC.length)
 }
 
+/** The borough's rating mix against the London line: the inner-page bar (in-mix), with London marked. */
+function PanelMix({ s }: { s: AreaSummary }) {
+  return (
+    <div className="rb-mix">
+      <div className="in-mix__lbl"><b>Ratings</b><span className="num">{fmt(s.ratings.n)} certificates</span></div>
+      <div className="rb-mix__wrap">
+        <span className="rb-mix__mark" style={{ left: `${atoC(london)}%` }} aria-hidden="true" />
+        <div className="in-mix__bar" aria-hidden="true">
+          {GROUPS.map((g) => s.ratings.pct[g.key] > 0 && (
+            <span key={g.key} style={{ width: `${s.ratings.pct[g.key]}%`, background: g.colour }}>
+              {s.ratings.pct[g.key] >= 8 ? `${Math.round(s.ratings.pct[g.key])}%` : ''}
+            </span>
+          ))}
+        </div>
+      </div>
+      <p className="rb-mix__note">Black line: London, {pct(atoC(london))} rated A to C</p>
+    </div>
+  )
+}
+
 function Panel({ s }: { s: AreaSummary }) {
   const prs = s.privateRented
   const rank = rankLabel(s.slug, atoC)
   return (
-    <article id={`borough-${s.slug}`} className="bx-panel rounded-xl border border-secondary-200 bg-white p-5 md:p-6" data-default={s.slug === top.slug ? '' : undefined} aria-labelledby={`h-${s.slug}`}>
-      <h3 id={`h-${s.slug}`} className="text-2xl font-bold tracking-tight text-secondary-900">{s.name}</h3>
-      <p className="mt-1 text-sm text-secondary-600">{rank} of {boroughCount} for the share rated A to C</p>
-      <p className="mt-4 text-secondary-700 leading-relaxed">
-        <strong className="text-secondary-900">{pct(atoC(s))}</strong> of {fmt(s.ratings.n)} certificates rated A to C, against {pct(atoC(london))} across London.
+    <article id={`borough-${s.slug}`} className="bx-panel rb-panel" data-default={s.slug === top.slug ? '' : undefined} aria-labelledby={`h-${s.slug}`}>
+      <p className="in-eyebrow">{rank} of {boroughCount} for the share rated A to C</p>
+      <h3 id={`h-${s.slug}`} className="in-h3">{s.name}</h3>
+      <p className="rb-panel__lead">
+        <b className="num">{pct(atoC(s))}</b> of {fmt(s.ratings.n)} certificates rated A to C, against {pct(atoC(london))} across London.
       </p>
-      <div className="mt-4">
-        <MixBar label="Ratings" s={s} marker={{ label: 'London', atoC: atoC(london) }} />
-      </div>
-      <dl className="mt-5 grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
-        <div>
-          <dt className="text-secondary-600">Private rentals rated below C</dt>
-          <dd className="font-semibold text-secondary-900 tabular-nums">{pct(prs.pctBelowC)} of {fmt(prs.n)}</dd>
-        </div>
-        <div>
-          <dt className="text-secondary-600">Private rentals rated F or G</dt>
-          <dd className="font-semibold text-secondary-900 tabular-nums">{fmt(prs.nFtoG)}</dd>
-        </div>
-        <div>
-          <dt className="text-secondary-600">Typical floor area</dt>
-          <dd className="font-semibold text-secondary-900 tabular-nums">{s.floorArea.median} m²</dd>
-        </div>
-        <div>
-          <dt className="text-secondary-600">Commonest size and EPC guide price</dt>
-          <dd className="font-semibold text-secondary-900 tabular-nums">{bandPhrase(s.commonestBand.id)}, {bandEpcPrice(s.commonestBand.id)}</dd>
-        </div>
+      <PanelMix s={s} />
+      <dl className="rb-panel__dl">
+        <div><dt>Private rentals rated below C</dt><dd className="num">{pct(prs.pctBelowC)} of {fmt(prs.n)}</dd></div>
+        <div><dt>Private rentals rated F or G</dt><dd className="num">{fmt(prs.nFtoG)}</dd></div>
+        <div><dt>Typical floor area</dt><dd className="num">{s.floorArea.median} m²</dd></div>
+        <div><dt>Commonest size and EPC guide price</dt><dd className="num">{bandPhrase(s.commonestBand.id)}, {bandEpcPrice(s.commonestBand.id)}</dd></div>
       </dl>
       {s.slug === 'city-of-london' && (
-        <p className="mt-4 text-sm text-secondary-700">Small base: the City has far fewer certificates than any borough, so its shares move a lot from year to year.</p>
+        <p className="in-note rb-panel__note">Small base: the City has far fewer certificates than any borough, so its shares move a lot from year to year.</p>
       )}
-      <Link href={`/areas/${s.slug}`} className="mt-5 inline-flex min-h-[44px] items-center gap-1.5 font-semibold text-primary-700 hover:text-primary-800">
-        EPCs in {s.name}: prices, postcodes and local rules <span aria-hidden="true">→</span>
+      <Link href={`/areas/${s.slug}`} className="in-link in-arrow rb-panel__go">
+        EPCs in {s.name}: prices, postcodes and local rules <Ico name="arrow-right" size={16} />
       </Link>
     </article>
+  )
+}
+
+/** How the figures were made: in the drawer behind the source chips and, in full, in About these figures. */
+function Method() {
+  return (
+    <>
+      <dl className="in-srcdl">
+        <div><dt>Source</dt><dd>{statsSource.publisher}, <a href={statsSource.url} rel="noopener">{statsSource.title}</a></dd></div>
+        <div><dt>Period</dt><dd>RdSAP certificates for existing homes lodged {period}, from the file of {ukDate(statsSource.fileUpdated)}.</dd></div>
+        <div><dt>Licence</dt><dd><a href={OGL} rel="noopener">{statsSource.licence}</a>. Not endorsed by MHCLG.</dd></div>
+      </dl>
+      <p>
+        &ldquo;Rated A to C&rdquo; is the number of certificates with a current rating of A, B or C, divided by all certificates
+        with a rating, for the borough. Typical floor area is the median total floor area. Private rentals are certificates
+        whose tenure is recorded as rented (private).
+      </p>
+    </>
   )
 }
 
@@ -103,6 +141,25 @@ const rows: SortRow[] = boroughsAtoZ.map((b) => ({
   },
 }))
 
+const sections: PageSection[] = [
+  { id: 'map', heading: 'map-h', label: 'Find your borough' },
+  { id: 'trend', heading: 'trend-h', label: 'The London trend, by year' },
+  { id: 'table', heading: 'table-h', label: `All ${boroughCount} boroughs, A to Z` },
+  { id: 'about-figures', heading: 'about-h', label: 'About these figures' },
+  { id: 'prices', heading: 'in-end-h', label: 'EPC prices in London' },
+]
+
+const readNext: NextStep[] = [
+  { kicker: 'Ratings', title: 'EPC ratings explained', href: '/blog/epc-ratings-explained',
+    text: 'What each band means, and how the score behind it is worked out.' },
+  { kicker: 'Comparing homes', title: 'Why EPC ratings differ between similar homes', href: '/blog/why-is-my-epc-different',
+    text: 'Floor area, outside walls, heating and evidence, side by side.' },
+  { kicker: 'Letting a home', title: 'EPCs for landlords', href: '/landlords',
+    text: 'Where your rental stands against the E minimum, one let or a portfolio.' },
+  { kicker: 'What’s coming', title: 'The 2030 standard for rented homes', href: '/blog/epc-c-by-2030',
+    text: 'What is settled for rented homes, and what still needs legislation.' },
+]
+
 export default function RatingsByBoroughPage() {
   const tiles: ExplorerTile[] = rankedByAtoC.map((b) => ({
     slug: b.slug,
@@ -114,6 +171,7 @@ export default function RatingsByBoroughPage() {
     step: stepFor(b.slug),
   }))
   const years = Object.keys(london.byYear).sort()
+  const chip = `MHCLG · ${fmt(london.certificates)} EPCs`
 
   const schema = [
     {
@@ -146,124 +204,157 @@ export default function RatingsByBoroughPage() {
   ]
 
   return (
-    <>
+    <div className="in rb">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
-      <BreadcrumbNav items={[{ href: '/', label: 'Home' }, { href: '/areas', label: 'Areas' }, { href: DATA_PAGE_PATH, label: 'EPC ratings by borough' }]} />
 
-      <section className="bg-gradient-to-b from-primary-50 via-white to-white border-b border-secondary-100 -mt-24">
-        <Container className="pt-32 pb-12 md:pb-16">
-          <p className="text-xs uppercase tracking-wide font-semibold text-primary-700 mb-3">EPC ratings by London borough, {firstYear}–{lastYear}</p>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-secondary-900 max-w-4xl text-balance">
-            {ratingsHeadline()}
-          </h1>
-          <p className="mt-5 text-lg md:text-xl text-secondary-700 leading-relaxed max-w-3xl">
-            {fmt(london.certificates)} EPCs were lodged for existing homes in London from {ukDate(statsSource.from)} to {ukDate(statsSource.to)}.
-            {' '}{pct(atoC(london))} were rated A to C. {top.name} is highest at {pct(atoC(top))} and {bottom.name} lowest at {pct(atoC(bottom))}.
-          </p>
-          <dl className="mt-8 grid max-w-3xl grid-cols-3 gap-2 sm:gap-4">
-            {[
-              { k: 'London certificates', v: fmt(london.certificates) },
-              { k: 'Rated A to C', v: pct(atoC(london)) },
-              { k: 'Private rentals below C', v: pct(london.privateRented.pctBelowC) },
-            ].map((x) => (
-              <div key={x.k} className="rounded-lg border border-secondary-200 bg-white px-3 py-3 sm:px-4">
-                <dt className="text-xs leading-snug text-secondary-600 sm:text-sm">{x.k}</dt>
-                <dd className="mt-1 text-lg font-bold tabular-nums text-secondary-900 sm:text-2xl">{x.v}</dd>
-              </div>
-            ))}
-          </dl>
-          <p className="mt-6 text-sm text-secondary-600">
-            Figures from the GOV.UK file of {ukDate(statsSource.fileUpdated)}, compiled by{' '}
-            <Link href="/about" className="font-semibold text-secondary-800 underline-offset-2 hover:underline">{site.assessor.name}</Link>,
-            {' '}Domestic Energy Assessor ({site.assessor.accreditations.map((a) => `${a.short} ${a.number}`).join(', ')}). Updated {ukDate(statsSource.generated)}.
-          </p>
+      {/* HERO: the finding, the lead and On this page, then London in three numbers with their source */}
+      <section className="in-hd" aria-labelledby="rb-h1">
+        <Container>
+          <nav className="in-crumbs" aria-label="Breadcrumb">
+            <ol>
+              <li><Link href="/">Home</Link><span className="sep" aria-hidden="true">›</span></li>
+              <li><Link href="/areas">Areas</Link><span className="sep" aria-hidden="true">›</span></li>
+              <li><span aria-current="page">EPC ratings by borough</span></li>
+            </ol>
+          </nav>
+          <div className="rb-hd">
+            <div className="in-hd__copy">
+              <p className="in-eyebrow">EPC ratings by London borough, {firstYear}–{lastYear}</p>
+              <h1 id="rb-h1">{ratingsHeadline()}</h1>
+              <p className="in-hd__answer">
+                {fmt(london.certificates)} EPCs were lodged for existing homes in London from {ukDate(statsSource.from)} to {ukDate(statsSource.to)}.
+                {' '}{pct(atoC(london))} were rated A to C. {top.name} is highest at {pct(atoC(top))} and {bottom.name} lowest at {pct(atoC(bottom))}.
+              </p>
+              <p className="in-by">
+                <ShieldCheck size={18} className="i" aria-hidden="true" />
+                <span>
+                  Figures from the GOV.UK file of {ukDate(statsSource.fileUpdated)}, compiled by{' '}
+                  <Link href="/about"><b>{site.assessor.name}</b></Link>, Domestic Energy Assessor
+                  ({site.assessor.accreditations.map((a) => `${a.short} ${a.number}`).join(', ')}). Updated {ukDate(statsSource.generated)}.
+                </span>
+              </p>
+            </div>
+            <div className="rb-hd__side">
+              <OnThisPage sections={sections} />
+            </div>
+          </div>
+          <FiguresDrawer title="How we got these numbers" stats={[
+            { value: fmt(london.certificates), label: 'London certificates for existing homes', chip },
+            { value: pct(atoC(london)), label: 'Rated A to C', chip },
+            { value: pct(london.privateRented.pctBelowC), label: 'Private rentals below C', chip },
+          ]}>
+            <Method />
+            <p className="in-eyebrow">Read these figures with care</p>
+            <ul className="in-caveats">{statsSource.caveats.map((c) => <li key={c}>{c}</li>)}</ul>
+          </FiguresDrawer>
         </Container>
       </section>
 
-      <Section variant="default" id="map" aria-labelledby="map-h">
-        <div className="max-w-3xl">
-          <p className="text-xs uppercase tracking-wide font-semibold text-primary-700">Every borough</p>
-          <h2 id="map-h" className="mt-2 text-3xl md:text-4xl font-bold tracking-tight text-secondary-900">Find your borough</h2>
-          <p className="mt-4 text-secondary-700 leading-relaxed">
-            Each square is a borough, placed roughly where it sits, with its share of certificates rated A to C. Darker means more homes rated A to C. Pick one to see its figures.
-          </p>
-        </div>
-        <div className="mt-8">
+      {/* FIND YOUR BOROUGH */}
+      <section className="in-sec in-sec--band" id="map" aria-labelledby="map-h">
+        <Container>
+          <div className="rb-head">
+            <div>
+              <p className="in-eyebrow">Every borough</p>
+              <h2 className="in-h2" id="map-h">Find your borough</h2>
+            </div>
+            <p className="in-lede">
+              Each square is a borough, placed roughly where it sits, with its share of certificates rated A to C. Darker means
+              more homes rated A to C. Pick one to see its figures.
+            </p>
+          </div>
           <BoroughExplorer tiles={tiles} initial={top.slug} panels={boroughsAtoZ.map((b) => <Panel key={b.slug} s={b} />)} />
-        </div>
-        <SourceLine>{dataSource}</SourceLine>
-      </Section>
+          <p className="in-src">{dataSource}</p>
+          <p className="rb-also"><Link className="in-link in-arrow" href="/areas">Every London area we cover <Ico name="arrow-right" size={16} /></Link></p>
+        </Container>
+      </section>
 
-      <Section variant="muted" id="trend" aria-labelledby="trend-h">
-        <div className="max-w-3xl">
-          <p className="text-xs uppercase tracking-wide font-semibold text-primary-700">London trend</p>
-          <h2 id="trend-h" className="mt-2 text-3xl md:text-4xl font-bold tracking-tight text-secondary-900">Share rated A to C in London, by year lodged</h2>
-          <ul className="mt-8 space-y-4">
-            {years.map((y) => {
-              const m = london.byYear[y]
-              return (
-                <li key={y} className="grid grid-cols-[4.5rem_minmax(0,1fr)_4rem] items-center gap-3 text-sm">
-                  <span className="font-semibold text-secondary-900">{y === lastYear ? `${y}*` : y}</span>
-                  <span className="h-6 rounded bg-secondary-200/70" aria-hidden="true">
-                    <span className="block h-6 rounded bg-[#19B459]" style={{ width: `${m.pct.AtoC}%` }} />
-                  </span>
-                  <span className="text-right font-semibold tabular-nums text-secondary-900">{pct(m.pct.AtoC)}</span>
-                  <span className="col-start-2 col-span-2 -mt-2 text-xs text-secondary-600 tabular-nums">of {fmt(m.n)} certificates</span>
-                </li>
-              )
-            })}
-          </ul>
-          <p className="mt-4 text-sm text-secondary-600">* {lastYear} to {ukDate(statsSource.to)}.</p>
-          <p className="mt-4 text-secondary-700 leading-relaxed">
-            The assessment method changed to RdSAP 10 during these years, and different homes are assessed each year, so the rise
-            is not proof that London&rsquo;s homes improved by that much.
-          </p>
-        </div>
-      </Section>
+      {/* LONDON TREND */}
+      <section className="in-sec" id="trend" aria-labelledby="trend-h">
+        <Container className="rb-trend">
+          <div>
+            <p className="in-eyebrow">London trend</p>
+            <h2 className="in-h2" id="trend-h">Share rated A to C in London, by year lodged</h2>
+            <p className="in-lede">
+              The assessment method changed to RdSAP 10 during these years, and different homes are assessed each year, so the rise
+              is not proof that London&rsquo;s homes improved by that much.
+            </p>
+          </div>
+          <div>
+            <ul className="rb-years">
+              {years.map((y) => {
+                const m = london.byYear[y]
+                return (
+                  <li key={y}>
+                    <span className="rb-years__y num">{y === lastYear ? `${y}*` : y}</span>
+                    <span className="rb-years__bar" aria-hidden="true"><span style={{ width: `${m.pct.AtoC}%` }} /></span>
+                    <span className="rb-years__v num">{pct(m.pct.AtoC)}</span>
+                    <span className="rb-years__n num">of {fmt(m.n)} certificates</span>
+                  </li>
+                )
+              })}
+            </ul>
+            <p className="in-note rb-years__foot">* {lastYear} to {ukDate(statsSource.to)}.</p>
+          </div>
+        </Container>
+      </section>
 
-      <Section variant="default" id="table" aria-labelledby="table-h">
-        <div className="max-w-5xl">
-          <h2 id="table-h" className="text-2xl md:text-3xl font-bold tracking-tight text-secondary-900">All {boroughCount} boroughs, A to Z</h2>
-          <details className="mt-6 rounded-lg border border-secondary-200 bg-white px-4 py-2 md:px-5">
-            <summary className="flex min-h-[44px] cursor-pointer items-center font-semibold text-secondary-900">Show the table</summary>
-            <div className="mt-2 pb-3">
+      {/* A TO Z */}
+      <section className="in-sec in-sec--band" id="table" aria-labelledby="table-h">
+        <Container>
+          <p className="in-eyebrow">The full table</p>
+          <h2 className="in-h2" id="table-h">All {boroughCount} boroughs, A to Z</h2>
+          <details className="rb-table">
+            <summary>
+              <span>Show the table</span>
+              <span className="rb-table__hint">Sort by any column. Each name opens its area page.</span>
+              <Ico name="arrow-right" size={18} />
+            </summary>
+            <div className="rb-table__in">
               <SortableTable caption={`EPC ratings of existing homes by London borough, certificates lodged ${period}`} columns={columns} rows={rows} />
             </div>
           </details>
-        </div>
-      </Section>
+        </Container>
+      </section>
 
-      <Section variant="default" tier="compact" id="about-figures" aria-labelledby="about-h">
-        <div className="max-w-3xl">
-          <h2 id="about-h" className="text-2xl md:text-3xl font-bold tracking-tight text-secondary-900">About these figures</h2>
-          <div className="mt-4 space-y-3 text-secondary-700 leading-relaxed">
-            <p>
-              Every figure comes from the domestic certificates on the GOV.UK EPC register: RdSAP certificates for existing
-              homes, lodged {period}. &ldquo;Rated A to C&rdquo; is the number of certificates with a current rating of A, B or C,
-              divided by all certificates with a rating, for the borough. Typical floor area is the median total floor area.
-              Private rentals are certificates whose tenure is recorded as rented (private).
+      {/* ABOUT THESE FIGURES */}
+      <section className="in-sec" id="about-figures" aria-labelledby="about-h">
+        <Container className="rb-about">
+          <div>
+            <p className="in-eyebrow">Method and source</p>
+            <h2 className="in-h2" id="about-h">About these figures</h2>
+            <p className="in-lede">
+              Every figure comes from the domestic certificates on the GOV.UK EPC register: RdSAP certificates for existing homes,
+              lodged {period}.
             </p>
-            <ul className="list-disc space-y-1 pl-5">
+          </div>
+          <div className="rb-about__body">
+            <div className="in-drawer__in rb-about__method"><Method /></div>
+            <p className="in-eyebrow">Read these figures with care</p>
+            <ul className="in-caveats rb-about__caveats">
               {statsSource.caveats.map((c) => <li key={c}>{c}</li>)}
               {city && <li>The City of London has {fmt(city.certificates)} certificates, far fewer than any borough, so treat its shares with care.</li>}
             </ul>
-            <p className="text-sm text-secondary-600">
-              Source: {statsSource.publisher}, <a href={statsSource.url} rel="noopener" className="underline underline-offset-2">{statsSource.title}</a>,
-              {' '}file of {ukDate(statsSource.fileUpdated)}. Licensed under the <a href={OGL} rel="noopener" className="underline underline-offset-2">{statsSource.licence}</a>.
+            <p className="in-src">
+              Source: {statsSource.publisher}, <a href={statsSource.url} rel="noopener">{statsSource.title}</a>, file
+              of {ukDate(statsSource.fileUpdated)}. Licensed under the <a href={OGL} rel="noopener">{statsSource.licence}</a>.
               {' '}{statsSource.attribution} Not endorsed by MHCLG.
             </p>
           </div>
-          <p className="mt-6 text-secondary-700">
-            <Link href="/areas" className="font-semibold text-primary-700 underline-offset-2 hover:underline">Every London area we cover</Link>
-            {' · '}
-            <Link href="/blog/epc-ratings-explained" className="font-semibold text-primary-700 underline-offset-2 hover:underline">EPC ratings explained</Link>
-          </p>
-        </div>
-      </Section>
+        </Container>
+      </section>
 
-      <InnerEnding variant="b" source="other"
-        heading="Need an EPC in London? Pick your size"
-        text="One price list for every borough, no travel charge. Every row opens the quote with that size filled in." />
-    </>
+      <ReadNext steps={readNext} />
+
+      {/* Ending B, the price list (Abdul 23/10: the borough ratings page) */}
+      <div id="prices">
+        <InnerEnding variant="b" source="other"
+          heading="Need an EPC in London? Pick your size"
+          text="One price list for every borough, no travel charge. Every row opens the quote with that size filled in." />
+      </div>
+
+      {/* Our promise under the prices (Abdul 24/10) */}
+      <OurPromise />
+    </div>
   )
 }

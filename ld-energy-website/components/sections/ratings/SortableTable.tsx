@@ -38,33 +38,31 @@ export function SortableTable({ caption, columns, rows }: { caption: string; col
   const arrow = (key: string) => (sort.key === key ? (sort.dir === 'asc' ? '↑' : '↓') : '↕')
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-[40rem] text-left text-sm">
+    <div className="in-tscroll st">
+      <table className="in-table st__t">
         <caption className="sr-only">{caption}. Column headers are buttons that sort the table.</caption>
         <thead>
-          <tr className="border-b border-secondary-200 text-secondary-600">
-            <th scope="col" aria-sort={ariaSort('name')} className="py-1 pr-3 font-semibold">
-              <button type="button" onClick={() => toggle('name')} className="inline-flex min-h-[44px] items-center gap-1 font-semibold hover:text-secondary-900">
+          <tr>
+            <th scope="col" aria-sort={ariaSort('name')}>
+              <button type="button" className="st__b" onClick={() => toggle('name')}>
                 Borough <span aria-hidden="true">{arrow('name')}</span>
               </button>
             </th>
             {columns.map((c) => (
-              <th key={c.key} scope="col" aria-sort={ariaSort(c.key)} className={`py-1 pr-3 font-semibold ${c.numeric ? 'text-right' : ''}`}>
-                <button type="button" onClick={() => toggle(c.key, c.numeric)} className="inline-flex min-h-[44px] items-center gap-1 font-semibold hover:text-secondary-900">
+              <th key={c.key} scope="col" aria-sort={ariaSort(c.key)} className={c.numeric ? 'r' : undefined}>
+                <button type="button" className="st__b" onClick={() => toggle(c.key, c.numeric)}>
                   {c.label} <span aria-hidden="true">{arrow(c.key)}</span>
                 </button>
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="tabular-nums">
+        <tbody className="num">
           {sorted.map((r) => (
-            <tr key={r.slug} id={`row-${r.slug}`} className="border-b border-secondary-100">
-              <th scope="row" className="py-2 pr-3 font-medium text-secondary-900">
-                <Link href={r.href} className="text-primary-700 underline-offset-2 hover:underline">{r.name}</Link>
-              </th>
+            <tr key={r.slug} id={`row-${r.slug}`}>
+              <th scope="row"><Link href={r.href} className="in-link">{r.name}</Link></th>
               {columns.map((c) => (
-                <td key={c.key} className={`py-2 pr-3 whitespace-nowrap text-secondary-800 ${c.numeric ? 'text-right' : ''}`}>{r.cells[c.key].text}</td>
+                <td key={c.key} className={c.numeric ? 'r' : undefined}>{r.cells[c.key].text}</td>
               ))}
             </tr>
           ))}
