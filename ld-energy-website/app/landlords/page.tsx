@@ -7,6 +7,7 @@ import { Ico } from '@/components/sections/home/HomeIcon'
 import { OnThisPage, type PageSection } from '@/components/inner/OnThisPage'
 import { ReadNext, type NextStep } from '@/components/inner/ReadNext'
 import { InnerEnding } from '@/components/inner/InnerEnding'
+import { RevealOnScroll } from '@/components/inner/RevealOnScroll'
 import {
   site, pricing, priceFrom, defaultOgImage, govUk, insurance, floorPlanDisclaimer, portfolioMinHomes, portfolioRatesText,
   SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE,
@@ -245,10 +246,10 @@ export default function LandlordsPage() {
       {/* WHERE YOUR RENTAL STANDS */}
       <section className="in-sec in-sec--band" id="stands" aria-labelledby="stands-h">
         <Container>
-          <p className="in-eyebrow">The rule today</p>
-          <h2 className="in-h2" id="stands-h">Where your rental stands</h2>
-          <p className="in-lede">For lets the rules cover in England and Wales, the minimum is E, unless a valid exemption is registered. Your EPC shows which of these you are in.</p>
-          <ul className="lp-bands">
+          <p className="in-eyebrow" data-reveal>The rule today</p>
+          <h2 className="in-h2" id="stands-h" data-reveal>Where your rental stands</h2>
+          <p className="in-lede" data-reveal>For lets the rules cover in England and Wales, the minimum is E, unless a valid exemption is registered. Your EPC shows which of these you are in.</p>
+          <ul className="lp-bands" data-reveal="list">
             <li>
               <div className="lp-bands__k">
                 <span className="lp-chip lp-chip--w" style={{ '--c': 'var(--epc-a)' } as React.CSSProperties}>A</span>
@@ -277,7 +278,7 @@ export default function LandlordsPage() {
               <p>Have it ready before you market the let. Your tenant needs a copy before the tenancy starts.</p>
             </li>
           </ul>
-          <div className="lp-2030">
+          <div className="lp-2030" data-reveal>
             <p className="in-eyebrow">2030: confirmed, not law yet</p>
             <p>
               Government has confirmed a higher standard, equivalent to C, from 1 October 2030, with a {gbp(COST_CAP_2030)} cost cap per
@@ -285,7 +286,7 @@ export default function LandlordsPage() {
               <Link className="in-link" href="/blog/epc-c-by-2030">What the 2030 standard means</Link>
             </p>
           </div>
-          <p className="in-src">
+          <p className="in-src" data-reveal>
             Sources: GOV.UK <a href={govUk.meesLandlordGuidance} target="_blank" rel="noopener">landlord guidance on the minimum standard</a> and
             the <a href={govUk.prsResponse2026} target="_blank" rel="noopener">January 2026 government response</a>. HMOs, holiday lets and
             listed buildings need their own check. An EPC shows the rating; it does not register an exemption.
@@ -296,9 +297,9 @@ export default function LandlordsPage() {
       {/* ONE LET OR A PORTFOLIO */}
       <section className="in-sec" id="portfolio" aria-labelledby="portfolio-h">
         <Container>
-          <p className="in-eyebrow">How you book</p>
-          <h2 className="in-h2" id="portfolio-h">One let or a portfolio</h2>
-          <div className="lp-ways">
+          <p className="in-eyebrow" data-reveal>How you book</p>
+          <h2 className="in-h2" id="portfolio-h" data-reveal>One let or a portfolio</h2>
+          <div className="lp-ways" data-reveal="list">
             <article className="lp-way">
               <span className="lp-way__ico"><Ico name="house" size={28} /></span>
               <h3 className="in-h3">One home</h3>
@@ -324,7 +325,7 @@ export default function LandlordsPage() {
               <Link className="in-arrow in-link" href="/services/floor-plans">Floor Plans <Ico name="arrow-right" size={16} /></Link>
             </article>
           </div>
-          <figure className="lp-quote">
+          <figure className="lp-quote" data-reveal>
             <blockquote>
               <p>I needed a floor plan for my flat that met the requirements for a property licence application. The whole process was smooth, efficient, and professional, with a very quick turnaround.</p>
             </blockquote>
@@ -339,7 +340,7 @@ export default function LandlordsPage() {
       {/* HOW THE VISIT WORKS */}
       <section className="in-sec in-sec--band" id="visit" aria-labelledby="visit-h">
         <Container className="lp-visit">
-          <div>
+          <div data-reveal>
             <p className="in-eyebrow">On the day</p>
             <h2 className="in-h2" id="visit-h">How the visit works</h2>
             <p className="in-lede">Your tenant doesn&apos;t need to move out or clear anything. We need to reach every room, the loft hatch (if there is one), the boiler and the meters.</p>
@@ -347,7 +348,7 @@ export default function LandlordsPage() {
             <img className="lp-visit__img" src="/home/assessor-visit-900.webp" width={900} height={600} loading="lazy" decoding="async"
               alt="An assessor in a sage jacket measures a London front room with a laser measure, beside a sash window and a column radiator" />
           </div>
-          <ol className="lp-steps">
+          <ol className="lp-steps" data-reveal="list">
             <li><span className="lp-steps__n">1</span><div><h3 className="in-h3">You book</h3><p>Send the address and the floor area, or tell us you&apos;re not sure. We confirm the exact price and a time before you agree. Same working-day reply.</p></div></li>
             <li><span className="lp-steps__n">2</span><div><h3 className="in-h3">We visit</h3><p>Every room is measured with a laser, and the insulation, heating, hot water, windows and lighting are recorded. About 45 minutes for a studio, up to 2 hours for a large home.</p></div></li>
             <li><span className="lp-steps__n">3</span><div><h3 className="in-h3">Ready within 72 hours</h3><p>Your EPC goes on the GOV.UK register with its recommendations, and the link comes to you, or to your agent if you ask.</p></div></li>
@@ -358,7 +359,7 @@ export default function LandlordsPage() {
       {/* IF IT COMES BACK F OR G */}
       <section className="in-sec" id="low" aria-labelledby="low-h">
         <Container className="lp-low">
-          <div>
+          <div data-reveal>
             <p className="in-eyebrow">Straight answer</p>
             <h2 className="in-h2" id="low-h">If it comes back F or G</h2>
             <p className="in-lede">
@@ -366,7 +367,7 @@ export default function LandlordsPage() {
               Evidence of work you&apos;ve done does count, so <Link className="in-link" href="/preparing-for-your-epc#documents-and-evidence">have it ready</Link>.
             </p>
           </div>
-          <dl className="in-diffs lp-opts">
+          <dl className="in-diffs lp-opts" data-reveal="list">
             <div><dt>Included</dt><dd><b>The recommendations</b> on every EPC list the improvements that could raise the rating, with a rough cost for each.</dd></div>
             <div><dt>£{site.addOns.improvementPlan} extra</dt><dd><b><Link className="in-link" href="/services/epc-improvement-plan">EPC Improvement Plan</Link>.</b> Abdul writes out what is holding the rating back and what to do first, with the full Elmhurst Energy Report behind it.</dd></div>
             <div><dt>From £{priceFrom.preAssessment}</dt><dd><b><Link className="in-link" href="/services/epc-pre-assessment">EPC Pre-Assessment</Link>.</b> Planning works before re-letting? The same survey, not lodged, so you know the rating before anything goes on the register.</dd></div>
@@ -377,9 +378,9 @@ export default function LandlordsPage() {
       {/* PROOF */}
       <section className="in-sec in-sec--band" aria-labelledby="proof-h">
         <Container>
-          <p className="in-eyebrow">Check us before you book</p>
-          <h2 className="in-h2" id="proof-h">{site.reviews.ratingValue.toFixed(1)} on Google <span className="lp-quiet">from {site.reviews.reviewCount} reviews</span></h2>
-          <ul className="lp-trust">
+          <p className="in-eyebrow" data-reveal>Check us before you book</p>
+          <h2 className="in-h2" id="proof-h" data-reveal>{site.reviews.ratingValue.toFixed(1)} on Google <span className="lp-quiet">from {site.reviews.reviewCount} reviews</span></h2>
+          <ul className="lp-trust" data-reveal="list">
             <li>
               <h3 className="in-h3">{site.assessor.name}</h3>
               <p>{site.assessor.qualification} with {reg.map((a, i) => <span key={a.number}>{i > 0 && ' and '}{a.scheme} (<b>{a.number}</b>)</span>)}. DBS checked.</p>
@@ -404,7 +405,7 @@ export default function LandlordsPage() {
       {/* QUESTIONS */}
       <section className="in-sec" id="questions" aria-labelledby="questions-h">
         <Container className="lp-faqwrap">
-          <div>
+          <div data-reveal>
             <p className="in-eyebrow">Landlord questions</p>
             <h2 className="in-h2" id="questions-h">Before you book</h2>
             <p className="in-note lp-faqside">
@@ -412,7 +413,7 @@ export default function LandlordsPage() {
               the <Link className="in-link" href="/blog/mees-regulations-2026">full guide to the rules</Link>.
             </p>
           </div>
-          <div className="in-faq">
+          <div className="in-faq" data-reveal>
             {faqs.map((f, i) => (
               <details key={f.q} open={i === 0}>
                 <summary><span>{f.q}</span><ChevronDown size={20} className="i" aria-hidden="true" /></summary>
@@ -424,6 +425,9 @@ export default function LandlordsPage() {
       </section>
 
       <ReadNext steps={readNext} />
+
+      {/* section reveals (motion, Considered); Our promise, Read next and the ending are shared parts, marked by selector */}
+      <RevealOnScroll blocks={['.lp .op__in', '.lp .in-rn h2', '.lp .in-end-a__in']} lists={['.lp .in-ncards']} />
 
       <div id="book">
         <InnerEnding variant="a" source="landlords"

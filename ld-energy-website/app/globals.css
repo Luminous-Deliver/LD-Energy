@@ -121,19 +121,6 @@
   .animate-delay-400 { animation-delay: 400ms; }
   .animate-delay-500 { animation-delay: 500ms; }
 
-  /* Subtle reveal — smaller travel (6px), slight blur, fills forward */
-  @keyframes reveal {
-    from { opacity: 0; transform: translateY(6px); filter: blur(2px); }
-    to   { opacity: 1; transform: translateY(0);   filter: blur(0); }
-  }
-  .animate-reveal {
-    animation: reveal 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .animate-reveal { animation: none; opacity: 1; }
-  }
-
   /* Premium soft shadows (slate-tinted) */
   .shadow-premium {
     box-shadow: 0 1px 2px -1px rgb(15 23 42 / 0.08),
@@ -243,16 +230,6 @@
   .lh-land__near { z-index: 4; width: max(100%, 1900px); bottom: -6px; filter: saturate(.75) brightness(.88) hue-rotate(6deg); }
   .lh-floor { position: absolute; left: 0; right: 0; bottom: 0; z-index: 5; height: 110px; pointer-events: none; background: linear-gradient(to bottom, transparent, rgba(250,251,252,.85) 70%, #FAFBFC); }
   .lh-card { position: relative; z-index: 3; margin: 52px auto 0; max-width: 1040px; padding: 0 1rem; }
-  /* entrance, OmniRated's measured numbers: sky brightens over 1.2s, the land and the
-     card rise 70px together over 1.3s (card .12s behind), words stagger 24px */
-  @keyframes lh-rise { from { opacity: 0; translate: 0 24px; } }
-  @keyframes lh-sky { from { opacity: .12; } }
-  @keyframes lh-land { from { translate: -50% 70px; } }
-  @keyframes lh-card { from { translate: 0 70px; } }
-  .lh-sky { animation: lh-sky 1.2s cubic-bezier(.22,1,.36,1) backwards; }
-  .lh-rise { animation: lh-rise 1s cubic-bezier(.22,1,.36,1) calc(.15s + var(--n) * .11s) backwards; }
-  .lh-land img { animation: lh-land 1.3s cubic-bezier(.22,1,.36,1) backwards; }
-  .lh-card { animation: lh-card 1.3s cubic-bezier(.22,1,.36,1) .12s backwards; }
   @media (max-width: 760px) {
     .lh { padding-bottom: 36px; }
     .lh-words { padding-top: 7.5rem; }
@@ -494,8 +471,6 @@
   .hv-details { margin-top: 28px; border-block: 1px solid rgba(13,27,51,.11); }
   .hv-details summary { cursor: pointer; padding: 14px 2px; font-weight: 600; }
   .hv-details p { padding: 0 2px 16px; color: #4B5A6C; line-height: 1.6; }
-  .will-reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1); }
-  .will-reveal.is-in { opacity: 1; transform: none; }
 
   /* services */
   .svc-grid { margin-top: clamp(28px, 4vw, 52px); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
@@ -557,7 +532,6 @@
 
   /* why + book with confidence */
   .hy-words { margin-top: 24px; font-family: var(--font-serif); font-size: clamp(1.6rem, 1.1rem + 1.8vw, 2.5rem); line-height: 1.32; font-weight: 500; letter-spacing: -0.01em; color: #0D1B33; text-wrap: pretty; }
-  .hy-words [data-w] { transition: opacity .12s linear; }
   .hy-vow { margin-top: clamp(40px, 6vw, 72px); }
   .hy-vow h3 { font-size: clamp(1.4rem, 1.1rem + 1vw, 1.9rem); font-weight: 500; }
   .hy-vow ul { margin-top: 18px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
@@ -667,13 +641,6 @@
   .hc-contact a:hover { text-decoration: underline; text-underline-offset: 4px; }
   .hc-sign { margin-top: 64px; }
   .hc-sign__name { display: inline-block; padding-inline: .15em; font-size: clamp(44px, 6vw, 64px); line-height: 1; color: #E7EDEA; opacity: .9; }
-  /* Close motion (CloseMotion): typed heading, written signature. Only armed by JS. */
-  .hc-type.is-armed [data-l]:not(.is-on) { visibility: hidden; }
-  .hc-type [data-l] { position: relative; }
-  .hc-type [data-l].is-cursor::after { content: ""; position: absolute; top: .1em; right: -.07em; width: 2px; height: .82em; background: currentColor; }
-  .hc-sign__name.is-armed { mask-image: linear-gradient(125deg, #000 47.61%, transparent 52.39%); mask-size: 240% 100%; mask-position: 100% 0; mask-repeat: no-repeat; }
-  .hc-sign__name.is-writing { animation: hc-sig-write 1.6s linear forwards; }
-  @keyframes hc-sig-write { 0% { mask-position: 100% 0; } 6.25% { mask-position: 83.19% 0; } 12.5% { mask-position: 80.19% 0; } 18.75% { mask-position: 76.54% 0; } 25% { mask-position: 71.44% 0; } 31.25% { mask-position: 67.13% 0; } 37.5% { mask-position: 62.04% 0; } 43.75% { mask-position: 56.81% 0; } 50% { mask-position: 51.82% 0; } 56.25% { mask-position: 48.01% 0; } 62.5% { mask-position: 44.81% 0; } 68.75% { mask-position: 41.15% 0; } 75% { mask-position: 37.59% 0; } 81.25% { mask-position: 32.12% 0; } 87.5% { mask-position: 27.08% 0; } 93.75% { mask-position: 20.38% 0; } 100% { mask-position: 0 0; } }
   .hc-who { margin-top: 6px; font-size: 14px; color: #AEBBCB; }
   .hc-credit { margin-top: 10px; font-size: 12.5px; color: #93A1B3; }
   .hc-credit a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
@@ -696,11 +663,6 @@ body:has(.hc-close) .cf-contact { display: none; }
 body:has(.hc-close) .cf-grid { border-top: 1px solid rgba(241, 244, 242, .12); }
 /* Phones keep the logo and rating too (the rating is desktop-only on other pages). */
 @media (max-width: 1023px) { body:has(.hc-close) .cf-proof { display: block; } }
-
-@media (prefers-reduced-motion: reduce) {
-  .lh-sky, .lh-rise, .lh-land img, .lh-card { animation: none; }
-  .will-reveal { opacity: 1; transform: none; }
-}
 
 /* Borough ratings data page (components/sections/ratings/BoroughExplorer.tsx): all 33 panels are in the HTML;
    one shows. Without JavaScript the tile links target a panel; with it, the component styles the chosen one. */
