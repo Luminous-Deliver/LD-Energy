@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getRequestContext } from '@cloudflare/next-on-pages'
 import { contactSchema, enquirySchema, type EnquiryInput } from '@/lib/validators'
-import { site } from '@/lib/site'
+import { site, promise } from '@/lib/site'
 import { areaLabel, legacyArea, TOP_BAND } from '@/lib/floor-area'
 import { bookingPriceRows, guideEstimate, guideEstimateLine, guidePrice, PLAN_LABEL, ENERGY_REPORT_LABEL } from '@/lib/pricing-estimate'
 import { boroughMeta } from '@/lib/boroughs'
@@ -170,6 +170,12 @@ function buildConfirmation(data: ParsedInput) {
   const steps = nextSteps(estimate.productKind, data.speed, estimate.energyReport)
   const showPrep = hasPrepChecklist(estimate.productKind)
   const tenanted = !isBulkEnquiry && data.customerType === 'Landlord (tenanted)'
+  // Our promise (Abdul 24/10/2026): the lodgement line only where an EPC is lodged; terms section 7, #our-promise
+  const lodged = estimate.productKind === 'epc' || estimate.productKind === 'bundle'
+  const promiseLines = [
+    ...(lodged ? [`£${promise.lateLodgement} off if your EPC isn't on the GOV.UK register within 72 hours of the visit.`] : []),
+    `£${promise.lateChange} off if we move your visit with less than 24 hours' notice.`,
+  ]
   // what the chosen service delivers (v7, approved 22/10/2026): the same list as the confirmation screen
   const delivered = deliveredList(estimate.productKind, { improvementPlan: estimate.improvementPlan > 0, energyReport: estimate.energyReport })
   const prepUrl = `${SITE_URL}${PREP_PATH}`
@@ -225,6 +231,7 @@ function buildConfirmation(data: ParsedInput) {
     steps.map((step, i) => `  ${i + 1}. ${step}`).join('\n') +
     (showPrep ? `\n\nBefore your visit:\n${prepChecklist.map(item => `  - ${item}`).join('\n')}\n  Please read before your visit: ${prepUrl}` : '') +
     (tenanted ? `\n\nTenanted property? ${TENANT_NOTICE}` : '') +
+    (isBulkEnquiry ? '' : `\n\nOur promise:\n${promiseLines.map(l => `  - ${l}`).join('\n')}\n  How it works: ${SITE_URL}/terms#our-promise`) +
     `\n\nNeed us sooner, or want to change something? Reply to this email, call or text ${PHONE}, or message us on WhatsApp.\n\n` +
     `L&D Energy, Elmhurst and Quidos accredited Domestic Energy Assessor\n` +
     `Covering all 32 London boroughs · ${SITE_URL}\n\n` +
@@ -322,7 +329,12 @@ function buildConfirmation(data: ParsedInput) {
               <!-- Next steps -->
               ${sectionLabel('What happens next')}
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 12px">${stepRows}</table>
-${prepBlock}${tenantBlock}
+${prepBlock}${tenantBlock}${isBulkEnquiry ? '' : `
+              ${sectionLabel('Our promise')}
+              <ul style="margin:0 0 8px;padding:0 0 0 18px;font-size:14px;line-height:1.55;color:${INK}">
+                ${promiseLines.map(l => `<li style="margin:0 0 6px">${escapeHtml(l)}</li>`).join('')}
+              </ul>
+              <p style="margin:0 0 24px;font-size:13px;line-height:1.5"><a href="${SITE_URL}/terms#our-promise" style="color:${NAVY}">How it works</a></p>`}
               <!-- CTA row -->
               <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 6px">
                 <tr>

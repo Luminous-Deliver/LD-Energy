@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { ArrowDown, CalendarClock, Clock, CreditCard, FileText, Home, Info, KeyRound, Mail, Phone } from 'lucide-react'
 import { GuideCrumbs } from '@/components/blog/GuideCrumbs'
 import { TableOfContents } from '@/components/blog/TableOfContents'
+import { ReadNext, type NextStep } from '@/components/inner/ReadNext'
 import { ratingQuestions } from '@/lib/faq'
 import { PrepChecklist } from '@/components/prep/PrepChecklist'
 import { WhatsAppIcon } from '@/components/ui/BrandIcons'
@@ -74,6 +75,17 @@ const shareLinks = [
   { id: 'how-your-epc-rating-is-calculated', label: 'How your rating is calculated' },
   { id: 'what-counts', label: 'Done work? What counts' },
   { id: 'rating-questions', label: 'When your rating comes back' },
+]
+
+const readNext: NextStep[] = [
+  { kicker: 'On the day', title: 'What happens during an EPC assessment', href: '/blog/what-happens-during-epc-assessment',
+    text: 'What your assessor records, room by room, and how long it takes.' },
+  { kicker: 'Comparing ratings', title: 'Why your EPC differs from your neighbour’s', href: '/blog/why-is-my-epc-different',
+    text: 'Terrace position, insulation, evidence and the method, explained.' },
+  { kicker: 'The method', title: 'RdSAP 10: what changed in 2025', href: '/blog/rdsap-10-what-changed-2025',
+    text: 'Why a new EPC may not match an older one, and the August 2026 update.' },
+  { kicker: 'After your EPC', title: 'How to improve your EPC rating', href: '/blog/how-to-improve-epc-rating',
+    text: 'Which measures to look at first, and what affects how much they count.' },
 ]
 
 const crumbs = [
@@ -353,6 +365,10 @@ export default function PreparingPage() {
 
                 <div id="what-to-prepare" className="pp-sub">
                   <h3>What to prepare</h3>
+                  {/* what the assessor needs to reach: loft hatch, boiler, cylinder, meters (illustrations board 24/10) */}
+                  {/* eslint-disable-next-line @next/next/no-img-element -- decorative; next/image is unoptimised on Pages */}
+                  <img className="pp-art" src="/illustrations/access-900.webp" srcSet="/illustrations/access-900.webp 900w, /illustrations/access-1600.webp 1600w"
+                    sizes="(min-width: 1100px) 720px, 92vw" alt="" width={900} height={500} loading="lazy" decoding="async" />
                   <ul className="pp-list">
                     {prepare.map((x) => (
                       <li key={x.title}>
@@ -516,9 +532,12 @@ export default function PreparingPage() {
                   <li>Hidden insulation only counts with paperwork that shows the thickness.</li>
                   <li>
                     The loft: if there’s no loft hatch or other way in, it’s recorded as no access and the method uses
-                    the default for the age of the home. If you can get into the loft, your assessor measures the
-                    insulation that’s actually there, which can be more or less than that default. A hatch that’s there
-                    but can’t be opened on the day is recorded as access with the insulation unknown, not as no access.
+                    the default for the age of the home. So if your loft has no insulation at all, the rating may be
+                    better with no access to the loft, where the default for its age is used, than with access, where
+                    none is recorded.
+                    If you can get into the loft, your assessor measures the insulation that’s actually there. A hatch
+                    that’s there but can’t be opened on the day is recorded as access with the insulation unknown, not
+                    as no access.
                   </li>
                 </ul>
                 <p>
@@ -708,6 +727,8 @@ export default function PreparingPage() {
           </div>
         </div>
       </div>
+      {/* Read next (Abdul 24/10/2026): the guides that answer what people ask before and after the visit */}
+      <ReadNext steps={readNext} />
     </>
   )
 }

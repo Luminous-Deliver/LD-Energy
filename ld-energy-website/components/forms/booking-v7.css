@@ -30,3 +30,8 @@
 .bf__sent-call a { font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 .bf__again { min-height: 44px; padding: 0 4px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 @media (max-width: 759px) { .bf__reply { text-align: left; } }
+
+/* Our promise under the send button (Abdul 24/10/2026) */
+.bf__promise { margin-top: 10px; padding: 10px 12px; border-left: 2px solid var(--sage-700, #3A624E); background: rgba(58, 98, 78, .06); font-size: 14px; line-height: 1.5; color: var(--ink, #1E2235); }
+.bf__promise b { font-weight: 600; color: var(--sage-700, #3A624E); }
+.bf__promise a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }

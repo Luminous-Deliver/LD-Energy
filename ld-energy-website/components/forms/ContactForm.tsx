@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowLeft, ArrowRight, Check, HelpCircle, Mail, MessageCircle, Phone, ShieldAlert, WifiOff } from 'lucide-react'
 import { Field, Input, Textarea } from '@/components/ui/Input'
 import { cn } from '@/lib/cn'
-import { pricing, site, maxBundleSaving, formatPrice, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE } from '@/lib/site'
+import { pricing, site, maxBundleSaving, formatPrice, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE, promise } from '@/lib/site'
 import { areaBands, areaLabel, bandForArea, parseExactArea, TOP_BAND } from '@/lib/floor-area'
 import { guideEstimate, guideEstimateRows, guidePrice, PLAN_LABEL, ENERGY_REPORT_LABEL } from '@/lib/pricing-estimate'
 import {
@@ -1044,6 +1044,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
           <button key="send" type="submit" disabled={status === 'submitting' || (!FORM_DRAFT && !turnstileToken)} className="bf__go">{status === 'submitting' ? 'Sending…' : 'Send my quote request'}</button>
         </div>
         <p className="bf__reply"><b>Same working-day reply</b>, with your exact price and available times.</p>
+        <p className="bf__promise"><b>Our promise:</b> £{promise.lateLodgement} off if your EPC isn’t on the register within 72 hours of the visit, £{promise.lateChange} off if we move your visit with less than 24 hours’ notice. <a href="/terms#our-promise">How it works</a></p>
       </>
     }
   }
@@ -1125,6 +1126,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
       </div>
       {/* who replies and how fast, under the send button (live wording) */}
       {step === LAST && <p className="bf__reply"><b>Same working-day reply</b>, with your exact price and available times.</p>}
+      {step === LAST && <p className="bf__promise"><b>Our promise:</b> £{promise.lateLodgement} off if your EPC isn’t on the register within 72 hours of the visit, £{promise.lateChange} off if we move your visit with less than 24 hours’ notice. <a href="/terms#our-promise">How it works</a></p>}
       <div className="bf__foot">
         <p>Questions first? <a href={formWhatsappHref(values, estimate.state === 'priced' && estimate.total !== null ? guidePrice(estimate, estimate.total) : undefined)} target="_blank" rel="noopener noreferrer">Message us on WhatsApp</a>, and what you’ve chosen so far comes with it.</p>
       </div>

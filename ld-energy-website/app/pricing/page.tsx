@@ -1,5 +1,6 @@
 import { quoteHref } from '@/lib/quote-context'
 import type { Metadata } from 'next'
+import { OurPromise } from '@/components/sections/OurPromise'
 import { CheckCircle2, XCircle, Sparkles, Ruler, Info } from 'lucide-react'
 import { Section } from '@/components/ui/Section'
 import { Card } from '@/components/ui/Card'
@@ -349,6 +350,9 @@ export default function PricingPage() {
           </div>
         </div>
       </Section>
+
+      {/* Our promise, under the prices (Abdul 24/10) */}
+      <OurPromise />
 
       {/* What's included / not included */}
       <Section variant="muted" id="whats-included">

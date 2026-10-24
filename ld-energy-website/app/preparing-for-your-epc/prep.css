@@ -196,3 +196,4 @@
 .pp-ev-h { margin-top: 40px; font: 400 24px/1.25 var(--font-serif); color: var(--ink); scroll-margin-top: calc(var(--head-h) + 20px); }
 .pp-ev-lede { margin-top: 6px; }
 .pp-qa--rating > div { scroll-margin-top: calc(var(--head-h) + 20px); }
+.pp-art { display: block; width: 100%; height: auto; margin-top: 14px; }

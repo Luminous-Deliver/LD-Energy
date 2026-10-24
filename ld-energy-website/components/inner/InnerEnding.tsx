@@ -19,7 +19,7 @@ const END_BAND_IMAGE: string | null = '/inner/end-band'
  * borough ratings page). Replaces the blue "Need an EPC? Get your exact quote." band.
  */
 export function InnerEnding({
-  variant, heading, text, eyebrow, quote, source, whatsapp,
+  variant, heading, text, eyebrow, quote, source, whatsapp, image,
 }: {
   variant: 'a' | 'b'
   heading?: string
@@ -32,7 +32,10 @@ export function InnerEnding({
   source?: SourcePage
   /** A's WhatsApp link and label, when the page asks for something other than one quote (landlords: a list). */
   whatsapp?: { href: string; label: string }
+  /** A's band picture, as a path without the -900/-1600.webp suffix; defaults to the shared end band (About: evening). */
+  image?: string
 }) {
+  const band = image ?? END_BAND_IMAGE
   const quoteLink = quote ?? quoteHref({ service: 'epc', sourcePage: source, ctaId: 'bottom' })
   if (variant === 'b') {
     return (
@@ -94,11 +97,11 @@ export function InnerEnding({
         </div>
         <p className="in-end-a__tel">Prefer to call? <a className="num" href={site.phoneHref}>{site.phone}</a>, {site.hours.replace('Monday–Sunday, ', '').replace('–', ' to ')}, every day</p>
       </Container>
-      {END_BAND_IMAGE && (
+      {band && (
         <>
           {/* in the flow, pulled up under the copy by less than its empty sky, so copy never meets the houses */}
           {/* eslint-disable-next-line @next/next/no-img-element -- decorative; next/image is unoptimised on Pages */}
-          <img className="in-end-a__img" src={`${END_BAND_IMAGE}-1600.webp`} srcSet={`${END_BAND_IMAGE}-900.webp 900w, ${END_BAND_IMAGE}-1600.webp 1600w`}
+          <img className="in-end-a__img" src={`${band}-1600.webp`} srcSet={`${band}-900.webp 900w, ${band}-1600.webp 1600w`}
             sizes="100vw" alt="" width={1600} height={900} loading="lazy" decoding="async" />
         </>
       )}

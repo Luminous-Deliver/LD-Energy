@@ -286,6 +286,7 @@ export default function AboutPage() {
 
       <InnerEnding
         variant="a"
+        image="/illustrations/evening"
         eyebrow="Get in touch"
         heading="Ready to work with us?"
         text="Request your EPC quote online, or get in touch with any question. We reply during our opening hours, Monday to Sunday, 8am to 8pm."

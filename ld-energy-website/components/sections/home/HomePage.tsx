@@ -189,6 +189,10 @@ function HowItWorks() {
                   <h3>Ready within 72 hours</h3>
                   <p>Your EPC goes on the GOV.UK register with its recommendations, and the certificate link comes to you once it is live. Floor plans come as JPG and PDF, drawn to scale.</p>
                   <p className="tl__fact"><Ico name="calendar" />Same-day lodgement, £{SAME_DAY_LODGEMENT_SURCHARGE} more. Next-day visit and lodgement, £{NEXT_DAY_VISIT_SURCHARGE} more.</p>
+                  {/* the report: the EPC's rating bars beside the floor plan (illustrations board 24/10, Abdul's pick) */}
+                  {/* eslint-disable-next-line @next/next/no-img-element -- decorative; next/image is unoptimised on Pages */}
+                  <img className="tl__art" src="/illustrations/report-900.webp" srcSet="/illustrations/report-900.webp 900w, /illustrations/report-1600.webp 1600w"
+                    sizes="(min-width: 1100px) 560px, 90vw" alt="" width={900} height={675} loading="lazy" decoding="async" />
                 </div>
               </li>
             </ol>

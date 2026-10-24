@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { OurPromise } from '@/components/sections/OurPromise'
 import { ChevronDown, ShieldCheck } from 'lucide-react'
 import { Container } from '@/components/ui/Container'
 import { Ico } from '@/components/sections/home/HomeIcon'
@@ -394,6 +395,9 @@ export default function LandlordsPage() {
           </ul>
         </Container>
       </section>
+
+      {/* Our promise, before the questions (Abdul 24/10) */}
+      <OurPromise />
 
       {/* QUESTIONS */}
       <section className="in-sec" id="questions" aria-labelledby="questions-h">

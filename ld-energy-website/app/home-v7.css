@@ -552,3 +552,6 @@ body:has(.hp) .dock { display: none !important; }
   .hp .offer--feature .offer__groups > :nth-child(3) { grid-column: 1; grid-row: 2; }
 }
 @media (max-width: 759px) { .hp .offer__foot { margin: auto -20px -18px; padding: 20px 20px 20px; } }
+
+/* How it works step 3: the report illustration (24/10) */
+.hp .tl__art { display: block; width: 100%; max-width: 520px; height: auto; margin-top: 10px; border: 1px solid var(--hair); }
