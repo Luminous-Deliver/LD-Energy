@@ -14,10 +14,6 @@ const CHECKED = '2026-10-24'
 
 const src = (label: string, url: string): CouncilSource => ({ label, url, checked: CHECKED })
 
-function district(s: AreaSummary, code: string) {
-  return s.districts.find((d) => d.district === code)
-}
-
 function spread(s: AreaSummary) {
   const ranked = [...s.districts].sort((a, b) => b.pctAtoC - a.pctAtoC)
   return { top: ranked[0], bottom: ranked[ranked.length - 1] }
