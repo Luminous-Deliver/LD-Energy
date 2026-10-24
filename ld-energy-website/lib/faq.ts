@@ -1,4 +1,4 @@
-import { pricing, priceFrom, topBand, site, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE } from '@/lib/site'
+import { pricing, priceFrom, topBand, site, portfolioRatesText, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE } from '@/lib/site'
 
 export interface FaqItem {
   q: string
@@ -30,7 +30,7 @@ export const homepageFaq: FaqItem[] = [
   },
   {
     q: 'How much does an EPC cost in London?',
-    a: `Guide EPC prices in London start at £${pricing[0].epc} for properties ${pricing[0].areaLabel.toLowerCase()} and rise with internal floor area; homes ${topBand.areaLabel.toLowerCase()} start from £${topBand.epc}. Internal floor area (m²) is the main pricing factor — bedroom count is only a familiar reference. Same-day lodgement is £${SAME_DAY_LODGEMENT_SURCHARGE} extra and a next-day visit and lodgement £${NEXT_DAY_VISIT_SURCHARGE} extra, and your exact quote is confirmed before booking.`,
+    a: `Guide EPC prices in London start at £${pricing[0].epc} for properties ${pricing[0].areaLabel.toLowerCase()} and rise with internal floor area; homes ${topBand.areaLabel.toLowerCase()} start from £${topBand.epc}. Internal floor area (m²) is the main pricing factor. Bedroom count is only a familiar reference. Same-day lodgement is £${SAME_DAY_LODGEMENT_SURCHARGE} extra and a next-day visit and lodgement £${NEXT_DAY_VISIT_SURCHARGE} extra, and your exact quote is confirmed before booking.`,
   },
   {
     q: 'How long does an EPC assessment take?',
@@ -66,11 +66,11 @@ export const homepageFaq: FaqItem[] = [
   },
   {
     q: 'Can I find out my rating without it going on the public register?',
-    a: `Yes — that is an EPC Pre-Assessment. We carry out the full survey exactly as we would for a real EPC, but we do not lodge it, so no certificate is published and nothing appears on the GOV.UK register. You get the score, a breakdown of what is holding it back, and a written improvement plan. It is priced on the same floor-area bands as an EPC, from £${priceFrom.preAssessment}, with the written improvement plan included; a separate energy report is available at no extra charge. If you decide you want the certificate afterwards, we can usually lodge the same survey for £${site.addOns.lodgeLater} without a second visit, as long as nothing at the property has changed and the survey data remains valid for lodgement under the applicable rules. It is not a substitute for an EPC where one is legally required, such as marketing a property for sale or rent.`,
+    a: `Yes. That is an EPC Pre-Assessment. We carry out the full survey exactly as we would for a real EPC, but we do not lodge it, so no certificate is published and nothing appears on the GOV.UK register. You get the score, a breakdown of what is holding it back, and a written improvement plan. It is priced on the same floor-area bands as an EPC, from £${priceFrom.preAssessment}, with the written improvement plan included; a separate energy report is available at no extra charge. If you decide you want the certificate afterwards, we can usually lodge the same survey for £${site.addOns.lodgeLater} without a second visit, as long as nothing at the property has changed and the survey data remains valid for lodgement under the applicable rules. It is not a substitute for an EPC where one is legally required, such as marketing a property for sale or rent.`,
   },
   {
     q: 'How do I check my assessor is genuinely accredited?',
-    a: 'Every UK domestic energy assessor appears on the official government register. Our assessor is Abdul Motaleb Taher, accredited with Elmhurst Energy (EES/036265) and Quidos (QUID202220) — you can look both up yourself on the government’s find-an-assessor service before you book.',
+    a: 'Every UK domestic energy assessor appears on the official government register. Our assessor is Abdul Motaleb Taher, accredited with Elmhurst Energy (EES/036265) and Quidos (QUID202220). You can look both up yourself on the government’s find-an-assessor service before you book.',
   },
   {
     q: 'Which areas of London do you cover?',
@@ -93,7 +93,7 @@ export const homepageFaqFeatured: FaqItem[] = [
   },
   {
     q: 'Are the prices on your website fixed?',
-    a: 'No — the figures shown are guide prices, based mainly on internal floor area (m²). Extensions, loft conversions, layout and access can change the final figure, so we confirm your exact quote before you book. That applies to urgent and same-day jobs too: we confirm availability and any surcharge before accepting the booking.',
+    a: 'No. The figures shown are guide prices, based mainly on internal floor area (m²). Extensions, loft conversions, layout and access can change the final figure, so we confirm your exact quote before you book. That applies to urgent and same-day jobs too: we confirm availability and any surcharge before accepting the booking.',
     links: [
       { href: '/pricing', label: 'How our guide pricing works' },
       { href: '/quote?source=faq&cta=inline', label: 'Get an exact quote for your property' },
@@ -195,12 +195,12 @@ export const fullFaq: FaqCategory[] = [
       },
       {
         q: 'Why is my EPC different from my neighbour’s?',
-        a: 'EPC ratings are specific to the individual property. Position in the terrace is a common reason — a mid-terrace home has two exposed external walls where an end-terrace or semi has three, which changes heat loss before anything else is considered. Floor area, extensions, insulation, glazing, heating, renewables and the evidence available on the day all vary between neighbouring homes too.',
+        a: 'EPC ratings are specific to the individual property. Position in the terrace is a common reason: a mid-terrace home has two exposed external walls where an end-terrace or semi has three, which changes heat loss before anything else is considered. Floor area, extensions, insulation, glazing, heating, renewables and the evidence available on the day all vary between neighbouring homes too.',
         links: [{ label: 'Why EPC ratings differ between similar homes', href: '/blog/why-is-my-epc-different' }],
       },
       {
         q: 'Why is my new EPC different from my old one?',
-        a: 'Existing dwellings in England and Wales have been assessed under the RdSAP 10 methodology since 15 June 2025, the first substantial change to the calculation in over a decade. A new certificate will not necessarily reproduce an older one even where the property is unchanged. There is no published rule that the update moves ratings up or down — it depends on the property. Previous certificates can also record different assumptions or information.',
+        a: 'Existing dwellings in England and Wales have been assessed under the RdSAP 10 methodology since 15 June 2025, the first substantial change to the calculation in over a decade. A new certificate will not necessarily reproduce an older one even where the property is unchanged. There is no published rule that the update moves ratings up or down. It depends on the property. Previous certificates can also record different assumptions or information.',
         links: [{ label: 'RdSAP 10: what changed in 2025', href: '/blog/rdsap-10-what-changed-2025' }],
       },
       {
@@ -215,7 +215,7 @@ export const fullFaq: FaqCategory[] = [
       },
       {
         q: 'What happens if my insulation cannot be seen?',
-        a: 'Where an improvement cannot be inspected and there is no evidence the assessor can accept, the methodology may require a default assumption based on the age and type of property, which can be less favourable than what is actually installed. Supporting paperwork changes what can legitimately be recorded — it does not guarantee a particular rating.',
+        a: 'Where an improvement cannot be inspected and there is no evidence the assessor can accept, the methodology may require a default assumption based on the age and type of property, which can be less favourable than what is actually installed. Supporting paperwork changes what can legitimately be recorded. It does not guarantee a particular rating.',
         links: [{ label: 'Documents and evidence that may help', href: '/preparing-for-your-epc#documents-and-evidence' }],
       },
       {
@@ -225,7 +225,7 @@ export const fullFaq: FaqCategory[] = [
       },
       {
         q: 'What if my property is larger than the details used for my quote?',
-        a: 'Our quote is based on the property information supplied before the appointment. If the property is materially larger or more complex than described — a significant undisclosed extension, an unmentioned loft conversion, or an unusually complex layout — we explain any adjustment and confirm it with you before the assessment begins, never afterwards. In practice this is rare.',
+        a: 'Our quote is based on the property information supplied before the appointment. If the property is materially larger or more complex than described (a significant undisclosed extension, an unmentioned loft conversion, or an unusually complex layout), we explain any adjustment and confirm it with you before the assessment begins, never afterwards. In practice this is rare.',
         links: [{ label: 'See guide pricing', href: '/pricing' }],
       },
 
@@ -324,7 +324,7 @@ export const fullFaq: FaqCategory[] = [
     items: [
       {
         q: 'How much does an EPC cost?',
-        a: `Guide EPC prices in London start at £${pricing[0].epc} for properties ${pricing[0].areaLabel.toLowerCase()} and rise with internal floor area; homes ${topBand.areaLabel.toLowerCase()} start from £${topBand.epc}. Internal floor area (m²) is the main pricing factor — bedroom count is only a familiar reference. Same-day lodgement is £${SAME_DAY_LODGEMENT_SURCHARGE} extra and a next-day visit and lodgement £${NEXT_DAY_VISIT_SURCHARGE} extra, and your exact quote is confirmed before booking.`,
+        a: `Guide EPC prices in London start at £${pricing[0].epc} for properties ${pricing[0].areaLabel.toLowerCase()} and rise with internal floor area; homes ${topBand.areaLabel.toLowerCase()} start from £${topBand.epc}. Internal floor area (m²) is the main pricing factor. Bedroom count is only a familiar reference. Same-day lodgement is £${SAME_DAY_LODGEMENT_SURCHARGE} extra and a next-day visit and lodgement £${NEXT_DAY_VISIT_SURCHARGE} extra, and your exact quote is confirmed before booking.`,
         links: [{ label: 'Guide prices by floor area', href: '/pricing#pricing-table' }],
       },
       {
@@ -339,7 +339,7 @@ export const fullFaq: FaqCategory[] = [
       },
       {
         q: 'Can I get a discount for multiple properties?',
-        a: 'Yes. We offer portfolio rates for landlords and letting agents with multiple properties. Contact us directly for a quote.',
+        a: `Yes. ${portfolioRatesText} Send us the addresses and we will quote the whole set together.`,
         links: [{ label: 'Landlords with several homes', href: '/landlords#portfolio' }, { label: 'Agents', href: '/estate-agents' }],
       },
       {

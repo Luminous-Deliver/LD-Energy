@@ -76,8 +76,8 @@ const norm = (s) => s.replace(/\s+/g, ' ').trim()
     // because the answers are shared with the schema and the homepage.
     const own = await page.evaluate(() => { const m = document.querySelector('main').cloneNode(true); m.querySelectorAll('.in-faq__a > p, script').forEach((p) => p.remove()); return m.textContent })
     ok(!own.includes('—'), 'no em dashes in the page copy')
-    const libDashes = items.filter((it) => it.a.includes('—')).length
-    eq(shown.filter((s) => s.a.includes('—')).length, libDashes, `em dashes only inside the ${libDashes} lib/faq.ts answers that have them`)
+    // lib/faq.ts answers rewritten without em dashes (24/10, lead session)
+    ok(!shown.some((s) => s.a.includes('—')), 'no em dashes in any answer')
 
     // On this page jumps to a group
     await page.locator('.in-otp a[href="#your-rating"]').click()

@@ -6,7 +6,7 @@
 //   BOOKING_TEST_URL=http://localhost:3104 node --require ./tests/register.cjs tests/home-v7.cjs
 const assert = require('node:assert/strict')
 const { chromium } = require('playwright')
-const { site, priceFrom, maxBundleSaving, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE } = require('../lib/site.ts')
+const { site, priceFrom, maxBundleSaving, portfolioRates, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE } = require('../lib/site.ts')
 const { whatsappQuoteHref } = require('../lib/area-page.ts')
 const { homeBookingFaqs } = require('../lib/homepage-content.ts')
 
@@ -73,7 +73,9 @@ const KEEP = [
       while (walk.nextNode()) { const el = walk.currentNode.parentElement; if (el.closest('#pricing, script')) continue; found.push(...(walk.currentNode.textContent.match(/£\d+(?:\.\d+)?m?/g) || [])) }
       return [...new Set(found)]
     })
-    const allowed = new Set([priceFrom.epc, priceFrom.bundle, priceFrom.floorPlan, priceFrom.preAssessment, maxBundleSaving, site.addOns.improvementPlan, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE].map((n) => `£${n}`).concat('£5m'))
+    const allowed = new Set([priceFrom.epc, priceFrom.bundle, priceFrom.floorPlan, priceFrom.preAssessment, maxBundleSaving, site.addOns.improvementPlan, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE,
+      // the FAQ's portfolio answer is portfolioRatesText (24/10)
+      portfolioRates.smallOff, portfolioRates.largeOff, portfolioRates.sameBuildingOff, portfolioRates.floor].map((n) => `£${n}`).concat('£5m'))
     ok(typedPrices.every((p) => allowed.has(p)), `no typed price outside lib/site.ts (${typedPrices})`)
 
     // WhatsApp: the approved prefill, and nothing else, in the body
