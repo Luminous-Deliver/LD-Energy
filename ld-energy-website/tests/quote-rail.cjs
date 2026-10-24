@@ -32,7 +32,13 @@ function rail(page, form) {
     else if (id === 'size') {
       const checked = open.locator('input[name="areaBand"]:checked')
       const value = await checked.count() ? await checked.getAttribute('value') : (answers.size || 'unknown')
-      if (value === 'over-115') { if (!await checked.count()) await open.locator('input[value="over-115"]').check(); await continueIn('Continue').click() }
+      if (value === 'over-115') {
+        // the top band moves on with a figure or "I don't know the floor area"
+        if (!await checked.count()) await open.locator('input[value="over-115"]').check()
+        const unknown = open.getByRole('checkbox', { name: 'I don’t know the floor area' })
+        if (!await open.locator('[id$="floorArea"]').inputValue() && !await unknown.isChecked()) await unknown.check()
+        await continueIn('Continue').click()
+      }
       else await open.locator(`input[name="areaBand"][value="${value}"]`).click()
     } else if (id === 'price') await open.getByRole('button', { name: /^Continue to/ }).click()
     else if (id === 'timing') await continueIn('Continue to your details').click()
