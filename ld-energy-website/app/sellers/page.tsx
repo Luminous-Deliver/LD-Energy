@@ -77,7 +77,7 @@ const whyMatters = [
   {
     icon: 'epc-rating' as const,
     title: 'Buyers care about efficiency',
-    body: 'With rising energy bills and tighter mortgage criteria, more buyers now factor EPC rating into offers. A better rating supports your asking price.',
+    body: 'The rating is on every listing, and with higher energy bills many buyers take it into account.',
   },
   {
     icon: 'clock' as const,
@@ -100,11 +100,11 @@ const faqs: { q: string; a: string }[] = [
   },
   {
     q: 'Should I arrange the EPC myself or leave it to my estate agent?',
-    a: 'Either works, but booking directly is often faster and cheaper than an agent-arranged panel provider. You keep control of the timing and can have the certificate ready the moment you instruct your agent.',
+    a: 'Either works. Booking directly, you see the price up front and keep control of the timing and can have the certificate ready the moment you instruct your agent.',
   },
   {
     q: 'Does a higher EPC rating actually help my sale?',
-    a: 'Increasingly, yes. With higher energy bills and tighter mortgage stress-testing, more buyers factor the EPC rating into their offers. A better rating can support your asking price and speed up the sale, while a poor one gives buyers a reason to negotiate down.',
+    a: 'It can. The rating shows on every listing, and with higher energy bills many buyers take it into account. A poor rating can give a buyer a reason to negotiate.',
   },
   {
     q: 'Should I improve my rating before selling, or sell as-is?',
@@ -275,7 +275,7 @@ export default function SellersPage() {
             ))}
           </ul>
           <p className="sl-direct">
-            You can book directly with us, often faster and cheaper than an agent-arranged panel provider, and if you work in
+            You can book directly with us, with the price up front, and if you work in
             property, <Link className="in-link" href="/estate-agents">estate and letting agents can partner with us</Link> for all their listings.
           </p>
           <p className="in-src">

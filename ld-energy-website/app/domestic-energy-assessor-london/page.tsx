@@ -73,14 +73,14 @@ const duties = [
   },
   {
     title: 'Recommends improvements',
-    body: 'Where improvements are possible, the certificate lists them with a rough cost for each, to help you raise the rating and cut running costs.',
+    body: 'Where improvements are possible, the certificate lists them with a typical installation cost for each, to help you raise the rating and cut running costs.',
   },
 ]
 
 const whyLocal = [
   {
     title: 'Knows London housing stock',
-    body: 'Victorian terraces, ex-council blocks, new-build flats, conservation areas: we assess them every week and know what affects each one.',
+    body: 'Victorian terraces, ex-council blocks, new-build flats, conservation areas: we assess all of them and know what affects each one.',
   },
   {
     title: 'A real assessor, not a call centre',
