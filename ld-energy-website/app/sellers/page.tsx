@@ -5,6 +5,8 @@ import { ChevronDown, ShieldCheck } from 'lucide-react'
 import { Container } from '@/components/ui/Container'
 import { Ico } from '@/components/sections/home/HomeIcon'
 import { OnThisPage, type PageSection } from '@/components/inner/OnThisPage'
+import { RevealOnScroll } from '@/components/inner/RevealOnScroll'
+import { innerReveals } from '@/components/inner/innerReveals'
 import { ReadNext, type NextStep } from '@/components/inner/ReadNext'
 import { InnerEnding } from '@/components/inner/InnerEnding'
 import {
@@ -387,6 +389,9 @@ export default function SellersPage() {
       </section>
 
       <ReadNext steps={readNext} />
+
+      {/* section reveals (motion, Considered); the price sections are left out on purpose, see innerReveals */}
+      <RevealOnScroll {...innerReveals('.sl', { lists: ['.sl-why', '.lp-steps', '.lp-trust', '.sl-opts'], blocks: ['.sl-wins'] })} />
 
       <div id="book">
         <InnerEnding variant="a" source="sellers"

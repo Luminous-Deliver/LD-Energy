@@ -5,6 +5,8 @@ import { Container } from '@/components/ui/Container'
 import { Ico } from '@/components/sections/home/HomeIcon'
 import { OurPromise } from '@/components/sections/OurPromise'
 import { OnThisPage, type PageSection } from '@/components/inner/OnThisPage'
+import { RevealOnScroll } from '@/components/inner/RevealOnScroll'
+import { innerReveals } from '@/components/inner/innerReveals'
 import { ReadNext, type NextStep } from '@/components/inner/ReadNext'
 import { InnerEnding } from '@/components/inner/InnerEnding'
 import { fullFaq, type FaqItem } from '@/lib/faq'
@@ -208,6 +210,9 @@ export default function FaqPage() {
       </section>
 
       <ReadNext steps={readNext} />
+
+      {/* section reveals (motion, Considered); the price sections are left out on purpose, see innerReveals */}
+      <RevealOnScroll {...innerReveals('.fq', { lists: ['.fq-ways'] })} />
 
       <div id="book">
         <InnerEnding variant="a" source="faq"
