@@ -17,12 +17,17 @@ export function MobileNav({ waHref }: { waHref: string }) {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const triggerRef = useRef<HTMLButtonElement>(null)
+  // the phone pill's menu button opens this same sheet (Header.tsx, 'mnav:open'); focus goes back to whichever opened it
+  const openerRef = useRef<HTMLElement | null>(null)
   const closeRef = useRef<HTMLButtonElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     setMounted(true)
+    const onOpen = (e: Event) => { openerRef.current = (e as CustomEvent<HTMLElement | null>).detail ?? null; setOpen(true) }
+    window.addEventListener('mnav:open', onOpen)
+    return () => window.removeEventListener('mnav:open', onOpen)
   }, [])
 
   // A resize past the breakpoint must not leave an invisible modal focus trap active.
@@ -45,7 +50,7 @@ export function MobileNav({ waHref }: { waHref: string }) {
   useEffect(() => {
     if (!open) return
     const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') { setOpen(false); triggerRef.current?.focus() }
+      if (e.key === 'Escape') { setOpen(false); (openerRef.current ?? triggerRef.current)?.focus() }
     }
     document.addEventListener('keydown', handler)
     return () => document.removeEventListener('keydown', handler)
@@ -78,7 +83,7 @@ export function MobileNav({ waHref }: { waHref: string }) {
 
   function close() {
     setOpen(false)
-    triggerRef.current?.focus()
+    ;(openerRef.current ?? triggerRef.current)?.focus()
   }
 
   const tab = open ? undefined : -1
@@ -89,7 +94,7 @@ export function MobileNav({ waHref }: { waHref: string }) {
       <button
         ref={triggerRef}
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={() => { openerRef.current = null; setOpen(true) }}
         className="sh__menu"
         aria-label="Open menu"
         aria-expanded={open}

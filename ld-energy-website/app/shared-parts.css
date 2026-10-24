@@ -62,16 +62,14 @@ html { font-synthesis-weight: none; }
 .sh { position: relative; z-index: 40; height: var(--head-h); padding-top: 1px; background: transparent;
   border-bottom: 1px solid transparent; transition: background-color .3s var(--ease-out), border-color .3s var(--ease-out); }
 .sh[data-solid="true"] { background: var(--ground); border-bottom-color: var(--hair); }
-/* phones (Abdul 24/10): pinned, hidden while scrolling down, back on the first scroll up (Header.tsx sets data-hidden).
-   The dock at the foot is untouched. Pinned bars under it follow it via html[data-head]. */
+/* phones (Abdul 24/10, "yes", after nateherk.com on a phone): the bar scrolls away as on desktop and the compact pill
+   docks (replacing that morning's pinned hide-on-scroll bar). The dock at the foot is untouched. Pinned bars sit under
+   the docked pill via html[data-head="pill"]: 10 px + 48 px + 8 px. */
 @media (max-width: 759px) {
-  .sh { position: sticky; top: 0; transition: background-color .3s var(--ease-out), border-color .3s var(--ease-out), transform .28s var(--ease-out); }
-  .sh[data-hidden="true"] { transform: translateY(-100%); }
-  html[data-head="shown"] .in-secbar[data-on="true"] { transform: translateY(var(--head-h)); }
-  html[data-head="shown"] .gd-toc { top: var(--head-h); }
+  html[data-head="pill"] .in-secbar[data-on="true"] { transform: translateY(66px); }
+  html[data-head="pill"] .gd-toc { top: 66px; }
   .gd-toc { transition: top .28s var(--ease-out); }
 }
-@media (max-width: 759px) and (prefers-reduced-motion: reduce) { .sh { transition: none; } }
 /* From 760 px the bar scrolls away with the page and the pill (.pill, below) takes over once the reader is in. */
 .sh__in { height: 100%; display: flex; align-items: center; gap: 12px; }
 @media (min-width: 760px) { .sh__in { gap: 32px; } }
@@ -203,8 +201,8 @@ html { font-synthesis-weight: none; }
    slides down 0.56 s on cubic-bezier(.23, 1, .32, 1) with a 0.42 s fade once the reader is past the hero; a 3 px
    gradient line with a soft glow fills left to right with the page. Ours: the brand's sage to leaf, desktop pill only
    (the dock is the phone's one floating bar), the line at every width. */
-.pill { display: none; }
-@media (min-width: 760px) {
+.pill__menu { display: none; }
+@media all {
   .pill { display: flex; align-items: center; gap: 4px; position: fixed; z-index: 45; top: 14px; left: 50%; width: max-content; height: 52px;
     padding: 0 6px; border-radius: 999px; border: 1px solid rgba(51, 56, 79, .1);
     background: rgba(252, 251, 248, .74); -webkit-backdrop-filter: blur(16px) saturate(1.3); backdrop-filter: blur(16px) saturate(1.3);
@@ -231,6 +229,16 @@ html { font-synthesis-weight: none; }
   .pill :focus-visible { outline: 2px solid var(--sage-700); outline-offset: 2px; }
 }
 @media (min-width: 760px) and (max-width: 899px) { .pill__home span { display: none; } .pill ul a { padding: 0 9px; } }
+/* phones: the mark, Landlords, Pricing and the menu, 48 px tall, 10 px down; the quote button stays on the dock */
+@media (max-width: 759px) {
+  .pill { top: 10px; height: 48px; padding: 0 4px; gap: 2px; }
+  .pill__home { min-height: 38px; padding: 0 10px; margin-right: 2px; }
+  .pill__home span, .pill .ld-btn, .pill li:not([data-phone]) { display: none; }
+  .pill ul a { min-height: 38px; padding: 0 11px; font-size: 15px; }
+  .pill__menu { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; margin-left: 2px;
+    border: 0; border-radius: 999px; background: transparent; color: var(--ink); cursor: pointer; }
+  .pill__menu:hover { background: rgba(51, 56, 79, .06); }
+}
 
 .sline { position: fixed; z-index: 60; top: 0; left: 0; width: 100%; height: 4px; pointer-events: none;
   background: var(--sage-700); transform: scaleX(0); transform-origin: 0 50%; will-change: transform; }

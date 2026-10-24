@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation'
 import { Container } from '@/components/ui/Container'
 import { MobileNav } from './MobileNav'
 import { quoteTargetFor } from '@/lib/quote-target'
-import { WhatsAppIcon } from '@/components/ui/BrandIcons'
+import { MenuIcon, WhatsAppIcon } from '@/components/ui/BrandIcons'
 
 /**
  * The redesign header decided 19/10/2026: Landlords · Agents · Pricing · About + Get a quote, no dropdowns
@@ -43,26 +43,21 @@ export function Header({ waHref }: { waHref: string }) {
   const pathname = usePathname()
   const [solid, setSolid] = useState(false)
   const [pill, setPill] = useState(false)
-  const [hidden, setHidden] = useState(false)
   const line = useRef<HTMLDivElement>(null)
   const track = useRef<HTMLDivElement>(null)
 
   // The bar takes the paper ground and the hairline once the page moves, and the pill arrives once the reader is
   // about half a screen in (nateherk.com docks when the hero is 62% gone); one state change per crossing. The line
   // is written straight to the element, once per frame, so scrolling never re-renders the header.
+  // Phones too since 24/10 (Abdul: "yes", beside nateherk.com on a phone): the bar scrolls away and a compact pill
+  // docks, replacing the morning's hide-on-scroll bar.
   useEffect(() => {
-    let raf = 0, lastY = window.scrollY
-    const phone = window.matchMedia('(max-width: 759px)')
+    let raf = 0
     const paint = () => {
       raf = 0
       const y = window.scrollY, room = document.documentElement.scrollHeight - window.innerHeight
       setSolid(y > 0)
       setPill(y > window.innerHeight * 0.45)
-      // Phones (Abdul 24/10, "yes"): the bar stays pinned, slides away while reading down and comes back, menu button and
-      // all, the moment the reader scrolls up. A few pixels of jitter change nothing; near the top it always shows.
-      const dy = y - lastY
-      if (!phone.matches || y < 80) { setHidden(false); lastY = y }
-      else if (Math.abs(dy) > 8) { setHidden(dy > 0); lastY = y }
       const k = room > 0 ? Math.min(1, y / room) : 0
       if (line.current) line.current.style.transform = `scaleX(${k})`
       track.current?.setAttribute('data-on', String(y > 0))
@@ -74,8 +69,8 @@ export function Header({ waHref }: { waHref: string }) {
     return () => { cancelAnimationFrame(raf); window.removeEventListener('scroll', update); window.removeEventListener('resize', update) }
   }, [])
 
-  // pinned things on phones (the On this page bar, a guide's contents) sit under the bar only while it shows
-  useEffect(() => { document.documentElement.dataset.head = hidden ? 'hidden' : 'shown' }, [hidden])
+  // pinned things on phones (the On this page bar, a guide's contents) sit under the pill while it is docked
+  useEffect(() => { document.documentElement.dataset.head = pill ? 'pill' : 'none' }, [pill])
 
   const quoteHref = quoteTargetFor(pathname, 'header')
 
@@ -85,7 +80,7 @@ export function Header({ waHref }: { waHref: string }) {
     {/* Abdul 23/10/2026: "too subtle", make it like the How it works line: a visible track, a solid fill (the marker went 24/10) */}
     <div ref={track} className="sline-track" data-on="false" aria-hidden="true" />
     <div ref={line} className="sline" aria-hidden="true" />
-    <header className="sh" data-solid={solid} data-dark={pathname === '/' && !solid} data-hidden={hidden}>
+    <header className="sh" data-solid={solid} data-dark={pathname === '/' && !solid}>
       <Container className="sh__in">
         <LogoLockup />
         <nav aria-label="Primary" className="sh__nav">
@@ -112,7 +107,8 @@ export function Header({ waHref }: { waHref: string }) {
         <MobileNav waHref={waHref} />
       </Container>
     </header>
-    {/* the scroll pill, desktop only (shared-parts.css): hidden, it is out of the tab order and the accessibility tree */}
+    {/* the scroll pill (shared-parts.css): hidden, it is out of the tab order and the accessibility tree. On phones it
+        carries the mark, Landlords, Pricing and the menu; the dock keeps the quote button */}
     <nav aria-label="Primary, compact" className="pill" data-on={pill}>
       <Link prefetch={false} href="/" className="pill__home" aria-label="L&D Energy home">
         {/* eslint-disable-next-line @next/next/no-img-element -- the header's own mark, already loaded */}
@@ -121,12 +117,16 @@ export function Header({ waHref }: { waHref: string }) {
       </Link>
       <ul>
         {headerNav.map((link) => (
-          <li key={link.href}>
+          <li key={link.href} data-phone={link.href === '/landlords' || link.href === '/pricing' || undefined}>
             <Link prefetch={false} href={link.href} aria-current={pathname === link.href ? 'page' : undefined}>{link.label}</Link>
           </li>
         ))}
       </ul>
       <Link prefetch={false} className="ld-btn ld-btn--primary" href={quoteHref}>Get a quote</Link>
+      <button type="button" className="pill__menu" aria-label="Open menu" aria-controls="mobile-nav-panel"
+        onClick={(e) => window.dispatchEvent(new CustomEvent('mnav:open', { detail: e.currentTarget }))}>
+        <MenuIcon />
+      </button>
     </nav>
     </>
   )
