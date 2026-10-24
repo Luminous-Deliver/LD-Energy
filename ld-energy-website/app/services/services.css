@@ -1,0 +1,156 @@
+/* The four service pages (/services/domestic-epc, floor-plans, epc-pre-assessment, epc-improvement-plan), rebuilt
+   24/10/2026 on the inner-page parts as /landlords. Only what inner.css does not already have, scoped under .sv so it
+   wins over inner.css whatever order the bundles load in. */
+
+/* hero: crumbs above the grid; the title block without the area pages' Share column */
+.sv .sv-hd { margin-top: 18px; }
+.sv .sv-art { margin: 0; }
+.sv .sv-art img { display: block; width: 100%; height: auto; border-radius: 4px; }
+.sv .sv-tb .in-tb__cols, .sv .sv-tb .in-tb__rows a { grid-template-columns: minmax(0, 1fr) 96px 16px; }
+@media (max-width: 420px) { .sv .sv-tb .in-tb__cols, .sv .sv-tb .in-tb__rows a { grid-template-columns: minmax(0, 1fr) 84px 14px; } }
+.sv .sv-tb .in-tb__cols span:nth-child(2) { text-align: right; }
+.sv .sv-tb .in-tb__p--tbc { text-align: right; }
+.sv .sv-tb .in-tb__foot .in-note { font-size: 13px; line-height: 1.5; }
+
+/* small uppercase heads over lists */
+.sv-k { font: 500 12px/1.4 var(--font-sans); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-quiet); padding-bottom: 12px; margin-bottom: 18px; border-bottom: 1px solid var(--ink); }
+
+/* section heads: heading left, lede right on desktop */
+.sv-head { display: grid; gap: 4px; margin-bottom: 32px; }
+.sv-head .in-lede { max-width: 52ch; }
+@media (min-width: 1024px) { .sv-head { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 72px; align-items: end; } .sv-head .in-lede { margin-top: 0; } }
+
+/* what it is: copy beside a drawn A to G scale, then two lists */
+.sv .sv-split { display: grid; gap: 32px; }
+.sv-scale { margin: 0; display: grid; gap: 12px; padding: 22px 22px 18px; background: var(--card); border: 1px solid var(--hair); border-radius: 10px; max-width: 520px; }
+.sv-scale__bars { list-style: none; padding: 0; display: grid; gap: 5px; }
+.sv-scale__bars li { display: flex; align-items: center; gap: 10px; }
+.sv-scale__bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: var(--w); min-height: 30px; padding: 0 10px; border-radius: 2px 15px 15px 2px;
+  background: var(--c); color: var(--ink); font-size: 13px; }
+.sv-scale__bar b { font: 600 16px/1 var(--font-sans); }
+.sv-scale__bars li.is-light .sv-scale__bar { color: #fff; }
+.sv-scale__tag { display: inline-flex; align-items: center; min-height: 26px; padding: 0 10px 0 8px; border-radius: 4px; background: var(--ink); color: #fff;
+  font: 500 12px/1 var(--font-sans); letter-spacing: .04em; white-space: nowrap; position: relative; }
+.sv-scale__tag::before { content: ""; position: absolute; left: -5px; top: 50%; width: 10px; height: 10px; background: inherit; transform: translateY(-50%) rotate(45deg); border-radius: 1px; }
+.sv-scale__tag--pot { background: var(--sage-700); }
+@media (min-width: 900px) {
+  .sv .sv-split { grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: 72px; align-items: center; }
+  .sv-scale { justify-self: end; width: 100%; }
+}
+.sv-cols { margin-top: 48px; display: grid; gap: 40px; }
+@media (min-width: 900px) { .sv-cols { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 72px; } }
+
+/* who it's for: three cards, as /landlords' ways */
+.sv-ways { margin-top: 36px; display: grid; gap: 14px; }
+.sv-way { display: grid; gap: 10px; align-content: start; padding: 24px; background: var(--card); border: 1px solid var(--hair-strong); border-radius: 10px; }
+.sv-way p { color: var(--ink); font-size: 16px; line-height: 1.6; }
+.sv-way__ico { color: var(--sage-700); margin-bottom: 6px; }
+.sv-way .in-arrow { margin-top: auto; }
+.sv-way .in-arrow .i { transition: transform .15s; }
+.sv-way .in-arrow:hover .i { transform: translateX(3px); }
+@media (min-width: 900px) { .sv-ways { grid-template-columns: repeat(3, 1fr); gap: 18px; } .sv-way { padding: 28px; grid-template-rows: auto auto 1fr auto; } }
+.sv-after { margin-top: 24px; }
+
+/* the visit: picture and steps, then what we record */
+.sv .sv-visit { display: grid; gap: 36px; }
+.sv-visit__img { display: block; width: 100%; height: auto; margin-top: 28px; border-radius: 6px; border: 1px solid var(--hair); }
+.sv-steps { list-style: none; padding: 0; border-top: 1px solid var(--hair-strong); }
+.sv-steps li { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 16px; padding: 22px 0; border-bottom: 1px solid var(--hair); }
+.sv-steps__n { font: 400 40px/1 var(--font-serif); color: var(--sage-700); }
+.sv-steps p { margin-top: 8px; color: var(--ink); font-size: 17px; line-height: 1.6; max-width: 52ch; }
+@media (min-width: 900px) {
+  .sv .sv-visit { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 72px; align-items: start; }
+  .sv-steps { margin-top: 44px; }
+  .sv-steps li { padding: 26px 0; }
+}
+.sv-rec { margin-top: 56px; padding-top: 32px; border-top: 1px solid var(--ink); display: grid; gap: 22px; }
+.sv-rec .in-note { margin-top: 12px; }
+.sv-rec__list { gap: 12px 32px; font-size: 16px; line-height: 1.5; }
+@media (min-width: 640px) { .sv .sv-rec__list { display: block; columns: 2; column-gap: 32px; } .sv-rec__list li { break-inside: avoid; margin-bottom: 12px; } }
+@media (min-width: 900px) { .sv-rec { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 72px; } }
+
+/* what it costs: the services side by side, stated, none favoured */
+.sv-opts { list-style: none; padding: 0; display: grid; gap: 14px; }
+.sv-opt { display: grid; gap: 16px; align-content: start; padding: 24px; background: var(--card); border: 1px solid var(--hair-strong); border-radius: 10px; }
+.sv-opt__top { display: grid; gap: 6px; padding-bottom: 16px; border-bottom: 1px solid var(--hair); }
+.sv-opt__h { font: 400 24px/1.2 var(--font-serif); }
+.sv-opt__p { display: flex; align-items: baseline; gap: 8px; }
+.sv-opt__p small { font-size: 13px; color: var(--ink-quiet); }
+.sv-opt__p b { font: 400 40px/1 var(--font-serif); color: var(--sage-700); }
+.sv-opt__save { font-size: 14px; color: var(--sage-700); font-weight: 500; }
+.sv-opt__lead { font-size: 16px; line-height: 1.55; }
+.sv-opt .in-ticks { gap: 10px; font-size: 15px; line-height: 1.5; }
+.sv-opt__go { margin-top: auto; }
+@media (min-width: 900px) { .sv-opts { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; } .sv-opt { padding: 28px; grid-template-rows: auto auto auto 1fr; } }
+
+.sv .sv-costs { margin-top: 48px; display: grid; gap: 36px; }
+@media (min-width: 900px) { .sv .sv-costs { grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: 72px; align-items: start; } }
+.sv-ledger .sv-k { margin-bottom: 0; }
+.sv-ledger dl > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 20px; align-items: baseline; padding: 14px 0; border-bottom: 1px solid var(--hair); }
+.sv-ledger dt { font-weight: 500; font-size: 16px; line-height: 1.4; }
+.sv-ledger dt small { display: block; margin-top: 2px; font-weight: 400; font-size: 14px; color: var(--ink-quiet); }
+.sv-ledger dd { font: 400 22px/1 var(--font-serif); white-space: nowrap; text-align: right; }
+.sv-ledger dd.is-muted { font: 500 14px/1.3 var(--font-sans); color: var(--ink-quiet); }
+.sv-ledger .in-note { margin-top: 18px; }
+.sv-aside { display: grid; gap: 16px; align-content: start; }
+.sv-callout { display: grid; gap: 10px; padding: 22px 24px; background: var(--card); border: 1px solid var(--hair); border-left: 3px solid var(--sage-700); border-radius: 0 8px 8px 0; }
+.sv-callout p { font-size: 16px; line-height: 1.6; }
+.sv-callout .sv-callout__h { font: 400 21px/1.25 var(--font-serif); }
+.sv-callout b { font-weight: 500; }
+.sv-callout--quiet { border-left-color: var(--hair-strong); background: transparent; }
+.sv-callout--warn { border-left-color: var(--epc-e); }
+.sv-callout .in-arrow { justify-self: start; }
+
+/* a band price table (floor plans: separately and together) */
+.sv-ptable { width: 100%; border-collapse: collapse; background: var(--card); border: 1.5px solid var(--ink); }
+.sv-ptable thead th { padding: 12px 14px; border-bottom: 1.5px solid var(--ink); font: 500 11px/1.35 var(--font-sans); letter-spacing: .14em; text-transform: uppercase; color: var(--slate-500); text-align: right; vertical-align: bottom; }
+.sv-ptable thead th:first-child { text-align: left; }
+.sv-ptable tbody tr + tr { border-top: 1px solid var(--hair); }
+.sv-ptable tbody th { padding: 12px 14px; text-align: left; font-weight: 500; font-size: 15px; line-height: 1.3; }
+.sv-ptable tbody th small { display: block; font-weight: 400; font-size: 12px; color: var(--slate-500); }
+.sv-ptable td { padding: 0; text-align: right; vertical-align: middle; }
+.sv-ptable td > a, .sv-ptable td > span { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; min-height: 58px; padding: 10px 14px; text-decoration: none; }
+.sv-ptable td > a { transition: background-color .15s; }
+.sv-ptable td > a:hover { background: var(--band); }
+.sv-ptable .sv-ptable__p { font: 400 22px/1 var(--font-serif); white-space: nowrap; }
+.sv-ptable .sv-ptable__p small { font: 400 11px/1 var(--font-sans); color: var(--slate-500); margin-right: 3px; }
+.sv-ptable .sv-ptable__s { margin-top: 5px; font-size: 13px; color: var(--sage-700); white-space: nowrap; }
+.sv-ptable .sv-ptable__sep { color: var(--ink-quiet); font-size: 15px; }
+@media (max-width: 559px) {
+  .sv-ptable thead th, .sv-ptable tbody th { padding-inline: 10px; }
+  .sv-ptable td > a, .sv-ptable td > span { padding-inline: 10px; }
+  .sv-ptable .sv-ptable__p { font-size: 19px; }
+  .sv-ptable .sv-ptable__sep { display: none; }
+}
+
+/* questions */
+.sv .sv-faqwrap { display: grid; gap: 8px; }
+.sv-faqside { margin-top: 16px; }
+@media (min-width: 900px) { .sv .sv-faqwrap { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 72px; } .sv .sv-faqwrap .in-faq { margin-top: 0; } }
+
+/* a two-column prose section with a sticky side card (Pre-Assessment, Improvement Plan) */
+.sv .sv-two { display: grid; gap: 36px; }
+.sv-two .in-prose h3 { margin-top: 32px; }
+@media (min-width: 900px) { .sv .sv-two { grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); gap: 72px; align-items: start; } }
+
+/* numbered parts of a product */
+.sv-parts { list-style: none; padding: 0; margin-top: 24px; border-top: 1px solid var(--hair-strong); }
+.sv-parts li { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 14px; padding: 18px 0; border-bottom: 1px solid var(--hair); }
+.sv-parts__n { font: 400 30px/1 var(--font-serif); color: var(--sage-700); }
+.sv-parts b { font-weight: 500; }
+
+/* included vs extra, two columns with a rule between */
+.sv-vs { display: grid; border: 1.5px solid var(--ink); background: var(--card); }
+.sv-vs > div { display: grid; gap: 14px; align-content: start; padding: 24px; }
+.sv-vs > div + div { border-top: 1px solid var(--hair-strong); }
+.sv-vs__k { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--ink); }
+.sv-vs__k span { font: 500 12px/1.4 var(--font-sans); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-quiet); }
+.sv-vs__k b { font: 400 26px/1 var(--font-serif); color: var(--sage-700); white-space: nowrap; }
+.sv-vs__k b.is-muted { font: 500 14px/1.3 var(--font-sans); color: var(--ink-quiet); }
+.sv-vs h3 { font: 400 24px/1.2 var(--font-serif); }
+.sv-vs p { font-size: 16px; line-height: 1.6; }
+.sv-vs .in-ticks { gap: 10px; font-size: 15px; line-height: 1.5; }
+@media (min-width: 900px) { .sv-vs { grid-template-columns: repeat(2, minmax(0, 1fr)); } .sv-vs > div { padding: 30px; } .sv-vs > div + div { border-top: 0; border-left: 1px solid var(--hair-strong); } }
+
+/* read next: the cards fill evenly */
+.sv .in-ncard__b { padding: 22px; }
