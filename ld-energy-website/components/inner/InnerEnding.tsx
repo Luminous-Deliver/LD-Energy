@@ -67,7 +67,7 @@ export function InnerEnding({
               <li>
                 <a className="in-prow" href={quoteHref({ service: 'epc', area: 'unknown', sourcePage: source, ctaId: 'bottom' })}>
                   <span className="in-prow__s"><b>Not sure of the size</b><span>We confirm it from your property details</span></span>
-                  <span className="in-prow__p in-prow__p--tbc">Confirmed before booking</span>
+                  <span className="in-prow__p in-prow__p--tbc">Exact quote</span>
                   <Ico name="arrow-right" size={18} />
                 </a>
               </li>

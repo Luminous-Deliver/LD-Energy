@@ -179,7 +179,7 @@ export function AreaHeroD({ slug, name, s, parent, sections }: {
               <a href={quoteHref({ service: 'epc', area: 'unknown', sourcePage: 'area', areaPage: slug, ctaId: 'pricing' })}>
                 <span className="in-tb__s">Not sure of the size<small>We confirm it from your property details</small></span>
                 <span className="in-tb__sh">–</span>
-                <span className="in-tb__p in-tb__p--tbc">Confirmed before booking</span>
+                <span className="in-tb__p in-tb__p--tbc">Exact quote</span>
                 <Ico name="arrow-right" size={16} />
               </a>
             </li>
