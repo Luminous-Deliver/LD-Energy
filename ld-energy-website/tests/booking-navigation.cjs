@@ -22,7 +22,13 @@ const { rail } = require('./quote-rail.cjs')
       ['/estate-agents','bulk','Agency / portfolio enquiry',false],
     ]) {
       await page.goto(base + route, { waitUntil: 'networkidle' })
-      const cta = page.locator('main a[href^="/quote"]').first()
+      let cta = page.locator('main a[href^="/quote"]').first()
+      if (service === 'bulk') {
+        // 7d7a15b (24/10/2026, parity item 9): the Agents hero quotes one home; the bulk route is the price list's
+        // "Three homes or more" row and the ending
+        assert.match(await cta.getAttribute('href'), /service=epc/)
+        cta = page.locator('main a[href^="/quote"][href*="service=bulk"]').first()
+      }
       const href = await cta.getAttribute('href')
       assert.match(href, new RegExp('service=' + service))
       assert.equal(new URL(href, base).pathname, '/quote')
@@ -40,12 +46,10 @@ const { rail } = require('./quote-rail.cjs')
       assert.equal(await page.locator('h1').count(), 1)
       report.push({ route, href, service, passed: true })
     }
-    // The floor-area picker left the homepage in 566d3cd (15/09); it lives in the Pricing section of service pages.
-    await page.goto(base + '/services/domestic-epc#pricing', { waitUntil: 'networkidle' })
-    await page.getByText('View guide prices by floor area', { exact: true }).click()
-    const picker = page.locator('.md\\:hidden').filter({ has: page.getByText('View guide prices by floor area', { exact: true }) })
-    await picker.getByRole('button', { name: /Over 75/ }).click()
-    const guideLink = picker.getByRole('link', { name: 'Get my exact quote', exact: true })
+    // The floor-area picker became the hero's title-block price list in 4356ef2 (24/10/2026, domestic-epc parity item 25):
+    // every size shows its price and opens the quote with that size.
+    await page.goto(base + '/services/domestic-epc', { waitUntil: 'networkidle' })
+    const guideLink = page.locator('main a[href^="/quote"][href*="area=75-95"]').first()
     assert.match(await guideLink.getAttribute('href'), /area=75-95/)
     await guideLink.click()
     const dialogForm = page.locator('dialog.qd form[aria-label="Exact quote enquiry"]')
