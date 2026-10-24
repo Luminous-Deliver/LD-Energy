@@ -55,7 +55,9 @@ const services = [
     ok(await page.getByText('Larger or unusually complex properties are quoted individually.', { exact: false }).first().isVisible(), 'Abdul\'s guide-price sentence (spec §11)')
     ok(await page.getByText('Bedrooms are shown only as a rough guide', { exact: false }).isVisible(), 'bedrooms as a rough guide')
     ok(/up to £35 on one visit/.test(await page.locator('.pr-notes').innerText()), 'largest bundle saving')
-    ok(!(await page.locator('#pricing-table').innerText()).match(/best value|most popular/i), 'no favourite column (board-v3)')
+    // 24/10: Abdul kept "Best value" on the bundle (a true saving, shown under each price); "most popular" needs booking data
+    ok(!(await page.locator('#pricing-table').innerText()).match(/most popular/i), 'no "most popular" claim')
+    ok(JSON.stringify(await page.locator('.pm__t thead .pm__tag').evaluateAll(t => t.map(e => [e.closest('th').dataset.s, e.textContent]))) === '[["bundle","Best value"]]', '"Best value" on the bundle column only')
 
     // Extras: each stated with its price, nothing to tick
     const extras = (await page.locator('#extras').innerText()).replace(/\s+/g, ' ')

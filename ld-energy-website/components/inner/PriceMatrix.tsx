@@ -7,12 +7,12 @@ import { pricing, bundleSaving, formatPrice, type PricingBand } from '@/lib/site
 import { quoteHref, type QuoteService } from '@/lib/quote-context'
 import type { AreaChoice } from '@/lib/floor-area'
 
-type Col = { id: QuoteService; key: 'epc' | 'floorPlan' | 'bundle' | 'preAssessment'; label: string; sub?: string; tab: string }
+type Col = { id: QuoteService; key: 'epc' | 'floorPlan' | 'bundle' | 'preAssessment'; label: string; sub?: string; tag?: string; tab: string }
 
 const cols: Col[] = [
   { id: 'epc', key: 'epc', label: 'Domestic EPC', sub: 'Lodged on GOV.UK', tab: 'EPC' },
   { id: 'floor-plan', key: 'floorPlan', label: 'Floor plan', sub: 'Drawn to scale', tab: 'Floor plan' },
-  { id: 'bundle', key: 'bundle', label: 'EPC + floor plan', sub: 'One visit', tab: 'EPC + plan' },
+  { id: 'bundle', key: 'bundle', label: 'EPC + floor plan', sub: 'One visit', tag: 'Best value', tab: 'EPC + plan' },
   { id: 'pre-assessment', key: 'preAssessment', label: 'Pre-Assessment', sub: 'Guidance only, not lodged', tab: 'Pre-Assessment' },
 ]
 
@@ -37,14 +37,14 @@ export function PriceMatrix() {
             className="pm__tab" onClick={() => setActive(c.id)}><span className="pm__dot" aria-hidden="true" />{c.tab}</button>
         ))}
       </div>
-      <p className="pm__sub" aria-live="polite">{cur.label}{cur.sub && <span> · {cur.sub}</span>}</p>
+      <p className="pm__sub" aria-live="polite">{cur.label}{cur.sub && <span> · {cur.sub}</span>}{cur.tag && <b className="pm__tag">{cur.tag}</b>}</p>
       <table className="pm__t" id="pm-table">
         <caption className="sr-only">Guide prices by internal floor area for each service</caption>
         <thead>
           <tr>
             <th scope="col" className="pm__area">Internal floor area</th>
             {cols.map((c) => (
-              <th key={c.id} scope="col" className="pm__svc" data-s={c.id}>{c.label}{c.sub && <small>{c.sub}</small>}</th>
+              <th key={c.id} scope="col" className="pm__svc" data-s={c.id}>{c.tag && <b className="pm__tag">{c.tag}</b>}{c.label}{c.sub && <small>{c.sub}</small>}</th>
             ))}
             <th scope="col" className="pm__one">{cur.label}</th>
           </tr>
