@@ -129,25 +129,42 @@ function findStars(img: HTMLImageElement, count: number): Star[] {
   const px = g.getImageData(0, 0, sw, sh).data
   const k = reg.w / sw
   const sky: [number, number][] = []
-  for (let y = 2; y < sh - 2; y++) for (let x = 2; x < sw - 2; x++) {
-    const my = reg.y + y * k
-    // from 150 master px down, so no star sits among the nav links; top half only
-    if (my < 150 || my > MASTER.h * 0.5) continue
+  // Open sky only: each column is walked down from the top and closes at the first roof, chimney or wall. Dark, flat brick in shadow passed the old
+  // per-pixel test, which put stars on the right-hand houses (Abdul 24/10, "fix the stars").
+  const isSky = (x: number, y: number) => {
     const i = (y * sw + x) * 4
     const lum = 0.2126 * px[i] + 0.7152 * px[i + 1] + 0.0722 * px[i + 2]
     const j = (y * sw + x + 2) * 4, l = ((y + 2) * sw + x) * 4
     const flat = Math.abs(px[i] - px[j]) + Math.abs(px[i] - px[l]) < 10
-    if (lum < 48 && flat) sky.push([x, y])
+    return lum < 48 && flat
+  }
+  // where each column's open sky ends (its first roof, chimney or wall pixel). The first non-sky pixel closes it: a
+  // roofline is a thin stroke and the dark slate roof below it is as flat as the sky.
+  const close: number[] = []
+  for (let x = 0; x < sw; x++) {
+    let y = 2
+    while (y < sh - 2 && reg.y + y * k <= MASTER.h * 0.5 && isSky(Math.min(sw - 3, Math.max(2, x)), y)) y++
+    close.push(y)
+  }
+  // a star needs open sky 5 px either side and 8 px below it (about 50 and 80 master px), so none sits against a wall,
+  // a chimney, a roof or the frame's edge
+  const R = 5
+  for (let x = R + 2; x < sw - R - 2; x++) {
+    let top = Infinity
+    for (let d = -R; d <= R; d++) top = Math.min(top, close[x + d])
+    for (let y = 2; y < top - 8; y++) if (reg.y + y * k >= 150) sky.push([x, y])
   }
   // a fixed seed, so the sky is the same on every visit and in every screenshot
   const rand = seeded(7)
   const stars: Star[] = []
   // spread out: a pick too close to an earlier star is redrawn (a few tries), so the sky never clumps
-  const gap = Math.sqrt((sky.length * k * k) / Math.max(1, count)) * 0.55
+  // never closer than 80 master px, and no fallback that drops the gap: with the sky now ending at the roofline the old
+  // last-resort picks piled the stars into clumps just above the roofs (Abdul 24/10)
+  const gap = Math.max(80, Math.sqrt((sky.length * k * k) / Math.max(1, count)) * 0.55)
   for (let n = 0, tries = 0; n < count && sky.length && tries < count * 12; tries++) {
     const [x, y] = sky[Math.floor(rand() * sky.length)]
     const sx = reg.x + (x + rand()) * k, sy = reg.y + (y + rand()) * k
-    if (tries < count * 8 && stars.some(o => (o.x - sx) ** 2 + (o.y - sy) ** 2 < gap * gap)) continue
+    if (stars.some(o => (o.x - sx) ** 2 + (o.y - sy) ** 2 < gap * gap)) continue
     stars.push({ x: sx, y: sy, ...starLook(rand) })
     n++
   }
@@ -388,7 +405,8 @@ export function HeroNight() {
       const head = document.querySelector('header')?.getBoundingClientRect()
       // from under the logo and menu to a third of the way into the picture, where its top edge has faded in
       const top = Math.max(0, (head ? head.bottom - o.top : 0) + 8)
-      const bottom = pic ? pic.top - o.top + pic.height * 0.3 : h * 0.55
+      // down to just inside the picture's faded top edge, never as far as its roofs (Abdul 24/10)
+      const bottom = pic ? pic.top - o.top + pic.height * 0.1 : h * 0.55
       const rand = seeded(11)
       // a wide screen has five times a phone's open sky: the phone density there read as noise, so desktop is sparser
       const count = Math.round((w * (bottom - top)) / (phone.matches ? 4200 : 15000))
@@ -410,8 +428,12 @@ export function HeroNight() {
       ctx!.setTransform(1, 0, 0, 1, 0, 0)
       ctx!.clearRect(0, 0, canvas!.width, canvas!.height)
       ctx!.setTransform(dpr, 0, 0, dpr, 0, 0)
+      // the picture rises with the scroll (parallax) while this layer stays put, so a star the picture's roofs move up
+      // to fades out over 40 px instead of sitting on a building
+      const o = stage!.getBoundingClientRect(), pic = stage!.querySelector('.pl--mid')?.getBoundingClientRect()
+      const limit = pic ? pic.top - o.top + pic.height * 0.1 : Infinity
       for (const st of stars) {
-        const fade = Math.min(1, Math.max(0, (t - st.delay) / 800))
+        const fade = Math.min(1, Math.max(0, (t - st.delay) / 800)) * Math.min(1, Math.max(0, (limit - st.y) / 40))
         if (fade) drawStar(ctx!, st, fade * twinkle(st, t, still), 1)
       }
       ctx!.globalAlpha = 1
