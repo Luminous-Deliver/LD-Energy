@@ -56,3 +56,13 @@ html.qd-locked { overflow: hidden; padding-right: var(--qd-gap, 0px); }
 @media (prefers-reduced-motion: reduce) {
   .qd[open], .qd[open]::backdrop { animation: none; }
 }
+
+/* the exit (motion proposal 24/10 §2.8): QuoteDialog.tsx sets data-closing, waits for qd-out, then closes. About 60% of
+   the 320 ms entrance, on the mirrored curve, so the page under it is where the visitor left it. */
+.qd[open][data-closing] { animation: qd-out 180ms var(--ease-in) both; }
+.qd[open][data-closing]::backdrop { animation: qd-fade-out 180ms var(--ease-in) both; }
+@keyframes qd-out { to { opacity: 0; transform: translateY(8px); } }
+@keyframes qd-fade-out { to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .qd[open][data-closing], .qd[open][data-closing]::backdrop { animation: none; }
+}

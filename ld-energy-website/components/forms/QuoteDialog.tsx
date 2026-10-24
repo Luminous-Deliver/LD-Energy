@@ -41,8 +41,26 @@ export function QuoteDialog() {
   const [Body, setBody] = useState<Body | null>(null)
   // the form stays mounted between opens of the same link, so closing it never loses what was typed
   const [current, setCurrent] = useState<{ href: string; context: QuoteContext } | null>(null)
+  // unlock and hand focus back; run straight after an animated close, since the dialog's own close event comes a task later
+  const afterClose = useRef<() => void>(() => {})
 
-  const close = useCallback(() => dialogRef.current?.close(), [])
+  // the exit (motion proposal 24/10 §2.8): 180 ms fade and 8 px drop, then the real close; a timeout guards a missed
+  // animationend. Reduced motion closes at once (its CSS has no animation to wait for).
+  const close = useCallback(() => {
+    const dialog = dialogRef.current
+    if (!dialog?.open || dialog.hasAttribute('data-closing')) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { dialog.close(); afterClose.current(); return }
+    let timer = 0
+    const finish = () => {
+      window.clearTimeout(timer)
+      dialog.removeEventListener('animationend', onEnd)
+      if (dialog.hasAttribute('data-closing')) { dialog.removeAttribute('data-closing'); dialog.close(); afterClose.current() }
+    }
+    const onEnd = (event: AnimationEvent) => { if (event.target === dialog && event.animationName === 'qd-out') finish() }
+    dialog.addEventListener('animationend', onEnd)
+    timer = window.setTimeout(finish, 220)
+    dialog.setAttribute('data-closing', '')
+  }, [])
 
   useEffect(() => {
     const dialog = dialogRef.current
@@ -74,28 +92,34 @@ export function QuoteDialog() {
       }
     }
     const warm = (event: Event) => { if (quoteLinkFrom(event)) void loadBody().catch(() => {}) }
+    // Escape leaves the same way as the × button
+    const onCancel = (event: Event) => { event.preventDefault(); close() }
     const onClose = () => {
+      dialog.removeAttribute('data-closing')
       document.documentElement.classList.remove('qd-locked')
       document.documentElement.style.removeProperty('--qd-gap')
       const back = trigger.current
       trigger.current = null
       if (back?.isConnected) back.focus({ preventScroll: true })
     }
+    afterClose.current = onClose
 
     document.addEventListener('click', onClick, true)
     document.addEventListener('pointerover', warm, { passive: true })
     document.addEventListener('focusin', warm)
     document.addEventListener('touchstart', warm, { passive: true })
+    dialog.addEventListener('cancel', onCancel)
     dialog.addEventListener('close', onClose)
     return () => {
       document.removeEventListener('click', onClick, true)
       document.removeEventListener('pointerover', warm)
       document.removeEventListener('focusin', warm)
       document.removeEventListener('touchstart', warm)
+      dialog.removeEventListener('cancel', onCancel)
       dialog.removeEventListener('close', onClose)
       onClose()
     }
-  }, [])
+  }, [close])
 
   return (
     <dialog

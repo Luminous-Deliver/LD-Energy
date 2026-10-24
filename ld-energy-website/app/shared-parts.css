@@ -21,6 +21,13 @@
   --hair-strong: rgba(51, 56, 79, .42);   /* frames, and the edge over the dock */
   --r-sm: 6px;
   --ease-out: cubic-bezier(.22, 1, .36, 1);
+  /* motion tokens (motion proposal 24/10, Considered): one family. Arrivals ease out, exits ease in on the same curve's
+     mirror and take about 60% of the entrance. The pill keeps its measured cubic-bezier(.23, 1, .32, 1). */
+  --ease-in: cubic-bezier(.64, 0, .78, 0);
+  --t-hover: 150ms;
+  --t-small: 220ms;
+  --t-sheet: 320ms;
+  --t-reveal: 480ms;
   --head-h: 56px;
   --dock-h: 68px;                          /* 48 px buttons + 10 px above and below */
   /* homepage CSS still names the old sans variable */
@@ -40,7 +47,7 @@ html { font-synthesis-weight: none; }
 .ld-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 22px;
   font: 500 17px/1 var(--font-sans); letter-spacing: .01em; white-space: nowrap; border-radius: var(--r-sm);
   border: 1px solid transparent; text-decoration: none; cursor: pointer; color: var(--ink); background: none;
-  transition: transform 160ms var(--ease-out), background-color .2s var(--ease-out), border-color .2s var(--ease-out), color .2s var(--ease-out); }
+  transition: transform 160ms var(--ease-out), background-color var(--t-hover) var(--ease-out), border-color var(--t-hover) var(--ease-out), color var(--t-hover) var(--ease-out); }
 .ld-btn:active { transform: scale(.97); }
 .ld-btn--primary { background: var(--sage-700); color: #fff; }
 .ld-btn--primary:hover { background: var(--sage-800); }
