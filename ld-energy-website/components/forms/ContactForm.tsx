@@ -21,7 +21,7 @@ import { whatsappQuoteText } from '@/lib/area-page'
 import { Ico } from '@/components/sections/home/HomeIcon'
 import { parseQuoteContext, quoteContextFromForm, quoteHref, quoteServices, QUOTE_PATH, type QuoteContext } from '@/lib/quote-context'
 import { conversionEvent } from '@/lib/conversion-events'
-import { customerTypeForSource, sourcePageForPath, type SourcePage, type CtaId } from '@/lib/enquiry-attribution'
+import { customerTypeForSource, sourcePageForPath, ctaIds, type SourcePage, type CtaId } from '@/lib/enquiry-attribution'
 import { restoredCustomerType, rememberCustomerType } from '@/lib/customer-type-history'
 import { useTurnstile } from '@/lib/useTurnstile'
 import { usePublishQuote } from '@/components/forms/QuoteSummary'
@@ -256,6 +256,11 @@ function focusBookingElement(element: HTMLElement | null) {
   element.scrollIntoView({ block: 'start', behavior: 'instant' })
 }
 
+/** The floor-area field above can close as a row is picked (320 px phones), pushing the picked row off screen. */
+function keepRowInView(input: HTMLInputElement) {
+  requestAnimationFrame(() => input.closest('label')?.scrollIntoView({ block: 'nearest' }))
+}
+
 export type FormVariant = 'hero' | 'page' | 'area' | 'dialog'
 
 export function ContactForm({ areaPage, sourcePage, variant = 'page', context, idPrefix = '' }: {
@@ -361,6 +366,19 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
     if (step === 1) headingRef.current?.focus({ preventScroll: true })
     else { moveFocus.current = true; setStep(1) }
   }, [request, variant, setValue, status]) // eslint-disable-line react-hooks/exhaustive-deps -- once per pick
+
+  // A #contact link on the same page (the area page's closing band) says which button led here. Dropped in 54d75fd;
+  // without it a quote from the closing band was logged as embedded.
+  useEffect(() => {
+    if (dedicated) return
+    const captureCta = (event: MouseEvent) => {
+      const anchor = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>('a[data-enquiry-cta]') : null
+      const ctaId = anchor?.dataset.enquiryCta as CtaId
+      if (anchor?.getAttribute('href') === '#contact' && ctaIds.includes(ctaId)) setValue('ctaId', ctaId)
+    }
+    document.addEventListener('click', captureCta)
+    return () => document.removeEventListener('click', captureCta)
+  }, [dedicated, setValue])
 
   useEffect(() => {
     if (moveFocus.current) { focusBookingElement(headingRef.current); moveFocus.current = false }
@@ -1016,10 +1034,11 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
                   <label className="bf-rr" data-checked={checked || undefined}>
                     <input type="radio" name="areaBand" value={b} checked={checked} required className="bf-radio"
                       aria-label={`${pricing[i].areaLabel}, ${pricing[i].typicalLabel}${price ? `, ${price}` : ''}`}
-                      onChange={() => {
+                      onChange={event => {
                         chooseArea(b)
                         // over 115 m² opens the floor-area field, with its own Continue
                         if (b === TOP_BAND) requestAnimationFrame(() => document.getElementById(fid('floorArea'))?.focus())
+                        else keepRowInView(event.currentTarget)
                       }}
                       onClick={() => { if (b !== TOP_BAND) railTap('size') }} onKeyDown={railEnter('size')} />
                     <b>{pricing[i].areaLabel}</b><span className="bf-rr__d">{pricing[i].typicalLabel}</span>
@@ -1031,7 +1050,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
             })}
             <label className="bf-rr" data-checked={values.areaBand === 'unknown' || undefined}>
               <input type="radio" name="areaBand" value="unknown" checked={values.areaBand === 'unknown'} required className="bf-radio"
-                aria-label="Not sure of floor area" onChange={() => chooseArea('unknown')} onClick={() => railTap('size')} onKeyDown={railEnter('size')} />
+                aria-label="Not sure of floor area" onChange={event => { chooseArea('unknown'); keepRowInView(event.currentTarget) }} onClick={() => railTap('size')} onKeyDown={railEnter('size')} />
               <b>Not sure of the size?</b><span className="bf-rr__d">We&rsquo;ll confirm the size and price from your property details.</span>
             </label>
           </div>
