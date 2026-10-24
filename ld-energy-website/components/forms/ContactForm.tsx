@@ -9,6 +9,7 @@ import { Field, Input, Textarea } from '@/components/ui/Input'
 import { cn } from '@/lib/cn'
 import { pricing, site, maxBundleSaving, formatPrice, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE, promise } from '@/lib/site'
 import { areaBands, areaLabel, bandForArea, parseExactArea, TOP_BAND } from '@/lib/floor-area'
+import { RollingPrice } from './RollingPrice'
 import { guideEstimate, guideEstimateRows, guidePrice, PLAN_LABEL, ENERGY_REPORT_LABEL } from '@/lib/pricing-estimate'
 import {
   turnaroundCopy, includedList, contactStepIntro, serviceChoices, serviceLabel, customerTypeChoices, nextSteps,
@@ -645,7 +646,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
       <><p className="bf__price"><b>Quote</b></p><p className="bf__for">Several properties are quoted individually.</p></>
     ) : estimate.state === 'priced' && band && estimate.total !== null ? (
       <>
-        <p className="bf__price">{estimate.isStartingPrice && <small>From</small>}<b data-price className="tabular-nums">£{formatPrice(estimate.total)}</b><span>{isLodged || productKind === 'preAssessment' ? 'inc. assessment' : 'inc. on-site measuring'}{isLodged ? ' and GOV.UK lodgement' : ''}</span></p>
+        <p className="bf__price">{estimate.isStartingPrice && <small>From</small>}<b data-price className="tabular-nums"><RollingPrice text={`£${formatPrice(estimate.total)}`} /></b><span>{isLodged || productKind === 'preAssessment' ? 'inc. assessment' : 'inc. on-site measuring'}{isLodged ? ' and GOV.UK lodgement' : ''}</span></p>
         <p className="bf__for">{areaLabel(values.areaBand, values.floorArea)}</p>
         {estimate.isStartingPrice && <p className="bf__for">Final price depends on property size and complexity. We&rsquo;ll confirm your exact quote before booking.</p>}
         {estimate.saving > 0 && <p className="bf__save">Save £{estimate.saving} compared with booking separately.</p>}
@@ -658,7 +659,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
         <dl className="bf__rows">{guideEstimateRows(estimate).map(([label, amount]) => <div key={label}><dt>{label}</dt><dd className="tabular-nums">{amount}</dd></div>)}</dl>
       </>
     ) : (
-      <><p className="bf__price"><small>From</small><b data-price className="tabular-nums">£{formatPrice(estimate.fromTotal ?? 0)}</b></p><p className="bf__for">Pick a size for your guide price.</p></>
+      <><p className="bf__price"><small>From</small><b data-price className="tabular-nums"><RollingPrice text={`£${formatPrice(estimate.fromTotal ?? 0)}`} /></b></p><p className="bf__for">Pick a size for your guide price.</p></>
     )}
   </>
   const estGet = <>

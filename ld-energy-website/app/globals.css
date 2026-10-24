@@ -708,3 +708,18 @@ body:has(.hc-close) .cf-grid { border-top: 1px solid rgba(241, 244, 242, .12); }
 .bx:not(.bx-js) .bx-panels:not(:has(.bx-panel:target)) .bx-panel[data-default] { display: block; }
 .bx:not(.bx-js) .bx-panel:target { display: block; }
 .bx-panel { scroll-margin-top: 6rem; }
+
+/* rolling price digits (RollingPrice, Abdul 24/10/2026; prototype v7.2 .odo): every glyph is generated content, so
+   the sr-only price is the element's only text */
+.odo { display: inline-flex; vertical-align: top; }  /* an overflow-hidden inline-block has its baseline at its foot; top-aligned in the 1em line, the glyphs sit where plain text would */
+.odo__c, .odo__g { display: inline-block; height: 1em; line-height: 1; overflow: hidden; }
+.odo__g { overflow: visible; }  /* only the digit columns clip; the £ dips below the 1em box */
+.odo__g::before { content: attr(data-ch); display: block; line-height: 1; white-space: pre; }  /* laid out as a digit is, so it shares their baseline */
+.odo__s { display: block; }
+.odo__s::before { content: "0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9"; white-space: pre; display: block; line-height: 1; }
+.odo[data-ready="true"] .odo__s { transition: transform .45s cubic-bezier(.22, 1, .36, 1); }
+@media (prefers-reduced-motion: reduce) { .odo[data-ready="true"] .odo__s { transition: none; } }
+/* the price's "inc. assessment" note is styled by `.bf__price span` (15 px, quiet); the digits inside the <b> are
+   spans too, so they take the price's own size and colour back (two classes and two types, to outrank the
+   homepage's :is(.hp, .bk7) .bf__price span) */
+.bf__price b span.odo, .bf__price b span.odo span { font-size: inherit; color: inherit; max-width: none; align-self: auto; }
