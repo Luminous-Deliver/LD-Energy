@@ -1,0 +1,30 @@
+/* /sellers, rebuilt 24/10/2026 on the /landlords template: the page wears .lp (landlords.css) for the shared
+   audience-page parts and .sl for what only this page has. Scoped so it wins whatever order the bundles load in. */
+
+/* why it matters: three reasons in a row */
+.sl .sl-why { list-style: none; padding: 0; margin-top: 32px; display: grid; border-top: 1px solid var(--hair-strong); }
+.sl .sl-why li { display: grid; gap: 8px; align-content: start; padding: 22px 0; border-bottom: 1px solid var(--hair); }
+.sl .sl-why p { font-size: 16px; line-height: 1.6; color: var(--ink); max-width: 44ch; }
+.sl .sl-why__ico { color: var(--sage-700); }
+@media (min-width: 900px) {
+  .sl .sl-why { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .sl .sl-why li { padding: 26px 28px; border-bottom: 0; }
+  .sl .sl-why li + li { border-left: 1px solid var(--hair); }
+  .sl .sl-why li:first-child { padding-left: 0; }
+}
+.sl .sl-direct { margin-top: 28px; font-size: 17px; line-height: 1.6; max-width: 70ch; }
+
+/* how your EPC affects your sale */
+.sl .sl-sale { display: grid; gap: 32px; }
+.sl .sl-p { margin-top: 16px; font-size: 17px; line-height: 1.6; max-width: 60ch; }
+.sl .sl-wins { display: grid; gap: 16px; align-content: start; padding: 24px; background: var(--card); border: 1px solid var(--hair-strong); border-radius: 10px; }
+.sl .sl-wins ul { list-style: none; padding: 0; display: grid; border-top: 1px solid var(--hair); }
+.sl .sl-wins li { display: grid; gap: 4px; padding: 14px 0; border-bottom: 1px solid var(--hair); font-size: 16px; line-height: 1.55; }
+.sl .sl-wins li:last-child { border-bottom: 0; padding-bottom: 0; }
+.sl .sl-wins b { font-weight: 500; }
+.sl .sl-opts { margin-top: 32px; }
+@media (min-width: 760px) { .sl .sl-opts div { grid-template-columns: 120px minmax(0, 1fr); } }
+@media (min-width: 900px) {
+  .sl .sl-sale { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 72px; align-items: start; }
+  .sl .sl-wins { padding: 28px; }
+}
