@@ -27,7 +27,9 @@ const out = path.resolve(process.env.BOOKING_EVIDENCE_DIR || '../../../audits/we
     }
     for (const route of ['/services/domestic-epc','/services/floor-plans','/services/epc-pre-assessment','/services/epc-improvement-plan','/blog','/landlords','/sellers','/estate-agents','/areas/stratford','/about','/areas','/faq','/domestic-energy-assessor-london']) {
       await page.goto(base + route, { waitUntil: 'networkidle' })
-      const labels = await page.locator('a[href*="/contact"], a[href*="/quote"], a[href="#contact"]').allTextContents()
+      // Exempt: Read next's "Ready to book?" quote card, a logged design (decisions/log.md 23/10/2026 late, "Correction:
+      // Read next is A's image cards plus C's quote card only")
+      const labels = await page.locator(':is(a[href*="/contact"], a[href*="/quote"], a[href="#contact"]):not(.in-ncard--go)').allTextContents()
       for (const label of labels) assert.doesNotMatch(label, /\bbook(?:ing)?\b/i, route)
       copy.push({ route, enquiryLabels: labels.map(label => label.trim()), passed: true })
     }
