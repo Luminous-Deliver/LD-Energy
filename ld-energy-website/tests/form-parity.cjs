@@ -22,6 +22,12 @@ if (!['localhost', '127.0.0.1'].includes(new URL(base).hostname)) throw new Erro
     const top = await page.evaluate(() => Math.round(document.getElementById('prices').getBoundingClientRect().top))
     ok(top >= 0 && top < 160, `a pick brings the Prices section's head to the top (${top})`)
 
+    // Abdul 24/10: picking a band opens the exact size under it, with an example inside that band
+    ok(await form.getByText('Know the exact size?').count() === 1, 'before a pick: the exact-size link')
+    await form.getByRole('radio', { name: /55–75 m²/ }).check({ force: true }); await page.waitForTimeout(300)
+    ok(await form.locator('[id$="floorArea"]').getAttribute('placeholder') === 'e.g. 64', 'a pick opens the exact size, its example inside 55–75 m²')
+    ok(await form.getByText('Know the exact size?').count() === 0, 'after a pick: no link, the field is open')
+
     // 8: the tenant note keeps its key
     await form.getByRole('radio', { name: /tenanted/i }).first().check({ force: true })
     ok(await form.locator('.bf__note--key svg.bf__note-ico').count() >= 1, 'the tenant note has its key icon')
@@ -56,7 +62,7 @@ if (!['localhost', '127.0.0.1'].includes(new URL(base).hostname)) throw new Erro
     ok(/bf__errsum/.test(sum.cls) && sum.rule === '2px', `a refused send focuses the error summary (${JSON.stringify(sum)})`)
 
     await page.close()
-    console.log(`PASS form parity: ${checks} checks (pick focus and scroll, tenant key, portfolio three columns and Quote size, plan pulse stops, step entrance, ruled speeds, error summary focus)`)
+    console.log(`PASS form parity: ${checks} checks (pick focus and scroll, exact size opens on a pick, tenant key, portfolio three columns and Quote size, plan pulse stops, step entrance, ruled speeds, error summary focus)`)
   } finally {
     await browser.close()
   }

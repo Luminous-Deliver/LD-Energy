@@ -599,6 +599,10 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
   const band = bandIndex >= 0 ? pricing[bandIndex] : undefined
   const onTopBand = values.areaBand === TOP_BAND
   const showArea = areaOpen || onTopBand || !!floorArea
+  // desktop (Abdul 24/10: "when I click the approximate floor area it opens"): a picked band opens the exact figure under
+  // it, still optional below the top band; phones keep the link, as a pick there moves straight to the next question
+  const bandPicked = !!values.areaBand && values.areaBand !== 'unknown'
+  const showAreaDesk = showArea || bandPicked
 
   const planChoice = canHavePlan && !planIncluded && (
     <label ref={planBox} className="bf-check bf-check--offer" onAnimationEnd={event => event.currentTarget.classList.remove('is-pulsing')}>
@@ -618,13 +622,15 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
   )
 
   /** One shared floor-area field (spec 2, 22/10/2026): under the top band's row, labelled for the band it serves. */
+  // the example sits inside the picked band, so it never suggests a figure the band would refuse (84 under 55-75 m²)
+  const areaExample = ({ 'up-to-40': 32, '40-55': 48, '55-75': 64, '75-95': 84, '95-115': 104, 'over-115': 145 } as Record<string, number>)[values.areaBand ?? ''] ?? 84
   const areaField = (
     <div className="bf__area">
       <label htmlFor={fid('floorArea')} className="bf__area-label">{onTopBand ? 'Approximate internal floor area' : 'Internal floor area'}</label>
       <p id={fid('floorArea-help')} className="bf__sub">{onTopBand ? 'Include all floors. An estimate is fine.' : 'Enter the size if known. An estimate is fine.'}</p>
       <div className="bf__area-row">
         <div className="relative w-36">
-          <Input id={fid('floorArea')} inputMode="decimal" autoComplete="off" maxLength={10} placeholder={onTopBand ? 'e.g. 145' : 'e.g. 84'}
+          <Input id={fid('floorArea')} inputMode="decimal" autoComplete="off" maxLength={10} placeholder={`e.g. ${areaExample}`}
             aria-invalid={!!errors.floorArea} aria-describedby={[fid('floorArea-help'), sizeNote ? fid('floorArea-note') : ''].filter(Boolean).join(' ')} hasError={!!errors.floorArea} className="pr-10"
             {...register('floorArea', {
               onChange: event => {
@@ -791,7 +797,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
                         <span className="bf-size__top"><b>{pricing[i].areaLabel}</b>{price && <span className="tabular-nums">{price}</span>}</span>
                         <span className="bf-tile__d">{pricing[i].typicalLabel}</span>
                       </label>
-                      {b === TOP_BAND && showArea && areaField}
+                      {showAreaDesk && (bandPicked ? checked : b === TOP_BAND) && areaField}
                     </div>
                   )
                 })}
@@ -803,7 +809,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
                     <span className="bf-tile__d">We&rsquo;ll confirm the size and price from your property details.</span></span>
                 </label>
               </div>
-              {!showArea && (
+              {!showAreaDesk && (
                 <button type="button" className="bf__more"
                   onClick={() => { setAreaOpen(true); requestAnimationFrame(() => document.getElementById(fid('floorArea'))?.focus()) }}>
                   Know the exact size? Enter it in m²
