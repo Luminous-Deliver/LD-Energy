@@ -58,13 +58,16 @@ const { rail } = require('./quote-rail.cjs')
       const customers = []
       for (const [route, initial] of [['landlords','Landlord (tenanted)'], ['estate-agents','Estate agent'], ['sellers','']]) {
         await page.goto(`${base}/${route}`, { waitUntil: 'networkidle' })
-        await page.locator('main a[href^="/quote"]').first().click()
+        // the first quote button; on /estate-agents that quotes one home since 7d7a15b (parity item 9), not a portfolio
+        const opener = page.locator('main a[href^="/quote"]').first()
+        const bulk = /service=bulk/.test(await opener.getAttribute('href'))
+        await opener.click()
         await page.locator('dialog.qd[open] form').waitFor({ timeout: 15000 })
         const phone = await r.isPhone()
         if (initial) assert.equal(await form.getByRole('radio', { name: initial, exact: true }).isChecked(), true)
         else assert.equal(await form.locator('input[name="customerType"]:checked').count(), 0)
         await chooseOn('who', 'Letting agent / firm')
-        if (route !== 'estate-agents') {
+        if (!bulk) {
           // Validation must not change the manual customer selection.
           if (phone) await page.keyboard.press('Enter') // Enter on a rail answer moves on, as Continue does
           else await next()
@@ -73,7 +76,7 @@ const { rail } = require('./quote-rail.cjs')
           await chooseOn('size', 'Not sure of floor area'); await chooseOn('dwelling', 'Flat')
         }
         // the timing step, or a portfolio's details step (it skips timing, 3abe7f8)
-        if (phone) await r.go(route === 'estate-agents' ? 'details' : 'timing')
+        if (phone) await r.go(bulk ? 'details' : 'timing')
         else await next()
         await form.locator('[id$="notes"]').fill('Private access note')
         if (phone) await r.go('service'); else await back()
