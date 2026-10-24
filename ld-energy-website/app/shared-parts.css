@@ -136,6 +136,13 @@ html { font-synthesis-weight: none; }
 .mnav li a { display: flex; flex-direction: column; justify-content: center; min-height: 48px; padding: 6px 0; color: var(--ink); text-decoration: none; font-size: 17px; }
 .mnav li a span + span { font-size: 15px; color: var(--ink-quiet); }
 .mnav li a:hover { color: var(--sage-700); }
+.mnav__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 6px 0 12px; }
+.mnav .mnav__grid a { flex-direction: row; align-items: center; justify-content: space-between; min-height: 52px; padding: 0 14px;
+  border: 1px solid var(--hair); border-radius: 10px; background: rgba(255, 255, 255, .55); font-size: 16px; transition: border-color .15s, color .15s; }
+.mnav .mnav__grid a::after { content: ""; width: 7px; height: 7px; border-top: 1.5px solid currentColor; border-right: 1.5px solid currentColor;
+  transform: rotate(45deg); opacity: .45; margin-right: 2px; }
+.mnav .mnav__grid a:hover { border-color: var(--sage-700); }
+.mnav .mnav__grid a[aria-current="page"] { border-color: var(--sage-700); color: var(--sage-700); font-weight: 500; }
 .mnav__foot { margin-top: auto; display: grid; gap: 10px; padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--hair-strong); }
 .mnav__foot .ld-btn { width: 100%; }
 .mnav__foot .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }

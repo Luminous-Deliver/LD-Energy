@@ -255,6 +255,15 @@
 .in-ncard--go .in-ncard__b { align-content: stretch; grid-template-rows: auto auto 1fr; padding: 22px; }
 .in-ncard--go .in-ncard__l { align-self: end; }
 @media (min-width: 760px) { .in-rn h2 { font-size: 40px; } .in-ncards { margin-top: 44px; gap: 18px; } }
+/* polish (Abdul 24/10, "the read next cards need work"): the body is a column so every card's link sits on its
+   foot and the links line up across a row; the picture eases in a touch on hover; the title gets a little more room */
+.in-ncard:not(.in-ncard--go) .in-ncard__b { display: flex; flex-direction: column; gap: 8px; padding: 20px 20px 22px; }
+.in-ncard:not(.in-ncard--go) .in-ncard__l { margin-top: auto; padding-top: 14px; }
+.in-ncard__k + b { margin-top: 2px; }
+.in-ncard__img img { transition: transform .5s cubic-bezier(.23, 1, .32, 1); }
+.in-ncard:hover .in-ncard__img img { transform: scale(1.035); }
+.in-ncard:focus-visible { outline: 2px solid var(--sage-700); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { .in-ncard__img img { transition: none; } .in-ncard:hover .in-ncard__img img { transform: none; } }
 @media (min-width: 1100px) { .in-ncards { grid-template-columns: repeat(4, 1fr); } }
 
 /* ------------------------------------------------------------------ ending A: night band -- */

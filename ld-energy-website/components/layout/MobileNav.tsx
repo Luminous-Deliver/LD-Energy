@@ -125,15 +125,21 @@ export function MobileNav({ waHref }: { waHref: string }) {
                   </ul>
                 </div>
               ))}
+              {/* Abdul 24/10, "could be better polished, especially this bit": the six loose rows become a headed
+                  two-column grid, half the height, with the page you are on marked */}
               <div className="mnav__group">
-                <ul>
-                  {other.map((link) => (
-                    <li key={link.href}>
-                      <Link prefetch={false} href={link.href} onClick={close} tabIndex={tab}>
-                        <span>{link.label}</span>
-                      </Link>
-                    </li>
-                  ))}
+                <p className="mnav__h">More</p>
+                <ul className="mnav__grid">
+                  {other.map((link) => {
+                    const here = pathname === link.href || pathname.startsWith(`${link.href}/`)
+                    return (
+                      <li key={link.href}>
+                        <Link prefetch={false} href={link.href} onClick={close} tabIndex={tab} aria-current={here ? 'page' : undefined}>
+                          <span>{link.label}</span>
+                        </Link>
+                      </li>
+                    )
+                  })}
                 </ul>
               </div>
             </nav>

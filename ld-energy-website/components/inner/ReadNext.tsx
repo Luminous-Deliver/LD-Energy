@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Container } from '@/components/ui/Container'
 import { Ico } from '@/components/sections/home/HomeIcon'
+import { guideImages } from '@/lib/guide-images'
 import '@/app/inner.css'
 
 /**
@@ -51,13 +52,21 @@ function Card({ s }: { s: NextStep }) {
 
 export function ReadNext({ title = 'Read next', intro, steps }: { title?: string; intro?: string; steps: NextStep[] }) {
   if (steps.length === 0) return null
+  // every card but the quote card gets a picture, and no picture twice in one row (lib/guide-images.ts, 24/10)
+  const used = new Set<string>()
+  const cards = steps.map((s) => {
+    if (s.go) return s
+    const img = [...guideImages(s.href), ...(s.img ? [s.img] : [])].find((x) => !used.has(x))
+    if (img) used.add(img)
+    return { ...s, img }
+  })
   return (
     <section className="in in-sec in-rn" aria-labelledby="in-rn-h">
       <Container>
         <h2 id="in-rn-h">{title}</h2>
         {intro && <p className="in-rn__intro">{intro}</p>}
         <ul className="in-ncards">
-          {steps.map((s) => {
+          {cards.map((s) => {
             const cls = `in-ncard${s.go ? ' in-ncard--go' : ''}`
             return (
               <li key={s.href + s.title}>
