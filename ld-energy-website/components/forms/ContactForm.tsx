@@ -278,6 +278,9 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
   // The shared floor-area field. "Over 115 m²" opens it; any other band opens it on request. Once
   // the customer types, it stays open even when their figure moves them to a smaller band.
   const [areaOpen, setAreaOpen] = useState(false)
+  // desktop: the band the exact-size field sits under; set by a hand pick (or frozen when typing starts), never by the
+  // band a typed figure selects, or the field would move rows mid-word and drop focus (24/10: "100" became "1")
+  const [areaHost, setAreaHost] = useState<string | null>(null)
   // phones (C): the open question, the answered ones, and a tick that asks for the open one to be scrolled to and focused
   const phone = usePhone()
   const [railOpen, setRailOpen] = useState<RailId>('who')
@@ -444,7 +447,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
 
   // a fresh request: "Send another request", and a "See my price" pick after a sent one
   function startOver() {
-    reset(); started.current = false; serviceTouched.current = false; setAreaOpen(false); setSent(null); setStatus('idle'); moveFocus.current = true; setStep(1)
+    reset(); started.current = false; serviceTouched.current = false; setAreaOpen(false); setAreaHost(null); setSent(null); setStatus('idle'); moveFocus.current = true; setStep(1)
     setRailOpen('who'); setRailSeen(new Set()); setRailTick(tick => tick + 1)
     rememberCustomerType('', window.history)
     if (dedicated) window.history.replaceState(window.history.state, '', quoteHref())
@@ -482,7 +485,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
   /** Start again (Abdul 24/10: on a phone there was no way back to a blank form short of changing every answer). */
   function railStartOver() {
     window.clearTimeout(railTimer.current)
-    reset(); clearErrors(); setShowErrors(false); started.current = false; serviceTouched.current = false; setAreaOpen(false)
+    reset(); clearErrors(); setShowErrors(false); started.current = false; serviceTouched.current = false; setAreaOpen(false); setAreaHost(null)
     rememberCustomerType('', window.history)
     railGo('who', new Set())
     requestAnimationFrame(() => formRef.current?.scrollIntoView({ block: 'start', behavior: 'instant' }))
@@ -581,6 +584,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
   }
   const chooseArea = (value: string) => {
     setValue('areaBand', value as ContactInput['areaBand'], { shouldValidate: !!errors.areaBand })
+    setAreaHost(value === 'unknown' ? null : value)
     // A typed figure stays only while it agrees with the chosen size, so picking another size clears it.
     const typed = getValues('floorArea'), exact = parseExactArea(typed)
     if (typed && (exact === undefined || bandForArea(exact) !== value)) { setValue('floorArea', ''); clearErrors('floorArea') }
@@ -603,6 +607,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
   // it, still optional below the top band; phones keep the link, as a pick there moves straight to the next question
   const bandPicked = !!values.areaBand && values.areaBand !== 'unknown'
   const showAreaDesk = showArea || bandPicked
+  const areaUnder: string = areaHost ?? (bandPicked && values.areaBand ? values.areaBand : TOP_BAND)
 
   const planChoice = canHavePlan && !planIncluded && (
     <label ref={planBox} className="bf-check bf-check--offer" onAnimationEnd={event => event.currentTarget.classList.remove('is-pulsing')}>
@@ -634,7 +639,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
             aria-invalid={!!errors.floorArea} aria-describedby={[fid('floorArea-help'), sizeNote ? fid('floorArea-note') : ''].filter(Boolean).join(' ')} hasError={!!errors.floorArea} className="pr-10"
             {...register('floorArea', {
               onChange: event => {
-                setAreaOpen(true)
+                setAreaOpen(true); setAreaHost((h) => h ?? areaUnder)
                 const exact = parseExactArea(event.target.value)
                 if (event.target.value) setValue('floorAreaUnknown', false)
                 if (exact !== undefined && getValues('areaBand') !== bandForArea(exact)) {
@@ -797,7 +802,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
                         <span className="bf-size__top"><b>{pricing[i].areaLabel}</b>{price && <span className="tabular-nums">{price}</span>}</span>
                         <span className="bf-tile__d">{pricing[i].typicalLabel}</span>
                       </label>
-                      {showAreaDesk && (bandPicked ? checked : b === TOP_BAND) && areaField}
+                      {showAreaDesk && b === areaUnder && areaField}
                     </div>
                   )
                 })}

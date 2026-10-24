@@ -27,6 +27,15 @@ if (!['localhost', '127.0.0.1'].includes(new URL(base).hostname)) throw new Erro
     await form.getByRole('radio', { name: /55–75 m²/ }).check({ force: true }); await page.waitForTimeout(300)
     ok(await form.locator('[id$="floorArea"]').getAttribute('placeholder') === 'e.g. 64', 'a pick opens the exact size, its example inside 55–75 m²')
     ok(await form.getByText('Know the exact size?').count() === 0, 'after a pick: no link, the field is open')
+    // 24/10 regression: typing a figure that selects another band must not move the field mid-word and drop focus
+    await form.getByRole('radio', { name: /^Over 115 m²/ }).check({ force: true }); await page.waitForTimeout(200)
+    const area = form.locator('[id$="floorArea"]')
+    await area.click(); await area.pressSequentially('100')
+    ok(await area.inputValue() === '100', `typing 100 keeps every digit (${await area.inputValue()})`)
+    ok(await page.evaluate(() => /floorArea$/.test(document.activeElement?.id || '')), 'focus stays in the field while typing')
+    ok(await form.getByRole('radio', { name: /^Over 95–115 m²/ }).isChecked(), '100 m² selects 95–115')
+    await area.fill('')
+    await form.getByRole('radio', { name: /55–75 m²/ }).check({ force: true }); await page.waitForTimeout(200)
 
     // 8: the tenant note keeps its key
     await form.getByRole('radio', { name: /tenanted/i }).first().check({ force: true })
