@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { LegalPage } from '@/components/ui/LegalPage'
-import { site, insurance, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE, defaultOgImage, promise } from '@/lib/site'
+import { site, insurance, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE, defaultOgImage, promise, portfolioRatesText } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'Terms of Service',
@@ -46,7 +46,7 @@ export default function TermsPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageSchema) }} />
       <LegalPage
       title="Terms of Service"
-      lastUpdated="23 October 2026"
+      lastUpdated="24 October 2026"
       breadcrumbs={[
         { href: '/', label: 'Home' },
         { href: '/terms', label: 'Terms of Service' },
@@ -83,6 +83,12 @@ export default function TermsPage() {
       </p>
       <p>
         Bookings are confirmed once we reply with a confirmed appointment time. We may decline bookings for properties outside our service area or where we cannot deliver the agreed turnaround.
+      </p>
+      {/* Abdul 24/10/2026: the portfolio rates, and his "yes" to the two rules that go with them */}
+      <h3 id="portfolio-rates">Portfolio rates</h3>
+      <p>{portfolioRatesText}</p>
+      <p>
+        The rate is set by the number of homes we actually assess. If we can&rsquo;t get into a home on the agreed day, the return visit is £25. If fewer homes are assessed than were ordered, the rate for that smaller number applies.
       </p>
 
       <h2>3. Your obligations</h2>
