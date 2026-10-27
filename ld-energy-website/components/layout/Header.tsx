@@ -1,244 +1,133 @@
 'use client'
 
-import { usePathname } from 'next/navigation'
-import { quoteHref, quoteContextForPath } from '@/lib/quote-context'
-
-import { useState, useRef, useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { Phone, ChevronDown } from 'lucide-react'
+import { usePathname } from 'next/navigation'
 import { Container } from '@/components/ui/Container'
-import { Logo } from '@/components/ui/Logo'
-import { Button } from '@/components/ui/Button'
 import { MobileNav } from './MobileNav'
-import { topNav, servicesMenu, site } from '@/lib/site'
-import { cn } from '@/lib/cn'
-import { useNavStage } from '@/lib/useScrollDirection'
+import { quoteTargetFor } from '@/lib/quote-target'
+import { MenuIcon, WhatsAppIcon } from '@/components/ui/BrandIcons'
 
-function ServicesDropdown() {
-  const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
-  const triggerRef = useRef<HTMLButtonElement>(null)
+/**
+ * The redesign header decided 19/10/2026: Landlords · Agents · Pricing · About + Get a quote, no dropdowns
+ * ("dont waste the nav"). Areas, Guides, FAQ, Contact and the service pages are in the phone menu and in the
+ * footer on every page (plan PLAN-AREAS-GUIDES-2026-10-22 "Navigation").
+ */
+export const headerNav = [
+  { href: '/landlords', label: 'Landlords' },
+  { href: '/estate-agents', label: 'Agents' },
+  { href: '/pricing', label: 'Pricing' },
+  { href: '/about', label: 'About' },
+] as const
 
-  // Close on outside click
-  useEffect(() => {
-    function handler(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
-    }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [])
-
-  // Escape closes and returns focus to the trigger; Tab out closes.
-  // This is a navigation disclosure containing links, not an ARIA menu, so
-  // roving arrow-key focus would be the wrong pattern — Tab is correct here.
-  useEffect(() => {
-    if (!open) return
-    const node = ref.current
-    if (!node) return
-    function onKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') {
-        e.stopPropagation()
-        setOpen(false)
-        triggerRef.current?.focus()
-      }
-    }
-    function onFocusOut(e: FocusEvent) {
-      if (node && !node.contains(e.relatedTarget as Node)) setOpen(false)
-    }
-    node.addEventListener('keydown', onKeyDown)
-    node.addEventListener('focusout', onFocusOut)
-    return () => {
-      node.removeEventListener('keydown', onKeyDown)
-      node.removeEventListener('focusout', onFocusOut)
-    }
-  }, [open])
-
+/** Logo A, locked 21/10/2026: his traced house at full weight beside the two lines of the master lockup in live text.
+ *  Wordmark option 2 (Abdul 23/10/2026): L&D Bold 700, ENERGY Regular 400. */
+export function LogoLockup() {
   return (
-    <div ref={ref} className="relative">
-      <button
-        ref={triggerRef}
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
-        aria-controls="services-menu"
-        className="inline-flex min-h-[44px] items-center gap-1 text-sm font-medium text-secondary-700 hover:text-primary-700 transition-colors"
-      >
-        Services
-        <ChevronDown
-          className={`w-3.5 h-3.5 text-secondary-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
-          aria-hidden="true"
-        />
-      </button>
-
-      {/*
-        Rendered unconditionally and hidden with `visibility`, not unmounted.
-        Previously `{open && …}` meant the Services destinations existed only
-        after a click, so /landlords, /sellers, /estate-agents and the service
-        pages had no crawlable link in the server-rendered header at all.
-
-        `invisible` (visibility: hidden) is the right hiding mechanism here: it
-        keeps the anchors in the HTML for crawlers while removing them from the
-        tab order and the accessibility tree, so keyboard and screen-reader
-        behaviour is unchanged. Interaction is identical.
-      */}
-      <div
-        id="services-menu"
-        className={`absolute top-full left-1/2 -translate-x-1/2 mt-3 w-72 rounded-2xl bg-white shadow-premium-lg ring-1 ring-secondary-900/5 overflow-hidden z-50 transition-opacity duration-150 ${
-          open ? 'visible opacity-100' : 'invisible opacity-0'
-        }`}
-      >
-        <div>
-          {/* Arrow pointer */}
-          <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-white rotate-45 ring-1 ring-secondary-900/5" aria-hidden="true" />
-          <div className="py-2">
-            {servicesMenu.map((group, gi) => (
-              <div key={group.heading}>
-                {gi > 0 && <div className="my-1 border-t border-secondary-100" aria-hidden="true" />}
-                <p className="px-4 pt-2 pb-1 text-xs font-bold uppercase tracking-widest text-secondary-600">
-                  {group.heading}
-                </p>
-                <ul>
-                  {group.links.map((item) => (
-                    <li key={item.href}>
-                      <Link
-                        prefetch={false}
-                        href={item.href}
-                        onClick={() => setOpen(false)}
-                        className="flex flex-col px-4 py-2.5 hover:bg-primary-50 transition-colors group"
-                      >
-                        <span className="text-sm font-semibold text-secondary-900 group-hover:text-primary-700">{item.label}</span>
-                        <span className="text-sm text-secondary-600 mt-0.5">{item.desc}</span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
+    <Link prefetch={false} href="/" className="lg">
+      {/* eslint-disable-next-line @next/next/no-img-element -- a 16 KB vector; next/image would add nothing */}
+      <img className="lg__mark" src="/brand/ld-energy-mark-nav.svg" alt="" width={72} height={38} fetchPriority="high" />
+      {/* the footer's reversed colours, his traced geometry unchanged; display:none elsewhere, so it only loads on dark */}
+      {/* eslint-disable-next-line @next/next/no-img-element -- as above */}
+      <img className="lg__mark lg__mark--rev" src="/brand/ld-energy-mark-nav-reversed.svg" alt="" width={72} height={38} loading="lazy" />
+      <span className="lg__words">
+        <span className="lg__name"><b>L&amp;D</b> Energy</span>
+        <span className="lg__tag">EPC · Floor plans</span>
+      </span>
+    </Link>
   )
 }
 
-// Draft A v3's reading line: 3px of EPC bands, G to A, filling as the page
-// scrolls. It sits outside the header so it stays when the nav leaves.
-// Written straight to the style each frame, so scrolling never re-renders.
-function ScrollProgress() {
-  const ref = useRef<HTMLSpanElement>(null)
-  useEffect(() => {
-    let ticking = false
-    const update = () => {
-      const el = ref.current
-      if (el) {
-        const max = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1)
-        el.style.transform = `scaleX(${Math.min(Math.max(window.scrollY / max, 0), 1).toFixed(4)})`
-      }
-      ticking = false
-    }
-    const onScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(update)
-        ticking = true
-      }
-    }
-    update()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', onScroll)
-    return () => {
-      window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', onScroll)
-    }
-  }, [])
-  return (
-    <span
-      ref={ref}
-      data-scroll-progress
-      aria-hidden="true"
-      className="pointer-events-none fixed inset-x-0 top-0 z-50 h-[3px] origin-left scale-x-0 will-change-transform"
-      style={{ background: 'linear-gradient(90deg,#E9153B 0 14.28%,#EF8023 0 28.57%,#FCAA65 0 42.85%,#FFD500 0 57.14%,#8DCE46 0 71.42%,#19B459 0 85.71%,#008054 0)' }}
-    />
-  )
-}
-
-export function Header() {
+/** `waHref` is built on the server (lib/area-page.ts whatsappQuoteHref) so the borough data stays out of the client bundle. */
+export function Header({ waHref }: { waHref: string }) {
   const pathname = usePathname()
-  const stage = useNavStage()
-  // The look only changes while the nav is out of sight, so the bar never
-  // morphs into the pill on screen: it leaves as a bar, returns as a pill.
-  const [look, setLook] = useState<'bar' | 'pill'>('bar')
-  useEffect(() => { if (stage !== 'away') setLook(stage === 'pill' ? 'pill' : 'bar') }, [stage])
-  const pill = look === 'pill'
-  return (
-    // OmniRated's nav (measured 15/10/2026). At the top: a plain bar that sits
-    // in the hero, no box. Scrolling down, it leaves. Past the hero's buttons a
-    // small frosted pill drops in (14px down, 48px tall, transform .56s). The
-    // spacer keeps the header's old 80px in the flow for every page below it.
-    <div className="h-[76px] md:h-[80px]">
-      <ScrollProgress />
-      <header
-        data-nav={stage}
-        className={cn(
-          'fixed inset-x-0 top-0 z-40 transition-[transform,opacity] duration-[560ms] ease-[cubic-bezier(.23,1,.32,1)] motion-reduce:transition-none',
-          'focus-within:translate-y-0 focus-within:opacity-100',
-          stage === 'away' ? '-translate-y-[130%] opacity-0' : 'translate-y-0 opacity-100',
-        )}
-      >
-        <Container as="div">
-          {/* Keep navigation disclosures and enlarged text outside the rounded background unclipped. */}
-          <div
-            data-look={look}
-            className={cn(
-              'mx-auto flex items-center justify-between',
-              pill
-                ? 'mt-[14px] h-12 w-full gap-3 rounded-full bg-white/75 pl-4 pr-1.5 ring-1 ring-secondary-900/5 backdrop-blur-[16px] backdrop-saturate-[1.3] shadow-[inset_0_1px_0_rgba(255,255,255,.9),0_10px_30px_-12px_rgba(13,27,51,.28)] lg:w-fit lg:gap-6'
-                : 'gap-3 pt-3 pb-1 md:pt-4',
-            )}
-          >
-            <span className={cn('inline-flex origin-left', pill && 'scale-[.84]')}>
-              <Logo size="sm" priority />
-            </span>
+  const [solid, setSolid] = useState(false)
+  const [pill, setPill] = useState(false)
+  const line = useRef<HTMLDivElement>(null)
+  const track = useRef<HTMLDivElement>(null)
 
-            <nav aria-label="Primary" className={cn('hidden lg:flex items-center', pill ? 'gap-5' : 'gap-6')}>
-              <ServicesDropdown />
-              {topNav.map((link) => (
-                <Link
-                  prefetch={false}
-                  key={link.href}
-                  href={link.href}
-                  className={cn('inline-flex items-center font-medium text-secondary-700 hover:text-primary-700 transition-colors', pill ? 'min-h-[40px] text-[15px]' : 'min-h-[44px] text-sm')}
-                >
+  // The bar takes the paper ground and the hairline once the page moves, and the pill arrives once the reader is
+  // about half a screen in (nateherk.com docks when the hero is 62% gone); one state change per crossing. The line
+  // is written straight to the element, once per frame, so scrolling never re-renders the header.
+  // Phones too since 24/10 (Abdul: "yes", beside nateherk.com on a phone): the bar scrolls away and a compact pill
+  // docks, replacing the morning's hide-on-scroll bar.
+  useEffect(() => {
+    let raf = 0
+    const paint = () => {
+      raf = 0
+      const y = window.scrollY, room = document.documentElement.scrollHeight - window.innerHeight
+      setSolid(y > 0)
+      setPill(y > window.innerHeight * 0.45)
+      const k = room > 0 ? Math.min(1, y / room) : 0
+      if (line.current) line.current.style.transform = `scaleX(${k})`
+      track.current?.setAttribute('data-on', String(y > 0))
+    }
+    const update = () => { if (!raf) raf = requestAnimationFrame(paint) }
+    paint()
+    window.addEventListener('scroll', update, { passive: true })
+    window.addEventListener('resize', update)
+    return () => { cancelAnimationFrame(raf); window.removeEventListener('scroll', update); window.removeEventListener('resize', update) }
+  }, [])
+
+  // pinned things on phones (the On this page bar, a guide's contents) sit under the pill while it is docked
+  useEffect(() => { document.documentElement.dataset.head = pill ? 'pill' : 'none' }, [pill])
+
+  const quoteHref = quoteTargetFor(pathname, 'header')
+
+  // the homepage's dusk hero sits under the bar: it goes light-on-dark until the page moves (data-dark)
+  return (
+    <>
+    {/* Abdul 23/10/2026: "too subtle", make it like the How it works line: a visible track, a solid fill (the marker went 24/10) */}
+    <div ref={track} className="sline-track" data-on="false" aria-hidden="true" />
+    <div ref={line} className="sline" aria-hidden="true" />
+    <header className="sh" data-solid={solid} data-dark={pathname === '/' && !solid}>
+      <Container className="sh__in">
+        <LogoLockup />
+        <nav aria-label="Primary" className="sh__nav">
+          <ul>
+            {headerNav.map((link) => (
+              <li key={link.href}>
+                <Link prefetch={false} href={link.href} aria-current={pathname === link.href ? 'page' : undefined}>
                   {link.label}
                 </Link>
-              ))}
-            </nav>
-
-            <div className="flex items-center gap-2 lg:gap-3">
-              {/* Phone + CTA appear at lg with the nav links. The pill keeps
-                  OmniRated's three-part shape, so the phone stays in the bar. */}
-              {!pill && (
-                <a
-                  href={site.phoneHref}
-                  className="hidden lg:inline-flex min-h-[44px] items-center gap-2 text-sm font-semibold text-secondary-800 hover:text-primary-700 transition-colors"
-                  aria-label={`Call ${site.phone}`}
-                >
-                  <Phone className="w-4 h-4" aria-hidden="true" />
-                  {site.phone}
-                </a>
-              )}
-              <Button
-                href={pathname === '/contact' ? '#booking-form' : pathname === '/' ? '#pricing' : quoteHref({ ...quoteContextForPath(pathname), ctaId: 'header' })}
-                variant="accent"
-                className={cn('hidden lg:inline-flex rounded-full min-h-0', pill ? 'px-4 py-2 text-[14px]' : 'px-5 py-2.5')}
-                size="md"
-              >
-                Get my exact quote
-              </Button>
-              <MobileNav />
-            </div>
-          </div>
-        </Container>
-      </header>
-    </div>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        {/* WhatsApp before the phone (Abdul 22/10), prefilled with the approved wording */}
+        <a className="sh__wa" href={waHref} target="_blank" rel="noopener noreferrer">
+          <WhatsAppIcon />
+          WhatsApp
+        </a>
+        {/* Outline, not filled: each page's hero and form hold the one filled action in their view. */}
+        <Link prefetch={false} className="ld-btn ld-btn--line ld-btn--sm sh__quote" href={quoteHref}>
+          <span className="lbl-l">Get my exact quote</span>
+          <span className="lbl-s">Get a quote</span>
+        </Link>
+        <MobileNav waHref={waHref} />
+      </Container>
+    </header>
+    {/* the scroll pill (shared-parts.css): hidden, it is out of the tab order and the accessibility tree. On phones it
+        carries the mark, Landlords, Pricing and the menu; the dock keeps the quote button */}
+    <nav aria-label="Primary, compact" className="pill" data-on={pill}>
+      <Link prefetch={false} href="/" className="pill__home" aria-label="L&D Energy home">
+        {/* eslint-disable-next-line @next/next/no-img-element -- the header's own mark, already loaded */}
+        <img src="/brand/ld-energy-mark-nav.svg" alt="" width={45} height={24} />
+        <span><b>L&amp;D</b> Energy</span>
+      </Link>
+      <ul>
+        {headerNav.map((link) => (
+          <li key={link.href} data-phone={link.href === '/landlords' || link.href === '/pricing' || undefined}>
+            <Link prefetch={false} href={link.href} aria-current={pathname === link.href ? 'page' : undefined}>{link.label}</Link>
+          </li>
+        ))}
+      </ul>
+      <Link prefetch={false} className="ld-btn ld-btn--primary" href={quoteHref}>Get a quote</Link>
+      <button type="button" className="pill__menu" aria-label="Open menu" aria-controls="mobile-nav-panel"
+        onClick={(e) => window.dispatchEvent(new CustomEvent('mnav:open', { detail: e.currentTarget }))}>
+        <MenuIcon />
+      </button>
+    </nav>
+    </>
   )
 }

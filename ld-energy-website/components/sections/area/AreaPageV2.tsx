@@ -1,18 +1,16 @@
-import Link from 'next/link'
-import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
-import { Section } from '@/components/ui/Section'
-import { Accordion } from '@/components/ui/Accordion'
 import { ContactSection } from '@/components/sections/ContactSection'
+import { ReadNext, type NextStep } from '@/components/inner/ReadNext'
+import { InnerEnding } from '@/components/inner/InnerEnding'
 import { boroughMeta } from '@/lib/boroughs'
 import { areaLocal } from '@/lib/area-local'
 import { getPostBySlug } from '@/lib/blog'
 import type { AreaSummary } from '@/lib/borough-stats-types'
 import type { FaqItem } from '@/lib/faq'
 import { site, pricing, priceFrom, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE } from '@/lib/site'
-import { london, statsSource, summaryFor } from '@/lib/area-page'
+import { london, pct, statsSource, summaryFor } from '@/lib/area-page'
+import { DATA_PAGE_PATH } from '@/lib/borough-ratings'
 import {
-  AboutFigures, AreaCtaBand, AreaHeroV2, CouncilRulesSection, CoverageSection, LettingSection, PriceLine,
-  RatingMixSection, StockSection,
+  AreaFaq, AreaHeroD, CouncilRulesSection, CoverageSection, JobNote, LettingSection, RatingMixSection, StockSection,
 } from './AreaBlocks'
 
 /**
@@ -58,14 +56,28 @@ function sharedFaqs(name: string): FaqItem[] {
   ]
 }
 
-/** Guides picked by what the area's certificates say about it. */
-function readNextSlugs(s: AreaSummary): string[] {
-  const picks: string[] = []
-  if (s.pctLettings >= 40) picks.push('epc-for-landlords-2026', 'epc-c-by-2030')
-  if (s.pctSales >= 40) picks.push('epc-for-selling-house', 'epc-vs-floor-plan-vs-survey')
-  if (s.pctFlats < 55) picks.push('how-to-improve-epc-rating')
-  picks.push('why-is-my-epc-different', 'epc-ratings-explained')
-  return [...new Set(picks)].slice(0, 4)
+/**
+ * Read next (option A cards, C's quote card last): the guide this area's certificates point to, why ratings differ,
+ * the borough comparison, then the ready-to-book card. Guide titles and descriptions come from the posts.
+ */
+async function readNextSteps(name: string, s: AreaSummary): Promise<NextStep[]> {
+  const guide = async (slug: string, kicker: string, img: string): Promise<NextStep | null> => {
+    const p = await getPostBySlug(slug)
+    return p ? { kicker, title: p.title, text: p.description, href: `/blog/${slug}`, img, meta: `${p.readingTime} min read` } : null
+  }
+  const first = s.pctLettings >= s.pctSales
+    ? await guide('epc-for-landlords-2026', 'Letting and MEES', '/inner/rn-landlord.svg')
+    : await guide('epc-for-selling-house', 'Selling and buying', '/inner/rn-seller.svg')
+  const second = await guide('why-is-my-epc-different', 'Understand your EPC', '/inner/rn-two-houses.svg')
+  const steps: (NextStep | null)[] = [
+    first,
+    second,
+    { kicker: 'Borough figures', title: 'EPC ratings in every London borough', href: DATA_PAGE_PATH, img: '/inner/rn-boroughs.svg',
+      text: `${name}'s ${pct(s.ratings.pct.AtoC)} rated A to C, against ${pct(london.ratings.pct.AtoC)} across London and the other councils.` },
+    { title: 'Ready to book?', href: '#contact', go: true,
+      text: 'Tell us the address and size. We confirm your exact price before you book.' },
+  ]
+  return steps.filter((x): x is NextStep => x !== null)
 }
 
 export async function AreaPageV2({ slug }: { slug: string }) {
@@ -78,7 +90,7 @@ export async function AreaPageV2({ slug }: { slug: string }) {
   const lettingCouncil = local?.council.filter((c) => /licensing|floor-plan/.test(c.id)) ?? []
   const otherCouncil = local?.council.filter((c) => !/licensing|floor-plan/.test(c.id)) ?? []
   const faqs = local ? local.faqs(s) : [meta.postcodeFaq, ...sharedFaqs(name)]
-  const guides = (await Promise.all(readNextSlugs(s).map((g) => getPostBySlug(g)))).filter(Boolean)
+  const steps = await readNextSteps(name, s)
   const job = approvedJobNotes[slug]
   const url = `${site.url}/areas/${slug}`
 
@@ -136,67 +148,37 @@ export async function AreaPageV2({ slug }: { slug: string }) {
     },
   ]
 
+  // labels are the sections' H2 text, so the list and the bar name what the reader sees; `heading` is the H2's id
+  const sections = [
+    { id: 'ratings', heading: 'ratings-h', label: `How do homes in ${name} rate?` },
+    { id: 'letting', heading: 'letting-h', label: `If you let in ${name}` },
+    { id: 'homes', heading: 'homes-h', label: `Why homes in ${name} rate as they do` },
+    { id: 'coverage', heading: 'coverage-h', label: `Areas and postcodes we cover in ${name}` },
+    ...(otherCouncil.length ? [{ id: 'council', heading: 'council-h', label: `Council rules that affect improvement work in ${name}` }] : []),
+    { id: 'faq', heading: 'faq-h', label: `EPC questions for ${name}` },
+    { id: 'contact', heading: 'contact-title', label: 'Get my exact quote' },
+  ]
+
   return (
-    <>
+    <div className="in">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
-      <BreadcrumbNav items={[{ href: '/', label: 'Home' }, { href: '/areas', label: 'Areas' }, { href: `/areas/${slug}`, label: name }]} />
 
-      <AreaHeroV2 name={name} s={s} />
+      <AreaHeroD slug={slug} name={name} s={s} parent={parent ? { slug: parent.slug, name: parent.name } : undefined} sections={sections} />
 
-      {parent && (
-        <Section variant="default" tier="compact">
-          <p className="max-w-3xl text-secondary-700 leading-relaxed">
-            {name} is part of the London Borough of{' '}
-            <Link href={`/areas/${parent.slug}`} className="text-primary-700 underline underline-offset-2">{parent.name}</Link>, and it is where we are based.
-          </p>
-        </Section>
-      )}
-
-      <RatingMixSection name={name} s={s} standout={local?.standout(s, london) ?? ''} />
+      <RatingMixSection slug={slug} name={name} s={s} standout={local?.standout(s, london) ?? ''} />
       <LettingSection name={name} s={s} council={lettingCouncil} />
       <StockSection name={name} s={s} local={local?.stock ?? [meta.housingStock, meta.epcIssues]} reading={local?.stockReading(s, london) ?? ''} />
       <CoverageSection name={name} slug={slug} s={s} local={local} />
-
-      {job && (
-        <Section variant="muted" id="recent-job" aria-labelledby="job-h">
-          <div className="max-w-3xl">
-            <h2 id="job-h" className="text-2xl md:text-3xl font-bold tracking-tight text-secondary-900">{job.heading}</h2>
-            {job.paragraphs.map((p) => <p key={p.slice(0, 40)} className="mt-4 text-secondary-700 leading-relaxed">{p}</p>)}
-          </div>
-        </Section>
-      )}
-
+      {job && <JobNote heading={job.heading} paragraphs={job.paragraphs} />}
       <CouncilRulesSection name={name} council={otherCouncil} />
-      <PriceLine name={name} s={s} />
-
-      <Section variant="muted" id="faq" aria-labelledby="faq-h">
-        <div className="max-w-3xl">
-          <p className="text-xs uppercase tracking-wide font-semibold text-primary-700">Questions</p>
-          <h2 id="faq-h" className="mt-2 text-3xl md:text-4xl font-bold tracking-tight text-secondary-900">EPC questions for {name}</h2>
-          <div className="mt-8"><Accordion items={faqs} /></div>
-        </div>
-      </Section>
+      <AreaFaq name={name} faqs={faqs} />
 
       <ContactSection areaPage={slug} sourcePage="area" />
 
-      <Section variant="default" id="read-next" aria-labelledby="next-h">
-        <div className="max-w-3xl">
-          <h2 id="next-h" className="text-2xl md:text-3xl font-bold tracking-tight text-secondary-900">Read next</h2>
-          <ul className="mt-6 space-y-3">
-            {guides.map((g) => g && (
-              <li key={g.slug}>
-                <Link href={`/blog/${g.slug}`} className="font-semibold text-primary-700 underline-offset-2 hover:underline">{g.title}</Link>
-              </li>
-            ))}
-            <li>
-              <Link href="/areas" className="font-semibold text-primary-700 underline-offset-2 hover:underline">Every London area we cover</Link>
-            </li>
-          </ul>
-        </div>
-      </Section>
-
-      <AboutFigures />
-      <AreaCtaBand name={name} />
-    </>
+      <ReadNext steps={steps} />
+      <InnerEnding variant="a" quote="#contact" source="area"
+        eyebrow={`${name} · from £${priceFrom.epc}`}
+        heading={`Book your ${name} EPC`} />
+    </div>
   )
 }

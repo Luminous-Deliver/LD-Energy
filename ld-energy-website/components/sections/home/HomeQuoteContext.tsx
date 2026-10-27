@@ -2,8 +2,8 @@
 
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react'
 
-/** The three services the homepage prices. Keys match `quoteServices`. */
-export type HomeService = 'epc' | 'bundle' | 'floor-plan'
+/** The services the homepage's cards and Pre-Assessment strip can pick. Keys match `quoteServices`. */
+export type HomeService = 'epc' | 'bundle' | 'floor-plan' | 'pre-assessment'
 
 interface HomeQuoteState {
   /** The latest "See my price" pick from further down the page; `n` changes on every click. */
@@ -27,7 +27,11 @@ export function HomeQuoteProvider({ children }: { children: ReactNode }) {
     setRequest(previous => ({ service, n: (previous?.n ?? 0) + 1 }))
     if (scroll && cardRef.current) {
       const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      cardRef.current.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' })
+      // desktop: to the Prices section's head, so its title, rating and accreditation line arrive with the form (prototype
+      // v7.2); phones: to the form, whose head is a screen below the section's
+      const wide = window.matchMedia('(min-width: 760px)').matches
+      const target = (wide && cardRef.current.closest('section')) || cardRef.current
+      target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' })
     }
   }, [])
 

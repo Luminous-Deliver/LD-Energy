@@ -1,0 +1,648 @@
+/* The homepage body, ported from the approved prototype v7.2 (projects/ld-energy-redesign-2026-10/scrollcraft/builds/home,
+   Abdul 22/10/2026: "so far v7.2 looks fine"). Imported by app/page.tsx only and scoped under .hp, so no other page
+   changes. One ground, hairline rules instead of boxes, no shadows, no pills; the hero's climb and the How it works
+   line are the moving parts. The header, phone menu, dock and footer are shared parts (app/shared-parts.css).
+
+   Unlayered on purpose: the booking form's own styles sit in globals.css's components layer, and the restyle at the
+   end of this file has to beat them without touching the component. */
+.hp {
+  --sage-50: #F1F9F5; --sage-100: #E7F1EB; --sage-600: #4F7A64;
+  --slate-100: #EBECF4; --slate-300: #B9BDCD;
+  --stone-100: #F1EFE8; --stone-300: #CFCECA;
+  --white: #FFFFFF; --error: #A83630;
+  --epc-a: #008054; --epc-b: #19B459; --epc-c: #8DCE46; --epc-d: #FFD500; --epc-e: #FCAA65; --epc-f: #EF8023; --epc-g: #E9153B;
+  --gutter: 16px;
+  --maxw: 1280px;   /* the site header's container (max-w-7xl), so the hero copy and every section line up under the logo */
+  --sec: 64px;
+  color: var(--ink); font: 400 18px/1.6 var(--font-sans);
+  /* the prototype's body tracking (scrollcraft.css --sc-track-normal), computed here and inherited as px, as there */
+  letter-spacing: -.005em; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+@media (min-width: 640px) { .hp { --gutter: 24px; } }
+@media (min-width: 760px) { .hp { --sec: 112px; font-size: 19px; } }
+@media (min-width: 1024px) { .hp { --gutter: 32px; } }   /* matches the header's px-4 / sm:px-6 / lg:px-8 */
+html:has(.hp) { scroll-padding-top: calc(var(--head-h) + 24px); }
+@media (max-width: 759px) { html:has(.hp) { scroll-padding-top: 16px; } }
+/* non-inherited, so a write each scroll frame restyles only the element that carries it (prototype motion F2) */
+@property --draw { syntax: '<number>'; inherits: true; initial-value: 1; }
+.hp ::selection { background: var(--sage-700); color: var(--white); }
+.hp p { margin: 0; }
+.hp :is(h1, h2, h3, h4) { margin: 0; font-family: var(--font-serif); font-weight: 400; font-optical-sizing: auto; color: var(--ink); text-wrap: balance; }
+.hp a { color: inherit; }
+.hp .wrap { width: 100%; max-width: var(--maxw); margin-inline: auto; padding-inline: var(--gutter); }
+.hp .i { flex: none; display: inline-block; }
+.hp .num { font-family: var(--font-serif); font-variant-numeric: lining-nums tabular-nums; }
+.hp .eyebrow.eyebrow { font: 500 12px/1.4 var(--font-sans); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-quiet); margin: 0; }
+.hp :focus-visible { outline: 2px solid var(--sage-700); outline-offset: 3px; }
+
+/* buttons: the design system's 6 px radius; the one filled action per view is sage 700 */
+.hp .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 0 26px;
+  font: 500 17px/1 var(--font-sans); letter-spacing: .01em; border-radius: var(--r-sm); border: 1px solid transparent;
+  text-decoration: none; cursor: pointer; background: none; color: var(--ink); text-align: center;
+  transition: transform 160ms var(--ease-out), background-color .2s var(--ease-out), border-color .2s var(--ease-out), color .2s var(--ease-out); }
+.hp .btn:active { transform: scale(.97); }
+.hp .btn-primary { background: var(--sage-700); color: var(--white); }
+.hp .btn-primary:hover { background: var(--sage-800); }
+.hp .btn-line { border-color: var(--slate-500); }
+.hp .btn-line:hover { border-color: var(--ink); }
+.hp .link { color: var(--sage-700); text-underline-offset: 3px; font-weight: 500; text-decoration: underline; }
+.hp .link:hover { color: var(--sage-800); }
+.hp .arrow-link { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; }
+
+/* the rating badge (design system RatingBadge: stars sage 600, never gold) */
+.hp .lde-rating { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; border: 1px solid #E2E1DE; border-radius: 999px; padding: 8px 14px;
+  font-size: 15px; line-height: 1.4; color: var(--ink); text-decoration: none; background: var(--white); justify-self: start; }
+.hp .lde-rating b { font: 400 22px/1 var(--font-serif); font-variant-numeric: lining-nums; }
+.hp .lde-stars { color: var(--sage-600); letter-spacing: .1em; }
+
+/* ===================================================================== 1 hero === */
+/* London rooftops at first light, full bleed, in planes (sky, glow, roofs, mist, a near ridge), the copy in the sky.
+   Desktop pins where the report fits: the camera lowers over the roofs while the paper sheet rises with the example
+   report (the plan draws, POTENTIAL climbs F 34 to D 58). Phones, short screens and reduced motion run in flow.
+   Transform and opacity only, written by one scroll-driven frame (HomeMotion). The header sits on the sky: the hero
+   slides up under it. */
+.hp-hero { --strip-h: 84px; position: relative; margin-top: calc(-1 * var(--head-h)); }
+.hp-hero .hero__stage { position: relative; height: auto; overflow: visible; background: #F2F0EE; isolation: isolate; }
+.hp-hero .scene-wrap { position: relative; height: calc(100svh - var(--strip-h)); min-height: 420px; overflow: hidden; }
+.hp-hero .scene { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.hp-hero .scene--front { z-index: 3; }
+/* every plane is the photograph's own 16:9 box covering the stage from its bottom edge, so the planes stay registered */
+.hp-hero .pl { position: absolute; left: 50%; bottom: calc(-1 * var(--strip-h)); width: max(100%, 177.78svh); aspect-ratio: 16 / 9;
+  transform: translate3d(-50%, 0, 0); transform-origin: 50% 100%; will-change: transform; }
+.hp-hero .pl img { display: block; width: 100%; height: 100%; max-width: none; object-fit: cover; }
+.hp-hero .pl picture { display: contents; }
+.hp-hero .pl--glow { background: radial-gradient(34% 26% at 71% 56%, rgba(255, 206, 150, .5), rgba(255, 220, 180, .18) 55%, transparent 75%); opacity: .5; }
+.hp-hero .pl--mist { background: linear-gradient(180deg, transparent 50%, rgba(250, 244, 235, .5) 59%, rgba(250, 244, 235, .25) 66%, transparent 74%); }
+.hp-hero .pl--near { left: 0; width: 100%; aspect-ratio: auto; transform: translate3d(0, 62%, 0); }
+.hp-hero .pl--near img { height: auto; }
+/* hero B (23/10): the cut-away on its own paper; the paper fade under the copy is always on from 760 px */
+.hp-hero .hero__stage { background: #FAF9F4; }
+.hp-hero .pl--far, .hp-hero .pl--glow, .hp-hero .pl--mist { display: none; }
+.hp-hero .pl--mid { background: #FAF9F4; }
+.hp-hero .hero__copy { position: relative; z-index: 2; display: grid; gap: 26px; justify-items: start; align-content: start;
+  padding-top: calc(var(--head-h) + clamp(48px, 10vh, 110px)); will-change: transform; }
+.hp-hero .hero__head { display: grid; gap: 16px; justify-items: start; }
+.hp-hero .hero__title { font-family: var(--font-serif); font-weight: 400; color: var(--ink); text-wrap: balance; font-size: clamp(46px, 5.6vw, 84px); line-height: 1.02; letter-spacing: -.018em; max-width: 11em; }
+.hp-hero .hero__sub { font-size: 20px; line-height: 1.55; max-width: 34ch; color: var(--ink); }
+.hp-hero .hero__cta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px; margin-top: 4px; }
+
+/* the sheet: paper laid over the photograph. Its strip is in the first screen (the prices, the rating, the two facts) */
+.hp-hero .report { position: relative; z-index: 4; background: var(--ground); will-change: transform; }
+.hp-hero .report::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px; background: var(--hair-strong); }
+.hp-hero .strip { height: var(--strip-h); display: flex; align-items: center; }
+.hp-hero .strip .wrap { display: flex; align-items: center; gap: 0; }
+.hp-hero .strip__item { display: flex; align-items: baseline; gap: 10px; padding: 0 28px; white-space: nowrap; font-size: 16px; color: var(--ink); }
+.hp-hero .strip__item:first-child { padding-left: 0; }
+.hp-hero .strip__item + .strip__item { border-left: 1px solid var(--hair); }
+.hp-hero .price { font-family: var(--font-serif); font-size: 28px; line-height: 1; font-variant-numeric: lining-nums tabular-nums; }
+.hp-hero .price small { font: 400 15px var(--font-sans); color: var(--ink-quiet); margin-right: 5px; }
+.hp-hero .facts { display: flex; gap: 24px; list-style: none; margin: 0 0 0 auto; padding: 0; font-size: 15px; color: var(--ink-quiet); }
+.hp-hero .facts li { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+.hp-hero .facts .i { color: var(--ink); }
+@media (max-width: 1239px) { .hp-hero .strip .facts li + li { display: none; } }
+@media (max-width: 1099px) { .hp-hero .strip .facts { display: none; } }
+/* tablets: the prototype's 28 px gaps pushed the rating past the screen edge at 768; tighter here so all three fit */
+@media (min-width: 760px) and (max-width: 1023px) {
+  .hp-hero .strip__item { padding: 0 14px; gap: 8px; }
+  .hp-hero .strip .eyebrow.eyebrow { letter-spacing: .1em; }
+  .hp-hero .strip .lde-rating { padding: 6px 10px; gap: 8px; }
+  /* the score and stars stay; the count's words are still read out */
+  .hp-hero .strip .lde-count { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+}
+
+.hp-hero .report__body { padding-top: 28px; padding-bottom: 40px; border-top: 1px solid var(--hair); }
+.hp-hero .report__rating { display: none; align-items: center; gap: 12px 20px; flex-wrap: wrap; margin-bottom: 28px; }
+.hp-hero .report__rating .facts { margin: 0; flex-wrap: wrap; gap: 8px 20px; font-size: 16px; }
+.hp-hero .report__cap { display: flex; justify-content: space-between; gap: 16px; }
+.hp-hero .report__grid { display: grid; grid-template-columns: minmax(0, 4.6fr) minmax(0, 3.6fr) minmax(0, 3.8fr); gap: 32px 48px; align-items: start; margin-top: 20px; }
+.hp-hero .report__plan { margin: 0; display: grid; gap: 10px; }
+.hp-hero .report__plan figcaption, .hp-hero .graph__note { font-size: 14px; color: var(--ink-quiet); line-height: 1.4; }
+/* the plan draws with the scroll: every stroke has pathLength 1, so one variable on the svg runs them all */
+.hp-hero .hplan { --draw: 1; width: 100%; height: auto; display: block; background: var(--white); border: 1px solid var(--hair); padding: 10px; }
+.hp-hero .hplan [pathLength] { stroke-dasharray: 1; stroke-dashoffset: calc(1 - var(--draw)); }
+.hp-hero .hplan text, .hp-hero .hplan [fill]:not([fill="none"]):not([fill="#FFFFFF"]) { opacity: calc((var(--draw) - .75) * 4); }
+
+/* the rating graph, drawn like the certificate's own A to G chart */
+.hp-hero .graph { display: grid; grid-template-columns: minmax(0, 1fr) minmax(64px, max-content) minmax(64px, max-content); column-gap: 6px; }
+.hp-hero .graph__h { font: 500 12px/1.3 var(--font-sans); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-quiet); padding: 0 4px 8px 8px; text-align: center; }
+.hp-hero .graph__h:first-child { text-align: left; }
+.hp-hero .bars { grid-row: 2; list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.hp-hero .bars li { height: 28px; display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 0 9px; font: 500 13px/1 var(--font-sans); color: var(--night); background: var(--c); }
+.hp-hero .bars li b { font-size: 15px; font-weight: 600; }
+.hp-hero .bars li.on-dark { color: var(--white); }
+.hp-hero .gcol { grid-row: 2; position: relative; border-left: 1px solid var(--hair); }
+.hp-hero .garrow { position: absolute; left: 4px; right: 0; top: 0; height: 28px; display: flex; align-items: center; justify-content: center; padding-left: 7px;
+  font: 500 14px/1 var(--font-sans); color: var(--night); background: var(--epc-f); font-variant-numeric: lining-nums tabular-nums;
+  clip-path: polygon(9px 0, 100% 0, 100% 100%, 9px 100%, 0 50%); transform: translateY(calc(var(--row) * 32px));
+  transition: transform .5s var(--ease-out), background-color .4s var(--ease-out); }
+.hp-hero .garrow[data-band="E"] { background: var(--epc-e); }
+.hp-hero .garrow[data-band="D"] { background: var(--epc-d); }
+.hp-hero .graph__note { grid-column: 1 / -1; margin-top: 10px; }
+.hp-hero .measures { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--hair-strong); }
+.hp-hero .measures li { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 10px; align-items: center; min-height: 46px; padding: 6px 0; border-bottom: 1px solid var(--hair);
+  font-size: 16px; line-height: 1.3; color: var(--ink-quiet); transition: color .4s var(--ease-out); }
+.hp-hero .measures li b { font: 500 13px/1 var(--font-sans); }
+.hp-hero .measures li.is-on { color: var(--ink); }
+.hp-hero .res { font: 500 13px/1 var(--font-sans); color: var(--night); padding: 4px 6px; border-radius: 3px; font-variant-numeric: lining-nums tabular-nums;
+  transition: background-color .4s var(--ease-out), color .4s var(--ease-out), box-shadow .4s var(--ease-out); }
+/* before it lands, each result is an outline of the rating it buys; on landing it fills with its band colour */
+.hp-hero .measures li:not(.is-on) .res { background: transparent; color: var(--ink-quiet); box-shadow: inset 0 0 0 1px currentColor; }
+.hp-hero .res[data-band="E"] { background: var(--epc-e); }
+.hp-hero .res[data-band="D"] { background: var(--epc-d); }
+.hp-hero .verdict { margin-top: 18px; font: 400 22px/1.3 var(--font-serif); min-height: 2.6em; text-wrap: balance; }
+
+/* rolling digits: each digit is a column that slides to its value */
+.hp-hero .odo { display: inline-flex; }
+.hp-hero .odo .c { display: inline-block; height: 1em; line-height: 1; overflow: hidden; vertical-align: top; }
+.hp-hero .odo .s { display: block; transition: transform .45s var(--ease-out); }
+.hp-hero .odo .s span { display: block; height: 1em; line-height: 1; }
+
+/* pinned (desktop with motion, where the report fits; HomeMotion adds .is-static where it does not): the stage sticks
+   for 2.6 screens, the copy sits in the sky and the sheet waits at the stage bottom with only its strip showing. Set
+   in CSS, so the first paint is already the first frame */
+@media (min-width: 760px) and (prefers-reduced-motion: no-preference) {
+  .hp-hero:not(.is-static) { height: 260vh; }
+  .hp-hero:not(.is-static) .hero__stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
+  .hp-hero:not(.is-static) .scene-wrap { position: absolute; inset: 0; height: auto; min-height: 0; }
+  .hp-hero:not(.is-static) .pl { bottom: 0; }
+  .hp-hero:not(.is-static) .pl--near { bottom: 0; }
+  .hp-hero:not(.is-static) .report { position: absolute; left: 0; right: 0; bottom: 0; transform: translate3d(0, calc(100% - var(--strip-h)), 0); }
+}
+/* short desktop screens (under ~820 px): the copy steps down a size and a paper column sits under it */
+.hp-hero .hero__scrim { display: none; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(90deg, rgba(243, 240, 235, .94) 0, rgba(243, 240, 235, .86) 36%, rgba(243, 240, 235, .5) 50%, rgba(243, 240, 235, 0) 64%); }
+@media (min-width: 760px) and (max-height: 820px) {
+  .hp-hero .hero__title { font-size: min(5.6vw, 9.6vh); }
+  .hp-hero .hero__copy { gap: 18px; padding-top: calc(var(--head-h) + 4vh); }
+  .hp-hero .hero__sub { font-size: 18px; }
+  .hp-hero .hero__scrim { display: block; }
+  .hp-hero .hero__cta .link { color: var(--sage-800); }
+}
+@media (max-width: 1100px) and (min-width: 760px) {
+  .hp-hero .report__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .hp-hero .report__plan { grid-row: span 2; }
+}
+/* phones: their own composition. The portrait cut of the same morning, copy in its sky, the strip right under the
+   scene with the two prices, then the report stacked. No pin: the rows land as each passes 70% of the screen */
+@media (max-width: 759px) {
+  .hp-hero { --strip-h: 88px; }
+  /* The image band is sized to its copy, not to the screen: the portrait planes are sized by the screen's width
+     (122vw, the srcset's size), so the roofline sits a fixed 91vw above the planes' bottom edge, which runs under the
+     strip. The copy's bottom padding puts that roofline about 24 px under the WhatsApp link on every phone, with the
+     mist just behind the link and clean sky behind the words. A taller copy block (narrow phones, large text) grows
+     the planes instead of leaving bare ground at the top. */
+  .hp-hero .scene-wrap { height: auto; min-height: 0; }
+  .hp-hero .hero__copy { padding-bottom: calc(91vw - var(--strip-h) + 24px); }
+  .hp-hero .pl { width: auto; height: max(216.9vw, calc(100% + var(--strip-h))); aspect-ratio: 9 / 16; }
+  .hp-hero .pl--near { display: none; }
+  .hp-hero .pl--glow { background: radial-gradient(60% 18% at 55% 54%, rgba(255, 206, 150, .5), rgba(255, 220, 180, .16) 55%, transparent 75%); }
+  .hp-hero .pl--mist { background: linear-gradient(180deg, transparent 50%, rgba(250, 244, 235, .45) 56%, rgba(250, 244, 235, .2) 62%, transparent 70%); }
+  .hp-hero .hero__copy { gap: 20px; padding-top: calc(var(--head-h) + 36px); }
+  .hp-hero .hero__title { font-size: clamp(40px, 11.2vw, 50px); }
+  .hp-hero .hero__head { gap: 12px; }
+  .hp-hero .hero__sub { font-size: 18px; max-width: 30ch; }
+  .hp-hero .hero__cta { gap: 4px 20px; }
+  .hp-hero .strip .wrap { display: grid; grid-template-columns: 1fr 1fr; }
+  .hp-hero .strip__item { display: grid; gap: 4px; padding: 0 14px; white-space: normal; }
+  .hp-hero .price { font-size: 26px; }
+  .hp-hero .strip .lde-rating, .hp-hero .strip .facts { display: none; }
+  .hp-hero .report__body { padding-top: 24px; padding-bottom: 8px; }
+  .hp-hero .report__cap { flex-direction: column; gap: 6px; }
+  .hp-hero .report__grid { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .hp-hero .report__rating { display: flex; }
+  .hp-hero .verdict { font-size: 20px; }
+}
+
+/* ================================================================= sections === */
+.hp .sec { padding-block: var(--sec); }
+.hp .sec + .sec { border-top: 1px solid var(--hair); }
+/* every statement sits below the H1: the H1 leads by about 1.3x on desktop, 1.4x on phones */
+.hp .statement { font-family: var(--font-serif); font-weight: 400; color: var(--ink); text-wrap: balance; font-size: clamp(30px, 3.9vw, 56px); line-height: 1.06; letter-spacing: -.012em; }
+.hp .lede-l { font-size: 20px; line-height: 1.55; max-width: 44ch; color: var(--ink); }
+
+/* ============================================================ how it works === */
+/* a timeline: the steps down a measuring line the scroll draws (its head held at 60% of the screen), the visit's
+   preparation hung off step 2, the three things worth knowing beside them as the report's margin notes */
+.hp .how__head { display: grid; gap: 20px; justify-items: start; }
+.hp .how__head .statement { max-width: 16ch; }
+.hp .how__grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); gap: 48px 96px; margin-top: 72px; align-items: start; }
+.hp .tl { position: relative; --n: 104px; --x: 18px; }
+.hp .tl__rail { position: absolute; left: var(--x); top: 76px; bottom: 120px; width: 1px; background: var(--hair-strong); }
+.hp .tl__fill { position: absolute; left: -.5px; top: 0; width: 2px; height: 100%; background: var(--sage-700); transform-origin: 50% 0; transform: scaleY(0); will-change: transform; }
+.hp .tl__head { position: absolute; left: -4.5px; top: -5px; width: 10px; height: 10px; border-radius: 50%; background: var(--sage-700);
+  box-shadow: 0 0 0 5px rgba(58, 98, 78, .14); will-change: transform; }
+.hp .tl__list { list-style: none; margin: 0; padding: 0; display: grid; }
+.hp .tl__step { display: grid; grid-template-columns: var(--n) minmax(0, 1fr); padding-bottom: 64px; }
+.hp .tl__step:last-child { padding-bottom: 0; }
+/* the numeral turns from a quiet slate to ink as the line reaches it; it sits on the ground over the rail */
+.hp .tl__n { width: calc(var(--x) * 2); text-align: center; font: 400 64px/1 var(--font-serif); font-variant-numeric: lining-nums; color: var(--slate-500);
+  transition: color .45s var(--ease-out); position: relative; z-index: 1; height: max-content; padding-block: 10px; margin-block: -10px; background: var(--ground); }
+.hp .tl__step.is-on .tl__n { color: var(--ink); }
+.hp .tl__body { display: grid; gap: 14px; align-content: start; padding-top: 4px; min-width: 0; }
+.hp .tl__body h3 { font-size: clamp(28px, 2.4vw, 36px); line-height: 1.08; }
+.hp .tl__body > p { font-size: 18px; line-height: 1.6; max-width: 42ch; }
+.hp .tl__body > p.tl__fact { max-width: none; display: flex; gap: 10px; align-items: flex-start; font-size: 16px; line-height: 1.5; color: var(--ink-quiet); }
+.hp .tl__fact .i { color: var(--sage-700); margin-top: 2px; }
+.hp .ticks { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.hp .ticks li { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 10px; font-size: 16px; line-height: 1.45; color: var(--ink); }
+.hp .ticks .i { color: var(--sage-700); margin-top: 1px; }
+.hp .ticks .plus { position: relative; width: 20px; height: 20px; }
+.hp .ticks .plus::before, .hp .ticks .plus::after { content: ""; position: absolute; left: 4px; right: 4px; top: 10px; height: 2px; margin-top: -1px; background: var(--sage-700); }
+.hp .ticks .plus::after { transform: rotate(90deg); }
+.hp .prep { margin-top: 14px; background: var(--white); border: 1px solid var(--hair); padding: 22px 26px 6px; display: grid; gap: 16px; }
+.hp .prep h4 { font: 400 24px/1.2 var(--font-serif); }
+.hp .prep .ticks { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px 32px; }
+.hp .prep .arrow-link { justify-self: start; font-size: 16px; }
+.hp .notes { position: sticky; top: calc(var(--head-h) + 40px); border-top: 1px solid var(--hair-strong); padding-top: 22px; }
+.hp .notes__t { font-size: 24px; line-height: 1.25; }
+.hp .notes ul { list-style: none; margin: 18px 0 0; padding: 0; }
+.hp .notes li { position: relative; display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 14px; padding: 20px 0 22px; border-top: 1px solid var(--hair); }
+.hp .notes li .i { color: var(--sage-700); margin-top: 3px; }
+.hp .notes h4 { font: 500 17px/1.35 var(--font-sans); }
+/* the whole note is the link to its answer */
+.hp .notes h4 a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--hair-strong); text-underline-offset: 4px; }
+.hp .notes h4 a::before { content: ""; position: absolute; inset: 0; }
+.hp .notes h4 a::after { content: " \2192" / ""; color: var(--sage-700); }
+.hp .notes li:hover h4 a { text-decoration-color: currentColor; }
+.hp .notes p { font-size: 16px; line-height: 1.55; color: var(--ink-quiet); margin-top: 6px; }
+@media (max-width: 1023px) {
+  .hp .how__grid { grid-template-columns: minmax(0, 1fr); gap: 56px; margin-top: 56px; }
+  .hp .notes { position: static; }
+}
+@media (max-width: 759px) {
+  .hp .tl { --n: 60px; --x: 14px; }
+  .hp .tl__rail { top: 52px; }
+  .hp .tl__n { font-size: 44px; }
+  .hp .tl__step { padding-bottom: 48px; }
+  .hp .tl__body { gap: 12px; padding-top: 2px; }
+  .hp .lede-l { font-size: 18px; }
+  .hp :is(.how__head, .offers__head) .statement { max-width: none; }
+  .hp .prep { padding: 18px 18px 4px; margin-top: 10px; }
+  .hp .prep h4 { font-size: 22px; }
+  .hp .prep .ticks { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ============================================================== photo break === */
+.hp .break { margin: 0; }
+.hp .break img { display: block; width: 100%; max-width: none; height: clamp(300px, 40vw, 600px); object-fit: cover; object-position: 50% 62%; }
+.hp .break figcaption { font-size: 13px; color: var(--ink-quiet); padding-top: 10px; }
+.hp .break--scene { max-width: 1140px; margin-inline: auto; padding-block: 8px 24px; }
+.hp .break--scene img { height: auto; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 8px; }
+
+/* =========================================================== what you get === */
+/* the live service cards as paper sheets: the one-visit bundle in the middle, wider and raised 20 px, the only filled button */
+.hp .offers__head { display: grid; gap: 20px; justify-items: start; }
+.hp .offers__head .statement { max-width: 15ch; }
+.hp .offers { list-style: none; margin: 72px 0 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.16fr) minmax(0, 1fr); gap: 20px; align-items: stretch; }
+.hp .offer { display: flex; flex-direction: column; min-width: 0; background: var(--white); border: 1px solid var(--hair); padding: 28px 28px 22px; }
+.hp .offer--feature { margin-top: -20px; padding-top: 34px; border-color: var(--hair-strong); box-shadow: inset 0 3px 0 var(--sage-700); }
+.hp .offer__top { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 28px; }
+.hp .offer__ico .i { width: 28px; height: 28px; color: var(--sage-700); display: block; }
+.hp .offer__flag { font: 500 13px/1 var(--font-sans); color: var(--sage-800); background: var(--sage-100); padding: 6px 8px; border-radius: 3px; white-space: nowrap; }
+.hp .offer h3 { margin-top: 20px; font-size: clamp(28px, 2.3vw, 32px); line-height: 1.1; }
+.hp .offer__for { margin-top: 8px; font-size: 16px; line-height: 1.45; color: var(--ink-quiet); }
+.hp .offer__price { margin-top: 22px; font: 400 40px/1 var(--font-serif); font-variant-numeric: lining-nums tabular-nums; color: var(--ink); }
+.hp .offer__price small { font: 400 15px var(--font-sans); color: var(--ink-quiet); margin-right: 6px; }
+.hp .offer__groups { margin-top: 24px; padding-top: 22px; border-top: 1px solid var(--hair); display: grid; gap: 20px; }
+.hp .offer__g { font: 500 12px/1.4 var(--font-sans); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-quiet); margin-bottom: 10px; }
+.hp .offer__foot { margin-top: auto; padding-top: 28px; display: grid; gap: 2px; justify-items: start; }
+.hp .offer__foot .btn { width: 100%; }
+.hp .offer__foot .arrow-link { font-size: 16px; }
+@media (max-width: 1099px) and (min-width: 760px) {
+  .hp .offers { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .hp .offer--feature { grid-column: 1 / -1; order: -1; margin-top: 0; padding-top: 28px; }
+  .hp .offer--feature .offer__groups { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 32px; }
+  .hp .offer--feature .offer__foot { grid-template-columns: auto auto; align-items: center; justify-content: start; column-gap: 24px; }
+  .hp .offer--feature .offer__foot .btn { width: auto; }
+}
+@media (max-width: 759px) {
+  .hp .offers { grid-template-columns: minmax(0, 1fr); gap: 16px; margin-top: 48px; }
+  .hp .offer, .hp .offer--feature { margin-top: 0; padding: 24px 20px 18px; }
+  .hp .offer--feature { padding-top: 27px; }
+  .hp .offer__price { font-size: 36px; margin-top: 16px; }
+  .hp .offer h3 { margin-top: 14px; }
+  .hp .offer__groups { margin-top: 20px; padding-top: 18px; gap: 18px; }
+  .hp .offer__foot { padding-top: 22px; }
+  .hp .offer__foot .btn { white-space: normal; padding: 10px 16px; line-height: 1.25; }
+}
+/* the Pre-Assessment strip under the three services: a paper sheet, the section drawing beside the copy */
+.hp .pre { margin-top: 20px; display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 24px 56px; align-items: center;
+  background: var(--white); border: 1px solid var(--hair); padding: 28px 36px; }
+.hp .pre__art { margin: 0; }
+.hp .section-art { display: block; width: 100%; height: auto; }
+.hp .tc__pic { position: relative; }
+.hp .tc img { display: block; width: 100%; height: auto; border-radius: 6px; }
+.hp .tc__m { position: absolute; width: 24px; height: 24px; margin: -12px 0 0 -12px; display: grid; place-items: center; border-radius: 50%; background: var(--sage-700); color: #fff; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .25); font: 600 12px/1 var(--font-sans); }
+.hp .tc__key { list-style: none; margin: 14px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 20px; }
+.hp .tc__key li { display: grid; grid-template-columns: 22px minmax(0, 1fr); column-gap: 10px; align-items: start; line-height: 1.2; }
+.hp .tc__key i { grid-row: span 2; width: 22px; height: 22px; display: grid; place-items: center; border-radius: 50%; background: var(--sage-700); color: #fff; font: normal 600 11px/1 var(--font-sans); align-self: start; }
+.hp .tc__key b { font-family: var(--font-sans); font-weight: 600; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--sage-800); }
+.hp .tc__key span { font-family: var(--font-serif); font-size: 15px; color: var(--ink); }
+@media (max-width: 479px) { .hp .tc__key { grid-template-columns: minmax(0, 1fr); gap: 8px; } .hp .tc__key li { grid-template-columns: 22px 78px minmax(0, 1fr); align-items: center; } .hp .tc__key i { grid-row: auto; } .hp .tc__key span { font-size: 15px; } }
+.hp .tc__cap { font-size: 13px; color: var(--ink-quiet); padding-top: 8px; }
+.hp .pre__body { display: grid; gap: 12px; justify-items: start; }
+.hp .pre__body h3 { font-size: clamp(28px, 2.3vw, 32px); line-height: 1.1; }
+.hp .pre__body > p { font-size: 18px; line-height: 1.55; max-width: 48ch; }
+.hp .pre__body > p.pre__fine { font-size: 15px; color: var(--ink-quiet); }
+.hp .pre__cta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 24px; margin-top: 6px; }
+@media (max-width: 899px) { .hp .pre { grid-template-columns: minmax(0, 1fr); padding: 22px 20px; } .hp .pre__art { max-width: 460px; } }
+@media (max-width: 759px) { .hp .pre__body > p.pre__fine, .hp .guides__list span, .hp .acc-line { font-size: 16px; } }
+
+/* ==================================================================== prices === */
+.hp .prices__head { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 20px 72px; align-items: end; }
+.hp .prices__head p.lede { font-size: 19px; max-width: 36ch; }
+.hp .prices__side { display: grid; gap: 18px; justify-items: start; }
+.hp .acc-line { display: inline-flex; align-items: flex-start; gap: 10px; min-height: 44px; font-size: 16px; line-height: 1.45; color: var(--ink); text-decoration: none; }
+.hp .acc-line .i { color: var(--sage-700); flex: none; margin-top: 1px; }
+.hp .acc-line u { color: var(--sage-700); text-decoration-color: var(--hair-strong); text-underline-offset: 3px; }
+.hp .acc-line:hover u { text-decoration-color: currentColor; }
+@media (max-width: 759px) { .hp .prices__head { grid-template-columns: 1fr; } }
+
+/* ===================================================================== proof === */
+.hp .proof__big { display: grid; gap: 20px; justify-items: start; }
+.hp .proof__big .statement { font-size: clamp(32px, 4.2vw, 60px); }
+.hp .proof__big .statement em { font-style: normal; color: var(--slate-500); }
+.hp .proof__stars { display: block; font-size: clamp(28px, 2.8vw, 40px); line-height: 1; letter-spacing: .08em; color: var(--sage-600); margin-bottom: 6px; }
+.hp .quotes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px 72px; margin-top: 56px; border-top: 1px solid var(--hair-strong); padding-top: 32px; }
+.hp .quote { margin: 0; display: grid; gap: 18px; align-content: start; }
+.hp .quote blockquote { margin: 0; display: grid; gap: 12px; font: 400 clamp(20px, 1.6vw, 23px)/1.5 var(--font-serif); color: var(--ink); max-width: 46ch; }
+.hp .quote figcaption { font-size: 15px; color: var(--ink-quiet); display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+.hp .quote__stars { color: var(--sage-600); letter-spacing: .06em; }
+.hp .creds { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 56px; border-top: 1px solid var(--hair-strong); border-bottom: 1px solid var(--hair); }
+.hp .creds > div { padding: 24px 32px 28px; display: grid; gap: 10px; align-content: start; justify-items: start; }
+.hp .creds > div:first-child { padding-left: 0; }
+.hp .creds > div + div { border-left: 1px solid var(--hair); }
+.hp .creds h3 { font-size: 26px; line-height: 1.2; }
+.hp .creds p { font-size: 18px; line-height: 1.6; color: var(--ink); }
+.hp .creds .acc { font-weight: 500; font-variant-numeric: lining-nums tabular-nums; }
+.hp .areas-more summary { list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; min-height: 48px; color: var(--sage-700); font-weight: 500; font-size: 16px; text-decoration: underline; text-underline-offset: 3px; }
+.hp .areas-more summary::-webkit-details-marker { display: none; }
+.hp .areas-more summary .i { transition: transform .3s var(--ease-out); }
+.hp .areas-more[open] summary .i { transform: rotate(90deg); }
+.hp .boroughs { margin: 4px 0 0; columns: 2 10rem; column-gap: 24px; list-style: none; padding: 0; font-size: 15px; line-height: 1.4; }
+.hp .boroughs li { break-inside: avoid; }
+.hp .boroughs a { display: inline-block; padding: 6px 0; color: var(--ink); text-decoration: underline; text-decoration-color: var(--stone-300); text-underline-offset: 3px; }
+@media (max-width: 759px) {
+  .hp .quotes { grid-template-columns: 1fr; }
+  .hp .quote figcaption { font-size: 16px; }
+  .hp .boroughs a { padding: 11px 0; }
+  .hp .creds { grid-template-columns: 1fr; }
+  .hp .creds > div { padding: 22px 0 24px; }
+  .hp .creds > div + div { border-left: 0; border-top: 1px solid var(--hair); }
+}
+
+/* ======================================================================= faq === */
+/* a sticky title in a narrow left column, questions at body-plus size on the right (Snøhetta's split) */
+.hp .faq__grid { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 32px 72px; align-items: start; }
+.hp .faq__side { position: sticky; top: calc(var(--head-h) + 40px); display: grid; gap: 20px; }
+.hp .faq__title { font-size: clamp(34px, 3.3vw, 48px); line-height: 1.06; letter-spacing: -.01em; max-width: 11ch; }
+.hp .faq__more { font-size: 16px; line-height: 1.55; color: var(--ink-quiet); max-width: 30ch; }
+.hp .faq__more a { color: var(--sage-700); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; }
+.hp .faq__list { border-top: 1px solid var(--hair-strong); }
+.hp .faq details { border-bottom: 1px solid var(--hair); }
+.hp .faq summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px; align-items: center; padding: 14px 0; min-height: 52px;
+  font: 400 clamp(18px, 1.4vw, 20px)/1.35 var(--font-serif); color: var(--ink); transition: color .2s var(--ease-out); }
+.hp .faq summary:hover { color: var(--sage-700); }
+.hp .faq summary::-webkit-details-marker { display: none; }
+.hp .faq summary .plus { width: 16px; height: 16px; position: relative; }
+.hp .faq summary .plus::before, .hp .faq summary .plus::after { content: ""; position: absolute; left: 0; right: 0; top: 7px; height: 2px; background: currentColor; transition: transform .3s var(--ease-out); }
+.hp .faq summary .plus::after { transform: rotate(90deg); }
+.hp .faq details[open] summary .plus::after { transform: rotate(0); }
+.hp .faq details > div { padding: 0 48px 18px 0; display: grid; gap: 8px; }
+.hp .faq details p { font-size: 17px; line-height: 1.6; max-width: 62ch; }
+.hp .faq details a { color: var(--sage-700); text-decoration: underline; text-underline-offset: 3px; }
+.hp .faq .faq__links { display: flex; flex-wrap: wrap; gap: 0 20px; font-size: 16px; }
+.hp .faq .faq__links a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 500; }
+/* the answer opens instead of appearing; browsers without ::details-content snap */
+.hp { interpolate-size: allow-keywords; }
+.hp .faq details::details-content { height: 0; overflow: clip; transition: height 220ms var(--ease-out), content-visibility 220ms allow-discrete; }
+.hp .faq details[open]::details-content { height: auto; }
+@media (max-width: 899px) {
+  .hp .faq__grid { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .hp .faq__side { position: static; }
+  .hp .faq summary { font-size: 18px; padding: 13px 0; }
+  .hp .faq details > div { padding-right: 0; }
+  .hp .faq details p { font-size: 16px; }
+}
+
+/* ==================================================================== guides === */
+.hp .guides__head { display: grid; gap: 14px; justify-items: start; }
+.hp .guides__head .statement { font-size: clamp(30px, 3.2vw, 44px); }
+.hp .guides__list { list-style: none; margin: 32px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--hair-strong); }
+.hp .guides__list li + li { border-left: 1px solid var(--hair); }
+.hp .guides__list a { display: grid; gap: 8px; align-content: start; height: 100%; padding: 18px 22px 22px 0; color: var(--ink); text-decoration: none; }
+.hp .guides__list li + li a { padding-left: 22px; }
+.hp .guides__list b { font: 400 clamp(19px, 1.5vw, 21px)/1.3 var(--font-serif); }
+.hp .guides__list span { font-size: 15px; line-height: 1.5; color: var(--ink-quiet); }
+.hp .guides__list a:hover b { color: var(--sage-700); }
+.hp .guides__more { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 0 32px; }
+@media (max-width: 899px) {
+  .hp .guides__list { grid-template-columns: minmax(0, 1fr); }
+  .hp .guides__list li + li { border-left: 0; border-top: 1px solid var(--hair); }
+  .hp .guides__list a, .hp .guides__list li + li a { padding: 16px 0 18px; }
+}
+/* pictures (Abdul 24/10): on top of each column from 900 px; on phones a thumbnail at the left and an arrow at the right,
+   so each row reads as a link to a guide and the section heading above stands apart */
+.hp .guides__img { display: block; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 6px; background: var(--band, #F1EFE8); margin-bottom: 6px; }
+.hp .guides__img img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .5s cubic-bezier(.23, 1, .32, 1); }
+.hp .guides__list a:hover .guides__img img { transform: scale(1.035); }
+.hp .guides__t { display: grid; gap: 8px; }
+.hp .guides__list a > .i { display: none; }
+@media (max-width: 899px) {
+  .hp .guides__list a { grid-template-columns: 104px minmax(0, 1fr) 18px; gap: 14px; align-items: center; }
+  .hp .guides__img { aspect-ratio: 4 / 3; margin: 0; }
+  .hp .guides__t { gap: 4px; }
+  .hp .guides__list b { font-size: 18px; }
+  .hp .guides__list .guides__t span { font-size: 14px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .hp .guides__list a > .i { display: block; width: 18px; height: 18px; color: var(--sage-700); }
+}
+@media (prefers-reduced-motion: reduce) { .hp .guides__img img { transition: none; } .hp .guides__list a:hover .guides__img img { transform: none; } }
+/* from 900 px (Abdul 24/10, "polish this"): four equal cards in the Read next style. The open columns gave the first
+   one no left padding, so its picture ran wider and its title sat lower than the other three */
+@media (min-width: 900px) {
+  .hp .guides__list { gap: 18px; border-top: 0; margin-top: 40px; }
+  .hp .guides__list li + li { border-left: 0; }
+  .hp .guides__list a, .hp .guides__list li + li a { display: flex; flex-direction: column; gap: 0; padding: 0; overflow: hidden;
+    border: 1px solid var(--hair-strong); border-radius: 10px; background: var(--white); transition: border-color .15s; }
+  .hp .guides__list a:hover { border-color: var(--sage-700); }
+  .hp .guides__img { margin: 0; border-radius: 0; border-bottom: 1px solid var(--hair); }
+  .hp .guides__t { padding: 18px 20px 4px; }
+  .hp .guides__list a > .i { display: block; width: 18px; height: 18px; margin: auto 20px 18px; padding-top: 10px; box-sizing: content-box; color: var(--sage-700); transition: transform .15s; }
+  .hp .guides__list a:hover > .i { transform: translateX(3px); }
+  .hp .guides__more { margin-top: 24px; }
+}
+
+/* ===================================================================== close === */
+.hp .close__grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 40px 72px; align-items: start; }
+.hp .close .statement { font-size: clamp(32px, 4.2vw, 60px); }
+.hp .close__side { display: grid; gap: 22px; justify-items: start; }
+.hp .close__side p { font-size: 18px; max-width: 36ch; }
+.hp .contact { list-style: none; margin: 0; padding: 0; display: grid; width: 100%; border-top: 1px solid var(--hair); }
+.hp .contact li { border-bottom: 1px solid var(--hair); }
+.hp .contact a { display: flex; align-items: center; gap: 12px; min-height: 52px; color: var(--ink); text-decoration: none; font-size: 17px; }
+.hp .contact a:hover { color: var(--sage-700); }
+.hp .signature { margin-top: 56px; border-top: 1px solid var(--hair-strong); padding-top: 16px; font-size: 15px; color: var(--ink-quiet); }
+.hp .signature .acc { color: var(--ink); font-weight: 500; }
+@media (max-width: 759px) { .hp .close__grid { grid-template-columns: 1fr; } }
+
+/* the live booking form, restyled: moved to app/booking-v7.css (23/10), scoped :is(.hp, .bk7) */
+
+/* phones: the prototype's quote bar replaces the shared dock on this page (Abdul 23/10: match the prototype). Flat, full
+   width, a hairline above; shown only when no other quote button and not the form is on screen */
+body:has(.hp) .dock { display: none !important; }
+.hp-quotebar { display: none; }
+@media (max-width: 759px) {
+  .hp-quotebar { display: flex; position: fixed; z-index: 45; left: 0; right: 0; bottom: 0; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+    background: var(--ground); border-top: 1px solid var(--hair-strong); transform: translateY(105%); visibility: hidden;
+    transition: transform .3s var(--ease-out), visibility 0s linear .3s; }
+  .hp-quotebar[data-on="true"] { transform: none; visibility: visible; transition: transform .3s var(--ease-out), visibility 0s; }
+  .hp-quotebar p { margin: 0; font: 400 14px/1.3 var(--font-sans); color: var(--ink-quiet); }
+  .hp-quotebar b { display: block; font: 400 20px/1.1 var(--font-serif); color: var(--ink); font-variant-numeric: lining-nums tabular-nums; }
+  .hp-quotebar .btn { min-height: 44px; padding: 0 16px; font-size: 15px; }
+}
+@media (max-width: 759px) and (prefers-reduced-motion: reduce) {
+  .hp-quotebar { transform: none; opacity: 0; transition: opacity .15s linear, visibility 0s linear .15s; }
+  .hp-quotebar[data-on="true"] { opacity: 1; transition: opacity .15s linear, visibility 0s; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hp *, .hp *::before, .hp *::after { transition-duration: 0s !important; }
+  .hp .btn:active, .hp .bf__go:active { transform: none; }
+}
+
+.hp .areas-links { display: grid; gap: 8px; justify-items: start; margin-top: 4px; }
+
+/* hero B (23/10), after every other hero rule so it wins. Desktop: the picture never grows taller than the space under
+   the header (the roof stays clear of the nav on short screens), sits against the right edge, and its left edge fades
+   into the paper; the copy keeps a paper fade at every height */
+/* B redrawn wider (23/10): the 21:9 picture fills the stage edge to edge, its quiet left half sits under the copy, and
+   it is cropped from the top and left so the house (centred at 68% across) and the pavement always stay in frame */
+@media (min-width: 760px) {
+  .hp-hero .pl--mid { top: 0; bottom: var(--strip-h); left: 50%; width: 100%; height: auto; aspect-ratio: auto; }   /* the motion script centres every plane with translate(-50%) */
+  .hp-hero .pl--mid picture, .hp-hero .pl--mid img { display: block; width: 100%; height: 100%; }
+  .hp-hero .pl--mid img { object-fit: cover; object-position: 70% 100%; }
+  .hp-hero .hero__scrim { display: block; background: linear-gradient(90deg, rgba(250, 249, 244, .97) 0, rgba(250, 249, 244, .88) 32%, rgba(250, 249, 244, 0) 52%); }
+  .hp-hero .hero__credit { position: absolute; left: max(var(--gutter, 48px), calc((100% - var(--maxw, 1280px)) / 2 + var(--gutter, 32px))); bottom: calc(var(--strip-h) + 12px); z-index: 2; margin: 0; font-size: 12px; color: var(--ink-quiet); }
+}
+@media (min-width: 760px) and (prefers-reduced-motion: no-preference) { .hp-hero:not(.is-static) .pl--mid { bottom: 0; } }
+/* Abdul 24/10 on a PC: "feels so massive and not premium designed". Cover-filling the stage's height blew the 21:9
+   picture up past the screen's width (x1.32 at 1440 x 900, the house ran into the menu). Now the picture is never
+   wider than the screen: it rests on the price strip at its own 21:9, its top dissolves into the night, and the
+   open sky above holds the copy, with the phone star layer (HeroNight) running there too. The house is about a
+   quarter smaller at 1440 and the whole street reads, as an illustration placed on the page, not a crop of one. */
+@media (min-width: 760px) {
+  .hp-hero--dusk .pl--mid { top: auto; height: auto; aspect-ratio: 3120 / 1344;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 26%); mask-image: linear-gradient(180deg, transparent 0, #000 26%); }
+}
+/* phones: the landscape cut-away under the copy, shifted left so the cut-open house stays in frame */
+@media (max-width: 759px) {
+  .hp-hero .pl--mid { width: 100vw; height: auto; aspect-ratio: 16 / 9; margin-left: 0; bottom: 0; }
+  .hp-hero .pl--mid img { display: block; width: 100%; height: auto; }
+  .hp-hero .hero__copy { padding-bottom: calc(56.25vw + 20px); }
+  .hp-hero .hero__credit { display: none; }
+}
+
+/* dusk (Abdul 23/10): night stage, light copy, the sky canvas over the picture */
+.hp-hero--dusk .hero__stage, .hp-hero--dusk .pl--mid { background: #171A2F; }
+.hp-hero--dusk .hero__title, .hp-hero--dusk .hero__sub, .hp-hero--dusk .hero__head .eyebrow { color: #FBF8F1; }
+.hp-hero--dusk .hero__cta .link { color: #EADFC8; text-decoration-color: rgba(234, 223, 200, .6); }
+.hp-hero--dusk .hero__credit { color: #9DA3B8; }
+.hp-hero--dusk .hero__sky { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+/* depth (Abdul 24/10: "elevate this hero ... the background colour"). The flat navy read as one fill: the stage gets a
+   darker zenith and a cool lift behind the copy, the picture's sky a faint blue-violet wash (over the picture, under
+   the stars), and the cut-open house a warm bloom that comes up once HeroSky has switched its last room on. Pseudo
+   elements on the plane, so they share its parallax and its faded top edge. */
+.hp-hero--dusk .hero__stage { background:
+  radial-gradient(60% 55% at 20% 30%, rgba(72, 84, 150, .3), transparent 70%),
+  linear-gradient(180deg, #0E1124 0, #171A2F 60%); }
+.hp-hero--dusk .pl--mid::before, .hp-hero--dusk .pl--mid::after { content: ""; position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; }
+.hp-hero--dusk .pl--mid::before { background:
+  radial-gradient(42% 60% at 18% 34%, rgba(70, 82, 160, .3), transparent 72%),
+  radial-gradient(30% 40% at 92% 6%, rgba(96, 112, 180, .16), transparent 70%); }
+.hp-hero--dusk .pl--mid::after { opacity: 0; transition: opacity 1.6s cubic-bezier(.22, 1, .36, 1);
+  background: radial-gradient(24% 52% at 71% 62%, rgba(255, 186, 112, .26), rgba(255, 196, 132, .09) 58%, transparent 80%); }
+.hp-hero--dusk .pl--mid[data-lit="true"]::after { opacity: 1; }
+@media (max-width: 759px) {
+  .hp-hero--dusk .pl--mid::before { background: radial-gradient(60% 40% at 25% 20%, rgba(70, 82, 160, .24), transparent 72%); }
+  .hp-hero--dusk .pl--mid::after { background: radial-gradient(34% 44% at 58% 62%, rgba(255, 186, 112, .24), rgba(255, 196, 132, .07) 60%, transparent 78%); }
+}
+@media (prefers-reduced-motion: reduce) { .hp-hero--dusk .pl--mid::after { transition: none; } }
+.hp-hero .hero__night { display: none; }
+.hp-hero--dusk .hero__night { display: block; position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; pointer-events: none; }
+@media (min-width: 760px) {
+  .hp-hero--dusk .hero__scrim { background: linear-gradient(90deg, rgba(17, 20, 38, .55) 0, rgba(17, 20, 38, .3) 34%, rgba(17, 20, 38, 0) 55%); }
+}
+/* phones: the taller crop melts into the night above it, and its foot meets the price sheet */
+@media (max-width: 759px) {
+  .hp-hero--dusk .pl--mid { aspect-ratio: 2100 / 1300; -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 30%); mask-image: linear-gradient(180deg, transparent 0, #000 30%); }
+  .hp-hero--dusk .hero__copy { padding-bottom: calc(61.9vw - 24px); }
+}
+
+/* service cards, price at the foot (Abdul 23/10): a hairline, the price and its note, then the button */
+.hp .offer__foot { border-top: 1px solid var(--hair); margin-top: auto; padding-top: 22px; }
+.hp .offer__groups + .offer__foot { margin-top: auto; }
+.hp .offer__groups { margin-bottom: 28px; }
+.hp .offer__cost { display: grid; gap: 6px; margin-bottom: 18px; }
+.hp .offer__cost .offer__price { margin-top: 0; }
+.hp .offer__note { font-size: 14px; color: var(--ink-quiet); }
+@media (min-width: 760px) and (max-width: 1099px) { .hp .offer--feature .offer__cost { grid-column: 1 / -1; } }
+
+/* service card polish (Abdul 23/10/2026: "looks good but needs a bit of polishing, there are white spaces"). Measured:
+   the Floor Plan subtitle wraps to two lines, so its divider and lists sat 23 px below the others; the shorter
+   cards left a 100-150 px empty band above the price; at 760-1099 px the feature card's two columns left a hole
+   under "Everything in the Domestic EPC". Now: from 1100 px the three cards share one set of rows (subgrid), so
+   titles, dividers, lists and prices line up across; the price sits on a warm plate to the card's edges, so the
+   space above it is the card's body, not a gap; the feature card's floor-plan list takes the right column whole. */
+.hp .offer__foot { margin: auto -28px -22px; padding: 22px 28px 24px; border-top: 1px solid var(--hair); background: #FAF6EE; }
+.hp .offer--feature .offer__foot { background: #F4F1E8; }
+.hp .offer__groups { margin-bottom: 24px; }
+@media (min-width: 1100px) {
+  @supports (grid-template-rows: subgrid) {
+    .hp .offers { grid-template-rows: repeat(5, auto); row-gap: 0; }
+    .hp .offer { display: grid; grid-row: span 5; grid-template-rows: subgrid; row-gap: 0; }
+    .hp .offer__groups { align-content: start; }
+  }
+}
+@media (min-width: 760px) and (max-width: 1099px) {
+  .hp .offer--feature .offer__groups { grid-template-rows: auto 1fr; row-gap: 20px; }
+  .hp .offer--feature .offer__groups > :nth-child(2) { grid-column: 2; grid-row: 1 / span 2; }
+  .hp .offer--feature .offer__groups > :nth-child(3) { grid-column: 1; grid-row: 2; }
+}
+@media (max-width: 759px) { .hp .offer__foot { margin: auto -20px -18px; padding: 20px 20px 20px; } }
+
+/* round 2 (Abdul 24/10, "optimise my current cards", old cards beside them): what the old set did better, in this
+   set's language. The saving sits at the price, where the choice is made, not in a corner flag; the flag says why the
+   middle card is marked; the feature card gets a sage edge so it reads as the pick at a glance; the Domestic EPC
+   names the 72-hour lodgement. The old cards' Pre-Assessment box is the strip under the cards (.pre). */
+.hp .offer--feature { border-color: rgba(58, 98, 78, .55); }
+.hp .offer__flag { text-transform: uppercase; letter-spacing: .1em; font-size: 11px; font-weight: 600; padding: 6px 9px; }
+.hp .offer__save { font: 500 15px/1.4 var(--font-sans); color: var(--sage-800); }
+
+/* How it works step 3: the report illustration (24/10) */
+.hp .tl__art { display: block; width: 100%; max-width: 520px; height: auto; margin-top: 10px; border: 1px solid var(--hair); }
+
+/* trust columns, polish (Abdul 24/10): icon chip, links on a shared foot line, every link 16 px, tighter list */
+.hp .creds { margin-top: 64px; }
+.hp .creds > div { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding-bottom: 24px; }
+.hp .creds__ico { display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: #EEF2EC; color: var(--sage-700); margin-bottom: 4px; }
+.hp .creds__links { margin-top: auto; padding-top: 6px; display: grid; justify-items: start; gap: 0; }
+.hp .creds__links .arrow-link, .hp .creds__links .areas-more summary { font-size: 16px; min-height: 40px; }
+.hp .creds__links .arrow-link .i { transition: transform .15s; }
+.hp .creds__links .arrow-link:hover .i { transform: translateX(3px); }
+
+/* Abdul 24/10 ("fix this section, shouldn't be this empty"): the promise's 72 px foot, its list's 24 px and How it works'
+   112 px head stacked to about 210 px of blank page. When How it works follows the promise, its head is trimmed so the
+   gap below the promise matches the one above it */
+.hp .op + .sec { padding-top: 24px; }
+@media (max-width: 759px) { .hp .op + .sec { padding-top: 12px; } }
+/* second pass (Abdul 24/10, screenshot: the area right of "One visit, then the paperwork is done" still empty): the
+   promise's own foot comes down too, and on desktop the head runs in two columns, the statement left and its lede
+   right, on the same 7 : 4 split as the steps and the side panel below it */
+.hp .op:has(+ .sec) .op__in { padding-bottom: 40px; }
+@media (min-width: 1024px) {
+  .hp .how__head { grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); column-gap: 96px; align-items: end; }
+  .hp .how__head .eyebrow, .hp .how__head .statement { grid-column: 1; }
+  .hp .how__head .lede-l { grid-column: 2; grid-row: 2; margin: 0; padding-bottom: 6px; }
+  .hp .how__grid { margin-top: 56px; }
+}

@@ -34,6 +34,16 @@ const nextConfig = {
         destination: '/services/epc-improvement-plan',
         permanent: true,
       },
+      // 23/10/2026: the quote form moved from /contact to /quote. Old quote links carry their choices in the query
+      // (service, area, speed, plan, source, cta), which Next carries over to /quote. Temporary (307), because
+      // /contact itself stays. A bare `/contact#booking-form` never reaches the server; LegacyQuoteRedirect on
+      // /contact handles that one in the browser.
+      ...['service', 'area', 'speed', 'plan', 'source', 'cta'].map((key) => ({
+        source: '/contact',
+        has: [{ type: 'query', key }],
+        destination: '/quote',
+        permanent: false,
+      })),
     ]
   },
 }

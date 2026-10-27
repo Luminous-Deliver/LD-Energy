@@ -5,14 +5,16 @@ import { Star } from 'lucide-react'
 import { site } from '@/lib/site'
 import { ContactForm, type FormVariant } from '@/components/forms/ContactForm'
 import type { SourcePage } from '@/lib/enquiry-attribution'
+import type { QuoteContext } from '@/lib/quote-context'
 
 /**
  * The one booking form in its card: the assessor strip on top, the form below. The same card
- * sits in the homepage hero, on /contact and on every area page, so a visitor sees one form
+ * sits in the homepage's Prices, on /quote and in the quote dialog, so a visitor sees one form
  * wherever they start.
  */
-export function BookingCard({ variant, cardRef, sourcePage, areaPage }: {
+export function BookingCard({ variant, cardRef, sourcePage, areaPage, context, idPrefix }: {
   variant: FormVariant; cardRef?: RefObject<HTMLDivElement | null>; sourcePage?: SourcePage; areaPage?: string
+  context?: QuoteContext; idPrefix?: string
 }) {
   return (
     <div ref={cardRef} className="qc scroll-mt-28" data-variant={variant}>
@@ -27,7 +29,7 @@ export function BookingCard({ variant, cardRef, sourcePage, areaPage }: {
           <a href={site.assessor.verifyUrl} target="_blank" rel="noopener noreferrer" className="qc__verify">Verify on GOV.UK</a>
         </span>
       </div>
-      <ContactForm variant={variant} sourcePage={sourcePage} areaPage={areaPage} />
+      <ContactForm variant={variant} sourcePage={sourcePage} areaPage={areaPage} context={context} idPrefix={idPrefix} />
     </div>
   )
 }

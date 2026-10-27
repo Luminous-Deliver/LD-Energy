@@ -1,12 +1,21 @@
 import type { FaqItem } from '@/lib/faq'
-import { SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE } from '@/lib/site'
+import { site, portfolioRatesText } from '@/lib/site'
+import { quoteHref } from '@/lib/quote-context'
 
-/** Shared by the visible homepage answers and its FAQ JSON-LD. */
+/**
+ * Shared by the visible homepage answers and its FAQ JSON-LD, so the schema always matches the page.
+ *
+ * The questions and answers are prototype v7.2's (approved by Abdul 22/10/2026): the money answers are the live
+ * FAQ's own words (lib/faq.ts), the rest written for the prototype. The links are the ones the previous homepage
+ * answers and sections carried, kept so no internal destination is lost (the Pre-Assessment, the Improvement Plan,
+ * the landlord guide, the agents' page, the areas).
+ */
 export const homeBookingFaqs: FaqItem[] = [
-  {q:'Is the guide price my final quote?',a:'No. Guide prices are based mainly on internal floor area. Layout, extensions and access may affect the final price. We confirm your exact quote before you agree to the appointment.',links:[{href:'/pricing',label:'Full guide prices'}]},
-  {q:'What if I do not know my floor area?',a:'Choose “Not sure of floor area” and send your property details. You can submit without selecting an m² band. We will review the details and confirm your exact quote; no guide total is invented.'},
-  {q:'When can you visit and lodge my EPC?',a:`Tell us your deadline and preferred timing. Next-day visits are available, and we confirm the slot and delivery timing before booking. Same-day lodgement adds £${SAME_DAY_LODGEMENT_SURCHARGE} and a next-day visit and lodgement £${NEXT_DAY_VISIT_SURCHARGE}, when agreed.`},
-  {q:'Do you cover my London postcode?',a:'L&D Energy is based in Stratford E15 and serves London. Send your postcode with your enquiry so we can confirm availability and access. There are no travel charges.',links:[{href:'/areas',label:'See London coverage'}]},
-  {q:'What if my rating comes back low?',a:'The rating is calculated from what is recorded at the property, so we cannot promise a particular band. Your EPC includes the standard recommendations, and the optional Improvement Plan turns them into priorities for your property. If you let the property, the current minimum is E. A private Pre-Assessment shows the likely score before anything is lodged.',links:[{href:'/services/epc-pre-assessment',label:'EPC Pre-Assessment'},{href:'/blog/epc-c-by-2030',label:'The 2030 rented home standard'}]},
-  {q:'What will I receive after the assessment?',a:'For a Domestic EPC, you receive a lodged certificate and its standard software-generated recommendation report where applicable. A floor-plan service provides a marketing plan as JPG and PDF. The optional Improvement Plan adds personalised interpretation and priorities, supported by the full Energy Report.'},
+  { q: 'Are the prices fixed?', a: 'No. They are guide prices, based mainly on internal floor area. Extensions, loft conversions, layout and access can change the final figure, so we confirm your exact quote before you book.', links: [{ href: '/pricing', label: 'Full guide prices' }] },
+  { q: 'Are there hidden fees?', a: 'No. The price we quote is the price you pay. Quotes are personalised based on property size and condition, so there are no surprise add-ons, call-out charges or travel charges.' },
+  { q: 'When do I pay?', a: 'No upfront payment. You pay once the assessment is done.' },
+  { q: 'How long does the visit take?', a: 'Most take 45 to 60 minutes for a flat or standard house, and up to 2 hours for a large home. It goes fastest when every room, the loft hatch (if there is one), the boiler and the meters are easy to reach.', links: [{ href: '/preparing-for-your-epc', label: 'Preparing for your EPC' }] },
+  { q: 'What if my rating comes back low?', a: `The rating is worked out from what is recorded at the property, so we cannot promise a particular band. Your EPC includes its recommendations, and the optional £${site.addOns.improvementPlan} improvement plan puts them in order for your property. If you let the property, the current minimum is E.`, links: [{ href: '/services/epc-improvement-plan', label: 'EPC Improvement Plan' }, { href: '/services/epc-pre-assessment', label: 'EPC Pre-Assessment' }, { href: '/landlords', label: 'The landlord guide' }] },
+  { q: 'Can I get a discount for multiple properties?', a: `Yes. ${portfolioRatesText} Send us the addresses and we will quote the whole set together.`, links: [{ href: quoteHref({ service: 'bulk', sourcePage: 'home', ctaId: 'inline' }), label: 'Start a portfolio enquiry' }, { href: '/estate-agents', label: 'Agents' }] },
+  { q: 'Do you cover my postcode?', a: 'We are based in Stratford, E15, and cover all 32 London boroughs and the City of London. There are no travel charges.', links: [{ href: '/areas', label: 'See the areas we cover' }] },
 ]

@@ -1,0 +1,78 @@
+/* /domestic-energy-assessor-london, redesigned 24/10/2026 on the inner-page parts. Only what inner.css does not already
+   have, scoped under .da so it wins over inner.css whatever order the bundles load in. */
+
+/* hero: area hero D's grid, with the register card where the drawing goes. On phones the card comes before the prices
+   (this page is about who you're getting), so the orders swap. */
+.da .da-hd { margin-top: 18px; }
+.da .da-reg { order: 2; }
+.da .da-tb { order: 3; }
+.da .da-tb .in-tb__cols, .da .da-tb .in-tb__rows a { grid-template-columns: minmax(0, 1fr) 96px 16px; }
+@media (max-width: 420px) { .da .da-tb .in-tb__cols, .da .da-tb .in-tb__rows a { grid-template-columns: minmax(0, 1fr) 84px 14px; } }
+.da .da-tb .in-tb__cols span:nth-child(2) { text-align: right; }
+
+/* the register card: the title block's frame, rows of key and value */
+.da .da-reg { display: block; gap: 0; border: 1.5px solid var(--ink); background: var(--card); align-self: start; }
+.da .da-reg .in-tb__head { grid-template-columns: 1.6fr 1fr; }
+.da-reg__rows { list-style: none; padding: 0; }
+.da-reg__rows li { display: grid; grid-template-columns: 96px minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; min-height: 52px; padding: 8px 12px; }
+.da-reg__rows li + li { border-top: 1px solid var(--hair); }
+.da-reg__k { font: 500 10px/1.3 var(--font-sans); letter-spacing: .14em; text-transform: uppercase; color: var(--slate-500); }
+.da-reg__v { font: 400 20px/1.2 var(--font-serif); color: var(--ink); min-width: 0; overflow-wrap: anywhere; }
+.da-reg__v--w { grid-column: 2 / -1; font: 400 15px/1.4 var(--font-sans); }
+.da-chk { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 0 12px; border: 1px solid var(--hair-strong); border-radius: 999px;
+  font-size: 14px; font-weight: 500; color: var(--sage-700); text-decoration: none; transition: border-color .15s, background-color .15s; }
+.da-chk:hover { border-color: var(--sage-700); background: var(--sage-50); }
+.da-reg__foot { padding: 12px; border-top: 1.5px solid var(--ink); font-size: 13px; line-height: 1.45; color: var(--ink-quiet); }
+@media (max-width: 420px) { .da-reg__rows li { grid-template-columns: 78px minmax(0, 1fr) auto; padding-inline: 10px; } .da-reg__v { font-size: 18px; } }
+
+/* two columns: heading and lede left, the rest right */
+.da .da-two { display: grid; gap: 28px; }
+.da-prose { font-size: 17px; }
+.da-prose b { font-weight: 500; }
+@media (min-width: 900px) { .da .da-two { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 72px; align-items: start; } .da-prose { padding-top: 34px; } }
+
+/* what a DEA does: the picture under the heading, the four steps beside it */
+.da .da-does { display: grid; gap: 36px; }
+.da-does__img { display: block; width: 100%; height: auto; margin-top: 28px; border-radius: 6px; border: 1px solid var(--hair); }
+.da-does__cap { margin-top: 10px; }
+.da-steps { list-style: none; padding: 0; border-top: 1px solid var(--hair-strong); }
+.da-steps li { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 16px; padding: 24px 0; border-bottom: 1px solid var(--hair); }
+.da-steps__n { font: 400 40px/1 var(--font-serif); color: var(--sage-700); }
+.da-steps p { margin-top: 8px; color: var(--ink); font-size: 17px; line-height: 1.6; max-width: 52ch; }
+@media (min-width: 900px) {
+  .da .da-does { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 72px; align-items: start; }
+  .da-steps { margin-top: 44px; }
+  .da-steps li { padding: 30px 0; }
+}
+
+/* accreditation: heading left, lede right; the two records as a ledger; three facts */
+.da-head { display: grid; gap: 4px; }
+@media (min-width: 1024px) { .da-head { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 72px; align-items: end; } .da-head .in-lede { margin-top: 0; } }
+.da-ledger { margin-top: 32px; background: var(--card); border: 1.5px solid var(--ink); }
+.da-lr { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 16px; align-items: center; padding: 14px 16px; }
+.da-lr + .da-lr { border-top: 1px solid var(--hair); }
+.da-lr--h { display: none; }
+.da-lr__s { font-weight: 500; }
+.da-lr__n { font: 400 22px/1.2 var(--font-serif); text-align: right; }
+.da-lr > span:last-child { grid-column: 1 / -1; }
+@media (min-width: 760px) {
+  .da-lr { grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr) minmax(0, 1fr); padding: 10px 20px; }
+  .da-lr--h { display: grid; padding-block: 12px; border-bottom: 1.5px solid var(--ink); font: 500 11px/1.35 var(--font-sans); letter-spacing: .14em; text-transform: uppercase; color: var(--slate-500); }
+  .da-lr__n { text-align: left; }
+  .da-lr > span:last-child { grid-column: auto; justify-self: end; }
+}
+.da-facts { margin-top: 32px; max-width: 900px; }
+.da-facts dd { margin: 0; font-size: 17px; line-height: 1.6; }
+.da-more { margin-top: 24px; font-size: 16px; color: var(--ink-quiet); }
+
+/* why local: four points, hairlines only */
+.da-why { list-style: none; padding: 0; margin-top: 32px; display: grid; border-top: 1px solid var(--ink); }
+.da-why li { display: grid; gap: 8px; align-content: start; padding: 22px 0; border-bottom: 1px solid var(--hair); }
+.da-why p { font-size: 16px; line-height: 1.6; color: var(--ink); max-width: 46ch; }
+@media (min-width: 760px) { .da-why { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 40px; } }
+@media (min-width: 1100px) { .da-why { grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 0; } .da-why li { border-top: 1px solid var(--ink); border-bottom: 0; padding-top: 24px; } }
+
+/* questions */
+.da .da-faqwrap { display: grid; gap: 8px; }
+.da-faqside { margin-top: 16px; }
+@media (min-width: 900px) { .da .da-faqwrap { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 72px; } .da .da-faqwrap .in-faq { margin-top: 0; } }

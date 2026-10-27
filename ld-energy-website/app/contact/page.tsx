@@ -1,37 +1,31 @@
 import type { Metadata } from 'next'
-import { Phone, MessageCircle, Mail, MapPin, Clock, Timer } from 'lucide-react'
-import { Section } from '@/components/ui/Section'
-import { Card } from '@/components/ui/Card'
-import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
-import { BookingCard } from '@/components/forms/BookingCard'
-import { QuoteSummaryProvider } from '@/components/forms/QuoteSummary'
-import { AssessorCard } from '@/components/ui/AssessorCard'
+import Link from 'next/link'
+import { Container } from '@/components/ui/Container'
+import { Ico } from '@/components/sections/home/HomeIcon'
+import { EnquiryForm } from '@/components/forms/EnquiryForm'
+import { LegacyQuoteRedirect } from '@/components/forms/LegacyQuoteRedirect'
 import { site, defaultOgImage } from '@/lib/site'
+import { quoteHref } from '@/lib/quote-context'
+import '../inner.css'
+import '../quote-contact.css'
+
+/*
+ * /contact to Abdul's brief of 23/10/2026 (projects/ld-energy-redesign-2026-10/BRIEF-ABDUL-2026-10-23-contact-quote.md):
+ * "one route for buying a service, another for asking a question". The price route leads and goes to the quote
+ * journey; the question route gives the direct lines, then a general enquiry form further down, secondary in weight.
+ * Old quote links to /contact are sent on to /quote (LegacyQuoteRedirect).
+ */
+const title = 'Contact: Bookings, Questions and Agency Work'
+const description =
+  'Questions about an EPC, an existing booking or agency work? Call, WhatsApp or email L&D Energy, or send a message. For a price, start a quote.'
 
 export const metadata: Metadata = {
-  title: 'Contact | Book Your London EPC',
-  description:
-    'Book your London EPC certificate. Call, WhatsApp, email or use our booking form. We reply during our opening hours, Mon–Sun 8am–8pm.',
+  title,
+  description,
   alternates: { canonical: `${site.url}/contact` },
-  openGraph: {
-    images: [defaultOgImage],
-    title: 'Contact L&D Energy | Book Your London EPC | 07492 575 396',
-    description:
-      'Book your London EPC certificate. Call, WhatsApp, email or use our booking form. We reply during our opening hours, Mon–Sun 8am–8pm.',
-    url: `${site.url}/contact`,
-  },
-  twitter: {
-    images: [defaultOgImage.url],
-    title: 'Contact L&D Energy | Book Your London EPC',
-    description:
-      'Book your London EPC certificate. Call, WhatsApp, email or use our booking form. Fast response.',
-  },
+  openGraph: { title: `${title} | L&D Energy`, description, url: `${site.url}/contact`, images: [defaultOgImage] },
+  twitter: { title: `${title} | L&D Energy`, description, images: [defaultOgImage.url] },
 }
-
-const breadcrumbs = [
-  { href: '/', label: 'Home' },
-  { href: '/contact', label: 'Contact' },
-]
 
 const breadcrumbSchema = {
   '@context': 'https://schema.org',
@@ -42,137 +36,78 @@ const breadcrumbSchema = {
   ],
 }
 
-const methods = [
-  {
-    Icon: Phone,
-    title: 'Phone',
-    value: site.phone,
-    detail: 'Fastest response. Tap to dial.',
-    href: site.phoneHref,
-    cta: 'Call Now',
-    external: true,
-  },
-  {
-    Icon: MessageCircle,
-    title: 'WhatsApp',
-    value: site.phone,
-    detail: 'Send a message, great for photos or property details.',
-    href: site.whatsappHref,
-    cta: 'Open WhatsApp',
-    external: true,
-  },
-  {
-    Icon: Mail,
-    title: 'Email',
-    value: site.email,
-    detail: 'We reply during our opening hours, Mon–Sun 8am–8pm.',
-    href: site.emailHref,
-    cta: 'Send Email',
-    external: true,
-  },
-] as const
+const hours = site.hours.replace('Monday–Sunday', 'Monday to Sunday').replace('8am–8pm', '8am to 8pm')
+const [elmhurst, quidos] = site.assessor.accreditations
 
 export default function ContactPage() {
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
+    <div className="in cp">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <LegacyQuoteRedirect />
 
-      <BreadcrumbNav items={breadcrumbs} />
+      <section className="cp-hero" aria-labelledby="contact-h1">
+        <Container>
+          <nav className="in-crumbs" aria-label="Breadcrumb">
+            <ol>
+              <li><Link href="/">Home</Link><span className="sep" aria-hidden="true">›</span></li>
+              <li><span aria-current="page">Contact</span></li>
+            </ol>
+          </nav>
+          <p className="in-eyebrow cp-hero__eyebrow">L&amp;D Energy · Contact</p>
+          <h1 id="contact-h1">How can we help?</h1>
+          <p className="cp-hero__lede">Whether you’re arranging a property service or have a question, we’ll point you in the right direction.</p>
+        </Container>
+      </section>
 
-      {/* Form first in both the reading order and mobile layout. */}
-      <Section variant="default" id="contact-methods" className="!py-4 sm:!py-6">
-        <QuoteSummaryProvider>
-        <div className="grid grid-cols-1 gap-8">
-          <div className="min-w-0">
-            <h1 id="booking-form" tabIndex={-1} className="scroll-mt-32 text-3xl font-bold tracking-tight text-secondary-900 md:text-4xl">Get your exact quote</h1>
-            <p className="mt-2 text-base text-secondary-700">Send your property details. We’ll confirm the exact price and an available appointment before booking.</p>
-            <div className="mt-4"><BookingCard variant="page" /></div>
+      <section className="cp-routes" aria-label="How to reach us">
+        <Container className="cp-routes__grid">
+          {/* the primary route: one button into the quote journey (the dialog with JavaScript, /quote without) */}
+          <div className="cp-price" aria-labelledby="cp-price-h">
+            <h2 id="cp-price-h" className="cp-price__h">Looking for a price?</h2>
+            <p className="cp-price__p">Need an EPC, a floor plan, or both? Start with a quote so we can collect the right property details and give you the most relevant pricing.</p>
+            <a className="ld-btn ld-btn--primary cp-price__go" href={quoteHref({ sourcePage: 'contact', ctaId: 'hero' })} data-enquiry-cta="hero">
+              Request a quote <Ico name="arrow-right" size={18} />
+            </a>
+            <ul className="cp-price__ticks">
+              <li><Ico name="check" size={18} />See a guide price as you choose</li>
+              <li><Ico name="check" size={18} />Exact price and visit time confirmed before you book</li>
+              <li><Ico name="check" size={18} />No upfront payment</li>
+            </ul>
           </div>
-          {/* The card carries its own live price, so the support cards sit below it at every width. */}
-          <div className="min-w-0 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {methods.map((m) => (
-              <div key={m.title} className="rounded-lg bg-white border border-secondary-200 p-4 sm:p-6 shadow-sm">
-                <div className="flex items-start gap-4">
-                  <span className="inline-flex items-center justify-center w-11 h-11 rounded-full bg-primary-100 text-primary-700 shrink-0">
-                    <m.Icon className="w-5 h-5" aria-hidden="true" />
-                  </span>
-                  <div className="min-w-0 flex-1 [overflow-wrap:anywhere]">
-                    <h2 className="text-base font-semibold text-secondary-900">{m.title}</h2>
-                    {/* Email breaks after "@" first; mid-word breaks only if the domain alone can't fit. */}
-                    <p className="mt-0.5 text-secondary-800 [overflow-wrap:break-word]">
-                      {m.value.includes('@') ? (
-                        <>
-                          {m.value.slice(0, m.value.indexOf('@') + 1)}
-                          <wbr />
-                          {m.value.slice(m.value.indexOf('@') + 1)}
-                        </>
-                      ) : (
-                        m.value
-                      )}
-                    </p>
-                    <p className="text-sm text-secondary-500">{m.detail}</p>
-                    <a
-                      href={m.href}
-                      {...(m.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                      className="mt-3 inline-flex items-center gap-2 min-h-[44px] rounded-md border border-secondary-200 bg-white hover:bg-secondary-50 text-secondary-800 font-semibold px-4 text-sm"
-                    >
-                      {m.cta}
-                    </a>
-                  </div>
-                </div>
-              </div>
-            ))}
 
-            <Card>
-              <h2 className="text-base font-semibold text-secondary-900">Office hours</h2>
-              <ul className="mt-3 space-y-2 text-sm text-secondary-700">
-                <li className="flex items-center gap-2.5">
-                  <Clock className="w-4 h-4 text-primary-600" aria-hidden="true" />
-                  Monday–Sunday, 8am–8pm
-                </li>
-                <li className="flex items-center gap-2.5">
-                  <Timer className="w-4 h-4 text-primary-600" aria-hidden="true" />
-                  Replies during opening hours
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <MapPin className="w-4 h-4 text-primary-600 mt-0.5" aria-hidden="true" />
-                  Based in Stratford, East London E15. Covering all 32 London boroughs and the City of London.
-                </li>
-              </ul>
-            </Card>
-
-            <AssessorCard headingLevel={2} className="md:col-span-2 lg:col-span-3" />
+          {/* the secondary route: direct lines for bookings, questions and business enquiries */}
+          <div className="cp-ask" aria-labelledby="cp-ask-h">
+            <h2 id="cp-ask-h" className="cp-ask__h">Have another question?</h2>
+            <p className="cp-ask__p">For existing bookings, general questions or business enquiries, contact us below.</p>
+            <dl className="cp-lines">
+              <div><dt><Ico name="phone" size={18} />Phone</dt><dd><a className="num" href={site.phoneHref}>{site.phone}</a><span>Call or text</span></dd></div>
+              <div><dt><Ico name="message" size={18} />WhatsApp</dt><dd><a href={site.whatsappHref} target="_blank" rel="noopener noreferrer">Message us on WhatsApp</a><span>Good for photos and documents</span></dd></div>
+              <div><dt><Ico name="mail" size={18} />Email</dt><dd><a className="cp-lines__mail" href={site.emailHref}>{site.email.slice(0, site.email.indexOf('@') + 1)}<wbr />{site.email.slice(site.email.indexOf('@') + 1)}</a></dd></div>
+              <div><dt><Ico name="clock" size={18} />Hours</dt><dd><span className="cp-lines__v">{hours}</span><span>We reply during these hours</span></dd></div>
+            </dl>
+            <p className="cp-ask__more"><a href="#enquiry">Or send us a message</a></p>
+            <p className="in-by cp-ask__by">
+              <Ico name="check" size={18} />
+              <span><b>{site.assessor.name}</b>, Elmhurst ({elmhurst.number}) and Quidos ({quidos.number}) accredited.{' '}
+                <a href={site.assessor.verifyUrl} target="_blank" rel="noopener noreferrer">Check the GOV.UK register</a></span>
+            </p>
+            <p className="cp-ask__area">Based in Stratford E15, covering all 32 London boroughs and the City of London, with no travel charge. <Link href="/areas">See the areas we cover</Link></p>
           </div>
-        </div>
-        </QuoteSummaryProvider>
-      </Section>
-      {/* Service area */}
-      <Section variant="muted" id="service-area">
-        <div className="max-w-3xl">
-          <p className="text-xs uppercase tracking-wide font-semibold text-primary-700">Service Area</p>
-          <h2 className="mt-2 text-3xl md:text-4xl font-bold tracking-tight text-secondary-900">
-            Where we cover
-          </h2>
-          <p className="mt-5 text-lg text-secondary-700 leading-relaxed">
-            Based in Stratford (E15), we cover all 32 London boroughs and the City of London. We also serve areas within a 1.5-hour radius, including parts of Essex, Kent, Hertfordshire and Surrey. No travel or call-out charges.
-          </p>
-        </div>
+        </Container>
+      </section>
 
-        <div className="mt-8 overflow-hidden rounded-lg border border-secondary-200">
-          <iframe
-            title="L&D Energy service area map"
-            aria-label="Map of L&D Energy service area centred on Stratford, East London"
-            src="https://www.openstreetmap.org/export/embed.html?bbox=-0.5%2C51.28%2C0.34%2C51.7&amp;layer=mapnik&amp;marker=51.543%2C-0.0005"
-            /* iframes carry a 300px intrinsic width; without min-w-0 that
-               becomes the grid track minimum and overflows a 320px viewport. */
-            className="w-full min-w-0 h-72 md:h-96 border-0"
-            loading="lazy"
-          />
-        </div>
-      </Section>
-    </>
+      <section id="enquiry" className="cp-form" aria-labelledby="cp-form-h">
+        <Container>
+          <div className="cp-form__in">
+            <div className="cp-form__head">
+              <p className="in-eyebrow">General enquiries</p>
+              <h2 id="cp-form-h" className="cp-form__h">Send us a message</h2>
+              <p>For anything that isn’t a request for a price: the service or the process, an existing booking or certificate, agency partnerships and multi-property work, or something else.</p>
+            </div>
+            <EnquiryForm />
+          </div>
+        </Container>
+      </section>
+    </div>
   )
 }

@@ -1,24 +1,28 @@
-import { quoteHref } from '@/lib/quote-context'
 import type { Metadata } from 'next'
-import { CheckCircle2, XCircle, Sparkles, Ruler, Info } from 'lucide-react'
-import { Section } from '@/components/ui/Section'
-import { Card } from '@/components/ui/Card'
-import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
-import { PageHero } from '@/components/sections/PageHero'
-import { CtaStrip } from '@/components/sections/CtaStrip'
-import { Accordion } from '@/components/ui/Accordion'
-import { GuidePriceNote } from '@/components/ui/GuidePriceNote'
-import { pricing,
-  site,
-  formatPrice,
-  bundleSaving,
-  maxBundleSaving,
-  priceFrom,
-  standardBands,
-  topBand,
-  SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE, defaultOgImage } from '@/lib/site'
-import type { FaqItem } from '@/lib/faq'
+import Link from 'next/link'
+import { ChevronDown, ShieldCheck } from 'lucide-react'
+import { OurPromise } from '@/components/sections/OurPromise'
+import { Container } from '@/components/ui/Container'
+import { Ico } from '@/components/sections/home/HomeIcon'
+import { OnThisPage, type PageSection } from '@/components/inner/OnThisPage'
+import { ReadNext, type NextStep } from '@/components/inner/ReadNext'
+import { InnerEnding } from '@/components/inner/InnerEnding'
+import { PriceMatrix } from '@/components/inner/PriceMatrix'
+import {
+  pricing, site, formatPrice, maxBundleSaving, priceFrom, standardBands, topBand, portfolioMinHomes, portfolioRatesText,
+  SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE, defaultOgImage,
+} from '@/lib/site'
+import { quoteHref } from '@/lib/quote-context'
+import '@/app/inner.css'
+import './pricing.css'
 
+/*
+ * /pricing, redesigned 24/10/2026 on the inner-page parts (/landlords) and the board-v3 pricing rules
+ * (projects/ld-energy-redesign-2026-10/references/board-v3/pricing/README.md): every price visible up front, receipt
+ * alignment, extras stated rather than ticked, no favourite column, no anchors or urgency. Title and descriptions stay
+ * frozen until 14/12; only the H1 changes. Section ids #pricing-table, #whats-included and #pricing-faq are linked from
+ * lib/faq.ts, so they stay.
+ */
 export const metadata: Metadata = {
   title: `EPC Prices London | From £${priceFrom.epc}`,
   description: `Guide prices for EPC and floor plan services in London, from £${priceFrom.epc}. Priced mainly on internal floor area (m²). Your exact quote is confirmed before booking.`,
@@ -36,10 +40,49 @@ export const metadata: Metadata = {
   },
 }
 
-const breadcrumbs = [
-  { href: '/', label: 'Home' },
-  { href: '/pricing', label: 'Pricing' },
+const WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine']
+const Portfolio = (WORDS[portfolioMinHomes] ?? String(portfolioMinHomes)).replace(/^./, (c) => c.toUpperCase())
+const listHref = `${site.whatsappHref}?text=${encodeURIComponent('Hi, I\'d like a quote for EPCs on these addresses:')}`
+const q = (ctaId: 'hero' | 'pricing' | 'inline' | 'bottom') => quoteHref({ sourcePage: 'pricing', ctaId })
+
+/** Extras sit on top of the size price: stated with their price, never ticked (board-v3: no pre-ticks, no calculator). */
+type Extra = { label: string; note?: string; price: string; muted?: boolean }
+const extras: Array<{ group: string; rows: Extra[] }> = [
+  {
+    group: 'How fast',
+    rows: [
+      { label: 'Standard lodgement', note: 'On the GOV.UK register within 72 hours of the visit', price: 'Included', muted: true },
+      { label: 'Same-day lodgement', note: 'Lodged on the day of the visit', price: `+£${SAME_DAY_LODGEMENT_SURCHARGE}` },
+      { label: 'Next-day visit and lodgement', note: 'We visit the next day and lodge it that day', price: `+£${NEXT_DAY_VISIT_SURCHARGE}` },
+    ],
+  },
+  {
+    group: 'Reports',
+    rows: [
+      { label: 'EPC recommendation report', note: 'Software-generated, on every EPC where improvements are possible', price: 'Included', muted: true },
+      { label: 'EPC Improvement Plan', note: 'Abdul\'s written priorities, with the full Elmhurst Energy Report', price: `+£${site.addOns.improvementPlan}` },
+      { label: 'Lodging a held Pre-Assessment later', note: 'The same survey, no second visit, if nothing has changed', price: `+£${site.addOns.lodgeLater}` },
+    ],
+  },
+  {
+    group: 'Quoted before you book',
+    rows: [
+      { label: 'Extensions, loft conversions or unusual layouts', price: 'Exact quote', muted: true },
+      { label: 'Multiple floors or additional measurement complexity', price: 'Exact quote', muted: true },
+      { label: 'Large or unusually complex properties', price: 'Exact quote', muted: true },
+    ],
+  },
+  {
+    group: 'Other charges',
+    rows: [
+      { label: 'Travel or call-out', note: 'Anywhere in the 32 boroughs and the City', price: 'None', muted: true },
+      { label: 'A return visit when we couldn\'t get in', note: 'Per visit, for access problems on the day', price: '£25' },
+    ],
+  },
 ]
+
+/** One worked example under the extras, built from the live figures (board-v3 receipt line). */
+const ex = pricing.find((b) => b.id === '55-75') ?? pricing[0]
 
 const included = [
   'On-site assessment by an Elmhurst and Quidos accredited DEA',
@@ -48,32 +91,16 @@ const included = [
   'Standard software-generated EPC recommendation report, where applicable',
   'No travel or call-out charges',
 ]
-
 const notIncluded = [
-  `Optional personalised EPC Improvement Plan and full Elmhurst Energy Report — £${site.addOns.improvementPlan} extra`,
+  `Optional personalised EPC Improvement Plan and full Elmhurst Energy Report, £${site.addOns.improvementPlan} extra`,
   'Re-visits due to access issues, charged at £25 per visit',
 ]
 
-/**
- * Modifiers to a quote, not price bands — hence a separate, smaller table.
- * Only the speed extras are fixed figures, and they come from the canonical
- * source so it can never drift from the estimator or the booking form.
- */
-const additionalCharges: Array<{ label: string; guide: string }> = [
-  { label: 'Same-day lodgement (lodged on the day of the visit)', guide: `+£${SAME_DAY_LODGEMENT_SURCHARGE}` },
-  { label: 'Next-day visit and lodgement', guide: `+£${NEXT_DAY_VISIT_SURCHARGE}` },
-  { label: 'EPC Improvement Plan', guide: `+£${site.addOns.improvementPlan}` },
-  { label: 'EPC Pre-Assessment (not lodged), improvement plan included', guide: `From £${priceFrom.preAssessment}` },
-  { label: 'Lodging a held Pre-Assessment later', guide: `+£${site.addOns.lodgeLater}` },
-  { label: 'Extensions, loft conversions or unusual layouts', guide: 'Exact quote' },
-  { label: 'Multiple floors or additional measurement complexity', guide: 'Exact quote' },
-  { label: 'Large or unusually complex properties', guide: 'Exact quote' },
-]
-
-const pricingFaq: FaqItem[] = [
+type Faq = { q: string; a: string }
+const faqs: Faq[] = [
   {
     q: 'How much does an EPC cost in London?',
-    a: `Guide prices start at £${pricing[0].epc} for properties ${pricing[0].areaLabel.toLowerCase()} and rise with internal floor area. Homes ${topBand.areaLabel.toLowerCase()} start from £${topBand.epc}. These are guide prices, not fixed quotes — the final price depends on the internal floor area (m²), any extensions or loft conversions, layout and condition. Your exact quote is confirmed before you book.`,
+    a: `Guide prices start at £${pricing[0].epc} for properties ${pricing[0].areaLabel.toLowerCase()} and rise with internal floor area. Homes ${topBand.areaLabel.toLowerCase()} start from £${topBand.epc}. These are guide prices, not fixed quotes. The final price depends on the internal floor area (m²), any extensions or loft conversions, layout and condition. Your exact quote is confirmed before you book.`,
   },
   {
     q: 'Are there any hidden fees?',
@@ -93,7 +120,7 @@ const pricingFaq: FaqItem[] = [
   },
   {
     q: 'Can I get a discount for multiple properties?',
-    a: 'Yes. We offer portfolio rates for landlords and letting agents with multiple properties. Send us the postcodes and we will quote the whole set together.',
+    a: `Yes. ${portfolioRatesText} Send us the addresses and we will quote the whole set together.`,
   },
   {
     q: 'What are the faster options?',
@@ -101,304 +128,255 @@ const pricingFaq: FaqItem[] = [
   },
   {
     q: 'How much does a floor plan cost?',
-    a: `Floor plans have guide prices from £${priceFrom.floorPlan}, priced on the same internal floor-area bands as the EPC. Booking an EPC and floor plan together costs less than booking them separately — up to £${formatPrice(maxBundleSaving)} less — because we measure the property during the assessment anyway, so it is one visit rather than two. Your exact quote is confirmed before booking.`,
+    a: `Floor plans have guide prices from £${priceFrom.floorPlan}, priced on the same internal floor-area bands as the EPC. Booking an EPC and floor plan together costs less than booking them separately, up to £${formatPrice(maxBundleSaving)} less, because we measure the property during the assessment anyway, so it is one visit rather than two. Your exact quote is confirmed before booking.`,
   },
   {
     q: `What if my property is larger than ${standardBands[standardBands.length - 1].areaMax} m²?`,
-    a: `Guide prices for homes ${topBand.areaLabel.toLowerCase()} start from £${topBand.epc} for the EPC, £${topBand.floorPlan} for a floor plan and £${topBand.bundle} for both together. Large properties vary a great deal in layout and complexity, so this band is a starting point rather than a typical figure — send us the address and we will confirm the exact quote before you book.`,
+    a: `Guide prices for homes ${topBand.areaLabel.toLowerCase()} start from £${topBand.epc} for the EPC, £${topBand.floorPlan} for a floor plan and £${topBand.bundle} for both together. Large properties vary a great deal in layout and complexity, so this band is a starting point rather than a typical figure. Send us the address and we will confirm the exact quote before you book.`,
   },
 ]
 
-// Typical internal floor-area ranges by property size (guide only) — reinforces
-// that floor area is the biggest driver of the final price.
-const offerCatalog = {
-  '@context': 'https://schema.org',
-  '@type': 'ItemList',
-  name: 'EPC and Floor Plan Pricing',
-  itemListElement: pricing.map((row, i) => ({
-    '@type': 'ListItem',
-    position: i + 1,
-    item: {
-      '@type': 'Offer',
-      name: `Domestic EPC, ${row.areaLabel}`,
-      // minPrice, not price: every figure on this page is a starting guide, and
-      // marking it as a fixed price would misrepresent visible page content.
-      priceSpecification: {
-        '@type': 'PriceSpecification',
-        minPrice: row.epc,
-        priceCurrency: 'GBP',
-      },
-      availability: 'https://schema.org/InStock',
-      url: `${site.url}/contact`,
-      seller: { '@id': `${site.url}/#business` },
-    },
-  })),
-}
+const sections: PageSection[] = [
+  { id: 'pricing-table', heading: 'prices-h', label: 'Every price, by floor area' },
+  { id: 'extras', heading: 'extras-h', label: 'Faster options and extras' },
+  { id: 'portfolio', heading: 'portfolio-h', label: `${Portfolio} homes or more` },
+  { id: 'whats-included', heading: 'included-h', label: 'What every EPC includes' },
+  { id: 'pricing-faq', heading: 'questions-h', label: 'Pricing questions' },
+  { id: 'book', heading: 'in-end-h', label: 'Get my exact quote' },
+]
 
-const breadcrumbSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Home', item: site.url },
-    { '@type': 'ListItem', position: 2, name: 'Pricing', item: `${site.url}/pricing` },
-  ],
-}
+const readNext: NextStep[] = [
+  { kicker: 'The main service', title: 'What a Domestic EPC involves', href: '/services/domestic-epc',
+    text: 'The visit, what we record and how the rating is worked out.' },
+  { kicker: 'Same visit', title: 'Floor plans, drawn to scale', href: '/services/floor-plans',
+    text: `Added to an EPC it costs up to £${formatPrice(maxBundleSaving)} less than booking both separately.` },
+  { kicker: 'Before the visit', title: 'Preparing for your EPC', href: '/preparing-for-your-epc',
+    text: 'What to have ready, so the rating counts everything you have done.' },
+  { kicker: 'Letting a home?', title: 'EPCs for landlords', href: '/landlords', go: true, cta: 'Landlords',
+    text: 'Where your rental stands against the E minimum, one let or a portfolio.' },
+]
+
+// minPrice, not price: every figure on this page is a starting guide, and a fixed price would misstate the page.
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'EPC and Floor Plan Pricing',
+    itemListElement: pricing.map((row, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      item: {
+        '@type': 'Offer',
+        name: `Domestic EPC, ${row.areaLabel}`,
+        priceSpecification: { '@type': 'PriceSpecification', minPrice: row.epc, priceCurrency: 'GBP' },
+        availability: 'https://schema.org/InStock',
+        url: `${site.url}/quote`,
+        seller: { '@id': `${site.url}/#business` },
+      },
+    })),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: site.url },
+      { '@type': 'ListItem', position: 2, name: 'Pricing', item: `${site.url}/pricing` },
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+  },
+]
 
 export default function PricingPage() {
+  const reg = site.assessor.accreditations
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify([offerCatalog, breadcrumbSchema]) }}
-      />
+    <div className="in pr">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
 
-      <BreadcrumbNav items={breadcrumbs} />
-
-      <PageHero
-        eyebrow="Pricing"
-        heading="EPC and Floor Plan Pricing"
-        subheading="Every figure here is a starting guide, not a fixed quote. Your final cost depends mainly on internal floor area (m²), plus any extensions, loft conversions, layout and condition. We confirm the exact price before you book — never after."
-        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ sourcePage: 'pricing', ctaId: 'hero' }) }}
-      />
-
-      {/* Full pricing table */}
-      <Section variant="default" id="pricing-table">
-        <div className="max-w-3xl">
-          <p className="text-xs uppercase tracking-wide font-semibold text-primary-700">The Numbers</p>
-          <h2 className="mt-2 text-3xl md:text-4xl font-bold tracking-tight text-secondary-900">
-            Guide Pricing Table
-          </h2>
-          <p className="mt-5 text-lg text-secondary-700 leading-relaxed">
-            Every EPC includes the on-site assessment, official lodgement on the GOV.UK EPC Register, and your certificate link sent once it is live. Same-day lodgement is {`£${SAME_DAY_LODGEMENT_SURCHARGE}`} extra, and a next-day visit and lodgement {`£${NEXT_DAY_VISIT_SURCHARGE}`} extra.
-          </p>
-        </div>
-
-        {/* Two prominent callouts — read at a glance, even if nothing else is */}
-        <div className="mt-6 grid gap-3 sm:grid-cols-2 max-w-3xl">
-          <div className="flex gap-3 rounded-xl border border-warm-200 bg-warm-50 p-4">
-            <Info className="w-5 h-5 text-warm-600 shrink-0 mt-0.5" aria-hidden="true" />
-            <div>
-              <p className="font-semibold text-secondary-900">These are guide prices</p>
-              <p className="mt-1 text-sm text-secondary-700 leading-relaxed">
-                Every figure below is a guide estimate, not a fixed quote. The largest band shows starting prices. You get an exact price confirmed before you book.
+      {/* HERO: the answer, four facts and On this page */}
+      <section className="in-hd" aria-labelledby="pr-h1">
+        <Container>
+          <nav className="in-crumbs" aria-label="Breadcrumb">
+            <ol>
+              <li><Link href="/">Home</Link><span className="sep" aria-hidden="true">›</span></li>
+              <li><span aria-current="page">Pricing</span></li>
+            </ol>
+          </nav>
+          <div className="pr-hd">
+            <div className="in-hd__copy">
+              <p className="in-eyebrow">Pricing</p>
+              <h1 id="pr-h1">EPC and floor plan prices</h1>
+              <p className="in-hd__answer">
+                One price list for all of London, set mainly by the home&apos;s internal floor area. EPCs from{' '}
+                <b className="num">£{priceFrom.epc}</b>, with no travel charges. Every figure is a guide: we confirm your exact price
+                before you book, never after.
+              </p>
+              <div className="in-hd__acts">
+                <a className="ld-btn ld-btn--primary" href={q('hero')} data-enquiry-cta="hero">Get my exact quote</a>
+                <a className="in-wa" href={site.whatsappHref} target="_blank" rel="noopener noreferrer"><Ico name="message" size={18} /> Ask on WhatsApp</a>
+              </div>
+              <p className="in-by">
+                <ShieldCheck size={18} className="i" aria-hidden="true" />
+                <span>
+                  <Link href="/about"><b>{site.assessor.name}</b></Link>, {reg.map((a) => a.short).join(' and ')} accredited,{' '}
+                  {reg.map((a, i) => <span key={a.number}>{i > 0 && ' and '}<span className="num">{a.number}</span></span>)}.{' '}
+                  <a href={site.assessor.verifyUrl} target="_blank" rel="noopener">Check the GOV.UK register</a>
+                </span>
               </p>
             </div>
-          </div>
-          <div className="flex gap-3 rounded-xl border border-primary-200 bg-primary-50 p-4">
-            <Ruler className="w-5 h-5 text-primary-700 shrink-0 mt-0.5" aria-hidden="true" />
-            <div>
-              <p className="font-semibold text-secondary-900">Floor area is the biggest factor</p>
-              <p className="mt-1 text-sm text-secondary-700 leading-relaxed">
-                Your price is driven mainly by internal floor area (m²). Extensions, loft conversions, layout and condition also count.
-              </p>
+            <div className="pr-hd__side">
+              <ul className="pr-facts">
+                <li><b className="num">£{priceFrom.epc}</b><span>EPCs from, by floor area</span></li>
+                <li><b className="num">£{priceFrom.floorPlan}</b><span>Floor plans from</span></li>
+                <li><b className="num">72 h</b><span>On the GOV.UK register after the visit</span></li>
+                <li><b className="num">{site.reviews.ratingValue.toFixed(1)}</b><span>On Google, from {site.reviews.reviewCount} reviews</span></li>
+              </ul>
+              <OnThisPage sections={sections} />
             </div>
           </div>
-        </div>
+        </Container>
+      </section>
 
-        {/* Phones: one block per band so every price is visible without sideways scrolling. */}
-        <div className="mt-8 overflow-hidden rounded-2xl border border-secondary-200 shadow-premium sm:hidden">
-          <ul className="divide-y divide-secondary-100">
-            {pricing.map((row) => (
-              <li key={row.id} className="bg-white px-4 py-4">
-                <p className="flex items-center gap-1.5 text-base font-bold text-secondary-900">
-                  <Ruler className="w-3.5 h-3.5 shrink-0 text-secondary-500" aria-hidden="true" />
-                  {row.areaLabel}
-                </p>
-                <p className="mt-0.5 pl-5 text-xs text-secondary-600">{row.typicalLabel}</p>
-                <dl className="mt-3 grid grid-cols-2 gap-2 text-sm">
-                  {([['EPC', row.epc], ['Floor plan', row.floorPlan], ['Pre-Assessment (not lodged)', row.preAssessment]] as const).map(([label, value]) => (
-                    <div key={label}>
-                      <dt className="text-xs font-medium text-secondary-600">{label}</dt>
-                      <dd>
-                        {row.startingPrice && <><span className="text-xs font-medium text-secondary-600">From</span>{' '}</>}
-                        <span className="text-base font-bold text-secondary-900">{`£${formatPrice(value)}`}</span>
-                      </dd>
+      {/* EVERY PRICE */}
+      <section className="in-sec in-sec--band" id="pricing-table" aria-labelledby="prices-h">
+        <Container>
+          <div className="pr-head">
+            <div>
+              <p className="in-eyebrow">Guide prices · {site.reviews.ratingValue.toFixed(1)} on Google</p>
+              <h2 className="in-h2" id="prices-h">Every price, by floor area</h2>
+            </div>
+            <p className="in-lede">
+              Find your size, then your service. Each price opens the quote with both filled in. Not sure of the size? Pick the
+              nearest; we confirm it from your property details.
+            </p>
+          </div>
+          <PriceMatrix />
+          <div className="pr-notes">
+            {/* Abdul's wording, 22/10/2026 pricing spec §11 */}
+            <p><b>Guide prices for standard domestic properties.</b> Larger or unusually complex properties are quoted individually. Your exact price is confirmed before booking.</p>
+            <p>
+              Internal floor area (m²) is the biggest factor in the price, alongside extensions, loft conversions, layout and condition.
+              Bedrooms are shown only as a rough guide, and the largest band shows starting prices. Savings are the difference between
+              the two services booked separately and booked together: up to <b className="num">£{formatPrice(maxBundleSaving)}</b> on one visit.{' '}
+              <a className="in-link" href={q('inline')}>Request an exact quote</a>
+            </p>
+          </div>
+        </Container>
+      </section>
+
+      {/* Our promise, directly under the prices (Abdul 24/10) */}
+      <OurPromise />
+
+      {/* EXTRAS */}
+      <section className="in-sec" id="extras" aria-labelledby="extras-h">
+        <Container className="pr-extras">
+          <div>
+            <p className="in-eyebrow">On top of the size price</p>
+            <h2 className="in-h2" id="extras-h">Faster options and extras</h2>
+            <p className="in-lede">Each one has its price beside it. Anything marked &ldquo;exact quote&rdquo; is confirmed in writing before you book, never added afterwards.</p>
+            <figure className="pr-receipt" aria-labelledby="pr-receipt-cap">
+              <figcaption id="pr-receipt-cap" className="in-eyebrow">A worked example</figcaption>
+              <dl>
+                <div><dt>Domestic EPC, {ex.areaLabel}</dt><dd className="num">£{ex.epc}</dd></div>
+                <div><dt>Same-day lodgement</dt><dd className="num">+£{SAME_DAY_LODGEMENT_SURCHARGE}</dd></div>
+                <div className="pr-receipt__t"><dt>Guide total</dt><dd className="num">£{ex.epc + SAME_DAY_LODGEMENT_SURCHARGE}</dd></div>
+              </dl>
+            </figure>
+          </div>
+          <div className="pr-ledger">
+            {extras.map((g) => (
+              <div key={g.group} className="pr-ledger__g">
+                <h3 className="pr-ledger__h">{g.group}</h3>
+                <dl>
+                  {g.rows.map((r) => (
+                    <div key={r.label}>
+                      <dt>{r.label}{r.note && <small>{r.note}</small>}</dt>
+                      <dd className={r.muted ? 'is-muted' : 'num'}>{r.price}</dd>
                     </div>
                   ))}
-                  <div className="col-span-2 flex flex-wrap items-baseline justify-between gap-x-3 rounded-lg bg-primary-50 px-3 py-2">
-                    <dt className="text-xs font-semibold text-primary-800">EPC + floor plan</dt>
-                    <dd className="text-right">
-                      <span className="text-base font-bold text-primary-800">
-                        {row.startingPrice && (
-                          <span className="text-xs font-medium text-primary-700">From </span>
-                        )}
-                        {`£${formatPrice(row.bundle)}`}
-                      </span>{' '}
-                      {!row.startingPrice && <span className="text-xs font-semibold text-primary-700">
-                        Save {`£${formatPrice(bundleSaving(row))}`}
-                      </span>}
-                    </dd>
-                  </div>
                 </dl>
-              </li>
+              </div>
             ))}
-          </ul>
-          <p className="bg-secondary-50 border-t border-secondary-200 px-4 py-3 text-xs text-secondary-500 leading-relaxed">
-            All figures are guide prices; the largest band shows starting prices. Internal floor area (m²) is the single biggest factor in the final price, alongside extensions, loft conversions, layout and condition; bedrooms are shown only as a rough guide. Savings shown are the difference between the two services booked separately and booked together.{' '}
-            <a href={quoteHref({ sourcePage: 'pricing', ctaId: 'inline' })} className="font-medium text-primary-700 underline">Request an exact quote</a>.
-          </p>
-        </div>
-
-        <div className="mt-8 hidden overflow-hidden rounded-2xl border border-secondary-200 shadow-premium sm:block">
-          <div className="overflow-x-auto overscroll-x-contain [scrollbar-width:thin]">
-            <table className="w-full text-sm min-w-[720px]">
-              <thead>
-                <tr className="bg-secondary-50 border-b border-secondary-200">
-                  <th scope="col" className="px-5 py-3.5 text-left font-semibold text-secondary-700">Internal floor area</th>
-                  <th scope="col" className="px-4 py-3.5 text-right font-semibold text-secondary-900">EPC</th>
-                  <th scope="col" className="px-4 py-3.5 text-right font-semibold text-secondary-900">Floor plan</th>
-                  <th scope="col" className="px-4 py-3.5 text-right font-semibold text-secondary-900">
-                    Pre-Assessment
-                    <span className="mt-1 block text-[10px] font-bold uppercase tracking-wider text-secondary-500">Not lodged</span>
-                  </th>
-                  <th scope="col" className="px-4 py-3.5 text-right font-semibold text-primary-800 bg-primary-50">
-                    EPC + floor plan
-                    <span className="mt-1 block text-[10px] font-bold uppercase tracking-wider text-primary-700">
-                      Best value
-                    </span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-secondary-100">
-                {pricing.map((row) => (
-                  <tr key={row.id} className="bg-white hover:bg-secondary-50/70 transition-colors">
-                    {/* PRIMARY: floor area drives the guide band */}
-                    <th scope="row" className="px-5 py-3.5 text-left">
-                      <span className="flex items-center gap-1.5 text-base font-bold text-secondary-900">
-                        <Ruler className="w-3.5 h-3.5 shrink-0 text-secondary-500" aria-hidden="true" />
-                        {row.areaLabel}
-                      </span>
-                      <span className="mt-0.5 block pl-5 text-xs font-normal text-secondary-600">{row.typicalLabel}</span>
-                    </th>
-                    {/* Standard bands are guide prices; the open-ended top band shows starting prices */}
-                    {[row.epc, row.floorPlan, row.preAssessment].map((value, i) => (
-                      <td key={i} className="px-4 py-3.5 text-right whitespace-nowrap">
-                        {row.startingPrice && <><span className="text-xs font-medium text-secondary-600">From</span>{' '}</>}
-                        <span className="text-base font-bold text-secondary-900">{`£${formatPrice(value)}`}</span>
-                      </td>
-                    ))}
-                    <td className="px-4 py-3.5 text-right bg-primary-50 whitespace-nowrap">
-                      <span className="text-base font-bold text-primary-800">
-                        {/* Open-ended top band varies far more, so it is the one
-                            bundle figure presented as a starting point. */}
-                        {row.startingPrice && (
-                          <span className="text-xs font-medium text-primary-700">From </span>
-                        )}
-                        {`£${formatPrice(row.bundle)}`}
-                      </span>
-                      {!row.startingPrice && <span className="block text-xs font-semibold text-primary-700">
-                        Save {`£${formatPrice(bundleSaving(row))}`}
-                      </span>}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-              <tfoot>
-                <tr className="bg-secondary-50 border-t border-secondary-200">
-                  <td colSpan={5} className="px-5 py-3 text-xs text-secondary-500 leading-relaxed">
-                    All figures are guide prices; the largest band shows starting prices. Internal floor area (m²) is the single biggest factor in the final price, alongside extensions, loft conversions, layout and condition; bedrooms are shown only as a rough guide. Savings shown are the difference between the two services booked separately and booked together.{' '}
-                    <a href={quoteHref({ sourcePage: 'pricing', ctaId: 'inline' })} className="font-medium text-primary-700 underline">Request an exact quote</a>.
-                  </td>
-                </tr>
-              </tfoot>
-            </table>
+            <p className="in-note">
+              The faster options cover visits in our standard hours (Mon–Sun, 8am–8pm), and availability is confirmed before booking.
+            </p>
           </div>
-        </div>
+        </Container>
+      </section>
 
-        <GuidePriceNote className="mt-6" />
-
-        <div className="mt-6 rounded-xl bg-primary-50 border border-primary-200 p-6 flex items-start gap-4">
-          <Sparkles className="w-6 h-6 text-primary-700 shrink-0 mt-0.5" aria-hidden="true" />
+      {/* PORTFOLIO */}
+      <section className="in-sec in-sec--band" id="portfolio" aria-labelledby="portfolio-h">
+        <Container className="pr-port">
           <div>
-            <p className="font-semibold text-primary-900">Better value together</p>
-            <p className="mt-1 text-primary-900 leading-relaxed">
-              Book both services in one visit and save up to {`£${formatPrice(maxBundleSaving)}`} — one appointment, both services completed together.
+            <p className="in-eyebrow">Landlords and agents</p>
+            <h2 className="in-h2" id="portfolio-h">{Portfolio} homes or more</h2>
+            <p className="in-lede">Send the addresses in one message. We price each home by its size, group the visits by area across London and quote the whole set together.</p>
+            <div className="in-hd__acts pr-port__acts">
+              <a className="in-wa" href={listHref} target="_blank" rel="noopener noreferrer"><Ico name="message" size={18} /> WhatsApp a list of addresses</a>
+              <a className="in-arrow in-link" href={quoteHref({ service: 'bulk', sourcePage: 'pricing', ctaId: 'inline' })}>Or use the quote form <Ico name="arrow-right" size={16} /></a>
+            </div>
+          </div>
+          {/* Abdul's approved portfolio rates (24/10), word for word from lib/site.ts */}
+          <p className="pr-port__rates">{portfolioRatesText}</p>
+        </Container>
+      </section>
+
+      {/* WHAT'S INCLUDED */}
+      <section className="in-sec" id="whats-included" aria-labelledby="included-h">
+        <Container>
+          <p className="in-eyebrow">No surprises</p>
+          <h2 className="in-h2" id="included-h">What every EPC includes</h2>
+          <div className="pr-inc">
+            <div>
+              <h3 className="pr-ledger__h">Included</h3>
+              <ul className="in-ticks">
+                {included.map((item) => <li key={item}><Ico name="check" size={20} /><span>{item}</span></li>)}
+              </ul>
+            </div>
+            <div>
+              <h3 className="pr-ledger__h">Not included</h3>
+              <ul className="in-ticks pr-inc__no">
+                {notIncluded.map((item) => <li key={item}><span className="pr-dash" aria-hidden="true" /><span>{item}</span></li>)}
+              </ul>
+              <p className="in-note pr-inc__far">For properties outside our service radius, contact us for a tailored quote.</p>
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {/* QUESTIONS */}
+      <section className="in-sec" id="pricing-faq" aria-labelledby="questions-h">
+        <Container className="pr-faqwrap">
+          <div>
+            <p className="in-eyebrow">FAQ</p>
+            <h2 className="in-h2" id="questions-h">Pricing questions</h2>
+            <p className="in-note pr-faqside">
+              Not covered here? <a className="in-link" href={site.whatsappHref} target="_blank" rel="noopener">WhatsApp us</a>, or see
+              the <Link className="in-link" href="/faq">full FAQ</Link>.
             </p>
           </div>
-        </div>
-
-        {/* Additional charges — deliberately a separate, smaller table. Folding
-            these into the main grid would read as six more price bands; they are
-            modifiers to a quote, and most of them resolve to "we will tell you". */}
-        <div className="mt-10 max-w-3xl">
-          <h3 className="text-xl font-bold text-secondary-900">Additional requirements</h3>
-          <p className="mt-2 text-secondary-700 leading-relaxed">
-            These sit on top of the guide prices above. Anything marked &ldquo;exact quote&rdquo; is confirmed in writing before you book, never added afterwards.
-          </p>
-
-          <div className="mt-5 overflow-hidden rounded-2xl border border-secondary-200">
-            <table className="w-full text-sm">
-              <caption className="sr-only">Additional requirements and their guide charges</caption>
-              <thead>
-                <tr className="bg-secondary-50 border-b border-secondary-200">
-                  <th scope="col" className="px-5 py-3 text-left font-semibold text-secondary-700">Additional requirement</th>
-                  <th scope="col" className="px-5 py-3 text-right font-semibold text-secondary-700">Guide</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-secondary-100">
-                {additionalCharges.map((row) => (
-                  <tr key={row.label} className="bg-white">
-                    <th scope="row" className="px-5 py-3 text-left font-normal text-secondary-700">{row.label}</th>
-                    <td className="px-5 py-3 text-right font-semibold text-secondary-900 whitespace-nowrap">
-                      {row.guide}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="in-faq">
+            {faqs.map((f, i) => (
+              <details key={f.q} open={i === 0}>
+                <summary><span>{f.q}</span><ChevronDown size={20} className="i" aria-hidden="true" /></summary>
+                <div className="in-faq__a"><p>{f.a}</p></div>
+              </details>
+            ))}
           </div>
-        </div>
-      </Section>
+        </Container>
+      </section>
 
-      {/* What's included / not included */}
-      <Section variant="muted" id="whats-included">
-        <div className="grid gap-5 md:gap-8 md:grid-cols-2">
-          <Card className="p-5 md:p-8">
-            <h2 className="text-xl font-semibold text-secondary-900">What&rsquo;s included in every EPC</h2>
-            <ul className="mt-5 space-y-2.5">
-              {included.map((item) => (
-                <li key={item} className="flex items-start gap-2.5 text-secondary-700">
-                  <CheckCircle2 className="w-5 h-5 text-primary-600 shrink-0 mt-0.5" aria-hidden="true" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </Card>
-          <Card className="p-5 md:p-8">
-            <h2 className="text-xl font-semibold text-secondary-900">What&rsquo;s not included</h2>
-            <ul className="mt-5 space-y-2.5">
-              {notIncluded.map((item) => (
-                <li key={item} className="flex items-start gap-2.5 text-secondary-700">
-                  <XCircle className="w-5 h-5 text-secondary-400 shrink-0 mt-0.5" aria-hidden="true" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-            <p className="mt-6 text-sm text-secondary-600">
-              For properties outside our service radius, contact us for a tailored quote.
-            </p>
-          </Card>
-        </div>
-      </Section>
+      <ReadNext steps={readNext} />
 
-      {/* Pricing FAQ */}
-      <Section variant="default" id="pricing-faq">
-        <div className="max-w-3xl">
-          <p className="text-xs uppercase tracking-wide font-semibold text-primary-700">FAQ</p>
-          <h2 className="mt-2 text-3xl md:text-4xl font-bold tracking-tight text-secondary-900">
-            Pricing Questions
-          </h2>
-          <div className="mt-8">
-            <Accordion items={pricingFaq} />
-          </div>
-        </div>
-      </Section>
-
-      <CtaStrip
-        heading="Get a Personalised Quote"
-        body="Send us the address and property size, and we'll confirm your exact price before anything is booked."
-        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ sourcePage: 'pricing', ctaId: 'bottom' }) }}
-      />
-    </>
+      <div id="book">
+        <InnerEnding variant="a" source="pricing"
+          eyebrow={<>EPCs from <span className="num">£{priceFrom.epc}</span> · no travel charges</>}
+          heading="Get a personalised quote"
+          text="Send us the address and property size, and we'll confirm your exact price before anything is booked." />
+      </div>
+    </div>
   )
 }

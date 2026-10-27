@@ -1,19 +1,18 @@
-// Homepage intro (16/10/2026): skipped on Data Saver and 2G/3G connections, shown otherwise,
-// including browsers with no navigator.connection (Safari, Firefox).
-// Run against a local production build: npx next start -p 3120, then
-//   node tests/intro-connection.cjs   (BOOKING_TEST_URL overrides the base)
+// The homepage intro overlay is gone (Abdul 23/10/2026, the redesign): on every connection type the page paints
+// straight away, no .ld-intro is ever added and nothing covers the hero. Replaces the 16/10 test, which checked the
+// intro was skipped only on Data Saver and 2G/3G.
+// Run against a local production build:
+//   BOOKING_TEST_URL=http://localhost:3104 node tests/intro-connection.cjs
 const { chromium } = require('playwright')
 
-const base = process.env.BOOKING_TEST_URL || 'http://localhost:3120'
+const base = process.env.BOOKING_TEST_URL || 'http://localhost:3104'
 if (!['localhost', '127.0.0.1'].includes(new URL(base).hostname)) throw new Error('Local preview only')
 
 const cases = [
-  { name: '4g', connection: { effectiveType: '4g', saveData: false }, intro: true },
-  { name: 'no Network Information API', connection: undefined, intro: true },
-  { name: '3g', connection: { effectiveType: '3g', saveData: false }, intro: false },
-  { name: '2g', connection: { effectiveType: '2g', saveData: false }, intro: false },
-  { name: 'slow-2g', connection: { effectiveType: 'slow-2g', saveData: false }, intro: false },
-  { name: '4g with Data Saver', connection: { effectiveType: '4g', saveData: true }, intro: false },
+  { name: '4g', connection: { effectiveType: '4g', saveData: false } },
+  { name: 'no Network Information API', connection: undefined },
+  { name: '3g', connection: { effectiveType: '3g', saveData: false } },
+  { name: '4g with Data Saver', connection: { effectiveType: '4g', saveData: true } },
 ]
 
 ;(async () => {
@@ -30,17 +29,18 @@ const cases = [
         }).observe(document, { childList: true, subtree: true })
       }, c.connection)
       const page = await context.newPage()
-      await page.goto(`${base}/`, { waitUntil: 'load' })
+      await page.goto(base + '/', { waitUntil: 'networkidle' })
       const seen = await page.evaluate(() => window.__introSeen)
-      if (seen !== c.intro) fails.push(`${c.name}: intro ${seen ? 'shown' : 'skipped'}, expected ${c.intro ? 'shown' : 'skipped'}`)
-      else console.log(`ok  ${c.name}: intro ${seen ? 'shown' : 'skipped'}`)
+      const covered = await page.evaluate(() => { const h = document.querySelector('#hero-quote').getBoundingClientRect(); const el = document.elementFromPoint(h.left + h.width / 2, h.top + h.height / 2); return !el || !el.closest('#hero-quote') })
+      if (seen) fails.push(`${c.name}: the intro overlay appeared`)
+      if (covered) fails.push(`${c.name}: something covers the hero's quote button`)
       await context.close()
     }
+    const html = await (await fetch(base + '/')).text()
+    if (/ld-intro/.test(html)) fails.push('the served HTML still carries the intro script')
   } finally {
     await browser.close()
   }
-  if (fails.length) {
-    console.error(fails.join('\n'))
-    process.exit(1)
-  }
+  if (fails.length) { console.error(fails.join('\n')); process.exit(1) }
+  console.log(`PASS no homepage intro: ${cases.length} connection types, no overlay, the hero's quote button uncovered, no intro script in the HTML`)
 })()

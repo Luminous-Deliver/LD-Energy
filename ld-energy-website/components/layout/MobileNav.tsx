@@ -1,33 +1,41 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import { quoteHref, quoteContextForPath } from '@/lib/quote-context'
-
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
-import { Menu, X, Phone, MessageCircle } from 'lucide-react'
 import { servicesMenu, topNav, site } from '@/lib/site'
-import { cn } from '@/lib/cn'
+import { quoteTargetFor } from '@/lib/quote-target'
+import { WhatsAppIcon, PhoneIcon, MenuIcon, CloseIcon } from '@/components/ui/BrandIcons'
 
-export function MobileNav() {
+/**
+ * The phone menu (below 760 px, where the bar has no links). It keeps every destination the old header had:
+ * the services and audiences, Areas, Pricing, FAQ, Guides, Contact and About. A modal dialog: focus moves to
+ * Close, Tab is trapped, Escape and the scrim close it, and focus returns to the menu button.
+ */
+export function MobileNav({ waHref }: { waHref: string }) {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const triggerRef = useRef<HTMLButtonElement>(null)
+  // the phone pill's menu button opens this same sheet (Header.tsx, 'mnav:open'); focus goes back to whichever opened it
+  const openerRef = useRef<HTMLElement | null>(null)
   const closeRef = useRef<HTMLButtonElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     setMounted(true)
+    const onOpen = (e: Event) => { openerRef.current = (e as CustomEvent<HTMLElement | null>).detail ?? null; setOpen(true) }
+    window.addEventListener('mnav:open', onOpen)
+    return () => window.removeEventListener('mnav:open', onOpen)
   }, [])
 
-  // A desktop resize must not leave an invisible modal focus trap active.
+  // A resize past the breakpoint must not leave an invisible modal focus trap active.
   useEffect(() => {
-    const desktop = window.matchMedia('(min-width: 1024px)')
-    const closeOnDesktop = () => { if (desktop.matches) setOpen(false) }
-    desktop.addEventListener('change', closeOnDesktop)
-    return () => desktop.removeEventListener('change', closeOnDesktop)
+    const wide = window.matchMedia('(min-width: 760px)')
+    const closeOnWide = () => { if (wide.matches) setOpen(false) }
+    wide.addEventListener('change', closeOnWide)
+    return () => wide.removeEventListener('change', closeOnWide)
   }, [])
 
   // Scroll lock
@@ -42,7 +50,7 @@ export function MobileNav() {
   useEffect(() => {
     if (!open) return
     const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') { setOpen(false); triggerRef.current?.focus() }
+      if (e.key === 'Escape') { setOpen(false); (openerRef.current ?? triggerRef.current)?.focus() }
     }
     document.addEventListener('keydown', handler)
     return () => document.removeEventListener('keydown', handler)
@@ -75,146 +83,90 @@ export function MobileNav() {
 
   function close() {
     setOpen(false)
-    triggerRef.current?.focus()
+    ;(openerRef.current ?? triggerRef.current)?.focus()
   }
+
+  const tab = open ? undefined : -1
+  const other = [...topNav, { href: '/about', label: 'About' }]
 
   return (
     <>
       <button
         ref={triggerRef}
         type="button"
-        onClick={() => setOpen(true)}
-        className="lg:hidden inline-flex items-center justify-center w-12 h-12 rounded-md text-secondary-800 hover:bg-secondary-100"
+        onClick={() => { openerRef.current = null; setOpen(true) }}
+        className="sh__menu"
         aria-label="Open menu"
         aria-expanded={open}
         aria-controls="mobile-nav-panel"
       >
-        <Menu className="w-6 h-6" aria-hidden="true" />
+        <MenuIcon />
       </button>
 
       {mounted && createPortal(
-        <div
-          className={cn('fixed inset-0 z-50 lg:hidden', !open && 'pointer-events-none')}
-          aria-hidden={open ? undefined : true}
-          inert={!open}
-        >
-        {/* Backdrop */}
-        <div
-          className={cn(
-            'absolute inset-0 bg-secondary-900/60 transition-opacity duration-200',
-            open ? 'opacity-100' : 'opacity-0',
-          )}
-          onClick={close}
-          aria-hidden="true"
-        />
+        <div className="mnav" data-open={open} aria-hidden={open ? undefined : true} inert={!open}>
+          <div className="mnav__scrim" onClick={close} aria-hidden="true" />
+          <div id="mobile-nav-panel" ref={panelRef} role="dialog" aria-modal="true" aria-label="Navigation menu" className="mnav__panel">
+            <div className="mnav__top">
+              <span className="lg__name">{site.name}</span>
+              <button ref={closeRef} type="button" onClick={close} className="sh__menu" style={{ display: 'inline-flex' }} aria-label="Close menu">
+                <CloseIcon />
+              </button>
+            </div>
 
-        {/* Panel */}
-        <div
-          id="mobile-nav-panel"
-          ref={panelRef}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Navigation menu"
-          style={{ backgroundColor: '#ffffff' }}
-          className={cn(
-            'absolute right-0 top-0 h-full w-full max-w-sm overflow-y-auto bg-white shadow-2xl flex flex-col transition-transform duration-200',
-            open ? 'translate-x-0' : 'translate-x-full',
-          )}
-        >
-          {/* Header */}
-          <div className="sticky top-0 z-10 flex items-center justify-between gap-3 px-4 min-h-14 py-1 border-b border-secondary-100 shrink-0 bg-white">
-            <span className="font-display font-bold text-secondary-900">{site.name}</span>
-            <button
-              ref={closeRef}
-              type="button"
-              onClick={close}
-              className="inline-flex items-center justify-center w-12 h-12 rounded-md text-secondary-500 hover:bg-secondary-100"
-              aria-label="Close menu"
-            >
-              <X className="w-5 h-5" aria-hidden="true" />
-            </button>
-          </div>
-
-
-
-          {/* Nav */}
-          <nav aria-label="Mobile" className="shrink-0 px-3 py-2 bg-white">
-            {servicesMenu.map((group) => (
-              <div key={group.heading}>
-                <p className="px-3 pt-3 pb-1 text-sm font-bold uppercase tracking-widest text-secondary-600">
-                  {group.heading}
-                </p>
-                <ul className="flex flex-col mb-1">
-                  {group.links.map((link) => (
-                    <li key={link.href}>
-                      <Link
-                        prefetch={false}
-                        href={link.href}
-                        onClick={close}
-                        tabIndex={open ? undefined : -1}
-                        className="flex min-h-[44px] flex-col justify-center w-full px-3 py-2.5 rounded-lg hover:bg-primary-50 transition-colors group"
-                      >
-                        <span className="text-base font-semibold text-secondary-800 group-hover:text-primary-700">{link.label}</span>
-                        <span className="text-sm text-secondary-600">{link.desc}</span>
-                      </Link>
-                    </li>
-                  ))}
+            <nav aria-label="Mobile">
+              {servicesMenu.map((group) => (
+                <div key={group.heading} className="mnav__group">
+                  <p className="mnav__h">{group.heading}</p>
+                  <ul>
+                    {group.links.map((link) => (
+                      <li key={link.href}>
+                        <Link prefetch={false} href={link.href} onClick={close} tabIndex={tab}>
+                          <span>{link.label}</span>
+                          <span>{link.desc}</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+              {/* Abdul 24/10, "could be better polished, especially this bit": the six loose rows become a headed
+                  two-column grid, half the height, with the page you are on marked */}
+              <div className="mnav__group">
+                <p className="mnav__h">More</p>
+                <ul className="mnav__grid">
+                  {other.map((link) => {
+                    const here = pathname === link.href || pathname.startsWith(`${link.href}/`)
+                    return (
+                      <li key={link.href}>
+                        <Link prefetch={false} href={link.href} onClick={close} tabIndex={tab} aria-current={here ? 'page' : undefined}>
+                          <span>{link.label}</span>
+                        </Link>
+                      </li>
+                    )
+                  })}
                 </ul>
               </div>
-            ))}
+            </nav>
 
-            <div className="my-2 border-t border-secondary-100" />
-
-            {/* Other links */}
-            <ul className="flex flex-col">
-              {[...topNav, { href: '/about', label: 'About' }].map((link) => (
-                <li key={link.href}>
-                  <Link
-                    prefetch={false}
-                    href={link.href}
-                    onClick={close}
-                    tabIndex={open ? undefined : -1}
-                    className="flex min-h-[44px] items-center w-full px-3 py-2.5 rounded-lg text-base font-semibold text-secondary-800 hover:bg-secondary-50 hover:text-primary-700 transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
-          {/* Contact + CTA Footer */}
-          <div className="shrink-0 border-t border-secondary-100 bg-secondary-50/50 p-4 flex flex-col gap-3">
-            <Link
-              prefetch={false}
-              href={pathname === '/contact' ? '#booking-form' : pathname === '/' ? '#pricing' : quoteHref({ ...quoteContextForPath(pathname), ctaId: 'mobile-menu' })}
-              onClick={close}
-              tabIndex={open ? undefined : -1}
-              className="flex items-center justify-center w-full bg-gradient-to-r from-accent-600 to-accent-700 hover:from-accent-700 hover:to-accent-800 text-white font-bold px-4 py-3.5 rounded-xl shadow-md text-base"
-            >
-              Get my exact quote
-            </Link>
-            <div className="flex flex-wrap gap-2">
-              <a
-                href={site.phoneHref}
-                tabIndex={open ? undefined : -1}
-                className="flex min-h-[44px] items-center justify-center gap-1.5 bg-white border border-secondary-200 hover:bg-secondary-100 text-secondary-800 text-sm font-semibold px-3 py-2.5 rounded-lg transition-colors"
-              >
-                <Phone className="w-4 h-4 shrink-0" aria-hidden="true" />
-                Call Us
-              </a>
-              <a
-                href={site.whatsappHref}
-                tabIndex={open ? undefined : -1}
-                className="flex min-h-[44px] items-center justify-center gap-1.5 bg-white border border-secondary-200 hover:bg-secondary-100 text-secondary-800 text-sm font-semibold px-3 py-2.5 rounded-lg transition-colors"
-              >
-                <MessageCircle className="w-4 h-4 shrink-0" aria-hidden="true" />
-                WhatsApp
-              </a>
+            <div className="mnav__foot">
+              <Link prefetch={false} href={quoteTargetFor(pathname, 'mobile-menu')} onClick={close} tabIndex={tab} className="ld-btn ld-btn--primary">
+                Get my exact quote
+              </Link>
+              {/* WhatsApp before the phone (Abdul 22/10) */}
+              <div className="pair">
+                <a href={waHref} target="_blank" rel="noopener noreferrer" tabIndex={tab} className="ld-btn ld-btn--line">
+                  <WhatsAppIcon />
+                  WhatsApp
+                </a>
+                <a href={site.phoneHref} tabIndex={tab} className="ld-btn ld-btn--line">
+                  <PhoneIcon />
+                  Call
+                </a>
+              </div>
             </div>
           </div>
-        </div>
-      </div>, document.body)}
+        </div>, document.body)}
     </>
   )
 }

@@ -1,0 +1,21 @@
+/* Our promise: a ruled band, the two amounts large in the serif so the money reads first (Abdul 23/10/2026) */
+.op { --op-ink: var(--ink, #1E2235); --op-quiet: var(--ink-quiet, #5B6072); --op-rule: var(--hair-strong, rgba(51, 56, 79, .22)); --op-accent: var(--sage-700, #3A624E);
+  background: var(--ground, #FAF9F4); }
+.op[data-tone="night"] { --op-ink: #FBF8F1; --op-quiet: #B8BDCC; --op-rule: rgba(251, 248, 241, .22); --op-accent: #9CC3A3; background: #171A2F; }
+.op__in { max-width: var(--maxw, 1280px); margin-inline: auto; padding: 56px var(--gutter, 20px);
+  display: grid; gap: 14px 64px; }
+.op__k { font: 500 13px/1 var(--font-sans); letter-spacing: .14em; text-transform: uppercase; color: var(--op-accent); }
+.op__h { font: 400 clamp(28px, 3vw, 40px)/1.1 var(--font-serif); color: var(--op-ink); text-wrap: balance; }
+.op__list { list-style: none; margin: 6px 0 0; padding: 0; display: grid; border-top: 1px solid var(--op-ink); }
+.op__list li { display: grid; gap: 4px; padding: 18px 0; border-bottom: 1px solid var(--op-rule); }
+.op__amt { font: 400 clamp(30px, 3.2vw, 44px)/1 var(--font-serif); color: var(--op-accent); font-variant-numeric: lining-nums; }
+.op__list span { font-size: 17px; line-height: 1.5; color: var(--op-ink); max-width: 46ch; }
+.op__small { font-size: 14px; color: var(--op-quiet); }
+.op__small a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+@media (min-width: 900px) {
+  .op__in { grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); align-items: start; padding-block: 72px; }
+  .op__k, .op__h { grid-column: 1; }
+  .op__list { grid-column: 2; grid-row: 1 / span 3; grid-template-columns: 1fr 1fr; gap: 0 40px; margin: 0; }
+  .op__list li { padding: 22px 0 24px; border-bottom: 0; }
+  .op__small { grid-column: 1; }
+}

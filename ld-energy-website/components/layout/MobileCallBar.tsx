@@ -20,7 +20,7 @@ export function MobileCallBar() {
    * follow the form; no marketing or price overlay competes with the keyboard.
    * The marketing bar's visual redesign belongs to the next approved stage.
    */
-  if (pathname === '/contact') return null
+  if (pathname === '/quote') return null
 
   return (
     <div
@@ -50,7 +50,7 @@ export function MobileCallBar() {
           WhatsApp
         </a>
         <Link
-          href={pathname === '/contact' ? '#booking-form' : quoteHref({ ...quoteContextForPath(pathname), ctaId: 'mobile-bar' })}
+          href={quoteHref({ ...quoteContextForPath(pathname), ctaId: 'mobile-bar' })}
           className="flex items-center justify-center gap-1.5 py-3.5 text-sm font-bold bg-accent-600 text-white active:bg-accent-700"
           aria-label="Get my exact quote"
         >

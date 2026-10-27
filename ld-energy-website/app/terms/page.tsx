@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { LegalPage } from '@/components/ui/LegalPage'
-import { site, insurance, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE, defaultOgImage } from '@/lib/site'
+import { site, insurance, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE, defaultOgImage, promise, portfolioRatesText } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'Terms of Service',
@@ -46,7 +46,7 @@ export default function TermsPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageSchema) }} />
       <LegalPage
       title="Terms of Service"
-      lastUpdated="14 September 2026"
+      lastUpdated="24 October 2026"
       breadcrumbs={[
         { href: '/', label: 'Home' },
         { href: '/terms', label: 'Terms of Service' },
@@ -83,6 +83,12 @@ export default function TermsPage() {
       </p>
       <p>
         Bookings are confirmed once we reply with a confirmed appointment time. We may decline bookings for properties outside our service area or where we cannot deliver the agreed turnaround.
+      </p>
+      {/* Abdul 24/10/2026: the portfolio rates, and his "yes" to the two rules that go with them */}
+      <h3 id="portfolio-rates">Portfolio rates</h3>
+      <p>{portfolioRatesText}</p>
+      <p>
+        The rate is set by the number of homes we actually assess. If we can&rsquo;t get into a home on the agreed day, the return visit is £25. If fewer homes are assessed than were ordered, the rate for that smaller number applies.
       </p>
 
       <h2>3. Your obligations</h2>
@@ -125,7 +131,7 @@ export default function TermsPage() {
 
       <h2>6. Payment</h2>
       <p>
-        Payment is due on completion of the assessment unless otherwise agreed in writing. We accept bank transfer and card payments.
+        Payment is due on completion of the assessment unless otherwise agreed in writing. We accept cash, bank transfer and card payments.
       </p>
 
       <h2>7. Cancellation</h2>
@@ -133,7 +139,20 @@ export default function TermsPage() {
         You may cancel or reschedule an appointment free of charge with at least 24 hours&rsquo; notice. Cancellations or reschedules with less than 24 hours&rsquo; notice may incur a £25 fee to cover travel and time.
       </p>
 
-      <h2>8. Liability</h2>
+      <h3 id="our-promise">Our promise</h3>
+      <p>
+        These promises are in addition to your legal rights and do not affect them. Each applies once per booking.
+      </p>
+      <ul>
+        <li>
+          <strong>Lodged within 72 hours, or £{promise.lateLodgement} off.</strong> If your EPC is not lodged on the GOV.UK register within 72 hours of the end of the visit, we take £{promise.lateLodgement} off the fee, or refund £{promise.lateLodgement} if you have already paid. The 72 hours pause while we are waiting on you: for access to anything we could not reach on the day, for paperwork you told us you would send, or for your reply to the draft EPC. They also pause while the GOV.UK register or our accreditation scheme&rsquo;s lodgement system is unavailable.
+        </li>
+        <li>
+          <strong>Moved by us at short notice, £{promise.lateChange} off.</strong> If we cancel or move your visit with less than 24 hours&rsquo; notice, we take £{promise.lateChange} off the fee for the visit when it takes place, or refund £{promise.lateChange} if you then cancel. A trusted, experienced colleague attending at the booked time, which we tell you about in advance, is not a change to your visit.
+        </li>
+      </ul>
+
+      <h2 id="liability">8. Liability</h2>
       <p>
         {insurance.legal} Our liability for any loss arising from the service is limited to the price paid for that service, except where liability cannot be limited by law (for example fraud or personal injury caused by negligence).
       </p>
@@ -144,9 +163,25 @@ export default function TermsPage() {
       </p>
 
       <h2>10. Complaints</h2>
+      {/* 24/10/2026: Quidos requires a stated policy that is free and keeps the complainant's recourse to law (Quidos T&Cs
+          §9.3, §9.5); the two scheme routes are from Elmhurst OP08 v15 (October 2025) and the Quidos Complaints,
+          Disciplinary & Appeals Procedure v2.1 (15/05/2026) */}
       <p>
-        Concerns should be raised with us in the first instance at <a href={site.emailHref}>{site.email}</a>. Complaints relating to the EPC itself can also be escalated through the formal complaints process of the accreditation scheme it was lodged under, Elmhurst Energy or Quidos.
+        If something isn&apos;t right, tell us first. Email <a href={site.emailHref}>{site.email}</a> or call <a href={site.phoneHref}>{site.phone}</a>. We keep a record of every complaint and will do all we can to put it right.
       </p>
+      <p>Making a complaint is free at every stage, with us and with the accreditation scheme.</p>
+      <p>
+        If you&apos;re not happy with our answer, a complaint about the EPC can go to the accreditation scheme it was lodged under. The scheme is named on the certificate.
+      </p>
+      <ul>
+        <li>
+          <strong>Elmhurst Energy:</strong> follow their <a href="https://www.elmhurstenergy.co.uk/app/uploads/2025/10/OP08_Complaints_Resolution_Process.pdf" rel="noopener">Complaints Resolution Process</a>. A member of their staff who hasn&apos;t been involved investigates, usually within six weeks, and the EPC may be audited. Send all your evidence at the start, as nothing can be added once the investigation begins.
+        </li>
+        <li>
+          <strong>Quidos:</strong> email <a href="mailto:complaints@quidos.co.uk">complaints@quidos.co.uk</a>. Their <a href="https://quidos.co.uk/wp-content/uploads/Complaints-Disciplinary-Appeals-Procedure.pdf" rel="noopener">Complaints, Disciplinary &amp; Appeals Procedure</a> sets out the steps. They reply within 3 working days and aim to resolve it within 10.
+        </li>
+      </ul>
+      <p>None of this affects your statutory rights, or stops you taking the matter to court.</p>
 
       <h2>11. Governing law</h2>
       <p>

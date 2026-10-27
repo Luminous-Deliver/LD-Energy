@@ -1,0 +1,95 @@
+/* /areas only: hero E, the borough map and the region list, from the approved prototype
+   (projects/ld-energy-redesign-2026-10/scrollcraft/builds/areas-map-proto, Abdul 23/10/2026). Region fills are the
+   prototype's five sage steps; everything else uses the .in tokens. */
+.in {
+  --r-central: #2F5241; --r-east: #6E9478; --r-north: #A6C1A9; --r-south: #C9D8C4; --r-west: #E1E7D5;
+}
+
+/* hero E */
+@media (min-width: 1024px) { .in-ah__grid { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); } }
+.in-ah__art { min-width: 0; }
+/* Abdul 24/10 "could be better displayed": the 900 px file was 40% blank paper, so the drawing sat small at the right with
+   hard cut edges. Now the drawn part only, from the 2736 px master (area-hero-options/gen/c4.png), at 4:3, every edge
+   fading into the paper so it reads as a drawing on the page rather than a pasted box. */
+.in-ah__art img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; object-position: 50% 30%;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 14%, #000 90%, transparent 100%), linear-gradient(180deg, transparent 0, #000 10%, #000 86%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(90deg, transparent 0, #000 14%, #000 90%, transparent 100%), linear-gradient(180deg, transparent 0, #000 10%, #000 86%, transparent 100%);
+  mask-composite: intersect; }
+.in-ah__art figcaption { margin-top: 6px; font-size: 12px; color: var(--ink-quiet); text-align: right; }
+
+/* map + side card */
+.in-amap { display: grid; gap: 24px; margin-top: 28px; align-items: start; }
+@media (min-width: 960px) { .in-amap { grid-template-columns: minmax(0, 1fr) 340px; } }
+.in-amap__box { min-width: 0; }
+.in-amap__svg { display: block; width: 100%; height: auto; }
+.in-amap__b path { stroke: var(--stone-50); stroke-width: 1.4; transition: opacity .15s, filter .15s; }
+.in-amap__b[data-region="central"] path { fill: var(--r-central); }
+.in-amap__b[data-region="east"] path { fill: var(--r-east); }
+.in-amap__b[data-region="north"] path { fill: var(--r-north); }
+.in-amap__b[data-region="south"] path { fill: var(--r-south); }
+.in-amap__b[data-region="west"] path { fill: var(--r-west); }
+.in-amap__b:hover path, .in-amap__b.is-on path { filter: brightness(.82); stroke: var(--ink); stroke-width: 2.2; }
+.in .in-amap__b:focus-visible { outline: none; }
+.in-amap__b:focus-visible path { stroke: var(--ink); stroke-width: 3.5; }
+.is-dim .in-amap__b:not(.is-hit) path { opacity: .28; }
+.in-amap__lb { font: 500 10.5px/1 var(--font-sans); fill: var(--ink); paint-order: stroke; stroke: rgba(252, 251, 248, .85); stroke-width: 3px;
+  pointer-events: none; text-anchor: middle; }
+.in-amap__lb.is-light { fill: #fff; stroke: rgba(35, 57, 45, .55); }
+.in-amap__pin { pointer-events: none; }
+.in-amap__pin circle { fill: var(--ink); stroke: var(--stone-50); stroke-width: 2.5; }
+.in-amap__pin text { font: 600 12px/1 var(--font-sans); fill: var(--ink); paint-order: stroke; stroke: var(--stone-50); stroke-width: 4px; }
+/* labels drop to unreadable size on phones; the card and list name every borough there */
+@media (max-width: 639px) { .in-amap__lb { display: none; } .in-amap__pin text { font-size: 22px; stroke-width: 6px; } }
+
+.in-amap__legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.in-amap__chip { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border: 1px solid var(--hair); border-radius: 999px;
+  background: var(--stone-50); color: var(--ink); font: 500 14px/1 var(--font-sans); cursor: pointer; }
+@media (min-width: 760px) { .in-amap__chip { min-height: 36px; } }
+.in-amap__chip i { width: 12px; height: 12px; border-radius: 3px; }
+.in-amap__chip i[data-region="central"] { background: var(--r-central); }
+.in-amap__chip i[data-region="east"] { background: var(--r-east); }
+.in-amap__chip i[data-region="north"] { background: var(--r-north); }
+.in-amap__chip i[data-region="south"] { background: var(--r-south); }
+.in-amap__chip i[data-region="west"] { background: var(--r-west); box-shadow: inset 0 0 0 1px var(--hair); }
+.in-amap__chip[aria-pressed="true"] { border-color: var(--ink); background: var(--stone-100); }
+.in-amap__pick { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 14px 0 0; padding: 0; list-style: none; }
+@media (min-width: 640px) { .in-amap__pick { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.in-amap__pick button { width: 100%; min-height: 44px; padding: 8px 12px; text-align: left; font: 500 15px/1.25 var(--font-sans); color: var(--ink);
+  background: var(--card); border: 1px solid var(--hair); border-radius: 8px; cursor: pointer; transition: border-color .15s; }
+.in-amap__pick button:hover { border-color: var(--sage-700); }
+.in-amap__pick button[aria-pressed="true"] { border-color: var(--sage-700); color: var(--sage-700); box-shadow: inset 0 0 0 1px var(--sage-700); }
+.in-amap__tip { margin-top: 12px; font-size: 13px; color: var(--ink-quiet); }
+@media (hover: hover) and (pointer: fine) { .in-amap__tip { display: none; } }
+
+.in-amap__side { display: grid; gap: 16px; min-width: 0; }
+.in-amap__search { display: grid; gap: 6px; }
+.in-amap__search label { font-size: 14px; color: var(--ink-quiet); }
+.in-amap__search input { width: 100%; min-height: 48px; padding: 12px 14px; border: 1px solid var(--hair-strong); border-radius: 6px; background: #fff;
+  color: var(--ink); font: 400 16px var(--font-sans); }
+.in-amap__search input:focus-visible { outline: 2px solid var(--sage-700); outline-offset: 2px; }
+.in-amap__hint { font-size: 13px; color: var(--ink-quiet); min-height: 1.4em; }
+.in-amap__card { border: 1px solid var(--hair); border-radius: 8px; background: var(--card); padding: 20px; }
+.in-amap__reg { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--sage-700); font-weight: 500; }
+.in-amap__card h3 { margin-top: 6px; font-size: 28px; line-height: 1.15; }
+.in-amap__ac { margin-top: 14px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 8px; }
+.in-amap__ac b { font: 400 34px/1 var(--font-serif); color: var(--sage-700); }
+.in-amap__ac span { font-size: 14px; color: var(--ink-quiet); }
+.in-amap__towns { margin-top: 12px; font-size: 15px; line-height: 1.5; }
+.in-amap__pcs { margin-top: 8px; font-size: 13px; color: var(--ink-quiet); letter-spacing: .02em; }
+.in .in-amap__go { margin-top: 18px; display: flex; justify-content: center; width: 100%; }
+
+/* the list: what search engines and screen readers read, and the no-JS route */
+.in-alist__h { margin: 32px 0 8px; font-size: 22px; line-height: 1.2; }
+.in-alist__ul { list-style: none; padding: 0; display: grid; gap: 0 24px; }
+@media (min-width: 700px) { .in-alist__ul { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .in-alist__ul { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.in-alist__ul li { padding: 10px 0 12px; border-bottom: 1px solid var(--hair); min-width: 0; }
+.in-alist__a { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; min-height: 32px; text-decoration: none; font-weight: 500; }
+.in-alist__a:hover { color: var(--sage-700); }
+.in-alist__a small { flex: none; font-size: 13px; font-weight: 400; color: var(--ink-quiet); }
+.in-alist__places { margin-top: 2px; font-size: 14px; line-height: 1.45; color: var(--ink); }
+.in-alist__pcs { margin-top: 4px; font-size: 12.5px; line-height: 1.5; color: var(--ink-quiet); letter-spacing: .02em; }
+.in-alist__child { margin-top: 6px; font-size: 14px; color: var(--ink-quiet); }
+
+@media (prefers-reduced-motion: reduce) { .in-amap__b path { transition: none; } }

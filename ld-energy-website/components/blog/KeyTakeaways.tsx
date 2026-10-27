@@ -7,15 +7,12 @@ interface KeyTakeawaysProps {
 export function KeyTakeaways({ takeaways }: KeyTakeawaysProps) {
   if (!takeaways || takeaways.length === 0) return null
   return (
-    <aside
-      aria-label="Key takeaways"
-      className="rounded-lg bg-primary-50 border border-primary-200 p-6 my-8 not-prose"
-    >
-      <h2 className="text-lg font-bold text-primary-900 mb-3">Key Takeaways</h2>
-      <ul className="space-y-2">
+    <aside aria-labelledby="key-takeaways" className="gd-take">
+      <h2 id="key-takeaways">Key takeaways</h2>
+      <ul>
         {takeaways.map((t) => (
-          <li key={t} className="flex items-start gap-2.5 text-secondary-800">
-            <CheckCircle2 className="w-5 h-5 text-primary-700 shrink-0 mt-0.5" aria-hidden="true" />
+          <li key={t}>
+            <CheckCircle2 width={20} height={20} aria-hidden="true" />
             <span>{t}</span>
           </li>
         ))}

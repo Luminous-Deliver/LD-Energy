@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server'
 import { getRequestContext } from '@cloudflare/next-on-pages'
-import { contactSchema } from '@/lib/validators'
-import { site } from '@/lib/site'
+import { contactSchema, enquirySchema, type EnquiryInput } from '@/lib/validators'
+import { site, promise } from '@/lib/site'
 import { areaLabel, legacyArea, TOP_BAND } from '@/lib/floor-area'
 import { bookingPriceRows, guideEstimate, guideEstimateLine, guidePrice, PLAN_LABEL, ENERGY_REPORT_LABEL } from '@/lib/pricing-estimate'
 import { boroughMeta } from '@/lib/boroughs'
 import { SAME_DAY_LODGEMENT_SPEED, NEXT_DAY_VISIT_SPEED } from '@/lib/booking-options'
-import { formatPreferredDate, hasPrepChecklist, nextSteps, OPENING_HOURS, prepChecklist, PREP_PATH, serviceLabel, TENANT_NOTICE } from '@/lib/booking-copy'
+import { deliveredList, formatPreferredDate, hasPrepChecklist, nextSteps, OPENING_HOURS, prepChecklist, PREP_PATH, serviceLabel, TENANT_NOTICE } from '@/lib/booking-copy'
 import type { EnquiryAttribution } from '@/lib/enquiry-attribution'
 
 export const runtime = 'edge'
@@ -55,6 +55,8 @@ interface ParsedInput extends EnquiryAttribution {
   address: string
   postcode: string
   propertyType?: string
+  /** Flat, maisonette, house or bungalow (v7). Never set on a bulk enquiry. */
+  dwellingType?: string
   areaBand?: string
   /** Customer-typed m², already checked against the band. Never set on a bulk enquiry. */
   floorArea?: string
@@ -112,7 +114,7 @@ function buildEmail(data: ParsedInput) {
       : data.floorArea
         ? `${areaLabel(data.areaBand, data.floorArea)} (customer's figure) · ${areaLabel(data.areaBand)} band`
         : `${areaLabel(data.areaBand || legacyArea(data.propertyType))}${data.areaBand === TOP_BAND && data.floorAreaUnknown ? ' · customer does not know the floor area' : ''}`],
-    ...(estimate.isBulk ? [] : [['Area band id', data.areaBand || '—'] as [string, string]]),
+    ...(estimate.isBulk ? [] : [['Area band id', data.areaBand || '—'] as [string, string], ['Property type', data.dwellingType || '—'] as [string, string]]),
     ['Customer type', data.customerType],
     ['Service(s)', data.services.join(', ')],
     ...(data.sourcePage ? [['Source page', data.sourcePage] as [string, string]] : []),
@@ -168,6 +170,14 @@ function buildConfirmation(data: ParsedInput) {
   const steps = nextSteps(estimate.productKind, data.speed, estimate.energyReport)
   const showPrep = hasPrepChecklist(estimate.productKind)
   const tenanted = !isBulkEnquiry && data.customerType === 'Landlord (tenanted)'
+  // Our promise (Abdul 24/10/2026): the lodgement line only where an EPC is lodged; terms section 7, #our-promise
+  const lodged = estimate.productKind === 'epc' || estimate.productKind === 'bundle'
+  const promiseLines = [
+    ...(lodged ? [`£${promise.lateLodgement} off if your EPC isn't on the GOV.UK register within 72 hours of the visit.`] : []),
+    `£${promise.lateChange} off if we move your visit with less than 24 hours' notice.`,
+  ]
+  // what the chosen service delivers (v7, approved 22/10/2026): the same list as the confirmation screen
+  const delivered = deliveredList(estimate.productKind, { improvementPlan: estimate.improvementPlan > 0, energyReport: estimate.energyReport })
   const prepUrl = `${SITE_URL}${PREP_PATH}`
 
   // Bulk has no single property and no agreed turnaround yet; an unlodged
@@ -180,6 +190,7 @@ function buildConfirmation(data: ParsedInput) {
     if (data.address) summary.push(['Addresses supplied', data.address])
     summary.push(['Turnaround', 'Agreed per property once quoted'])
   } else {
+    if (data.dwellingType) summary.push(['Property type', data.dwellingType])
     summary.push(['Floor area', areaLabel(data.areaBand || legacyArea(data.propertyType), data.floorArea)])
     summary.push(['Property', `${data.address}, ${data.postcode}`])
     summary.push(['Turnaround', estimate.isLodged
@@ -204,7 +215,7 @@ function buildConfirmation(data: ParsedInput) {
 
   const intro = isBulkEnquiry
     ? `Thanks for your enquiry with L&D Energy. We've received it. Abdul will be in touch during our opening hours (${OPENING_HOURS}) with volume rates for your portfolio.`
-    : `Thanks for your quote request with L&D Energy. We've received it. Abdul will be in touch during our opening hours (${OPENING_HOURS}) with your exact price and an available appointment.`
+    : `Thanks for your quote request with L&D Energy. We've received it. Abdul will reply the same working day with your exact price and an available appointment (opening hours ${OPENING_HOURS}).`
   const preheader = isBulkEnquiry
     ? 'Abdul will reply with volume rates for your portfolio.'
     : 'Abdul will reply with your exact price and available times.'
@@ -215,10 +226,12 @@ function buildConfirmation(data: ParsedInput) {
     `${intro}\n\n` +
     `Your request:\n` +
     summary.map(([k, v]) => `  ${k}: ${v}`).join('\n') +
+    (delivered.length ? `\n\nWhat you receive:\n${delivered.map(item => `  - ${item}`).join('\n')}` : '') +
     `\n\nWhat happens next:\n` +
     steps.map((step, i) => `  ${i + 1}. ${step}`).join('\n') +
-    (showPrep ? `\n\nBefore your visit:\n${prepChecklist.map(item => `  - ${item}`).join('\n')}\n  Full checklist: ${prepUrl}` : '') +
+    (showPrep ? `\n\nBefore your visit:\n${prepChecklist.map(item => `  - ${item}`).join('\n')}\n  Please read before your visit: ${prepUrl}` : '') +
     (tenanted ? `\n\nTenanted property? ${TENANT_NOTICE}` : '') +
+    (isBulkEnquiry ? '' : `\n\nOur promise:\n${promiseLines.map(l => `  - ${l}`).join('\n')}\n  How it works: ${SITE_URL}/terms#our-promise`) +
     `\n\nNeed us sooner, or want to change something? Reply to this email, call or text ${PHONE}, or message us on WhatsApp.\n\n` +
     `L&D Energy, Elmhurst and Quidos accredited Domestic Energy Assessor\n` +
     `Covering all 32 London boroughs · ${SITE_URL}\n\n` +
@@ -256,7 +269,7 @@ function buildConfirmation(data: ParsedInput) {
                   <ul style="margin:0 0 12px;padding:0 0 0 18px;font-size:14px;line-height:1.55;color:${INK}">
                     ${prepChecklist.map(item => `<li style="margin:0 0 6px">${escapeHtml(item)}</li>`).join('')}
                   </ul>
-                  <a href="${prepUrl}" style="font-size:14px;font-weight:700;color:${NAVY}">See the full checklist</a>
+                  <a href="${prepUrl}" style="font-size:14px;font-weight:700;color:${NAVY}">Please read before your visit</a>
                 </td></tr>
               </table>` : ''
 
@@ -307,10 +320,21 @@ function buildConfirmation(data: ParsedInput) {
                 </td></tr>
               </table>
 
+              <!-- What you receive -->
+              ${delivered.length ? `${sectionLabel('What you receive')}
+              <ul style="margin:0 0 24px;padding:0 0 0 18px;font-size:14px;line-height:1.55;color:${INK}">
+                ${delivered.map(item => `<li style="margin:0 0 6px">${escapeHtml(item)}</li>`).join('')}
+              </ul>` : ''}
+
               <!-- Next steps -->
               ${sectionLabel('What happens next')}
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 12px">${stepRows}</table>
-${prepBlock}${tenantBlock}
+${prepBlock}${tenantBlock}${isBulkEnquiry ? '' : `
+              ${sectionLabel('Our promise')}
+              <ul style="margin:0 0 8px;padding:0 0 0 18px;font-size:14px;line-height:1.55;color:${INK}">
+                ${promiseLines.map(l => `<li style="margin:0 0 6px">${escapeHtml(l)}</li>`).join('')}
+              </ul>
+              <p style="margin:0 0 24px;font-size:13px;line-height:1.5"><a href="${SITE_URL}/terms#our-promise" style="color:${NAVY}">How it works</a></p>`}
               <!-- CTA row -->
               <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 6px">
                 <tr>
@@ -356,6 +380,78 @@ ${prepBlock}${tenantBlock}
   return { text, html }
 }
 
+/** The general enquiry's notification: who, what about and the message; replying answers the sender. No customer confirmation. */
+function buildEnquiryEmail(data: EnquiryInput) {
+  const rows: Array<[string, string]> = [
+    ['Enquiry type', data.enquiryType],
+    ['Name', data.name],
+    ['Email', data.email],
+    ['Phone', data.phone || '—'],
+    ['Message', data.message],
+  ]
+  const text = rows.map(([k, v]) => `${k}: ${v}`).join('\n')
+  const html = `<!doctype html><html><body style="font-family:Inter,Arial,sans-serif;color:#1E293B;line-height:1.5">
+<h2 style="margin:0 0 16px;color:#0F172A">New website enquiry: ${escapeHtml(data.enquiryType)}</h2>
+<table cellpadding="8" cellspacing="0" border="0" style="border-collapse:collapse;width:100%;max-width:560px">
+${rows.map(([k, v]) => `<tr><td style="background:#F8FAFC;border:1px solid #E2E8F0;font-weight:600;width:32%">${escapeHtml(k)}</td><td style="border:1px solid #E2E8F0">${escapeHtml(v).replace(/\n/g, '<br>')}</td></tr>`).join('')}
+</table>
+<p style="margin-top:16px;font-size:12px;color:#64748B">Sent from the contact page on epc.luminousanddeliver.co.uk. Reply to this email to answer.</p>
+</body></html>`
+  return { text, html }
+}
+
+/**
+ * A general enquiry from /contact: the same checks as a quote request (size, origin, schema, honeypot, Turnstile) and
+ * the same Resend sender, but its own subject, prefixed with the enquiry type. Never "EPC booking:", which the
+ * booking follow-up scripts match on.
+ */
+async function handleEnquiry(req: Request, payload: unknown) {
+  const parsed = enquirySchema.safeParse(payload)
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Validation failed', issues: parsed.error.flatten() }, { status: 400 })
+  }
+  if (parsed.data.website) return NextResponse.json({ ok: true })
+
+  let cfEnv: Record<string, string> = {}
+  try { cfEnv = getRequestContext().env as Record<string, string> } catch { /* process.env when running locally */ }
+
+  const turnstileSecret = cfEnv.TURNSTILE_SECRET_KEY || process.env.TURNSTILE_SECRET_KEY
+  if (!turnstileSecret && process.env.NODE_ENV === 'production') {
+    console.error('[contact] TURNSTILE_SECRET_KEY is not configured in production.')
+    return NextResponse.json({ error: 'Messages are temporarily unavailable. Please call or WhatsApp us instead.' }, { status: 503 })
+  }
+  if (turnstileSecret) {
+    const clientIP = req.headers.get('CF-Connecting-IP') || req.headers.get('X-Forwarded-For')?.split(',')[0]?.trim() || ''
+    if (!(await verifyTurnstile(parsed.data.turnstileToken, turnstileSecret, clientIP))) {
+      return NextResponse.json({ error: 'Security verification failed. Please refresh and try again.', code: 'security' }, { status: 400 })
+    }
+  }
+
+  const apiKey = cfEnv.RESEND_API_KEY || process.env.RESEND_API_KEY
+  if (!apiKey) {
+    console.error('[contact] RESEND_API_KEY is not configured.')
+    return NextResponse.json({ error: 'Messages are temporarily unavailable. Please call or WhatsApp us instead.' }, { status: 503 })
+  }
+  const from = (cfEnv.RESEND_FROM || process.env.RESEND_FROM || FROM_DEFAULT).replace('@epc.luminousanddeliver.co.uk', '@luminousanddeliver.co.uk')
+  const to = cfEnv.RESEND_TO || process.env.RESEND_TO || NOTIFY_TO
+  const { text, html } = buildEnquiryEmail(parsed.data)
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from, to, reply_to: parsed.data.email, subject: `${parsed.data.enquiryType}: website enquiry from ${parsed.data.name}`, text, html }),
+    })
+    if (!res.ok) {
+      console.error('[contact] Resend error (enquiry)', res.status, await res.text())
+      return NextResponse.json({ error: 'We could not send your message right now. Please call us on 07492 575 396.' }, { status: 502 })
+    }
+  } catch (err) {
+    console.error('[contact] Resend fetch failed (enquiry)', err)
+    return NextResponse.json({ error: 'Network error. Please try again or call us on 07492 575 396.' }, { status: 502 })
+  }
+  return NextResponse.json({ ok: true, delivered: true })
+}
+
 const MAX_BODY_BYTES = 10_000
 const ALLOWED_ORIGINS = [
   'https://epc.luminousanddeliver.co.uk',
@@ -381,6 +477,11 @@ export async function POST(req: Request) {
     payload = JSON.parse(raw)
   } catch {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+  }
+
+  // a general enquiry from /contact carries kind: 'enquiry'; everything else is a quote request
+  if (typeof payload === 'object' && payload !== null && (payload as { kind?: unknown }).kind === 'enquiry') {
+    return handleEnquiry(req, payload)
   }
 
   const parsed = contactSchema.safeParse(payload)
@@ -443,6 +544,7 @@ export async function POST(req: Request) {
     address: parsed.data.address,
     postcode: parsed.data.postcode,
     propertyType: parsed.data.propertyType,
+    dwellingType: parsed.data.services.includes('Bulk / Agency Enquiry') ? undefined : parsed.data.dwellingType || undefined,
     areaBand: parsed.data.areaBand || legacyArea(parsed.data.propertyType),
     floorArea: parsed.data.services.includes('Bulk / Agency Enquiry') ? undefined : parsed.data.floorArea || undefined,
     floorAreaUnknown: parsed.data.floorAreaUnknown,

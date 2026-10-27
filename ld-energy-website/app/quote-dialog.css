@@ -1,0 +1,68 @@
+/* The quote dialog (components/forms/QuoteDialog.tsx): the homepage's paper, ink and sage, a serif title, hairlines.
+   A centred sheet on desktop, the full screen on phones. Only opacity and transform animate, and not at all under
+   reduced motion. The form inside takes the homepage's v7 look from app/booking-v7.css (.bk7). */
+html.qd-locked { overflow: hidden; padding-right: var(--qd-gap, 0px); }
+
+.qd {
+  --qd-pad: 20px;
+  box-sizing: border-box; width: min(1120px, calc(100vw - 48px)); max-width: none; max-height: calc(100dvh - 48px);
+  margin: auto; padding: 0; border: 1px solid var(--hair); border-radius: 10px; background: var(--ground); color: var(--ink);
+  box-shadow: 0 24px 80px rgba(11, 21, 40, .28); overflow-y: auto; overscroll-behavior: contain;
+  font: 400 17px/1.6 var(--font-sans); -webkit-font-smoothing: antialiased;
+}
+.qd[open] { animation: qd-in .32s var(--ease-out) both; }
+.qd::backdrop { background: rgba(11, 21, 40, .56); }
+.qd[open]::backdrop { animation: qd-fade .32s var(--ease-out) both; }
+@keyframes qd-in { from { opacity: 0; transform: translateY(14px) scale(.985); } }
+@keyframes qd-fade { from { opacity: 0; } }
+@media (min-width: 760px) { .qd { --qd-pad: 40px; } }
+
+.qd__bar {
+  position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 14px var(--qd-pad); background: var(--ground); border-bottom: 1px solid var(--hair);
+}
+.qd__head { display: grid; gap: 2px; min-width: 0; }
+.qd__eyebrow { margin: 0; font: 500 12px/1.4 var(--font-sans); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-quiet); }
+.qd__title { margin: 0; font: 400 24px/1.15 var(--font-serif); letter-spacing: -.01em; color: var(--ink); }
+.qd__title:focus { outline: none; }
+.qd__title:focus-visible { outline: 2px solid var(--sage-700); outline-offset: 3px; border-radius: 2px; }
+@media (min-width: 760px) { .qd__title { font-size: 30px; } }
+.qd__x {
+  display: inline-flex; flex: none; align-items: center; justify-content: center; width: 48px; height: 48px;
+  border: 1px solid var(--hair-strong); border-radius: 999px; background: transparent; color: var(--ink); cursor: pointer;
+  transition: border-color .15s, color .15s;
+}
+.qd__x:hover { border-color: var(--sage-700); color: var(--sage-700); }
+.qd__x:focus-visible { outline: 2px solid var(--sage-700); outline-offset: 3px; }
+
+.qd__body { padding: 16px var(--qd-pad) 28px; }
+.qd__by { margin: 0; font-size: 15px; line-height: 1.5; color: var(--ink-quiet); }
+.qd__by a { color: var(--sage-700); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.qd__loading { margin: 32px 0; font-size: 16px; color: var(--ink-quiet); }
+.qd__page { margin: 24px 0 0; padding-top: 16px; border-top: 1px solid var(--hair); font-size: 15px; }
+.qd__page a { color: var(--ink-quiet); text-decoration: underline; text-underline-offset: 3px; }
+.qd__page a:hover { color: var(--ink); }
+
+/* the form: no rule above it (the bar carries the title), and its own step heading a size down */
+.qd .bk7 .qc { margin-top: 4px; border-top: 0; }
+.qd .bk7 .bf__head { padding-top: 12px; }
+
+@media (max-width: 759px) {
+  .qd { width: 100%; height: 100dvh; max-height: 100dvh; margin: 0; border: 0; border-radius: 0; box-shadow: none; }
+  @keyframes qd-in { from { opacity: 0; transform: translateY(24px); } }
+  .qd__bar { padding-top: calc(10px + env(safe-area-inset-top, 0px)); padding-bottom: 10px; }
+  .qd__body { padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .qd[open], .qd[open]::backdrop { animation: none; }
+}
+
+/* the exit (motion proposal 24/10 §2.8): QuoteDialog.tsx sets data-closing, waits for qd-out, then closes. About 60% of
+   the 320 ms entrance, on the mirrored curve, so the page under it is where the visitor left it. */
+.qd[open][data-closing] { animation: qd-out 180ms var(--ease-in) both; }
+.qd[open][data-closing]::backdrop { animation: qd-fade-out 180ms var(--ease-in) both; }
+@keyframes qd-out { to { opacity: 0; transform: translateY(8px); } }
+@keyframes qd-fade-out { to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .qd[open][data-closing], .qd[open][data-closing]::backdrop { animation: none; }
+}

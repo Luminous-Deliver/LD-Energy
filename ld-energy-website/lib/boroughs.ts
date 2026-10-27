@@ -765,32 +765,34 @@ export const areaServedLondon = [
 ]
 
 /**
- * Boroughs surfaced in the footer's Service Areas strip.
+ * Boroughs surfaced in the footer's area links.
  *
  * A curated subset rather than all 34, deliberately: a sitewide footer linking
  * every borough produces 34 near-identical anchors on every page of the site,
  * which is boilerplate that dilutes both anchor text and the equity each link
  * carries. Twelve links pass meaningfully more each.
  *
- * Discovery of the full set is not affected — /areas server-renders all 34 as
- * real links, and every borough is in the sitemap. This is the standard
- * hub-and-spoke shape: footer -> priority areas + hub, hub -> everything.
+ * Discovery of the full set is not affected: /areas server-renders all 34 as
+ * real links, and every borough is in the sitemap.
  *
- * Ordered by commercial priority, anchored on the Stratford E15 base.
+ * Stratford first as the base (Abdul's choice, 23/10/2026), then the 11 area
+ * pages with the most Search Console impressions in the 22/10/2026 content
+ * inventory, §4.1, highest first (plan PLAN-AREAS-GUIDES-2026-10-22 §2).
+ * Re-derive the 11 from fresh Search Console data rather than editing by hand.
  */
 export const priorityBoroughSlugs = [
   'stratford',
-  'newham',
-  'tower-hamlets',
-  'hackney',
+  'croydon',
+  'wandsworth',
   'waltham-forest',
-  'redbridge',
-  'barking-dagenham',
   'greenwich',
-  'lewisham',
-  'islington',
-  'southwark',
+  'lambeth',
+  'brent',
+  'tower-hamlets',
   'camden',
+  'barking-dagenham',
+  'newham',
+  'ealing',
 ] as const
 
 export const priorityBoroughs = priorityBoroughSlugs

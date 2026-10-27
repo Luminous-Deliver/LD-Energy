@@ -1,14 +1,12 @@
-import { quoteHref } from '@/lib/quote-context'
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { Section } from '@/components/ui/Section'
-import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
-import { PageHero } from '@/components/sections/PageHero'
-import { CtaStrip } from '@/components/sections/CtaStrip'
-import { PostCard } from '@/components/blog/PostCard'
+import { ArrowRight, Clock } from 'lucide-react'
+import { GuideCrumbs } from '@/components/blog/GuideCrumbs'
+import { InnerEnding } from '@/components/inner/InnerEnding'
 import { categories, getCategory } from '@/lib/blog-categories'
 import { getPostsByCategory } from '@/lib/blog'
-import { site, priceFrom, defaultOgImage } from '@/lib/site'
+import { site, defaultOgImage } from '@/lib/site'
 
 interface PageProps {
   params: Promise<{ category: string }>
@@ -52,7 +50,7 @@ export default async function BlogCategoryPage({ params }: PageProps) {
 
   const breadcrumbs = [
     { href: '/', label: 'Home' },
-    { href: '/blog', label: 'Blog' },
+    { href: '/blog', label: 'Guides' },
     { href: `/blog/category/${cat.slug}`, label: cat.name },
   ]
 
@@ -90,34 +88,59 @@ export default async function BlogCategoryPage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify([breadcrumbSchema, collectionSchema]) }}
       />
-      <BreadcrumbNav items={breadcrumbs} />
-      <PageHero
-        eyebrow="EPC Blog"
-        heading={`${cat.name}: EPC Guides for London`}
-        subheading={cat.description}
-        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'blog', ctaId: 'hero' }) }}
-      />
-
-      <Section variant="default">
-        {posts.length === 0 ? (
-          <p className="text-secondary-700">No posts in this category yet, check back soon.</p>
-        ) : (
-          <>
-            <h2 className="mb-6 text-2xl md:text-3xl font-bold tracking-tight text-secondary-900">All {cat.name} guides</h2>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {posts.map((p) => (
-                <PostCard key={p.slug} post={p} />
+      <div className="gd">
+        <header className="gd-hub-hero">
+          <div className="gd-w gd-hub-hero__in">
+            <GuideCrumbs items={breadcrumbs} />
+            <p className="gd-eyebrow">EPC guides</p>
+            <h1>{`${cat.name}: EPC Guides for London`}</h1>
+            <p className="gd-hub-hero__lede">{cat.description}</p>
+            <nav className="gd-cats" aria-label="Guide topics">
+              {categories.map((c) => (
+                <Link key={c.slug} href={`/blog/category/${c.slug}`} aria-current={c.slug === cat.slug ? 'page' : undefined}>
+                  {c.name}
+                </Link>
               ))}
-            </div>
-          </>
-        )}
-      </Section>
-
-      <CtaStrip
-        heading="Need an EPC? Get your exact quote."
-        body={`Elmhurst and Quidos accredited assessor. Guide prices from £${priceFrom.epc}. Lodged within 72 hours.`}
-        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'blog', ctaId: 'bottom' }) }}
-      />
+            </nav>
+          </div>
+        </header>
+        <section className="gd-w gd-all" aria-labelledby="cat-list">
+          {posts.length === 0 ? (
+            <p>No guides in this topic yet. <Link href="/blog" className="gd-link">See every guide</Link></p>
+          ) : (
+            <>
+              <div className="gd-all__h">
+                <h2 id="cat-list">{`All ${cat.name} guides`}</h2>
+                <p>
+                  <span className="num">{posts.length}</span> {posts.length === 1 ? 'guide' : 'guides'}, written by your assessor.{' '}
+                  <Link href="/blog" className="gd-link">See every guide</Link>
+                </p>
+              </div>
+              <ol className="gd-list">
+                {posts.map((p, i) => (
+                  <li key={p.slug}>
+                    <Link href={`/blog/${p.slug}`} className="gd-row">
+                      <span className="gd-row__n num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                      <span className="gd-row__b">
+                        <b>{p.title}</b>
+                        <span className="gd-row__d">{p.description}</span>
+                      </span>
+                      <span className="gd-row__m">
+                        <Clock width={14} height={14} aria-hidden="true" />
+                        <span>
+                          <span className="num">{p.readingTime}</span> min
+                        </span>
+                      </span>
+                      <ArrowRight className="gd-arrow" width={18} height={18} aria-hidden="true" />
+                    </Link>
+                  </li>
+                ))}
+              </ol>
+            </>
+          )}
+        </section>
+      </div>
+      <InnerEnding variant="a" source="blog" />
     </>
   )
 }

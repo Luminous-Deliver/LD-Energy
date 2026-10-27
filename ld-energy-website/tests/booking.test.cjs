@@ -9,7 +9,7 @@ const { POST } = require('../app/api/contact/route.ts')
 const { boroughMeta } = require('../lib/boroughs.ts')
 const { sourcePages, ctaIds, customerTypeForSource } = require('../lib/enquiry-attribution.ts')
 
-const sample = { name: 'Test Customer', email: 'test@example.invalid', phone: '07000000000', address: '1 Test Road', postcode: 'E15 1AA', areaBand: '55-75', services: ['EPC Certificate'], customerType: 'Homeowner', speed: 'Standard (72 hours)', consent: true, turnstileToken: 'mock-token', website: '' }
+const sample = { name: 'Test Customer', email: 'test@example.invalid', phone: '07000000000', address: '1 Test Road', postcode: 'E15 1AA', areaBand: '55-75', dwellingType: 'Flat', services: ['EPC Certificate'], customerType: 'Homeowner', speed: 'Standard (72 hours)', consent: true, turnstileToken: 'mock-token', website: '' }
 
 test('every service and band retains prices and eligible extras; unknown and absent area never have a total', () => {
   for (const [service, label] of Object.entries(quoteServices)) {
@@ -286,7 +286,7 @@ test('contact API security, recalculation and both email representations with de
       assert.match(body, /What happens next/)
       assert.match(body, /on the day of the visit/)
       assert.match(body, /Before your visit/)
-      assert.match(body, /preparing-for-your-epc#what-to-have-ready/)
+      assert.match(body, /preparing-for-your-epc#please-read/)
       assert.match(body, /Booking as/)
     }
     assert.doesNotMatch(messages[1].html, /&#128222;/)
@@ -299,10 +299,10 @@ test('contact API security, recalculation and both email representations with de
       assert.doesNotMatch(messages[1].html, /Before your visit/)
     }
     messages = []
-    assert.equal((await request({ ...sample, customerType: 'Landlord (tenanted)', preferredDate: '2026-10-07', notes: 'Key with <neighbour>' })).status, 200)
+    assert.equal((await request({ ...sample, customerType: 'Landlord (tenanted)', preferredDate: '2099-10-07', notes: 'Key with <neighbour>' })).status, 200)
     assert.match(messages[1].html, /Tenanted property\?/)
-    assert.match(messages[1].text, /Preferred date: 07\/10\/2026/)
-    assert.match(messages[0].text, /Preferred Date: 07\/10\/2026/)
+    assert.match(messages[1].text, /Preferred date: 07\/10\/2099/)
+    assert.match(messages[0].text, /Preferred Date: 07\/10\/2099/)
     assert.match(messages[1].html, /Key with &lt;neighbour&gt;/)
 
     // The response says whether the customer's copy actually went, so the page never claims it did when it did not.

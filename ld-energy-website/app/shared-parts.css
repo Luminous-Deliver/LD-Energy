@@ -1,0 +1,265 @@
+/* Shared parts: the header, the phone menu and the phone dock, ported from the approved homepage
+   prototype v7.2 (projects/ld-energy-redesign-2026-10/scrollcraft/builds/home, Abdul 22/10/2026: "so far v7.2
+   looks fine"). The footer keeps the live structure with these tokens
+   (components/layout/CompactFooter.tsx) until Abdul's footer brief. Every page gets these; page bodies keep their own styles until their slice. Kept in its own file,
+   imported after globals.css, so the other redesign branches that append to globals.css merge cleanly.
+
+   Tokens are the prototype's tokens.css. Contrast on the ground (#FCFBF8): ink 11.2:1, ink quiet 7.2:1, sage 700
+   6.7:1, white on sage 700 6.9:1, the outline button's slate 500 edge 4.5:1. On night (#0B1528): stone 100 15.8:1,
+   sage 300 11.0:1, stone 300 11.6:1, stone 400 7.9:1. */
+:root {
+  --slate-500: #6D738D; --slate-600: #4F546B; --slate-700: #33384F; --slate-950: #0B1528;
+  --sage-300: #B7CEC1; --sage-600: #4F7A64; --sage-700: #3A624E; --sage-800: #2C4A3B;
+  --stone-50: #FCFBF8; --stone-100: #F1EFE8;
+  --ground: var(--stone-50);
+  --ink: var(--slate-700);
+  --ink-quiet: var(--slate-600);
+  --night: var(--slate-950);
+  --on-night: var(--stone-100);
+  --link-on-night: var(--sage-300);
+  --hair: rgba(51, 56, 79, .16);          /* the only divider */
+  --hair-strong: rgba(51, 56, 79, .42);   /* frames, and the edge over the dock */
+  --r-sm: 6px;
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+  /* motion tokens (motion proposal 24/10, Considered): one family. Arrivals ease out, exits ease in on the same curve's
+     mirror and take about 60% of the entrance. The pill keeps its measured cubic-bezier(.23, 1, .32, 1). */
+  --ease-in: cubic-bezier(.64, 0, .78, 0);
+  --t-hover: 150ms;
+  --t-small: 220ms;
+  --t-sheet: 320ms;
+  --t-reveal: 480ms;
+  --head-h: 56px;
+  --dock-h: 68px;                          /* 48 px buttons + 10 px above and below */
+  /* homepage CSS still names the old sans variable */
+  --font-inter: var(--font-sans);
+}
+@media (min-width: 760px) { :root { --head-h: 64px; } }
+
+/* The serif ships at 400 only (opsz axis, no wght): the prototype sets every serif at 400. Without this the
+   browser would fake bold for the pages' old 500-700 headings. */
+html { font-synthesis-weight: none; }
+@media (max-width: 759px) {
+  /* keep focused controls and anchor targets clear of the dock (WCAG 2.4.11) */
+  html { scroll-padding-bottom: calc(var(--dock-h) + 20px + env(safe-area-inset-bottom, 0px)); }
+}
+
+/* ------------------------------------------------------------------ buttons -- */
+.ld-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 22px;
+  font: 500 17px/1 var(--font-sans); letter-spacing: .01em; white-space: nowrap; border-radius: var(--r-sm);
+  border: 1px solid transparent; text-decoration: none; cursor: pointer; color: var(--ink); background: none;
+  transition: transform 160ms var(--ease-out), background-color var(--t-hover) var(--ease-out), border-color var(--t-hover) var(--ease-out), color var(--t-hover) var(--ease-out); }
+.ld-btn:active { transform: scale(.97); }
+.ld-btn--primary { background: var(--sage-700); color: #fff; }
+.ld-btn--primary:hover { background: var(--sage-800); }
+.ld-btn--line { border-color: var(--slate-500); }
+.ld-btn--line:hover { border-color: var(--ink); }
+.ld-btn--sm { min-height: 40px; padding: 0 16px; font-size: 15px; }
+@media (max-width: 759px) { .ld-btn--sm { min-height: 44px; } }
+.ld-btn .i { flex: none; }
+:is(.sh, .dock, .mnav) :focus-visible { outline: 2px solid var(--sage-700); outline-offset: 3px; box-shadow: none; --tw-ring-shadow: 0 0 #0000; }
+
+/* one label, two lengths: the outcome on wide screens, short where width is tight */
+.lbl-s { display: none; }
+@media (max-width: 1099px) { .lbl-l { display: none; } .lbl-s { display: inline; } }
+
+/* ------------------------------------------------------------------- header -- */
+/* L1: a flat bar, a hairline, no shadow. In the flow at every width: on phones it scrolls away and the dock is the
+   one sticky thing; from 760 px the scroll pill replaces it (Abdul 23/10/2026, after nateherk.com). Transparent at the top, the paper ground and the hairline once the
+   page moves (design preferences, navbar pattern 1). */
+.sh { position: relative; z-index: 40; height: var(--head-h); padding-top: 1px; background: transparent;
+  border-bottom: 1px solid transparent; transition: background-color .3s var(--ease-out), border-color .3s var(--ease-out); }
+.sh[data-solid="true"] { background: var(--ground); border-bottom-color: var(--hair); }
+/* phones (Abdul 24/10, "yes", after nateherk.com on a phone): the bar scrolls away as on desktop and the compact pill
+   docks (replacing that morning's pinned hide-on-scroll bar). The dock at the foot is untouched. Pinned bars sit under
+   the docked pill via html[data-head="pill"]: 10 px + 48 px + 8 px. */
+@media (max-width: 759px) {
+  html[data-head="pill"] .in-secbar[data-on="true"] { transform: translateY(66px); }
+  html[data-head="pill"] .gd-toc { top: 66px; }
+  .gd-toc { transition: top .28s var(--ease-out); }
+}
+/* From 760 px the bar scrolls away with the page and the pill (.pill, below) takes over once the reader is in. */
+.sh__in { height: 100%; display: flex; align-items: center; gap: 12px; }
+@media (min-width: 760px) { .sh__in { gap: 32px; } }
+.sh__nav { display: none; }
+.sh__quote { margin-left: auto; }
+@media (min-width: 760px) {
+  .sh__nav { display: block; margin-left: auto; }
+  .sh__nav ul { display: flex; gap: 32px; margin: 0; padding: 0; list-style: none; }
+  .sh__nav a { display: inline-flex; align-items: center; min-height: 44px; font-size: 15px; color: var(--ink); text-decoration: none; }
+  .sh__nav a:hover, .sh__nav a[aria-current="page"] { color: var(--sage-700); }
+  .sh__quote { margin-left: 8px; }
+}
+@media (min-width: 760px) and (max-width: 899px) { .sh__in { gap: 24px; } .sh__nav ul { gap: 22px; } }
+/* WhatsApp in the bar from 1200 px, where the number used to be (Abdul 22/10: the number was "too easily and early") */
+.sh__wa { display: none; }
+@media (min-width: 1200px) {
+  .sh__wa { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin-left: 8px; font-size: 15px; font-weight: 500;
+    color: var(--ink); text-decoration: none; white-space: nowrap; }
+  .sh__wa:hover { color: var(--sage-700); }
+}
+/* the menu button: phones only, where the bar has no links */
+.sh__menu { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 44px; height: 44px; margin-right: -8px;
+  border: 0; border-radius: var(--r-sm); background: none; color: var(--ink); cursor: pointer; }
+.sh__menu:hover { color: var(--sage-700); }
+@media (min-width: 760px) { .sh__menu { display: none; } }
+@media (max-width: 389px) {
+  .sh__in { gap: 10px; }
+  .sh .ld-btn--sm { padding: 0 11px; font-size: 14px; }
+}
+/* phones: the logo and the menu only (Abdul 23/10/2026: the bar looked squished with the button in it). The hero,
+   the dock and the homepage's price bar carry the quote action. */
+@media (max-width: 759px) { .sh__quote { display: none; } .sh__menu { margin-left: auto; } }
+
+/* Logo A, nav option 1 (Abdul 23/10, "a step heavier"): the navy outline thickened by a same-colour stroke in
+   ld-energy-mark-nav.svg (paths untouched, leaf and roof as drawn), house 38 px, name Jost SemiBold 19 px.
+   Was (BRIEF § v6.1, locked 21/10): the master lockup's two lines as live Jost beside the full-weight house,
+   his traced geometry untouched (public/brand/ld-energy-mark-full.svg). Name .07em, tagline .17em, 10 px to the
+   house: about 197 px on desktop, 174 px on phones. The two text lines share one measure. */
+.lg { display: inline-flex; align-items: center; flex: none; min-height: 44px; color: var(--ink); text-decoration: none; }
+/* L1 (Abdul 23/10/2026, "Quieter, same lockup"): house 32 px, name 16 px on desktop so the nav reads as its equal;
+   phones keep their size. */
+.lg__mark { display: block; height: 32px; width: auto; flex: none; }
+.lg__words { display: grid; justify-items: start; gap: 7px; margin-left: 10px; }   /* 12 + 7 + 7 = 26: (32 - 26) / 2 is whole */
+.lg__name, .lg__tag { text-transform: uppercase; white-space: nowrap; }
+/* option 2 (Abdul 23/10/2026, premium board): L&D Bold 700, ENERGY Regular 400, same tracking; was one weight, 600 */
+.lg__name b, .pill__home b { font-weight: 700; }
+.lg__name { --t: .06em; font: 400 16px/12px var(--font-sans); letter-spacing: var(--t); margin-right: calc(-1 * var(--t)); color: var(--ink); }
+.lg__tag { --t: .17em; font: 600 9px/7px var(--font-sans); letter-spacing: var(--t); margin-right: calc(-1 * var(--t)); color: var(--sage-700); }
+/* P1 (Abdul 23/10/2026, "P1 · smaller"): phones take L1's proportions so phone and desktop match, house 28 px,
+   name 14.5 px. 11 + 5 + 6 = 22: (28 - 22) / 2 is whole. Was house 33 px, name 17 px. */
+@media (max-width: 759px) {
+  .lg__mark { height: 28px; }
+  .lg__words { gap: 5px; margin-left: 9px; }
+  .lg__name { font-size: 14.5px; line-height: 11px; }
+  .lg__tag { font-size: 8.5px; line-height: 6px; --t: .16em; }
+}
+
+/* --------------------------------------------------------------- phone menu -- */
+.mnav { position: fixed; inset: 0; z-index: 50; }
+.mnav[data-open="false"] { pointer-events: none; }
+.mnav__scrim { position: absolute; inset: 0; background: rgba(11, 21, 40, .5); opacity: 0; transition: opacity .2s var(--ease-out); }
+.mnav[data-open="true"] .mnav__scrim { opacity: 1; }
+.mnav__panel { position: absolute; top: 0; right: 0; height: 100%; width: 100%; max-width: 400px; overflow-y: auto; display: flex; flex-direction: column;
+  background: var(--ground); color: var(--ink); border-left: 1px solid var(--hair); transform: translateX(100%); transition: transform .26s var(--ease-out); }
+.mnav[data-open="true"] .mnav__panel { transform: none; }
+.mnav__top { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; justify-content: space-between; min-height: var(--head-h);
+  padding: 0 16px; background: var(--ground); border-bottom: 1px solid var(--hair); }
+.mnav__group { padding: 12px 16px 4px; }
+.mnav__group + .mnav__group { border-top: 1px solid var(--hair); }
+.mnav__h { margin: 8px 0 4px; font: 500 12px/1.4 var(--font-sans); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-quiet); }
+.mnav ul { margin: 0; padding: 0; list-style: none; }
+.mnav li a { display: flex; flex-direction: column; justify-content: center; min-height: 48px; padding: 6px 0; color: var(--ink); text-decoration: none; font-size: 17px; }
+.mnav li a span + span { font-size: 15px; color: var(--ink-quiet); }
+.mnav li a:hover { color: var(--sage-700); }
+.mnav__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 6px 0 12px; }
+.mnav .mnav__grid a { flex-direction: row; align-items: center; justify-content: space-between; min-height: 52px; padding: 0 14px;
+  border: 1px solid var(--hair); border-radius: 10px; background: rgba(255, 255, 255, .55); font-size: 16px; transition: border-color .15s, color .15s; }
+.mnav .mnav__grid a::after { content: ""; width: 7px; height: 7px; border-top: 1.5px solid currentColor; border-right: 1.5px solid currentColor;
+  transform: rotate(45deg); opacity: .45; margin-right: 2px; }
+.mnav .mnav__grid a:hover { border-color: var(--sage-700); }
+.mnav .mnav__grid a[aria-current="page"] { border-color: var(--sage-700); color: var(--sage-700); font-weight: 500; }
+.mnav__foot { margin-top: auto; display: grid; gap: 10px; padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--hair-strong); }
+.mnav__foot .ld-btn { width: 100%; }
+.mnav__foot .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* -------------------------------------------------------------- phone dock --- */
+/* WhatsApp and "Get my exact quote" at the bottom of phone screens (AZRated research §5, plan §15 row 7): shown
+   once the hero has gone, hidden over a booking form, the footer, a cookie banner and the open menu. Flat, the
+   paper ground with a hairline above, as the prototype's quote bar. */
+.dock { display: none; }
+@media (max-width: 759px) {
+  .dock { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); gap: 10px; position: fixed; z-index: 40; left: 0; right: 0; bottom: 0;
+    padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+    background: var(--ground); border-top: 1px solid var(--hair-strong);
+    transform: translateY(105%); visibility: hidden;
+    transition: transform .3s var(--ease-out), visibility 0s linear .3s; }
+  .dock[data-on="true"] { transform: none; visibility: visible; transition: transform .3s var(--ease-out), visibility 0s; }
+  .dock .ld-btn { width: 100%; padding: 0 12px; font-size: 16px; }
+  .dock--one { grid-template-columns: minmax(0, 1fr); }
+  /* the dock never covers the end of a page: the last content clears it (the homepage close runs into the footer) */
+  main { padding-bottom: calc(var(--dock-h) + env(safe-area-inset-bottom, 0px)); }
+  body:has(.hc-close) main { padding-bottom: 0; }
+}
+@media (max-width: 759px) and (prefers-reduced-motion: reduce) {
+  /* no slide: a short fade, so the dock still arrives without moving */
+  .dock { transform: none; opacity: 0; transition: opacity .15s linear, visibility 0s linear .15s; }
+  .dock[data-on="true"] { opacity: 1; transition: opacity .15s linear, visibility 0s; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sh, .mnav__scrim, .mnav__panel, .ld-btn { transition-duration: 0s; }
+  .ld-btn:active { transform: none; }
+}
+
+/* dusk (23/10): the bar over the homepage hero, light on dark until the page moves */
+.lg__mark--rev { display: none; }
+.sh[data-dark="true"] { color: #F4F1EA; }
+.sh[data-dark="true"] .lg__mark:not(.lg__mark--rev) { display: none; }
+.sh[data-dark="true"] .lg__mark--rev { display: block; }
+.sh[data-dark="true"] .lg__name, .sh[data-dark="true"] .sh__nav a, .sh[data-dark="true"] .sh__wa { color: #F4F1EA; }
+.sh[data-dark="true"] .lg__tag { color: #A9C7AE; }
+.sh[data-dark="true"] .sh__quote { color: #F4F1EA; border-color: rgba(244, 241, 234, .65); background: transparent; }
+.sh[data-dark="true"] .sh__quote:hover { background: rgba(244, 241, 234, .1); }
+.sh[data-dark="true"] .mnav__toggle, .sh[data-dark="true"] button { color: #F4F1EA; }
+
+/* ------------------------------------------------------- scroll pill + line -- */
+/* Abdul 23/10/2026: "look at nateherk.com, how when you scroll down nav becomes a pill and there is the scroll line
+   at the top". Measured there: a separate fixed pill, 48 px, radius 999, frosted paper (blur 16 px, saturate 1.3),
+   slides down 0.56 s on cubic-bezier(.23, 1, .32, 1) with a 0.42 s fade once the reader is past the hero; a 3 px
+   gradient line with a soft glow fills left to right with the page. Ours: the brand's sage to leaf, desktop pill only
+   (the dock is the phone's one floating bar), the line at every width. */
+.pill__menu { display: none; }
+@media all {
+  .pill { display: flex; align-items: center; gap: 4px; position: fixed; z-index: 45; top: 14px; left: 50%; width: max-content; height: 52px;
+    padding: 0 6px; border-radius: 999px; border: 1px solid rgba(51, 56, 79, .1);
+    background: rgba(252, 251, 248, .74); -webkit-backdrop-filter: blur(16px) saturate(1.3); backdrop-filter: blur(16px) saturate(1.3);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .9), 0 8px 28px rgba(11, 21, 40, .1), 0 1px 3px rgba(11, 21, 40, .06);
+    transform: translate(-50%, -76px); opacity: 0; visibility: hidden;
+    transition: transform .56s cubic-bezier(.23, 1, .32, 1), opacity .42s cubic-bezier(.23, 1, .32, 1), visibility 0s linear .56s; }
+  .pill[data-on="true"] { transform: translate(-50%, 0); opacity: 1; visibility: visible;
+    transition: transform .56s cubic-bezier(.23, 1, .32, 1), opacity .42s cubic-bezier(.23, 1, .32, 1), visibility 0s; }
+  /* flex: none, so the name never shrinks under the links (at 1027 px "ENERGY" ran into Landlords, Abdul 24/10) */
+  /* polish (Abdul 24/10, beside nateherk.com's pill): the name sits in its own white chip inside the frosted pill, an
+     even 6 px inset all round, instead of behind a divider; the page you are on gets a faint sage fill */
+  .pill__home { flex: none; display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 14px 0 10px; margin-right: 6px;
+    border-radius: 999px; background: #fff; box-shadow: 0 0 0 1px rgba(51, 56, 79, .08), 0 1px 2px rgba(11, 21, 40, .06);
+    color: var(--ink); text-decoration: none; transition: box-shadow .2s var(--ease-out); }
+  .pill__home:hover { box-shadow: 0 0 0 1px rgba(58, 98, 78, .35), 0 1px 2px rgba(11, 21, 40, .06); }
+  .pill__home img { display: block; height: 24px; width: auto; }
+  .pill__home span { --t: .06em; font: 400 13px/1 var(--font-sans); letter-spacing: var(--t); text-transform: uppercase; white-space: nowrap; }
+  .pill ul { display: flex; margin: 0; padding: 0; list-style: none; }
+  .pill ul a { display: inline-flex; align-items: center; min-height: 40px; padding: 0 12px; border-radius: 999px; font-size: 15px;
+    color: var(--ink); text-decoration: none; transition: background-color .2s var(--ease-out), color .2s var(--ease-out); }
+  .pill ul a:hover { background: rgba(51, 56, 79, .06); }
+  .pill ul a[aria-current="page"] { color: var(--sage-700); background: rgba(58, 98, 78, .08); }
+  .pill .ld-btn { min-height: 40px; margin-left: 6px; padding: 0 18px; border-radius: 999px; font-size: 15px; }
+  .pill :focus-visible { outline: 2px solid var(--sage-700); outline-offset: 2px; }
+}
+@media (min-width: 760px) and (max-width: 899px) { .pill__home span { display: none; } .pill ul a { padding: 0 9px; } }
+/* phones: the mark, Landlords, Pricing and the menu, 48 px tall, 10 px down; the quote button stays on the dock */
+@media (max-width: 759px) {
+  .pill { top: 10px; height: 48px; padding: 0 4px; gap: 2px; }
+  .pill__home { min-height: 38px; padding: 0 10px; margin-right: 2px; }
+  .pill__home span, .pill .ld-btn, .pill li:not([data-phone]) { display: none; }
+  .pill ul a { min-height: 38px; padding: 0 11px; font-size: 15px; }
+  .pill__menu { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; margin-left: 2px;
+    border: 0; border-radius: 999px; background: transparent; color: var(--ink); cursor: pointer; }
+  .pill__menu:hover { background: rgba(51, 56, 79, .06); }
+}
+
+.sline { position: fixed; z-index: 60; top: 0; left: 0; width: 100%; height: 4px; pointer-events: none;
+  background: var(--sage-700); transform: scaleX(0); transform-origin: 0 50%; will-change: transform; }
+/* second pass (Abdul 23/10: "too subtle"): the How it works line's grammar. A hairline track the fill runs along, shown
+   once the page moves, and a round marker with a soft ring at the fill's tip */
+.sline-track { position: fixed; z-index: 59; top: 0; left: 0; width: 100%; height: 4px; pointer-events: none;
+  background: rgba(51, 56, 79, .12); opacity: 0; transition: opacity .3s var(--ease-out); }
+.sline-track[data-on="true"] { opacity: 1; }
+/* the round marker went 24/10: at the screen's top edge it was cut in half and sat on the logo as a dot (Abdul's phone
+   screenshot); a plain bar, as on nateherk.com */
+@media (prefers-reduced-motion: reduce) { .sline-track { transition: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  /* no slide: the pill fades in place */
+  .pill, .pill[data-on="true"] { transform: translate(-50%, 0); transition: opacity .15s linear, visibility 0s linear .15s; }
+  .pill[data-on="true"] { transition: opacity .15s linear, visibility 0s; }
+}

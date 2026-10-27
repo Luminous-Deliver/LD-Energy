@@ -1,15 +1,16 @@
-import { quoteHref } from '@/lib/quote-context'
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Section } from '@/components/ui/Section'
-import { BreadcrumbNav } from '@/components/ui/BreadcrumbNav'
-import { PageHero } from '@/components/sections/PageHero'
-import { CtaStrip } from '@/components/sections/CtaStrip'
-import { PostCard } from '@/components/blog/PostCard'
-import { getAllPosts, getFeaturedPosts } from '@/lib/blog'
-import { categories } from '@/lib/blog-categories'
-import { site, priceFrom, defaultOgImage } from '@/lib/site'
+import { ArrowRight, BarChart3, Clock, MapPin, ShieldCheck } from 'lucide-react'
+import { GuideCrumbs } from '@/components/blog/GuideCrumbs'
+import { GuideScale } from '@/components/blog/GuideScale'
+import { GuideList, type GuideListGroup } from '@/components/blog/GuideList'
+import { InnerEnding } from '@/components/inner/InnerEnding'
+import { getAllPosts, type Post } from '@/lib/blog'
+import { BOROUGH_DATA_PAGE, guideGroups } from '@/lib/guides'
+import { site, defaultOgImage } from '@/lib/site'
 
+// Title and H1 are frozen until the 14/12 review (references/local-seo.md); the body is the Guides hub
+// of plan PLAN-AREAS-GUIDES-2026-10-22 §8.1.
 export const metadata: Metadata = {
   title: 'EPC Guides for London Homeowners & Landlords',
   description:
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
 
 const breadcrumbs = [
   { href: '/', label: 'Home' },
-  { href: '/blog', label: 'Blog' },
+  { href: '/blog', label: 'Guides' },
 ]
 
 const breadcrumbSchema = {
@@ -40,23 +41,24 @@ const breadcrumbSchema = {
   '@type': 'BreadcrumbList',
   itemListElement: [
     { '@type': 'ListItem', position: 1, name: 'Home', item: site.url },
-    { '@type': 'ListItem', position: 2, name: 'Blog', item: `${site.url}/blog` },
+    { '@type': 'ListItem', position: 2, name: 'Guides', item: `${site.url}/blog` },
   ],
 }
 
+const OPENING_ANSWER =
+  'An EPC rates a home from A to G using a modelled score, not your bills. You need a valid one, lodged no more than 10 years ago, before you sell or let, and rented homes covered by the minimum standard must be band E or above unless an exemption is registered. Approved software works out the rating from what the assessor records and the evidence you can show. Start with the group that fits where you are.'
+
 export default async function BlogIndexPage() {
   const allPosts = await getAllPosts()
-  const featured = await getFeaturedPosts(3)
-  const featuredSlugs = new Set(featured.map((p) => p.slug))
-  const recent = allPosts.filter((p) => !featuredSlugs.has(p.slug))
+  const bySlug = new Map<string, Post>(allPosts.map((p) => [p.slug, p]))
 
   const blogSchema = {
     '@context': 'https://schema.org',
     '@type': 'Blog',
     '@id': `${site.url}/blog`,
-    name: 'L&D Energy Blog',
+    name: 'L&D Energy Guides',
     description:
-      'Expert guidance on EPCs, MEES compliance, and improving energy efficiency from a working London DEA.',
+      'Guidance on EPCs, MEES compliance and improving energy efficiency from a working London DEA.',
     publisher: { '@id': `${site.url}/#business` },
     blogPost: allPosts.slice(0, 20).map((p) => ({
       '@type': 'BlogPosting',
@@ -66,102 +68,132 @@ export default async function BlogIndexPage() {
     })),
   }
 
+  const groups: GuideListGroup[] = guideGroups.map((g) => ({
+    id: g.id,
+    heading: g.heading,
+    intro: g.intro,
+    guides: g.guides.flatMap((x) => {
+      const p = bySlug.get(x.slug)
+      return p ? [{ slug: x.slug, title: p.title, summary: x.summary, minutes: p.readingTime }] : []
+    }),
+  }))
+  const total = groups.reduce((n, g) => n + g.guides.length, 0)
+  const summaryOf = (slug: string) => guideGroups.flatMap((g) => g.guides).find((x) => x.slug === slug)?.summary ?? ''
+  const groupOf = (slug: string) => guideGroups.find((g) => g.guides.some((x) => x.slug === slug))?.heading ?? ''
+  const feat = bySlug.get('epc-ratings-explained')
+  // the two picture cards: the visit and the house in section (AI illustrations, imagery policy checked 23/10/2026)
+  const sides = [
+    { slug: 'what-happens-during-epc-assessment', img: '/guides/assessor-room', w: 1200, h: 800 },
+    { slug: 'how-to-improve-epc-rating', img: '/guides/house-section', w: 1200, h: 667 },
+  ].flatMap((x) => {
+    const p = bySlug.get(x.slug)
+    return p ? [{ ...x, post: p }] : []
+  })
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify([breadcrumbSchema, blogSchema]) }}
       />
-      <BreadcrumbNav items={breadcrumbs} />
-
-      <PageHero
-        eyebrow="EPC Blog"
-        heading="EPC Insights & Guides for London Homeowners & Landlords"
-        subheading="Expert guidance on Energy Performance Certificates, MEES compliance, and improving your rating, written by a working London DEA."
-        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'blog', ctaId: 'hero' }) }}
-      />
-
-      {allPosts.length === 0 ? (
-        <Section variant="default">
-          <div className="max-w-2xl">
-            <p className="text-lg text-secondary-700">
-              New posts are on the way. In the meantime, see our{' '}
-              <Link href="/services/domestic-epc" className="text-primary-700 underline">
-                Domestic EPC service
-              </Link>{' '}
-              or{' '}
-              <Link href={quoteHref({ sourcePage: 'blog', ctaId: 'inline' })} className="text-primary-700 underline">
-                request an assessment quote
-              </Link>
-              .
+      <div className="gd">
+        <header className="gd-hub-hero">
+          <div className="gd-w gd-hub-hero__in">
+            <GuideCrumbs items={breadcrumbs} />
+            <h1>EPC Insights &amp; Guides for London Homeowners &amp; Landlords</h1>
+            <p className="gd-hub-hero__lede">{OPENING_ANSWER}</p>
+            <p className="gd-hub-hero__by">
+              <span>
+                <ShieldCheck width={16} height={16} aria-hidden="true" />
+                Written by your assessor, Abdul Motaleb Taher, Elmhurst and Quidos accredited
+              </span>
+              <span>
+                <span className="num">{total}</span> guides
+              </span>
             </p>
           </div>
-        </Section>
-      ) : (
-        <>
-          {featured.length > 0 && (
-            <Section variant="default" id="featured">
-              <p className="text-xs uppercase tracking-wide font-semibold text-primary-700">
-                Featured
-              </p>
-              <h2 className="mt-2 text-3xl md:text-4xl font-bold tracking-tight text-secondary-900">
-                Editor&rsquo;s picks
-              </h2>
-              <div className="mt-8 grid gap-6 md:grid-cols-2">
-                {featured.map((post, i) => (
-                  <PostCard key={post.slug} post={post} featured={i === 0 && featured.length > 1} />
-                ))}
-              </div>
-            </Section>
-          )}
+        </header>
 
-          <Section variant="muted" id="categories">
-            <p className="text-xs uppercase tracking-wide font-semibold text-primary-700">
-              Browse by topic
-            </p>
-            <h2 className="mt-2 text-3xl md:text-4xl font-bold tracking-tight text-secondary-900">
-              Explore by category
-            </h2>
-            <ul className="mt-8 grid gap-3 sm:grid-cols-2 md:grid-cols-3">
-              {categories.map((cat) => (
-                <li key={cat.slug}>
-                  <Link
-                    href={`/blog/category/${cat.slug}`}
-                    className="block h-full rounded-lg border border-secondary-200 bg-white p-5 transition-colors hover:border-primary-300 hover:bg-primary-50"
-                  >
-                    <p className="font-semibold text-secondary-900 group-hover:text-primary-700">
-                      {cat.name}
-                    </p>
-                    <p className="mt-1 text-sm text-secondary-600">{cat.description}</p>
-                  </Link>
-                </li>
+        <section className="gd-w" aria-label="Start here">
+          <div className="gd-top">
+            {feat && (
+              <Link href={`/blog/${feat.slug}`} className="gd-feat">
+                <div className="gd-feat__art">
+                  <GuideScale art minimum={false} />
+                </div>
+                <span className="gd-feat__b">
+                  <span className="gd-tagline">
+                    <span className="gd-start">Start here</span>
+                    <span className="gd-eyebrow">{groupOf(feat.slug)}</span>
+                  </span>
+                  <b>{feat.title}</b>
+                  <span className="gd-feat__d">{summaryOf(feat.slug)}</span>
+                  <span className="gd-mins">
+                    <Clock width={14} height={14} aria-hidden="true" />
+                    <span className="num">{feat.readingTime}</span> min read
+                  </span>
+                </span>
+              </Link>
+            )}
+            <div className="gd-sides">
+              {sides.map(({ slug, img, w, h, post }) => (
+                <Link key={slug} href={`/blog/${slug}`} className="gd-side">
+                  <span className="gd-side__img">
+                    {/* eslint-disable-next-line @next/next/no-img-element -- next/image is unoptimised on Pages */}
+                    <img src={`${img}-720.webp`} srcSet={`${img}-720.webp 720w, ${img}-1200.webp 1200w`} sizes="(max-width: 899px) 116px, 30vw" alt="" width={w} height={h} loading="lazy" decoding="async" />
+                  </span>
+                  <span className="gd-side__b">
+                    <span className="gd-eyebrow">{groupOf(slug)}</span>
+                    <b>{post.title}</b>
+                    <span className="gd-mins">
+                      <Clock width={14} height={14} aria-hidden="true" />
+                      <span className="num">{post.readingTime}</span> min read
+                    </span>
+                  </span>
+                </Link>
               ))}
-            </ul>
-          </Section>
+            </div>
+          </div>
+        </section>
 
-          {recent.length > 0 && (
-            <Section variant="default" id="recent">
-              <p className="text-xs uppercase tracking-wide font-semibold text-primary-700">
-                Recent posts
-              </p>
-              <h2 className="mt-2 text-3xl md:text-4xl font-bold tracking-tight text-secondary-900">
-                Latest guides
-              </h2>
-              <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {recent.map((post) => (
-                  <PostCard key={post.slug} post={post} />
-                ))}
-              </div>
-            </Section>
-          )}
-        </>
-      )}
+        <section className="gd-w gd-all" id="guides" aria-labelledby="all-guides">
+          <div className="gd-all__h">
+            <h2 id="all-guides">Every guide, by topic</h2>
+            <p>Pick a topic, then read down the list: each group starts with the guide to read first.</p>
+          </div>
+          <GuideList groups={groups} />
+        </section>
 
-      <CtaStrip
-        heading="Need an EPC? Get your exact quote."
-        body={`Elmhurst and Quidos accredited assessor. Guide prices from £${priceFrom.epc}. Lodged within 72 hours.`}
-        primaryCta={{ label: 'Get my exact quote', href: quoteHref({ service: 'epc', sourcePage: 'blog', ctaId: 'bottom' }) }}
-      />
+        <section className="gd-local" id="local-figures" aria-labelledby="local-figures-h">
+          <div className="gd-w gd-local__in">
+            <div>
+              <h2 id="local-figures-h">Local figures</h2>
+              <p>How homes in each London borough rate, from EPCs on the GOV.UK register, and what that means locally.</p>
+            </div>
+            <div className="gd-local__links">
+              <Link href="/areas">
+                <MapPin width={20} height={20} aria-hidden="true" />
+                <span>
+                  Find your area
+                  <small>Prices, ratings and local rules for every borough</small>
+                </span>
+                <ArrowRight className="gd-arrow" width={18} height={18} aria-hidden="true" />
+              </Link>
+              {BOROUGH_DATA_PAGE.live && (
+                <Link href={BOROUGH_DATA_PAGE.href}>
+                  <BarChart3 width={20} height={20} aria-hidden="true" />
+                  <span>
+                    {BOROUGH_DATA_PAGE.label}
+                    <small>All 33 councils side by side</small>
+                  </span>
+                  <ArrowRight className="gd-arrow" width={18} height={18} aria-hidden="true" />
+                </Link>
+              )}
+            </div>
+          </div>
+        </section>
+      </div>
+      <InnerEnding variant="a" source="blog" />
     </>
   )
 }
