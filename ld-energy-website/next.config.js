@@ -34,6 +34,12 @@ const nextConfig = {
         destination: '/services/epc-improvement-plan',
         permanent: true,
       },
+      {
+        // Old slug of the preparation page; still earning impressions in Search Console on 28/10/2026.
+        source: '/preparing-for-epc-assessment',
+        destination: '/preparing-for-your-epc',
+        permanent: true,
+      },
       // 23/10/2026: the quote form moved from /contact to /quote. Old quote links carry their choices in the query
       // (service, area, speed, plan, source, cta), which Next carries over to /quote. Temporary (307), because
       // /contact itself stays. A bare `/contact#booking-form` never reaches the server; LegacyQuoteRedirect on

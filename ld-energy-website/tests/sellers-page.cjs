@@ -38,7 +38,7 @@ const epc = [65, 75, 85, 95, 105, 120]
     }
     eq(await rows.nth(6).getAttribute('href'), '/quote?service=epc&area=unknown&source=sellers&cta=pricing', 'not sure of the size')
     const foot = (await page.locator('.in-tb__other').innerText()).replace(/\s+/g, ' ')
-    ok(/Floor plan from £55/.test(foot) && /from £105/.test(foot) && /£15 extra/.test(foot) && /£35 extra/.test(foot), `price list foot (${foot})`)
+    ok(/Floor plan from £65/.test(foot) && /from £115/.test(foot) && /£15 extra/.test(foot) && /£35 extra/.test(foot), `price list foot (${foot})`)
     eq(await page.locator('.in-hd__acts a.ld-btn').getAttribute('href'), '/quote?service=epc&source=sellers&cta=hero', 'hero quote link')
     ok(/same day for £15 extra/.test(await page.locator('.in-hd__answer').innerText()), 'hero: same-day £15 extra')
 

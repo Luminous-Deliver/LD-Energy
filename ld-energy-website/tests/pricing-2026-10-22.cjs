@@ -15,8 +15,8 @@ const bands = ['Up to 40 m²', 'Over 40–55 m²', 'Over 55–75 m²', 'Over 75�
 const captions = ['Studios and compact flats', '1-bedroom flats', '2-bedroom flats and small homes', '2–3-bedroom homes', '3–4-bedroom houses', 'Large homes, 4+\u00a0bedrooms']
 const prices = {
   'Domestic EPC': ['£65', '£75', '£85', '£95', '£105', 'From £120'],
-  'Floor Plan': ['£55', '£65', '£75', '£90', '£105', 'From £125'],
-  'EPC + Floor Plan': ['£105', '£120', '£135', '£155', '£175', 'From £210'],
+  'Floor Plan': ['£65', '£75', '£85', '£95', '£105', 'From £120'],
+  'EPC + Floor Plan': ['£115', '£130', '£145', '£160', '£175', 'From £200'],
   'EPC Pre-Assessment': ['£90', '£100', '£110', '£120', '£130', 'From £145'],
 }
 const escape = text => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -108,17 +108,17 @@ const escape = text => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
       eq(await guide(), '£65', 'EPC from')
       if (!phone) ok(/From/.test(await panel.innerText()) && /Pick a size for your guide price\./.test(await panel.innerText()), 'EPC from line')
       await togglePlan(); eq(await price(), '£100', 'EPC + plan from')
-      await chooseService('EPC + Floor Plan'); eq(await guide(), '£140', 'bundle + plan from (plan kept between EPC and bundle)')
-      await chooseService('Floor Plan'); eq(await guide(), '£55', 'floor plan from'); eq(await plan.count(), 0, 'no plan on Floor Plan'); eq(await report.count(), 0, 'no report on Floor Plan')
+      await chooseService('EPC + Floor Plan'); eq(await guide(), '£150', 'bundle + plan from (plan kept between EPC and bundle)')
+      await chooseService('Floor Plan'); eq(await guide(), '£65', 'floor plan from'); eq(await plan.count(), 0, 'no plan on Floor Plan'); eq(await report.count(), 0, 'no report on Floor Plan')
       await chooseService('EPC Pre-Assessment'); eq(await guide(), '£90', 'pre-assessment from'); eq(await plan.count(), 0, 'no paid plan on Pre-Assessment')
 
       // §8B, §5, §7: a standard band, its saving, the plan's £35, and no "From".
       await chooseService('EPC + Floor Plan'); await go('price')
       eq(await plan.isChecked(), false, 'leaving for Floor Plan cleared the paid plan')
       await chooseSize('Over 55–75 m²')
-      eq(await guide(), '£135', 'bundle 55-75'); ok(!/From/.test(await panel.locator('.bf__price').innerText()), 'no From on a standard band')
+      eq(await guide(), '£145', 'bundle 55-75'); ok(!/From/.test(await panel.locator('.bf__price').innerText()), 'no From on a standard band')
       ok(await panel.getByText('Save £25 compared with booking separately.').isVisible(), 'saving line')
-      await togglePlan(); eq(await price(), '£170', 'bundle 55-75 + plan')
+      await togglePlan(); eq(await price(), '£180', 'bundle 55-75 + plan')
       await chooseService('Domestic EPC'); eq(await guide(), '£120', 'EPC 55-75 + plan (§7 example)')
       ok(await panel.locator('.bf__rows').getByText('Personalised EPC Improvement Plan').isVisible(), 'plan row')
 

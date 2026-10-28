@@ -37,12 +37,12 @@ const epc = [65, 75, 85, 95, 105, 120]
     }
     eq(await rows.nth(6).getAttribute('href'), '/quote?service=epc&area=unknown&source=domestic-epc&cta=pricing', 'not sure: quote link')
     const other = await page.locator('.sv-tb .in-tb__other').innerText()
-    for (const s of ['Floor plan from £55', 'from £105', 'Same-day lodgement £15', '£35 extra', 'No travel charges']) ok(other.includes(s), `title block foot: ${s}`)
+    for (const s of ['Floor plan from £65', 'from £115', 'Same-day lodgement £15', '£35 extra', 'No travel charges']) ok(other.includes(s), `title block foot: ${s}`)
     eq(await page.locator('.in-hd a[data-enquiry-cta="hero"]').getAttribute('href'), '/quote?service=epc&source=domestic-epc&cta=hero', 'hero quote link')
 
     // what it costs: the three services and extras, from lib/site
     const costs = (await page.locator('#pricing').innerText()).replace(/\s+/g, ' ')
-    for (const [name, from, service] of [['Domestic EPC', 65, 'epc'], ['EPC and floor plan', 105, 'bundle'], ['Floor plan only', 55, 'floor-plan']]) {
+    for (const [name, from, service] of [['Domestic EPC', 65, 'epc'], ['EPC and floor plan', 115, 'bundle'], ['Floor plan only', 65, 'floor-plan']]) {
       ok(new RegExp(`${name} Guide price from £${from}`).test(costs), `${name} from £${from}`)
       eq(await page.locator(`#pricing a[href="/quote?service=${service}&source=domestic-epc&cta=pricing"]`).count(), 1, `${name}: quote link`)
     }

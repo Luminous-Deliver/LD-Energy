@@ -10,7 +10,7 @@ if (!['localhost', '127.0.0.1'].includes(new URL(base).hostname)) throw new Erro
 const norm = (s) => s.toLowerCase().replace(/[’']/g, "'")
 const ids = ['up-to-40', '40-55', '55-75', '75-95', '95-115', 'over-115']
 const epc = [65, 75, 85, 95, 105, 120]
-const rates = 'Three to five homes: £5 off each EPC. Six or more: £10 off each. Flats in the same building on the same day: £15 off each after the first. That replaces the other discount, it doesn\'t add to it. Never less than £55 an EPC. Floor plans and faster options stay full price.'
+const rates = 'Three to five homes: £5 off each EPC or floor plan. Six or more: £10 off each. Homes in the same postcode area (like E15) on the same day: £10 off each after the first. Flats in the same building on the same day: £15 off each after the first. Only the biggest discount applies; they don\'t add up. With an EPC and floor plan together, you pay the bundle price and the discount comes off once per home. Never less than £55 for an EPC or a floor plan, or £100 for both. Faster options stay full price.'
 
 ;(async () => {
   const browser = await chromium.launch({ channel: 'msedge', headless: true })
@@ -40,7 +40,7 @@ const rates = 'Three to five homes: £5 off each EPC. Six or more: £10 off each
     }
     eq(await rows.nth(6).getAttribute('href'), '/quote?service=bulk&source=estate-agents&cta=pricing', 'three homes or more: bulk quote')
     const foot = (await page.locator('.in-tb__other').innerText()).replace(/\s+/g, ' ')
-    ok(/Floor plan from £55/.test(foot) && /from £105/.test(foot) && /£15 extra/.test(foot) && /£35 extra/.test(foot), `price list foot (${foot})`)
+    ok(/Floor plan from £65/.test(foot) && /from £115/.test(foot) && /£15 extra/.test(foot) && /£35 extra/.test(foot), `price list foot (${foot})`)
     eq(await page.locator('.in-hd__acts a.ld-btn').getAttribute('href'), '/quote?service=epc&source=estate-agents&cta=hero', 'hero quote link')
     ok((await page.locator('.in-hd__acts a.in-wa').getAttribute('href')).startsWith('https://wa.me/447492575396?text='), 'hero WhatsApp a list')
 
@@ -55,7 +55,7 @@ const rates = 'Three to five homes: £5 off each EPC. Six or more: £10 off each
       '45 minutes to 2 hours on-site', 'or the same day for urgent listings', 'Everything a listing needs',
       'Professional floor plan, discounted with an EPC', 'High-resolution files sized for Rightmove and Zoopla',
       'Same-day lodgement (+£15) or a next-day visit (+£35) for urgent instructions', 'One supplier for all 32 boroughs, no travel charges',
-      'Property photography', 'Coming soon', 'up to £35 less than booking them separately', 'Illustrative only and not to scale']) ok(norm(main).includes(norm(fact)), `fact: ${fact}`)
+      'Property photography', 'Coming soon', 'up to £35 less than booking them separately', 'Not to exact scale']) ok(norm(main).includes(norm(fact)), `fact: ${fact}`)
     for (const href of ['/services/domestic-epc', '/services/floor-plans', '/pricing']) ok(await page.locator(`main a[href="${href}"]`).count() > 0, `links ${href}`)
     eq(await page.locator('.ea-soon a').count(), 0, 'photography: no link, no CTA')
 

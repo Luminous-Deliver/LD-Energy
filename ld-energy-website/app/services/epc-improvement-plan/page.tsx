@@ -70,6 +70,16 @@ const covered = [
   'Which measures may be unsuitable or need specialist advice, and why',
 ]
 
+/* Disclaimers (Abdul 28/10/2026: "add all the disclaimers"). Worded within the Consumer Rights Act 2015: no exclusion
+   of liability for our own care and skill (s. 57) or negligence causing injury (s. 65); the cap lives in terms §8. */
+const beforeYouAct = [
+  'It is guidance based on what was recorded at the visit. It is not a survey of the structure or condition of the building, an installation design or a PAS 2035 retrofit assessment.',
+  'Costs, savings and ratings are estimates from the approved software and typical figures. They are not quotes, and real results depend on the installer, the materials and how the home is used.',
+  'No particular rating, band, grant, funding or MEES exemption is guaranteed. A later EPC is a new assessment of the property as it is then.',
+  'Get quotes and advice from qualified installers before any work, and check planning permission, listed building consent and Building Regulations where they apply.',
+  'Which works to do is your decision. We are not responsible for installers’ work, products, prices or results.',
+]
+
 const audience = [
   {
     icon: 'key' as const,
@@ -119,7 +129,7 @@ const readNext: NextStep[] = [
   { kicker: 'The service it adds to', title: 'What a Domestic EPC involves', href: '/services/domestic-epc', img: '/guides/assessor-room-720.webp',
     text: 'The visit, what we record and how the rating is worked out.' },
   { kicker: 'Plan included', title: 'EPC Pre-Assessment', href: '/services/epc-pre-assessment', img: '/guides/house-section-720.webp',
-    text: 'The same survey, not lodged. Guidance only, with the written plan in the price.' },
+    text: 'A full EPC assessment, not lodged: your exact rating, with the written plan in the price. Guidance only.' },
   { kicker: 'Same visit', title: 'Floor plans, laser-measured', href: '/services/floor-plans', img: '/illustrations/report-900.webp',
     text: 'A floor plan drawn from the same visit, as JPG and PDF.' },
   { kicker: 'Every price', title: 'Prices for every size', href: '/pricing', go: true, cta: 'See every price',
@@ -296,6 +306,16 @@ export default function EpcImprovementPlanPage() {
                 omission follows assessment rules, not your add-on choice. The plan is not a PAS 2035 retrofit assessment or an
                 installation design. Costs and savings are estimates, not quotes or guarantees. No particular rating or improvement
                 is guaranteed.
+              </p>
+            </div>
+            <div className="sv-callout sv-gap">
+              <p className="sv-callout__h">Before you act on the plan</p>
+              <ul>
+                {beforeYouAct.map((t) => <li key={t}>{t}</li>)}
+              </ul>
+              <p>
+                Nothing here limits your statutory rights. Our liability is set out in{' '}
+                <Link className="in-link" href="/terms#liability">our terms</Link>.
               </p>
             </div>
           </div>

@@ -169,9 +169,9 @@ export default function EpcPreAssessmentPage() {
               <p className="in-eyebrow">Assessment service</p>
               <h1 id="sv-h1">EPC Pre-Assessment</h1>
               <p className="in-hd__answer">
-                Find out what your property would score before anything goes on the public register. A full survey, deliberately
-                not lodged, so there is no certificate and nothing to undo. It is <b>guidance only</b>, with a written improvement
-                plan included, from <b className="num">{FROM_PRICE}</b>.
+                Find out what your property would score before anything goes on the public register. You get a full EPC assessment
+                with your exact rating and a written improvement plan, from <b className="num">{FROM_PRICE}</b>. It is deliberately
+                not lodged, so there is no certificate and nothing to undo. It is <b>guidance only</b>.
               </p>
               <div className="in-hd__acts">
                 <a className="ld-btn ld-btn--primary" href={q('hero')} data-enquiry-cta="hero">Get my exact quote</a>
