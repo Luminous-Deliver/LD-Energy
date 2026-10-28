@@ -13,8 +13,8 @@ const captions = ['Studios and compact flats', '1-bedroom flats', '2-bedroom fla
 // Abdul's 22/10/2026 spec §2, column by column
 const services = [
   { id: 'epc', label: 'Domestic EPC', tab: 'EPC', prices: [65, 75, 85, 95, 105, 120] },
-  { id: 'floor-plan', label: 'Floor plan', tab: 'Floor plan', prices: [55, 65, 75, 90, 105, 125] },
-  { id: 'bundle', label: 'EPC + floor plan', tab: 'EPC + plan', prices: [105, 120, 135, 155, 175, 210], save: [15, 20, 25, 30, 35] },
+  { id: 'floor-plan', label: 'Floor plan', tab: 'Floor plan', prices: [65, 75, 85, 95, 105, 120] },
+  { id: 'bundle', label: 'EPC + floor plan', tab: 'EPC + plan', prices: [115, 130, 145, 160, 175, 200], save: [15, 20, 25, 30, 35] },
   { id: 'pre-assessment', label: 'Pre-Assessment', tab: 'Pre-Assessment', prices: [90, 100, 110, 120, 130, 145] },
 ]
 
@@ -70,7 +70,7 @@ const services = [
     ok(/Mon–Sun, 8am–8pm/.test(extras), 'faster options: standard hours')
 
     // Portfolio: Abdul's approved wording, word for word
-    ok((await page.locator('#portfolio').innerText()).includes('Three to five homes: £5 off each EPC. Six or more: £10 off each. Flats in the same building on the same day: £15 off each after the first. That replaces the other discount, it doesn\'t add to it. Never less than £55 an EPC. Floor plans and faster options stay full price.'), 'portfolio rates, approved wording')
+    ok((await page.locator('#portfolio').innerText()).includes('Three to five homes: £5 off each EPC or floor plan. Six or more: £10 off each. Homes in the same postcode area (like E15) on the same day: £10 off each after the first. Flats in the same building on the same day: £15 off each after the first. Only the biggest discount applies; they don\'t add up. With an EPC and floor plan together, you pay the bundle price and the discount comes off once per home. Never less than £55 for an EPC or a floor plan, or £100 for both. Faster options stay full price.'), 'portfolio rates, approved wording')
 
     // Included / not included, carried over item for item
     const inc = await page.locator('#whats-included').innerText()

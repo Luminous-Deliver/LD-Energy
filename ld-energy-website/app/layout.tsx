@@ -160,6 +160,16 @@ const localBusinessSchema = {
       },
     ],
   },
+  // Hours match the visible site text (Mon–Sun 8am–8pm), which is what Google checks markup against (28/10/2026).
+  openingHoursSpecification: [{
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+    opens: '08:00',
+    closes: '20:00',
+  }],
+  hasMap: site.reviews.profileUrl,
+  // Only profiles Abdul has actually claimed (site.sameAs); never an unclaimed directory URL.
+  sameAs: site.sameAs,
   // One LocalBusiness node also represents the organisation. The Person owns the credential.
   founder: { '@id': `${site.url}/about#assessor` },
   knowsAbout: [

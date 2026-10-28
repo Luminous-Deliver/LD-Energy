@@ -193,7 +193,7 @@ const readNext: NextStep[] = [
   { kicker: 'Same visit', title: 'Floor plans, laser-measured', href: '/services/floor-plans', img: '/illustrations/report-900.webp',
     text: `Added to an EPC it costs up to £${formatPrice(maxBundleSaving)} less than booking both separately.` },
   { kicker: 'Before anything is lodged', title: 'EPC Pre-Assessment', href: '/services/epc-pre-assessment', img: '/guides/house-section-720.webp',
-    text: 'The same survey, not lodged. Guidance only, so you see the rating first.' },
+    text: 'A full EPC assessment, not lodged: your exact rating and a written improvement plan. Guidance only.' },
   { kicker: `£${site.addOns.improvementPlan} add-on`, title: 'EPC Improvement Plan', href: '/services/epc-improvement-plan', img: '/home/terrace-cutaway-900.webp',
     text: 'Abdul\'s written priorities on top of the recommendations every EPC includes.' },
   { kicker: 'Every price', title: 'Prices for every size', href: '/pricing', go: true, cta: 'See every price',

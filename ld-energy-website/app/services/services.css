@@ -97,6 +97,7 @@
 .sv-callout p { font-size: 16px; line-height: 1.6; }
 .sv-callout .sv-callout__h { font: 400 21px/1.25 var(--font-serif); }
 .sv-callout b { font-weight: 500; }
+.sv-callout ul { display: grid; gap: 8px; padding-left: 1.15em; list-style: disc; font-size: 16px; line-height: 1.6; }
 .sv-callout--quiet { border-left-color: var(--hair-strong); background: transparent; }
 .sv-callout--warn { border-left-color: var(--epc-e); }
 .sv-callout .in-arrow { justify-self: start; }

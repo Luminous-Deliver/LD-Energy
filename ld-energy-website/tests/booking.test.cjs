@@ -104,12 +104,12 @@ test('the 22/10/2026 pricing spec: example totals, statuses, savings, starting p
   for (const [areaBand, service, plan, report, expected] of [
     ['up-to-40', EPC, false, false, '£65'], ['up-to-40', EPC, true, false, '£100'], ['55-75', EPC, false, false, '£85'],
     ['75-95', EPC, false, false, '£95'], ['95-115', BUNDLE, false, false, '£175'], ['95-115', BUNDLE, true, false, '£210'],
-    ['over-115', EPC, false, false, 'From £120'], ['over-115', EPC, true, false, 'From £155'], ['over-115', BUNDLE, false, false, 'From £210'],
-    ['over-115', BUNDLE, true, false, 'From £245'], ['up-to-40', PRE_ASSESSMENT, false, false, '£90'], ['up-to-40', PRE_ASSESSMENT, false, true, '£90'],
+    ['over-115', EPC, false, false, 'From £120'], ['over-115', EPC, true, false, 'From £155'], ['over-115', BUNDLE, false, false, 'From £200'],
+    ['over-115', BUNDLE, true, false, 'From £235'], ['up-to-40', PRE_ASSESSMENT, false, false, '£90'], ['up-to-40', PRE_ASSESSMENT, false, true, '£90'],
     ['over-115', PRE_ASSESSMENT, false, false, 'From £145'],
   ]) assert.equal(show(guideEstimate({ areaBand, services: [service], improvementPlan: plan, energyReport: report })), expected, `${areaBand} ${service} ${plan} ${report}`)
   // Spec §2's table, every cell.
-  const table = [[65, 55, 105, 90], [75, 65, 120, 100], [85, 75, 135, 110], [95, 90, 155, 120], [105, 105, 175, 130], [120, 125, 210, 145]]
+  const table = [[65, 65, 115, 90], [75, 75, 130, 100], [85, 85, 145, 110], [95, 95, 160, 120], [105, 105, 175, 130], [120, 120, 200, 145]]
   assert.deepEqual(pricing.map(b => [b.epc, b.floorPlan, b.bundle, b.preAssessment]), table)
   assert.deepEqual(pricing.map(b => b.areaLabel), ['Up to 40 m²', 'Over 40–55 m²', 'Over 55–75 m²', 'Over 75–95 m²', 'Over 95–115 m²', 'Over 115 m²'])
   assert.equal(topBand.startingPrice, true)
@@ -118,8 +118,8 @@ test('the 22/10/2026 pricing spec: example totals, statuses, savings, starting p
   assert.equal(maxBundleSaving, 35)
   assert.equal(guideEstimate({ areaBand: 'unknown', services: [BUNDLE] }).saving, 0)
   // Spec §8A: starting summaries before a size, with the plan added where it applies.
-  assert.deepEqual([EPC, FP, BUNDLE, PRE_ASSESSMENT].map(service => guideEstimate({ areaBand: '', services: [service] }).fromTotal), [65, 55, 105, 90])
-  assert.deepEqual([EPC, BUNDLE].map(service => guideEstimate({ areaBand: '', services: [service], improvementPlan: true }).fromTotal), [100, 140])
+  assert.deepEqual([EPC, FP, BUNDLE, PRE_ASSESSMENT].map(service => guideEstimate({ areaBand: '', services: [service] }).fromTotal), [65, 65, 115, 90])
+  assert.deepEqual([EPC, BUNDLE].map(service => guideEstimate({ areaBand: '', services: [service], improvementPlan: true }).fromTotal), [100, 150])
   assert.equal(priceFrom.preAssessment, 90)
   // Spec §7: the paid plan never applies to Floor Plan or Pre-Assessment; the free report only to Pre-Assessment.
   for (const service of [FP, PRE_ASSESSMENT]) assert.equal(guideEstimate({ areaBand: '55-75', services: [service], improvementPlan: true }).improvementPlan, 0)
@@ -147,7 +147,7 @@ test('quote links allow only safe selections, preserve intent and never contain 
     assert.equal(context.speed, ['epc', 'bundle'].includes(service) ? 'next-day' : 'standard')
     assert.equal(context.area, 'unknown')
     assert.equal(context.plan, ['epc', 'bundle'].includes(service))
-    assert.equal(url.hash, '#booking-form')
+    assert.equal(url.hash, '') // since 23/10 quote links open /quote, which is the form; no #booking-form hash
     assert.doesNotMatch(url.search, /secret|123|total|name/)
   }
   const context = parseQuoteContext(new URLSearchParams('service=__proto__&area=address&speed=tomorrow&plan=evil'))
@@ -242,8 +242,8 @@ test('contact API security, recalculation and both email representations with de
     }
     messages = []
     assert.equal((await request({ ...sample, services: ['Both (Bundle)'], speed: SAME_DAY_LODGEMENT_SPEED, improvementPlan: true, total: 1 })).status, 200)
-    assert.match(messages[0].text, /£185 guide/)
-    assert.match(messages[1].text, /£185 guide/)
+    assert.match(messages[0].text, /£195 guide/)
+    assert.match(messages[1].text, /£195 guide/)
 
     // A customer's own figure reaches Abdul with the band that priced the guide.
     messages = []

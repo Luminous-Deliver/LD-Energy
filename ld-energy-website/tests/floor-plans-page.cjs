@@ -3,15 +3,15 @@
 // Abdul-2 projects/ld-energy-redesign-2026-10/research/floor-plans-parity-2026-10-24.md
 const { checkServicePage, ids } = require('./service-page-checks.cjs')
 const epc = [65, 75, 85, 95, 105, 120]
-const fp = [55, 65, 75, 90, 105, 125]
-const both = [105, 120, 135, 155, 175, 210]
-const disclaimer = 'Illustrative only and not to scale. Measurements are approximate and for guidance only, following RICS guidance; floor areas are calculated in accordance with RICS Property Measurement Standards. Do not rely on them for valuation, flooring or furnishing.'
+const fp = [65, 75, 85, 95, 105, 120]
+const both = [115, 130, 145, 160, 175, 200]
+const disclaimer = 'Not to exact scale. Measurements are approximate and for guidance only, following RICS guidance; floor areas are calculated in accordance with RICS Property Measurement Standards. Do not rely on them for valuation, flooring or furnishing.'
 const q = (s, a) => `/quote?service=${s}&area=${a}&source=floor-plans&cta=pricing`
 
 checkServicePage({
   route: '/services/floor-plans',
   h1: 'Professional property floor plans',
-  title: 'Property Floor Plans London | From £55 | L&D Energy',
+  title: 'Property Floor Plans London | From £65 | L&D Energy',
   ids: ['why-floor-plans', 'included', 'process', 'pricing', 'floor-plan-faq', 'book'],
   faqId: 'floor-plan-faq', faqCount: 5,
   schemaTypes: ['Service', 'FAQPage', 'BreadcrumbList'],

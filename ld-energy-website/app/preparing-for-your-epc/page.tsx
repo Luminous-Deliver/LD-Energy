@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowDown, CalendarClock, Clock, CreditCard, FileText, Home, Info, KeyRound, Mail, Phone } from 'lucide-react'
 import { GuideCrumbs } from '@/components/blog/GuideCrumbs'
+import { GuideFeedback } from '@/components/blog/GuideFeedback'
 import { TableOfContents } from '@/components/blog/TableOfContents'
 import { ReadNext, type NextStep } from '@/components/inner/ReadNext'
 import { ratingQuestions } from '@/lib/faq'
@@ -525,9 +526,10 @@ export default function PreparingPage() {
                     joist insulation is counted, so the rafter insulation adds nothing to the rating.
                   </li>
                   <li>
-                    Underfloor heating run from the same boiler as your radiators: the rating follows the boiler far more
-                    than how the heat is delivered, so it rarely changes the score. With a heat pump, if radiators heat
-                    half the floor area or more, only the radiators are counted.
+                    Underfloor heating run from the same boiler as your radiators: both are recorded, each with the same
+                    boiler, but the rating follows the boiler far more than how the heat is delivered, so the underfloor
+                    only moves it a little. With a heat pump, if radiators heat half the floor area or more, only the
+                    radiators are counted.
                   </li>
                   <li>Hidden insulation only counts with paperwork that shows the thickness.</li>
                   <li>
@@ -723,6 +725,8 @@ export default function PreparingPage() {
                   </div>
                 </div>
               </aside>
+              {/* Abdul 28/10/2026: the same "was this useful" close as every guide */}
+              <GuideFeedback slug="preparing-for-your-epc" waHref={`${site.whatsappHref}?text=${encodeURIComponent("Hi, I read your EPC preparation guide. It didn't cover: ")}`} email={site.email} emailHref={site.emailHref} />
             </article>
           </div>
         </div>

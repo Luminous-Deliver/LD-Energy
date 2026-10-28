@@ -102,11 +102,7 @@ export const site = {
   /**
    * Google Business Profile. Keep in sync with the live profile.
    *
-   * `profileUrl` is still a share.google shortlink, which resolves to a Google
-   * search URL rather than a canonical place page — it works for humans but is
-   * not a usable `sameAs` entity reference. Replace with the long
-   * maps.google.com/?cid=... form when available, and only then wire it into
-   * schema. See the sameAs note in app/layout.tsx.
+   * `profileUrl` is the canonical CID place link; it is wired into schema as `hasMap` and in `sameAs` (28/10/2026).
    *
    * The public search result currently displays the profile as
    * "L&D Energy – EPC & Energy Assessor London". That is NOT mirrored into the
@@ -119,10 +115,17 @@ export const site = {
     // when the count changes; it is shown as text only, never as review markup.
     ratingValue: 5,
     reviewCount: 6,
-    // Canonical place link (CID read from the listing 19/10/2026). Not yet wired into schema.
+    // Canonical place link (CID read from the listing 19/10/2026). In schema since 28/10/2026.
     profileUrl: 'https://maps.google.com/?cid=14054711842511866215',
     writeUrl: 'https://g.page/r/CWdJZan0XQzDEAI/review',
   },
+  /**
+   * Schema `sameAs`: profiles of this business that Abdul has claimed. Add a URL only once the profile is live
+   * and his; an unclaimed directory URL here is a citation lie (decisions/log.md 18/08/2026).
+   */
+  sameAs: [
+    'https://maps.google.com/?cid=14054711842511866215',
+  ],
 } as const
 
 export const navLinks = [
@@ -192,10 +195,11 @@ export const promise = { lateLodgement: 20, lateChange: 25 } as const
 export const NEXT_DAY_VISIT_SURCHARGE = 35
 
 /**
- * The floor plan disclaimer, shown wherever a floor plan is offered. Abdul's two wordings combined (23/10/2026).
+ * The floor plan disclaimer, shown wherever a floor plan is offered. Abdul's two wordings combined (23/10/2026);
+ * "Illustrative only" dropped for "Not to exact scale" (Abdul 28/10/2026).
  */
 export const floorPlanDisclaimer =
-  'Illustrative only and not to scale. Measurements are approximate and for guidance only, following RICS guidance; floor areas are calculated in accordance with RICS Property Measurement Standards. Do not rely on them for valuation, flooring or furnishing.'
+  'Not to exact scale. Measurements are approximate and for guidance only, following RICS guidance; floor areas are calculated in accordance with RICS Property Measurement Standards. Do not rely on them for valuation, flooring or furnishing.'
 
 /**
  * From this many homes in one enquiry, a landlord's list is quoted as a portfolio: each home priced by its size,
@@ -204,19 +208,26 @@ export const floorPlanDisclaimer =
 export const portfolioMinHomes = 3
 
 /**
- * Portfolio rates, approved by Abdul 24/10/2026 ("yes") after the research in Abdul-2
- * projects/ld-energy-redesign-2026-10/research/portfolio-rates-2026-10-24.md: off the EPC price only, never stacked,
- * never below the floor. `portfolioRatesText` is his approved wording; it is built from these numbers so the two
- * cannot drift, and the test in tests/portfolio-rates.test.cjs holds it to the approved sentence.
+ * Portfolio rates. Approved by Abdul 24/10/2026 for EPCs (research: Abdul-2
+ * projects/ld-energy-redesign-2026-10/research/portfolio-rates-2026-10-24.md); extended 28/10/2026 to floor plans
+ * with a same-postcode-area tier ("Mirror + same-area tier"). One discount per home, the biggest that applies, never
+ * stacked. A bundle pays its bundle price and the discount comes off once per home. `portfolioRatesText` is built
+ * from these numbers so the two cannot drift; tests/portfolio-rates.test.cjs holds it to the approved sentence.
  */
-export const portfolioRates = { smallMin: 3, smallMax: 5, smallOff: 5, largeMin: 6, largeOff: 10, sameBuildingOff: 15, floor: 55 } as const
+export const portfolioRates = {
+  smallMin: 3, smallMax: 5, smallOff: 5, largeMin: 6, largeOff: 10, sameAreaOff: 10, sameBuildingOff: 15,
+  floor: 55, bundleFloor: 100,
+} as const
 const NUM: Record<number, string> = { 3: 'Three', 5: 'five', 6: 'Six' }
 export const portfolioRatesText =
-  `${NUM[portfolioRates.smallMin]} to ${NUM[portfolioRates.smallMax]} homes: £${portfolioRates.smallOff} off each EPC. ` +
+  `${NUM[portfolioRates.smallMin]} to ${NUM[portfolioRates.smallMax]} homes: £${portfolioRates.smallOff} off each EPC or floor plan. ` +
   `${NUM[portfolioRates.largeMin]} or more: £${portfolioRates.largeOff} off each. ` +
+  `Homes in the same postcode area (like E15) on the same day: £${portfolioRates.sameAreaOff} off each after the first. ` +
   `Flats in the same building on the same day: £${portfolioRates.sameBuildingOff} off each after the first. ` +
-  `That replaces the other discount, it doesn't add to it. Never less than £${portfolioRates.floor} an EPC. ` +
-  'Floor plans and faster options stay full price.'
+  "Only the biggest discount applies; they don't add up. " +
+  'With an EPC and floor plan together, you pay the bundle price and the discount comes off once per home. ' +
+  `Never less than £${portfolioRates.floor} for an EPC or a floor plan, or £${portfolioRates.bundleFloor} for both. ` +
+  'Faster options stay full price.'
 
 /**
  * CANONICAL PRICING SOURCE.
@@ -260,12 +271,12 @@ export interface PricingBand {
 }
 
 export const pricing: PricingBand[] = [
-  { id: 'up-to-40', areaLabel: 'Up to 40 m²',    typicalLabel: 'Studios and compact flats',       areaMax: 40,   epc: 65,  floorPlan: 55,  bundle: 105, preAssessment: 90 },
-  { id: '40-55',    areaLabel: 'Over 40–55 m²',  typicalLabel: '1-bedroom flats',                 areaMax: 55,   epc: 75,  floorPlan: 65,  bundle: 120, preAssessment: 100 },
-  { id: '55-75',    areaLabel: 'Over 55–75 m²',  typicalLabel: '2-bedroom flats and small homes', areaMax: 75,   epc: 85,  floorPlan: 75,  bundle: 135, preAssessment: 110 },
-  { id: '75-95',    areaLabel: 'Over 75–95 m²',  typicalLabel: '2–3-bedroom homes',               areaMax: 95,   epc: 95,  floorPlan: 90,  bundle: 155, preAssessment: 120 },
+  { id: 'up-to-40', areaLabel: 'Up to 40 m²',    typicalLabel: 'Studios and compact flats',       areaMax: 40,   epc: 65,  floorPlan: 65,  bundle: 115, preAssessment: 90 },
+  { id: '40-55',    areaLabel: 'Over 40–55 m²',  typicalLabel: '1-bedroom flats',                 areaMax: 55,   epc: 75,  floorPlan: 75,  bundle: 130, preAssessment: 100 },
+  { id: '55-75',    areaLabel: 'Over 55–75 m²',  typicalLabel: '2-bedroom flats and small homes', areaMax: 75,   epc: 85,  floorPlan: 85,  bundle: 145, preAssessment: 110 },
+  { id: '75-95',    areaLabel: 'Over 75–95 m²',  typicalLabel: '2–3-bedroom homes',               areaMax: 95,   epc: 95,  floorPlan: 95,  bundle: 160, preAssessment: 120 },
   { id: '95-115',   areaLabel: 'Over 95–115 m²', typicalLabel: '3–4-bedroom houses',              areaMax: 115,  epc: 105, floorPlan: 105, bundle: 175, preAssessment: 130 },
-  { id: 'over-115', areaLabel: 'Over 115 m²',    typicalLabel: 'Large homes, 4+\u00a0bedrooms',  areaMax: null, epc: 120, floorPlan: 125, bundle: 210, preAssessment: 145, startingPrice: true },
+  { id: 'over-115', areaLabel: 'Over 115 m²',    typicalLabel: 'Large homes, 4+\u00a0bedrooms',  areaMax: null, epc: 120, floorPlan: 120, bundle: 200, preAssessment: 145, startingPrice: true },
 ]
 
 /** The bands with fixed guide prices, i.e. every band except the open-ended top one. */
