@@ -34,7 +34,7 @@ jobs:
         run: |
           code=$(curl -sS --retry 2 -o contact.json -w '%{http_code}' -X POST "$SITE/api/contact" \
             -H 'Content-Type: application/json' \
-            -d '{"name":"Health Check","phone":"07000 000000","email":"health-check@example.invalid","address":"1 Health Check Road","postcode":"E15 1AA","services":["Floor Plan"],"areaBand":"71-95","customerType":"Letting agent / firm","improvementPlan":false,"speed":"Standard (72 hours)","sourcePage":"contact","ctaId":"direct","propertyCount":"","preferredDate":"","notes":"","website":"","turnstileToken":"health-check-dummy-token","consent":true}')
+            -d '{"name":"Health Check","phone":"07000 000000","email":"health-check@example.invalid","address":"1 Health Check Road","postcode":"E15 1AA","services":["Floor Plan"],"dwellingType":"Flat","areaBand":"71-95","customerType":"Letting agent / firm","improvementPlan":false,"speed":"Standard (72 hours)","sourcePage":"contact","ctaId":"direct","propertyCount":"","preferredDate":"","notes":"","website":"","turnstileToken":"health-check-dummy-token","consent":true}')
           cat contact.json; echo
           test "$code" = "400"
           grep -q 'Security verification failed' contact.json
