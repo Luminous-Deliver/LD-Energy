@@ -2,6 +2,10 @@ import type { AreaSummary } from './borough-stats-types'
 import type { FaqItem } from './faq'
 import { boroughCount, fmt, pct, rankLabel, rankOf } from './area-page'
 import { d1Local } from './area-local-d1'
+import { d2aLocal } from './area-local-d2a'
+import { d2bLocal } from './area-local-d2b'
+import { d3aLocal } from './area-local-d3a'
+import { d3bLocal } from './area-local-d3b'
 
 /**
  * Hand-written local content for rebuilt area pages: the parts no template can produce.
@@ -80,6 +84,10 @@ function district(s: AreaSummary, code: string) {
 
 export const areaLocal: Record<string, AreaLocal> = {
   ...d1Local,
+  ...d2aLocal,
+  ...d2bLocal,
+  ...d3aLocal,
+  ...d3bLocal,
   stratford: {
     districtNames: {
       E15: 'Stratford, Maryland and Forest Lane',

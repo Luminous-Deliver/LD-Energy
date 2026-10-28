@@ -15,7 +15,8 @@ const { boroughMeta } = require('../lib/boroughs.ts')
 const { areaLocal } = require('../lib/area-local.ts')
 
 const dir = process.argv[2] || path.join(__dirname, '..', '.next', 'server', 'app', 'areas')
-const targets = (process.argv[3] || 'stratford,newham,croydon,wandsworth,waltham-forest,greenwich,lambeth,brent,tower-hamlets,camden,barking-dagenham').split(',')
+// Every area page with hand-written local content (all 34 since D2 and D3 on 28/10/2026).
+const targets = process.argv[3] ? process.argv[3].split(',') : Object.keys(areaLocal)
 const GATE = 40
 
 const names = Object.values(boroughMeta).flatMap((b) => [b.name, b.name.replace('&', 'and')])
