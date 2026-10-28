@@ -133,7 +133,7 @@ export function AreaHeroD({ slug, name, s, parent, sections }: {
                 <span key={l.name} className="in-map__lb" style={{ left: `${l.x}%`, top: `${l.y}%` }}>{l.name}</span>
               ))}
               {AREA_MAPS[map].pin && (
-                <span className="in-map__pin" style={{ left: `${AREA_MAPS[map].pin!.x}%`, top: `${AREA_MAPS[map].pin!.y}%` }}>
+                <span className={AREA_MAPS[map].pin!.x > 55 ? 'in-map__pin in-map__pin--left' : 'in-map__pin'} style={{ left: `${AREA_MAPS[map].pin!.x}%`, top: `${AREA_MAPS[map].pin!.y}%` }}>
                   <i aria-hidden="true" />Our base, Stratford
                 </span>
               )}

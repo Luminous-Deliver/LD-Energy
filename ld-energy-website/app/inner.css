@@ -61,7 +61,7 @@
 /* buttons: the shared .ld-btn, plus a light one for night grounds */
 .in .ld-btn--light { background: var(--on-night); color: var(--night); }
 .in .ld-btn--light:hover { background: #fff; }
-.in .ld-btn--block { display: flex; width: 100%; }
+.in .ld-btn--block { display: flex; width: 100%; white-space: normal; text-align: center; }
 .in-wa { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-weight: 500; color: var(--sage-700); text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
 
 /* ------------------------------------------------------------------ breadcrumbs -- */
@@ -91,6 +91,8 @@
   font-size: 11px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--ink, #33384F);
   text-shadow: 0 0 3px #FCFBF8, 0 0 3px #FCFBF8, 0 0 6px #FCFBF8; }
 .in-map__pin { transform: translate(-7px, -50%); display: inline-flex; align-items: center; gap: 8px; color: #2D4C3C; font-weight: 600; letter-spacing: .06em; text-transform: none; font-size: 12.5px; }
+/* a pin in the right half labels to its left, so "Our base, Stratford" never runs off a phone (Tower Hamlets) */
+.in-map__pin--left { flex-direction: row-reverse; transform: translate(calc(-100% + 7px), -50%); }
 .in-map__pin i { width: 14px; height: 14px; border-radius: 50%; background: #3A624E; box-shadow: 0 0 0 4px rgba(58, 98, 78, .22), 0 0 0 2px #FCFBF8 inset; flex: none; }
 @media (max-width: 520px) { .in-map__lb { font-size: 9.5px; letter-spacing: .08em; } .in-map__pin { font-size: 11px; } }
 .in-hd__credit { margin-top: 10px; font-size: 11px; color: var(--ink-3, #6b7083); }
