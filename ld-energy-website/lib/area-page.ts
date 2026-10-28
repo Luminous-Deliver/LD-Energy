@@ -12,7 +12,11 @@ import { pricing, site } from './site'
 export const PILOT_SLUGS = ['stratford', 'newham', 'croydon'] as const
 /** Batch D1 (plan §11): the rest of the top ten boroughs by impressions. */
 export const D1_SLUGS = ['wandsworth', 'waltham-forest', 'greenwich', 'lambeth', 'brent', 'tower-hamlets', 'camden', 'barking-dagenham'] as const
-export const AREA_V2_SLUGS = [...PILOT_SLUGS, ...D1_SLUGS] as const
+/** Batch D2 (plan §11), brought forward from 24/11 by Abdul on 28/10/2026. */
+export const D2_SLUGS = ['ealing', 'lewisham', 'hounslow', 'islington', 'barnet', 'haringey', 'westminster', 'hackney', 'southwark', 'richmond', 'havering', 'sutton', 'kensington-chelsea', 'city-of-london'] as const
+/** Batch D3 (plan §11), brought forward from 05/12 by Abdul on 28/10/2026. */
+export const D3_SLUGS = ['enfield', 'redbridge', 'hammersmith-fulham', 'hillingdon', 'bexley', 'merton', 'harrow', 'bromley', 'kingston'] as const
+export const AREA_V2_SLUGS = [...PILOT_SLUGS, ...D1_SLUGS, ...D2_SLUGS, ...D3_SLUGS] as const
 
 /**
  * Plan §15 refinement 2, from batch D1: where marketed sales outnumber private lettings in the borough's data,

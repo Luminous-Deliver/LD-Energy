@@ -54,7 +54,8 @@ const norm = (s) => s.replace(/\s+/g, ' ').trim()
     const second = page.locator('main .in-faq details').nth(1)
     ok(!(await second.locator('.in-faq__a').isVisible()), 'second answer hidden before a tap')
     await second.locator('summary').click()
-    ok(await second.locator('.in-faq__a').isVisible(), 'tapping a question opens it')
+    // The FAQ block fades in on scroll (innerReveals), so the click's scroll-into-view can land before the reveal: wait for it.
+    ok(await second.locator('.in-faq__a').waitFor({ state: 'visible', timeout: 2000 }).then(() => true, () => false), 'tapping a question opens it')
 
     // Schema: FAQPage = the visible questions and answers, in order
     const blocks = await page.evaluate(() => [...document.querySelectorAll('script[type="application/ld+json"]')].flatMap((s) => [JSON.parse(s.textContent)].flat()))
