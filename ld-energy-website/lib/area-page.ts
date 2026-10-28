@@ -5,11 +5,24 @@ import { pricing, site } from './site'
 
 /**
  * Area pages on the rebuilt template (plan PLAN-AREAS-GUIDES-2026-10-22 §4). The pilot is three
- * pages; the other 31 keep the current template until their batch. AREA_V2_ALL=1 at build time
+ * pages and D1 adds eight; the others keep the current template until their batch. AREA_V2_ALL=1 at build time
  * renders every area page on the new template, which the uniqueness check uses to measure the
  * pilot pages against the shared parts of the template.
  */
-export const AREA_V2_SLUGS = ['stratford', 'newham', 'croydon'] as const
+export const PILOT_SLUGS = ['stratford', 'newham', 'croydon'] as const
+/** Batch D1 (plan §11): the rest of the top ten boroughs by impressions. */
+export const D1_SLUGS = ['wandsworth', 'waltham-forest', 'greenwich', 'lambeth', 'brent', 'tower-hamlets', 'camden', 'barking-dagenham'] as const
+export const AREA_V2_SLUGS = [...PILOT_SLUGS, ...D1_SLUGS] as const
+
+/**
+ * Plan §15 refinement 2, from batch D1: where marketed sales outnumber private lettings in the borough's data,
+ * "Why homes here rate" comes before "If you let". Decided by the data at build, never by hand; the pilot keeps its order.
+ */
+export function salesLed(slug: string): boolean {
+  if ((PILOT_SLUGS as readonly string[]).includes(slug)) return false
+  const s = summaryFor(slug)
+  return !!s && s.pctSales > s.pctLettings
+}
 
 export function usesAreaV2(slug: string): boolean {
   return process.env.AREA_V2_ALL === '1' || (AREA_V2_SLUGS as readonly string[]).includes(slug)
