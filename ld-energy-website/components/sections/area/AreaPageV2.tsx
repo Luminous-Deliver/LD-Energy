@@ -61,19 +61,19 @@ function sharedFaqs(name: string): FaqItem[] {
  * the borough comparison, then the ready-to-book card. Guide titles and descriptions come from the posts.
  */
 async function readNextSteps(name: string, s: AreaSummary): Promise<NextStep[]> {
-  const guide = async (slug: string, kicker: string, img: string): Promise<NextStep | null> => {
+  const guide = async (slug: string, kicker: string, img: string, text: string): Promise<NextStep | null> => {
     const p = await getPostBySlug(slug)
-    return p ? { kicker, title: p.title, text: p.description, href: `/blog/${slug}`, img, meta: `${p.readingTime} min read` } : null
+    return p ? { kicker, title: p.title, text, href: `/blog/${slug}`, img, meta: `${p.readingTime} min read` } : null
   }
   const first = s.pctLettings >= s.pctSales
-    ? await guide('epc-for-landlords-2026', 'Letting and MEES', '/inner/rn-landlord.svg')
-    : await guide('epc-for-selling-house', 'Selling and buying', '/inner/rn-seller.svg')
-  const second = await guide('why-is-my-epc-different', 'Understand your EPC', '/inner/rn-two-houses.svg')
+    ? await guide('epc-for-landlords-2026', 'Letting and MEES', '/inner/rn-landlord.svg', 'The rules for letting today.')
+    : await guide('epc-for-selling-house', 'Selling and buying', '/inner/rn-seller.svg', 'What buyers and agents look at.')
+  const second = await guide('why-is-my-epc-different', 'Understand your EPC', '/inner/rn-two-houses.svg', 'Why similar homes score differently.')
   const steps: (NextStep | null)[] = [
     first,
     second,
     { kicker: 'Borough figures', title: 'EPC ratings in every London borough', href: DATA_PAGE_PATH, img: '/inner/rn-boroughs.svg',
-      text: `${name}'s ${pct(s.ratings.pct.AtoC)} rated A to C, against ${pct(london.ratings.pct.AtoC)} across London and the other councils.` },
+      text: `${name}: ${pct(s.ratings.pct.AtoC)} rated A to C. London: ${pct(london.ratings.pct.AtoC)}.` },
     { title: 'Ready to book?', href: '#contact', go: true,
       text: 'Tell us the address and size. We confirm your exact price before you book.' },
   ]
