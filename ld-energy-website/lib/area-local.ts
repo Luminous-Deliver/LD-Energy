@@ -56,6 +56,18 @@ const newhamConservation: CouncilSource = {
   checked: CHECKED,
 }
 
+const newhamArticle4: CouncilSource = {
+  label: 'Newham Council, additional planning controls: Article 4 Directions',
+  url: 'https://www.newham.gov.uk/planning-development-conservation/conservation-areas-listed-buildings-newham/2',
+  checked: '2026-10-28',
+}
+
+const newhamListed: CouncilSource = {
+  label: 'Newham Council, listed and locally listed buildings',
+  url: 'https://www.newham.gov.uk/planning-development-conservation/conservation-areas-listed-buildings-newham/6',
+  checked: '2026-10-28',
+}
+
 const croydonSources = {
   schemes: { label: 'Croydon Council, about our new housing licensing schemes', url: 'https://www.croydon.gov.uk/housing/landlords-and-managing-agents/property-licensing-schemes/about-our-new-housing-licensing-schemes', checked: CHECKED },
   selective: { label: 'Croydon Council, Selective Licensing Scheme 2026', url: 'https://www.croydon.gov.uk/housing/landlords-and-managing-agents/property-licensing-schemes/selective-licensing-scheme-2026', checked: CHECKED },
@@ -179,8 +191,10 @@ export const areaLocal: Record<string, AreaLocal> = {
         heading: 'Conservation areas in Newham',
         paragraphs: [
           'Newham has nine conservation areas, among them the Woodgrange Estate, Forest Gate Town Centre and Romford Road in E7, East Ham in E6 and Durham Road in Manor Park. Changing windows or doors in one of them may need planning permission that the same work elsewhere would not.',
+          'Article 4 Directions currently apply in three of them: Durham Road, Romford Road and Woodgrange Road. There, replacing windows, doors and roof materials, and painting, cladding or pebble-dashing walls, needs consent. Householders can ask for written pre-application advice, which the council says is free.',
+          'Newham has over 100 listed buildings, from the 15th century Spotted Dog pub to the 19th century Abbey Mills Pumping Station. A building on the local list is not listed, so it needs no listed building consent, and its permitted development rights are unaffected unless an Article 4 direction applies.',
         ],
-        sources: [newhamConservation],
+        sources: [newhamConservation, newhamArticle4, newhamListed],
       },
     ],
     faqs: (s) => {
@@ -201,6 +215,11 @@ export const areaLocal: Record<string, AreaLocal> = {
           q: 'Does a better EPC rating lower the Newham licence fee?',
           a: 'It can. The selective licence is £750 for up to five years. If the licence holder is an accredited landlord and the home has an EPC of C or above, the online fee comes down to £650. Proof of both is uploaded with the application.',
           links: [{ label: 'Newham licence fees', href: newhamLicensingSources[2].url, external: true }],
+        },
+        {
+          q: 'Can I replace the windows of my Newham home in a conservation area?',
+          a: 'Newham lists nine conservation areas, and says you may need permission for work that would not normally need it, such as changing windows or doors. Article 4 Directions apply in Durham Road, Romford Road and Woodgrange Road, where replacing windows, doors and roof materials needs consent. The duty planning officer can confirm an address.',
+          links: [{ label: 'Newham Article 4 Directions', href: newhamArticle4.url, external: true }],
         },
         ...(top && bottom && top !== bottom ? [{
           q: 'Which parts of Newham rate highest?',

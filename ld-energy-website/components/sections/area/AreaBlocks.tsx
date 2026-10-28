@@ -250,10 +250,6 @@ function InMix({ label, s }: { label: string; s: AreaSummary }) {
 function FiguresMethod() {
   return (
     <>
-      <p>
-        Source: {statsSource.publisher}, <a href={statsSource.url} rel="noopener">{statsSource.title}</a>, file of {ukDate(statsSource.fileUpdated)}.{' '}
-        <a href={OGL} rel="noopener">{statsSource.licence}</a>.
-      </p>
       <p><Link href={`${DATA_PAGE_PATH}#about-figures`} className={linkCls}>How these figures are counted</Link>, and what to read with care.</p>
     </>
   )
@@ -365,8 +361,7 @@ export function LettingSection({ name, s, council, band = true }: { name: string
             rated below C, against {pct(london.privateRented.pctBelowC)} across London, and {fmt(prs.nFtoG)} were rated F or G.
           </p>
           <p>
-            A rental needs an E or better today unless a valid exemption is registered. Government has confirmed a higher standard equivalent to C for 1 October 2030, but the legislation for it is
-            still to be passed.
+            A rental needs an E or better today unless a valid exemption is registered.
           </p>
           <p>
             Read <Link href="/blog/epc-for-landlords-2026">the rules for landlords today</Link>,{' '}
@@ -413,7 +408,6 @@ export function StockSection({ name, s, local, reading, band = false }: { name: 
             On {pct(s.potential.pctBelowCCouldReachC)} of the certificates rated D or lower, the potential rating (every
             recommendation carried out) is C or better.
           </p>
-          <p className="in-src">{dataSource}</p>
         </div>
       </Container>
     </section>

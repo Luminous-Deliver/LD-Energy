@@ -131,6 +131,16 @@ export const d1Local: Record<string, AreaLocal> = {
         ],
         sources: [wandsworth.conservation, wandsworth.article4],
       },
+      {
+        id: 'wandsworth-estates',
+        heading: 'Estates, windows and retrofit in Wandsworth',
+        paragraphs: [
+          'Wandsworth’s conservation area appraisals describe whole estates. Shaftesbury Park in Battersea is about 1,200 mainly two-storey terraced houses, completed between 1873 and 1877. Totterdown Fields in Tooting has 1,261 cottages, and some are a separate ground-floor and first-floor flat. The Latchmere Estate, completed in 1903, was the first municipal housing estate in the country built with a council’s own workforce.',
+          'On Shaftesbury Park, the Article 4 Direction puts replacement windows and doors, and re-roofing in a different material, under planning control. The Dover House Estate appraisal, for a 1920s London County Council cottage estate, suggests draught-proofing or secondary glazing as an alternative to replacing original windows, and says repair work does not need planning permission.',
+          'Wandsworth’s licence conditions say the EPC rating must meet the current minimum energy efficiency standard at the time of letting, unless exempt. A licence can be granted for up to five years. The council’s retrofit pages say most buildings can be retrofitted under permitted development rights, but a conservation area or listed building may need planning permission.',
+        ],
+        sources: [src('Wandsworth Council, Shaftesbury Park Estate appraisal', 'https://www.wandsworth.gov.uk/media/1681/shaftesbury_caaandms.pdf'), src('Wandsworth Council, Totterdown Fields Estate appraisal', 'https://www.wandsworth.gov.uk/media/djnpu24q/totterdown.pdf'), src('Wandsworth Council, Latchmere Estate appraisal', 'https://www.wandsworth.gov.uk/media/1604/latchmereplusappraisalplusms.pdf'), src('Wandsworth Council, Shaftesbury Park Article 4 Direction', 'https://www.wandsworth.gov.uk/planning/permitted-development-and-article-4-directions/article-4-directions/shaftesbury-park-estate-conservation-area/'), src('Wandsworth Council, Dover House Estate appraisal', 'https://www.wandsworth.gov.uk/media/1595/dover_house_final.pdf'), src('Wandsworth Council, selective licensing conditions', 'https://www.wandsworth.gov.uk/media/nrjp3c0m/selective_licensing_conditions.pdf'), src('Wandsworth Council, retrofit planning and regulation', 'https://www.wandsworth.gov.uk/environment/climate-change/retrofit-advice/retrofit-planning-and-regulation/')],
+      },
     ],
     faqs: (s) => [
       {
@@ -147,6 +157,11 @@ export const d1Local: Record<string, AreaLocal> = {
         q: 'Can I change the windows of my Wandsworth flat in a conservation area?',
         a: 'Wandsworth says flats, and houses converted into flats, do not have permitted development rights, so planning permission is always needed to change doors and windows. That applies to many Putney and Balham conversions.',
         links: [{ label: 'Wandsworth conservation areas FAQ', href: wandsworth.conservation.url, external: true }],
+      },
+      {
+        q: 'Do Wandsworth’s licence conditions mention the EPC?',
+        a: 'Yes. The selective licensing conditions say the EPC rating must meet the current minimum energy efficiency standard at the time of letting, unless the property is exempt. The additional licensing conditions say the same.',
+        links: [{ label: 'Wandsworth selective licensing conditions', href: 'https://www.wandsworth.gov.uk/media/nrjp3c0m/selective_licensing_conditions.pdf', external: true }],
       },
       ...districtFaq(s, 'Wandsworth'),
     ],
@@ -192,6 +207,16 @@ export const d1Local: Record<string, AreaLocal> = {
         ],
         sources: [walthamForest.conservation],
       },
+      {
+        id: 'walthamforest-estates',
+        heading: 'Streets, estates and standards in Waltham Forest',
+        paragraphs: [
+          'The council’s conservation area appraisals show how varied the older homes are. Leucha Road in Walthamstow is 1895 two-storey maisonettes, called half houses, all originally built to rent. By 1901 the Warner company had 2,184 weekly tenants in the terraces around Lloyd Park. Thornhill Road in Leyton runs from small cottages to large villas. The Ropers Field Estate in Chingford was developed for housing from 1946.',
+          'The council’s standards for private rented property say homes should be improved over time towards an EPC band C, and call that an aspiration. The same standards expect effective loft insulation of at least 200mm or equivalent.',
+          'Planning permission is generally needed for solar panels on a wall that fronts a highway in a conservation area.',
+        ],
+        sources: [src('Waltham Forest Council, Leucha Road appraisal', 'https://www.walthamforest.gov.uk/sites/default/files/2021-10/CA%20APPRAISAL%20MANAGEMENT%20PLAN%20-%20LEUCHA%20ROAD.pdf'), src('Waltham Forest Council, Lloyd Park appraisal', 'https://www.walthamforest.gov.uk/sites/default/files/2021-10/CA%20APPRAISAL%20MANAGEMENT%20PLAN%20-%20LLOYD%20PARK.pdf'), src('Waltham Forest Council, Thornhill Road appraisal', 'https://www.walthamforest.gov.uk/sites/default/files/2021-10/CA%20APPRAISAL%20MANAGEMENT%20PLAN%20-%20THORNHILL%20ROAD.pdf'), src('Waltham Forest Council, Ropers Field appraisal', 'https://www.walthamforest.gov.uk/sites/default/files/2021-10/CA%20APPRAISAL%20MANAGEMENT%20PLAN%20-%20ROPERS%20FIELD.pdf'), src('Waltham Forest Council, standards for private rented property', 'https://www.walthamforest.gov.uk/sites/default/files/2021-10/Standards%20for%20Private%20Rented%20Property.pdf'), src('Waltham Forest Council, conservation areas and listed buildings', 'https://www.walthamforest.gov.uk/planning-and-building-control/design-and-conservation/conservation-areas-and-listed-buildings')],
+      },
     ],
     faqs: (s) => [
       {
@@ -207,6 +232,11 @@ export const d1Local: Record<string, AreaLocal> = {
       {
         q: 'Do you cover Walthamstow Village and Chingford?',
         a: 'Yes. Walthamstow Village is a conservation area, so tell us if you plan outside work such as new windows, as the planning rules are stricter there. Chingford, Highams Park and Woodford Green are covered at the same price as the rest of London.',
+      },
+      {
+        q: 'Does Waltham Forest expect rented homes to reach EPC C?',
+        a: 'The council’s standards for private rented property call band C an aspirational minimum, to be reached over time, and say the council will work with landlords on advice and grant funding. It is not a licence condition. The legal minimum today is E.',
+        links: [{ label: 'Waltham Forest standards for private rented property', href: 'https://www.walthamforest.gov.uk/sites/default/files/2021-10/Standards%20for%20Private%20Rented%20Property.pdf', external: true }],
       },
       ...districtFaq(s, 'Waltham Forest'),
     ],
@@ -254,6 +284,16 @@ export const d1Local: Record<string, AreaLocal> = {
         ],
         sources: [greenwich.conservation],
       },
+      {
+        id: 'greenwich-estates',
+        heading: 'Estates and heritage areas in Greenwich',
+        paragraphs: [
+          'The Progress Estate at Well Hall in Eltham was built in 1915 to house munitions workers, and nearly the whole estate of 1,200 housing units survives. The Ashburnham Triangle in West Greenwich is Georgian and mid-Victorian terraces in yellow London stock brick under slate roofs, with 26 statutorily listed buildings and 210 on the local list. Plumstead Common is mainly late 19th century two-storey terraces facing the Common.',
+          'The 2007 Progress Estate appraisal says its Article 4 Direction almost entirely removes householder permitted development rights for single-family houses. The 2008 Ashburnham Triangle appraisal says replacing a window needs planning permission if it alters the building’s appearance. Both are older documents, so check the current position with the council. Buildings on the local list need no listed building consent, but alterations may still need planning permission.',
+          'The January 2026 HMO licence conditions require the holder to keep a valid EPC. The selective licence conditions require the holder to give the tenant a copy of the EPC.',
+        ],
+        sources: [src('Royal Greenwich, Progress Estate appraisal', 'https://www.royalgreenwich.gov.uk/sites/default/files/2025-07/Progress_Estate_CAA_adopted_Dec_2007.pdf'), src('Royal Greenwich, Ashburnham Triangle appraisal', 'https://www.royalgreenwich.gov.uk/sites/default/files/2025-07/Ashburnham_Triangle_CAA_adopted_Dec_2008%20%281%29_0.pdf'), src('Royal Greenwich, Plumstead Common appraisal', 'https://www.royalgreenwich.gov.uk/sites/default/files/2025-07/Plumstead_Common_CAA_adopted_Mar_2010.pdf'), src('Royal Greenwich, locally listed buildings', 'https://www.royalgreenwich.gov.uk/planning-and-building-control/conservation-and-listed-buildings/listed-buildings-information/local'), src('Royal Greenwich, HMO licence conditions January 2026', 'https://www.royalgreenwich.gov.uk/sites/default/files/2026-01/HMO-licence-conditions-january-2026.pdf'), src('Royal Greenwich, selective licence conditions January 2026', 'https://www.royalgreenwich.gov.uk/sites/default/files/2026-01/selective-licence-conditions-january-2026.pdf')],
+      },
     ],
     faqs: (s) => [
       {
@@ -270,6 +310,11 @@ export const d1Local: Record<string, AreaLocal> = {
         q: 'Can you assess a Blackheath or West Greenwich home?',
         a: 'Yes. Both are conservation areas, and West Greenwich has two Article 4 directions. They affect outside work, not the assessment. We record the walls, windows and heating as they are on the visit.',
         links: [{ label: 'Greenwich conservation areas', href: greenwich.conservation.url, external: true }],
+      },
+      {
+        q: 'Do Greenwich’s licence conditions mention the EPC?',
+        a: 'Yes. The HMO licence conditions say the licence holder must make sure the flat or house has a valid EPC. The selective licence conditions say the holder must provide the tenant with a copy of the EPC for the property.',
+        links: [{ label: 'Greenwich selective licence conditions', href: 'https://www.royalgreenwich.gov.uk/sites/default/files/2026-01/selective-licence-conditions-january-2026.pdf', external: true }],
       },
       ...districtFaq(s, 'Greenwich'),
     ],
@@ -327,6 +372,16 @@ export const d1Local: Record<string, AreaLocal> = {
         ],
         sources: [lambeth.conservation],
       },
+      {
+        id: 'lambeth-estates',
+        heading: 'Estates, listings and heat networks in Lambeth',
+        paragraphs: [
+          'Lambeth’s conservation area profiles name its planned estates. The Leigham Court Estate in Streatham was developed between 1889 and 1928 by the Artizans, Labourers and General Dwellings Company. Hyde Farm has a marked Edwardian character, built between 1896 and 1916 by Emmanuel College Cambridge. The Peabody Estate on Rosendale Road is 20 acres of social housing from 1901, in flats and terraced houses. Roupell Street has uniform terraced houses with corner shops and a pub.',
+          'The profiles for Albert Square, Lansdowne Gardens, Leigham Court Estate, Park Hall Road, St Marks, Stockwell Park, Streatham Lodge and Vauxhall each say an Article 4 Direction applies, and Hyde Farm’s profile says so too. Lambeth has over 2,000 statutorily listed buildings. Local heritage listing adds no extra planning controls, but it is a material consideration.',
+          'The council runs heat networks supplying 117 buildings with more than 4,118 dwellings, which matters when a flat is on communal heating.',
+        ],
+        sources: [src('Lambeth Council, Leigham Court Estate profile', 'https://www.lambeth.gov.uk/planning-and-building-control/conservation-and-listed-buildings/conservation-area-profiles/leigham-court-estate-ca31'), src('Lambeth Council, Hyde Farm profile', 'https://www.lambeth.gov.uk/planning-and-building-control/conservation-and-listed-buildings/conservation-area-profiles/hyde-farm-ca48'), src('Lambeth Council, Peabody Estate Rosendale Road profile', 'https://www.lambeth.gov.uk/planning-and-building-control/conservation-and-listed-buildings/conservation-area-profiles/peabody-estate-rosendale-road-ca53'), src('Lambeth Council, statutory listed buildings', 'https://www.lambeth.gov.uk/planning-and-building-control/conservation-and-listed-buildings/statutory-listed-buildings'), src('Lambeth Council, locally listed buildings', 'https://www.lambeth.gov.uk/planning-and-building-control/conservation-and-listed-buildings/locally-listed-buildings'), src('Lambeth Council, heat networks', 'https://www.lambeth.gov.uk/housing/heat-networks')],
+      },
     ],
     faqs: (s) => [
       {
@@ -342,6 +397,11 @@ export const d1Local: Record<string, AreaLocal> = {
       {
         q: 'Do you assess flats in converted Brixton and Clapham houses?',
         a: 'Yes. Each self-contained flat gets its own EPC. Tell us which floor it is on and how its heating works, and whether the roof above is shared.',
+      },
+      {
+        q: 'Can I see my Lambeth building’s EPC on a council map?',
+        a: 'Lambeth’s heat decarbonisation study has an interactive map with information about every building in the borough. Buildings are colour-coded by the heating energy they need, and each shows details such as the EPC, building age and insulation levels.',
+        links: [{ label: 'Lambeth heat decarbonisation study', href: 'https://www.lambeth.gov.uk/environmental-services/climate-change-sustainability/buildings-energy/heat-decarbonisation-study', external: true }],
       },
       ...districtFaq(s, 'Lambeth'),
     ],
@@ -397,6 +457,16 @@ export const d1Local: Record<string, AreaLocal> = {
         ],
         sources: [brent.conservation],
       },
+      {
+        id: 'brent-estates',
+        heading: 'Metroland, listings and planning in Brent',
+        paragraphs: [
+          'Brent’s heritage page says the railways enabled suburban Metroland development, boosted by the British Empire Exhibition at Wembley Park. The conservation area appraisals show the spread. Queen’s Park is rows of two and three-storey Victorian and Edwardian terraces. Kilburn is wholly Victorian, mostly three-storey terraces. Sudbury Court was laid out from 1925 to Garden Suburb principles. Roe Green Village is a garden-city style estate planned in 1916, with construction from 1918.',
+          'All of Brent’s residential conservation areas are covered by Article 4 directions, and exterior cladding needs planning permission in a conservation area. Brent has one Grade I, nine Grade II* and around 200 Grade II listed buildings. A separate direction, in effect since 1 November 2022, requires planning permission to change a dwelling to a small house in multiple occupation.',
+          'Brent’s HMO licence conditions list the EPCs carried out for new tenancies among the records the licence holder must be able to produce.',
+        ],
+        sources: [src('Brent Council, listed buildings and conservation areas', 'https://www.brent.gov.uk/planning-and-building-control/listed-buildings-and-conservation-areas'), src('Brent Council, Queen’s Park conservation area appraisal', 'https://www.brent.gov.uk/-/media/files/resident-documents/planning-and-bc-documents/queens-park-conservation-area-appraisal.pdf'), src('Brent Council, Kilburn conservation area appraisal', 'https://www.brent.gov.uk/-/media/files/resident-documents/planning-and-bc-documents/kilburn-conservation-area-appraisal.pdf'), src('Brent Council, Sudbury Court conservation area appraisal', 'https://www.brent.gov.uk/-/media/files/resident-documents/planning-and-bc-documents/sudbury-court-conservation-area-appraisal.pdf'), src('Brent Council, Roe Green conservation area appraisal', 'https://www.brent.gov.uk/-/media/files/resident-documents/planning-and-bc-documents/roe-green-conservation-area-appraisal.pdf'), src('Brent Council, Article 4 directions', 'https://www.brent.gov.uk/planning-and-building-control/planning-policy-and-guidance/article-4-directions'), src('Brent Council, HMO licence conditions', 'https://www.brent.gov.uk/-/media/files/resident-documents/housing/final--conditions-for-the-mandatory--additional-hmo-property-licensing-scheme-approved-october-13-20.pdf')],
+      },
     ],
     faqs: (s) => [
       {
@@ -412,6 +482,11 @@ export const d1Local: Record<string, AreaLocal> = {
       {
         q: 'Do you cover Wembley Park and the towers?',
         a: 'Yes, at the same price as the rest of London. For a flat in a managed block, tell us the concierge or entry arrangements when you book. Wembley Park is the one ward outside Brent’s selective licensing.',
+      },
+      {
+        q: 'Do I need planning permission to turn a Brent house into a small HMO?',
+        a: 'Brent’s Article 4 page says a direction in effect since 1 November 2022 requires planning permission for a change of use from a dwelling (Class C3) to a small house in multiple occupation (Class C4). That is separate from the licence.',
+        links: [{ label: 'Brent Article 4 directions', href: 'https://www.brent.gov.uk/planning-and-building-control/planning-policy-and-guidance/article-4-directions', external: true }],
       },
       ...districtFaq(s, 'Brent'),
     ],
@@ -462,6 +537,16 @@ export const d1Local: Record<string, AreaLocal> = {
         ],
         sources: [towerHamlets.conservation],
       },
+      {
+        id: 'towerhamlets-estates',
+        heading: 'Terraces, estates and energy schemes in Tower Hamlets',
+        paragraphs: [
+          'Tower Hamlets’ conservation area appraisals cover very different homes. Tredegar Square is early Georgian terraced houses. At Wapping Pierhead, two terraces were designed by Daniel Alexander in 1811, and former warehouses have been converted to homes. The Boundary Estate is 20 blocks of five-storey flats built around a central circus. The Balfron Tower area is two residential blocks designed by Ernő Goldfinger for the London County Council in the 1960s.',
+          'The Tredegar Square appraisal says external insulation through rendering or other methods will not be supported, and that any extra insulation should go on the inside. It says original windows should be retained and repaired, with draught-proofing and, if necessary, internal secondary glazing. The borough has 13 Grade I and around 2,000 Grade II listed buildings.',
+          'An additional licence is valid for five years, assuming no significant change to the property or its ownership. The council’s Residential Energy Efficiency Programme offers free home energy upgrades to owner-occupiers, and at least one owner must live in the property, so it is not a landlord scheme.',
+        ],
+        sources: [src('Tower Hamlets Council, Tredegar Square appraisal', 'https://www.towerhamlets.gov.uk/Documents/Planning-and-building-control/Development-control/Conservation-areas/Tredegar-Square-Camp.pdf'), src('Tower Hamlets Council, Wapping Pierhead appraisal', 'https://www.towerhamlets.gov.uk/Documents/Planning-and-building-control/Development-control/Conservation-areas/Wapping-PierheadV2.pdf'), src('Tower Hamlets Council, Boundary Estate appraisal', 'https://www.towerhamlets.gov.uk/Documents/Planning-and-building-control/Development-control/Conservation-areas/Boundary-EstateV1.pdf'), src('Tower Hamlets Council, Balfron Tower appraisal', 'https://www.towerhamlets.gov.uk/Documents/Planning-and-building-control/Development-control/Conservation-areas/Balfron-TowerV1.pdf'), src('Tower Hamlets Council, listed buildings', 'https://www.towerhamlets.gov.uk/lgnl/planning_and_building_control/conservation_and_urban_design/listed_buildings.aspx'), src('Tower Hamlets Council, Residential Energy Efficiency Programme', 'https://www.towerhamlets.gov.uk/lgnl/environment_and_waste/Sustainability/Tower_Hamlets_Energy/Residential-Energy-Efficiency-Programme.aspx')],
+      },
     ],
     faqs: (s) => [
       {
@@ -477,6 +562,11 @@ export const d1Local: Record<string, AreaLocal> = {
       {
         q: 'Can you assess a Canary Wharf apartment?',
         a: 'Yes, at the same price as the rest of London. Tell us about the concierge or entry arrangements when you book. Details of the communal heating system and the controls in the flat help the assessment.',
+      },
+      {
+        q: 'Does Tower Hamlets fund energy upgrades for homeowners?',
+        a: 'Its Residential Energy Efficiency Programme offers free home energy upgrades to owner-occupiers, and at least one owner must live in the property. The council also funds a Home Energy Advice Programme with the Bromley by Bow Centre and SHINE. Neither is for landlords.',
+        links: [{ label: 'Tower Hamlets Residential Energy Efficiency Programme', href: 'https://www.towerhamlets.gov.uk/lgnl/environment_and_waste/Sustainability/Tower_Hamlets_Energy/Residential-Energy-Efficiency-Programme.aspx', external: true }],
       },
       ...districtFaq(s, 'Tower Hamlets'),
     ],
@@ -531,6 +621,16 @@ export const d1Local: Record<string, AreaLocal> = {
         ],
         sources: [camden.conservation, camden.article4],
       },
+      {
+        id: 'camden-estates',
+        heading: 'Listed homes, Belsize rules and landlord grants in Camden',
+        paragraphs: [
+          'Camden has more than 5,600 listed buildings, including the 1970s Alexandra Road Estate. Every part of a listed building is protected, inside as well as out. Belsize is mid-19th century Italianate villas, planned in pairs of three or four storeys plus a basement, with late 19th century red-brick streets in an Arts and Crafts style. Kentish Town is mainly terraced houses. The Holly Lodge Estate in Highgate follows a 1923 masterplan based on garden suburb principles.',
+          'In Belsize, replacing front windows or doors with matching double-glazed ones needs planning permission under the Article 4 Direction, and the council charges no fee for those applications. The council’s design guides say draught-proofing, secondary glazing and roof insulation need no planning permission.',
+          'Camden’s minimum energy efficiency standards support grant matches a landlord’s contribution up to £10,000 per building. The works must come from a valid EPC, ideally no more than 24 months old, and the grant asks for a certificate of future occupation, for renting for five years.',
+        ],
+        sources: [src('Camden Council, listed buildings', 'https://www.camden.gov.uk/listed-buildings'), src('Camden Council, Belsize area design guide, June 2026', 'https://www.camden.gov.uk/documents/d/guest/belsize-area-design-guide-june-2026'), src('Camden Council, Belsize fact sheet, June 2026', 'https://www.camden.gov.uk/documents/d/guest/belsize-fact-sheet-june-2026'), src('Camden Council, Holly Lodge Estate appraisal', 'https://www.camden.gov.uk/documents/20142/7616115/HollyLodgeAppraisal_Adopted+Dec+2012.pdf/088d6b35-acc9-eada-c373-198483f3e2c1'), src('Camden Council, minimum energy efficiency standards support grant', 'https://www.camden.gov.uk/minimum-energy-efficiency-standards-support-grant')],
+      },
     ],
     faqs: (s) => [
       {
@@ -546,6 +646,11 @@ export const d1Local: Record<string, AreaLocal> = {
       {
         q: 'Do you assess mansion flats in Bloomsbury and St John’s Wood?',
         a: 'Yes. Have the heating controls, the boiler or communal system details and any evidence of glazing work ready. Each self-contained flat gets its own EPC.',
+      },
+      {
+        q: 'Does Camden help landlords pay for energy improvements?',
+        a: 'Camden’s minimum energy efficiency standards support grant matches a landlord’s contribution up to £10,000 per building. The works must be recommended by a valid EPC, ideally no more than 24 months old, so a current certificate comes first.',
+        links: [{ label: 'Camden minimum energy efficiency standards support grant', href: 'https://www.camden.gov.uk/minimum-energy-efficiency-standards-support-grant', external: true }],
       },
       ...districtFaq(s, 'Camden', ' Some Camden districts are small, so read their figures with the certificate count beside them.'),
     ],
@@ -589,6 +694,17 @@ export const d1Local: Record<string, AreaLocal> = {
         ],
         sources: [barking.conservation],
       },
+      {
+        id: 'barkingdagenham-estates',
+        heading: 'The Becontree estate, listings and landlord expectations in Barking & Dagenham',
+        paragraphs: [
+          'The council describes the Becontree estate as uniform terraces and cottages, mostly two to three storeys with pitched roofs. Common features are red brick or rendered facades, tall brick chimneys and tiled pitched roofs. It says there are about 29,000 homes on the estate. Becontree is not a conservation area: the council’s Local Plan treats it as a non-designated heritage asset.',
+          'The council says new Article 4 Directions will be introduced in November 2026. One removes permitted development rights for porches across the Becontree estate, and another covers side and roof alterations on corner blocks. The council puts the application cost for a porch at £528 for a householder application, against £264 for a lawful development certificate today. The directions were not yet confirmed when we checked, so ask the planning team before starting work.',
+          'Elsewhere, the borough has 45 statutory listed buildings and a local list of 123. In a conservation area, changing the profile of a roof, such as adding a dormer, and cladding in a different material need the council’s consent. Barking Town Centre is mainly shops with flats above, in red and brown brick. A separate Article 4 Direction has applied across the borough since 22 February 2022 to additional storeys on homes.',
+          'The council tells landlords the property must be at EPC band E or better unless an exemption applies, and an EPC is one of the documents a licence application needs. Its Housing Strategy 2026 to 2031 says licensing and targeted inspections will be used to require minimum energy-efficiency expectations, with part-grant funding for landlords who need support.',
+        ],
+        sources: [src('Barking and Dagenham Council, Article 4 Directions', 'https://www.lbbd.gov.uk/planning-building-control-and-local-land-charges/planning-guidance-and-policies/article-4'), src('Barking and Dagenham Council, draft Becontree Estate design code consultation', 'https://www.lbbd.gov.uk/sites/default/files/2025-11/Draft%20Becontree%20Estate%20Supplementary%20Planning%20Document%20and%20Design%20Code%20Public%20Consultation.pdf'), src('Barking and Dagenham Council, housing standards', 'https://www.lbbd.gov.uk/private-sector-housing/housing-standards'), src('Barking and Dagenham Council, licence application process', 'https://www.lbbd.gov.uk/private-sector-housing/property-licensing/application-process'), src('Barking and Dagenham Council, Housing Strategy 2026 to 2031', 'https://www.lbbd.gov.uk/sites/default/files/2026-03/Barking%20and%20Dagenham%20Housing%20Strategy%202026-2031.pdf')],
+      },
     ],
     faqs: (s) => [
       {
@@ -604,6 +720,16 @@ export const d1Local: Record<string, AreaLocal> = {
       {
         q: 'Do you assess Becontree estate houses?',
         a: 'Yes, at the same price as the rest of London. If the cavity or loft has been insulated, keep the receipts or installer certificate to show on the visit. Without evidence, the method treats the walls and roof as originally built.',
+      },
+      {
+        q: 'Will the Becontree porch rule affect my home?',
+        a: 'If the council confirms it, planning permission will be needed to add a porch to any Becontree estate house, instead of the lawful development certificate used today. The council expects the directions in November 2026. Ask the planning team to confirm the status before you start work.',
+        links: [{ label: 'Barking and Dagenham Article 4 Directions', href: 'https://www.lbbd.gov.uk/planning-building-control-and-local-land-charges/planning-guidance-and-policies/article-4', external: true }],
+      },
+      {
+        q: 'Does the council need an EPC with a Barking and Dagenham licence application?',
+        a: 'Yes. The council’s application process lists a valid, up-to-date EPC among the documents to have ready, with the tenancy agreement and the electrical installation condition report.',
+        links: [{ label: 'Barking and Dagenham licence application process', href: 'https://www.lbbd.gov.uk/private-sector-housing/property-licensing/application-process', external: true }],
       },
       ...districtFaq(s, 'Barking & Dagenham'),
     ],
