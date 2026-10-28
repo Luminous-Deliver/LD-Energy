@@ -5,6 +5,8 @@ import { OurPromise } from '@/components/sections/OurPromise'
 import { Container } from '@/components/ui/Container'
 import { Ico } from '@/components/sections/home/HomeIcon'
 import { OnThisPage, type PageSection } from '@/components/inner/OnThisPage'
+import { RevealOnScroll } from '@/components/inner/RevealOnScroll'
+import { innerReveals } from '@/components/inner/innerReveals'
 import { ReadNext, type NextStep } from '@/components/inner/ReadNext'
 import { InnerEnding } from '@/components/inner/InnerEnding'
 import { PriceMatrix } from '@/components/inner/PriceMatrix'
@@ -370,6 +372,9 @@ export default function PricingPage() {
       </section>
 
       <ReadNext steps={readNext} />
+
+      {/* section reveals (motion, Considered); the price sections are left out on purpose, see innerReveals */}
+      <RevealOnScroll {...innerReveals('.pr', { lists: ['.pr-inc'], blocks: ['.pr-port__acts'] })} />
 
       <div id="book">
         <InnerEnding variant="a" source="pricing"

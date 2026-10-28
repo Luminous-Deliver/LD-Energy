@@ -51,7 +51,7 @@ const epc = [65, 75, 85, 95, 105, 120]
     const steps = await page.locator('#timeline .lp-steps h3').allInnerTexts()
     eq(steps.join(' | '), 'Get your EPC before marketing | Book early in the listing process | Book a next-day visit if you’re tight | Give it to buyers', 'timeline, four steps')
     ok(/lodge your certificate that day \(\+£35\)/.test(main), 'next-day visit +£35')
-    for (const fact of ['Legal requirement', 'Buyers care about efficiency', 'Don’t hold up your sale', 'often faster and cheaper than an agent-arranged panel provider',
+    for (const fact of ['Legal requirement', 'Buyers care about efficiency', 'Don’t hold up your sale', 'with the price up front',
       'Rightmove, Zoopla and OnTheMarket', 'A lower rating doesn’t stop a sale', 'Booking your EPC at the same time as your photography and floor plan',
       'LED lighting', 'Modern condensing boiler', 'Loft and cavity wall insulation', 'Renewables', 'A particular rating gain is not guaranteed',
       'guidance only, not lodged']) ok(norm(main).includes(norm(fact)), `fact: ${fact}`)

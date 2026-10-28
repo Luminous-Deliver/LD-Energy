@@ -308,7 +308,180 @@ const vp = (w) => ({ width: w, height: w > 800 ? 900 : 844 })
         await mctx.close()
       }
     }
-    console.log(`PASS inner motion: ${checks} checks (above the fold never hidden, reveal once, 4-step stagger cap, reduced motion, no JS, jumps, FAQ open and close, dialog exit, no layout shift, touch hover guard; 1440 and 390)`)
+
+    // ================================================== rollout: the same behaviour on every rebuilt inner page
+    const PAGES = ['/landlords', '/pricing', '/estate-agents', '/sellers', '/services/domestic-epc', '/services/floor-plans',
+      '/services/epc-pre-assessment', '/services/epc-improvement-plan', '/faq', '/epc-ratings-by-borough', '/domestic-energy-assessor-london']
+    // nothing in these ever carries or sits inside a reveal: the hero, the price matrix and every price list or table, the
+    // borough explorer and sortable table, the borough table's details and the accreditation ledger
+    const NEVER = '.in-hd, .in-tb, .pm, table, [role="table"], .sv-ptable, .sv-opts, .sv-ledger, .sv-costs, .pr-ledger, .pr-receipt, .pr-notes, .pr-port__rates, .rb-table, .rb-years, .in-drawer__in, .da-ledger'
+    const stats = {}
+    for (const w of widths) {
+      for (const url of PAGES) {
+        const tag = `${w} ${url}`
+        // R1. what is marked: counted, none inside or around a protected part, none in the hero, enough below the fold to matter
+        {
+          const ctx = await context(w)
+          const page = await ctx.newPage()
+          await page.goto(base + url, { waitUntil: 'networkidle' })
+          await motionOn(page)
+          const m = await page.evaluate((never) => {
+            const marked = [...document.querySelectorAll('[data-reveal]')]
+            const isList = (e) => e.getAttribute('data-reveal') === 'list'
+            return {
+              total: marked.length, lists: marked.filter(isList).length,
+              kids: marked.reduce((n, el) => n + (isList(el) ? el.children.length : 0), 0),
+              inside: marked.filter((e) => e.closest(never) || (!e.matches('.in-faq') && e.querySelector(never))).map((e) => e.tagName + '.' + e.className).slice(0, 4),
+              nested: marked.filter((e) => e.parentElement?.closest('[data-reveal]')).map((e) => e.tagName + '.' + e.className).slice(0, 4),
+              emptyList: marked.filter((e) => isList(e) && !e.children.length).length,
+              waiting: marked.filter((e) => e.getBoundingClientRect().top > innerHeight * 1.2 && getComputedStyle(isList(e) ? e.firstElementChild : e).opacity === '0').length,
+            }
+          }, NEVER)
+          stats[tag] = m
+          ok(m.total >= 8, `${tag}: ${m.total} blocks and ${m.lists} lists are marked`)
+          ok(m.inside.length === 0, `${tag}: no reveal on or around a protected part (${m.inside})`)
+          ok(m.nested.length === 0, `${tag}: no reveal nested in another (${m.nested})`)
+          ok(m.emptyList === 0, `${tag}: no empty list`)
+          ok(m.waiting > 3, `${tag}: blocks below the fold do wait to be revealed (${m.waiting})`)
+          ok(await page.evaluate(() => !document.querySelector('.in-hd [data-reveal], .in-hd[data-reveal]')), `${tag}: the hero carries no data-reveal`)
+          await ctx.close()
+        }
+        // R2. above the fold is never dimmed or moved, on any frame
+        {
+          const ctx = await context(w)
+          await ctx.addInitScript(() => {
+            window.__dim = []
+            const watch = () => {
+              for (const el of document.querySelectorAll('.in-hd h1, .in-hd .in-hd__answer, .in-hd .in-tb, .in-hd .in-crumbs, .in-hd .in-otp, .in-hd .in-hd__acts, [data-reveal], [data-reveal="list"] > *')) {
+                const r = el.getBoundingClientRect()
+                if (r.top >= innerHeight || r.bottom <= 0) continue
+                const cs = getComputedStyle(el)
+                if (cs.opacity !== '1' || cs.transform !== 'none') window.__dim.push(`${el.tagName}.${el.className} ${cs.opacity} ${cs.transform}`)
+              }
+              if (performance.now() < 3500) requestAnimationFrame(watch)
+            }
+            requestAnimationFrame(watch)
+          })
+          const page = await ctx.newPage()
+          await page.goto(base + url, { waitUntil: 'networkidle' })
+          await motionOn(page)
+          await page.waitForFunction(() => performance.now() > 3500)
+          const dim = await page.evaluate(() => window.__dim)
+          ok(dim.length === 0, `${tag}: nothing on screen at load is dimmed or moved on any frame (${dim.slice(0, 3)})`)
+          await ctx.close()
+        }
+        // R3. a reveal plays once; the stagger never goes past 4 steps; no animation is left behind
+        {
+          const ctx = await context(w)
+          const page = await ctx.newPage()
+          await page.goto(base + url, { waitUntil: 'networkidle' })
+          await motionOn(page)
+          const found = await page.evaluate(() => {
+            const el = [...document.querySelectorAll('[data-reveal]:not([data-reveal="list"]):not([data-revealed])')].find((e) => e.getBoundingClientRect().top > innerHeight * 1.5)
+            if (el) el.setAttribute('data-probe', '1')
+            return !!el
+          })
+          ok(found, `${tag}: there is a block below the fold to probe`)
+          const res = await page.evaluate(() => new Promise((resolve) => {
+            const el = document.querySelector('[data-probe]')
+            const read = () => { const cs = getComputedStyle(el); return { o: +cs.opacity, y: cs.transform === 'none' ? 0 : new DOMMatrix(cs.transform).m42 } }
+            new MutationObserver((_, mo) => {
+              if (el.getAttribute('data-revealed') !== 'in') return
+              mo.disconnect()
+              const first = read()
+              setTimeout(() => resolve({ first, last: read(), anims: el.getAnimations().length }), 700)
+            }).observe(el, { attributes: true })
+            scrollTo(0, scrollY + el.getBoundingClientRect().top - innerHeight * 0.6)
+          }))
+          ok(res.first.o < 1 && res.first.y <= 12 && res.first.y > 0, `${tag}: it starts dim and at most 12 px low (${res.first.o.toFixed(2)}, ${res.first.y.toFixed(1)})`)
+          ok(res.last.o === 1 && res.last.y === 0 && res.anims === 0, `${tag}: it ends at opacity 1, no transform, no animation left`)
+          await page.evaluate(() => scrollTo(0, 0)); await page.waitForTimeout(250)
+          await page.evaluate(() => { const el = document.querySelector('[data-probe]'); scrollTo(0, scrollY + el.getBoundingClientRect().top - innerHeight * 0.5) })
+          await page.waitForTimeout(80)
+          ok(await page.evaluate(() => document.querySelector('[data-probe]').getAnimations().length === 0), `${tag}: scrolled away and back, it does not play again`)
+          // stagger cap: give the last unseen list six children, then read the delays once it plays
+          const delays = await page.evaluate(() => new Promise((resolve) => {
+            const lists = [...document.querySelectorAll('[data-reveal="list"]:not([data-revealed])')]
+            const ul = lists[lists.length - 1]
+            if (!ul) return resolve(null)
+            while (ul.children.length < 6) ul.appendChild(ul.lastElementChild.cloneNode(true))
+            new MutationObserver((_, mo) => {
+              if (ul.getAttribute('data-revealed') !== 'in') return
+              mo.disconnect()
+              resolve([...ul.children].map((c) => Math.round(parseFloat(getComputedStyle(c).animationDelay) * 1000)))
+            }).observe(ul, { attributes: true })
+            scrollTo(0, scrollY + ul.getBoundingClientRect().top - innerHeight * 0.6)
+          }))
+          ok(delays && delays.join() === '0,60,120,180,180,180', `${tag}: the stagger runs 0, 60, 120, 180 ms and stops there (${delays})`)
+          await ctx.close()
+        }
+        // R4. reduced motion: no data-motion, nothing hidden or moving
+        {
+          const ctx = await context(w, { reducedMotion: 'reduce' })
+          const page = await ctx.newPage()
+          await page.goto(base + url, { waitUntil: 'networkidle' })
+          await page.waitForTimeout(300)
+          const r = await page.evaluate(() => ({
+            on: document.documentElement.hasAttribute('data-motion'),
+            hidden: [...document.querySelectorAll('[data-reveal], [data-reveal="list"] > *')].filter((el) => getComputedStyle(el).opacity !== '1' || getComputedStyle(el).transform !== 'none').length,
+            moving: document.getAnimations().filter((a) => a.effect?.target?.closest?.('[data-reveal]')).length,
+          }))
+          ok(!r.on && r.hidden === 0 && r.moving === 0, `${tag} reduced: no data-motion, nothing hidden or moving (${JSON.stringify(r)})`)
+          await ctx.close()
+        }
+        // R5. no JavaScript: nothing is hidden (the hiding rule needs the attribute only the script sets)
+        {
+          const ctx = await context(w, { javaScriptEnabled: false })
+          const page = await ctx.newPage()
+          await page.goto(base + url, { waitUntil: 'load' })
+          const hidden = await page.evaluate(() => [...document.querySelectorAll('.in *')].filter((el) => getComputedStyle(el).opacity === '0' && !el.closest('[hidden], [aria-hidden="true"], details:not([open])')).length)
+          ok(hidden === 0, `${tag} no JS: nothing renders at opacity 0 (${hidden})`)
+          await ctx.close()
+        }
+        // R6. no layout shift from the motion across a full scroll
+        {
+          const ctx = await context(w)
+          await ctx.addInitScript(() => {
+            window.__shifts = []
+            new PerformanceObserver((l) => { for (const e of l.getEntries()) window.__shifts.push({ v: e.value, src: (e.sources || []).map((s) => s.node?.className || s.node?.nodeName || '?').join(' | ') }) }).observe({ type: 'layout-shift', buffered: true })
+          })
+          const page = await ctx.newPage()
+          await page.goto(base + url, { waitUntil: 'networkidle' })
+          await motionOn(page)
+          const loadShift = await page.evaluate(() => window.__shifts.length)
+          const h = await page.evaluate(() => document.documentElement.scrollHeight)
+          for (let y = 0; y < h; y += 300) { await page.evaluate((v) => scrollTo(0, v), y); await page.waitForTimeout(50) }
+          await page.waitForTimeout(700)
+          const shifts = (await page.evaluate((n) => window.__shifts.slice(n), loadShift)).filter((e) => e.src !== 'in-secbar__btn')
+          const sum = shifts.reduce((a, e) => a + e.v, 0)
+          ok(sum === 0, `${tag}: layout shift across the scroll is 0, bar label aside (${sum.toFixed(4)} ${JSON.stringify(shifts.slice(0, 3))})`)
+          await ctx.close()
+        }
+        // R7. an On this page jump, and a load at a #hash, land beside visible content
+        {
+          const ctx = await context(w)
+          const page = await ctx.newPage()
+          await page.goto(base + url, { waitUntil: 'networkidle' })
+          await motionOn(page)
+          const ids = await page.evaluate(() => [...document.querySelectorAll('.in-otp a[href^="#"]')].map((a) => a.getAttribute('href')).filter((h) => document.querySelector(h)))
+          ok(ids.length >= 1, `${tag}: the page has On this page links to jump to (${ids.length})`)
+          const last = ids[ids.length - 1]
+          await page.locator(`.in-otp a[href="${last}"]`).first().click()
+          await settle(page)
+          let bad = await hiddenInView(page)
+          ok(bad.length === 0, `${tag}: after the jump to ${last}, the target and everything above it shows (${bad})`)
+          ok(await page.evaluate((id) => { const t = document.querySelector(id); const r = (t.querySelector('h2[id]') || t).getBoundingClientRect(); return r.top < innerHeight && r.bottom > -4 }, last), `${tag}: the jump landed on ${last}`)
+          await page.goto(base + url + last, { waitUntil: 'networkidle' })
+          await motionOn(page); await settle(page)
+          bad = await hiddenInView(page)
+          ok(bad.length === 0, `${tag}: loaded at ${last}, everything on screen and above shows (${bad})`)
+          await ctx.close()
+        }
+      }
+    }
+    console.log('rollout reveal counts (1440):', JSON.stringify(Object.fromEntries(Object.entries(stats).filter(([k]) => k.startsWith('1440')).map(([k, v]) => [k.slice(5), `${v.total} marked, ${v.lists} lists, ${v.kids} list items`])), null, 1))
+
+    console.log(`PASS inner motion: ${checks} checks (above the fold never hidden, reveal once, 4-step stagger cap, reduced motion, no JS, jumps, FAQ open and close, dialog exit, no layout shift, touch hover guard; 1440 and 390; reveals on 11 pages)`)
   } finally {
     await browser.close()
   }

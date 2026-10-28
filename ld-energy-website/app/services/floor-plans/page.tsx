@@ -5,6 +5,8 @@ import { OurPromise } from '@/components/sections/OurPromise'
 import { Container } from '@/components/ui/Container'
 import { Ico } from '@/components/sections/home/HomeIcon'
 import { OnThisPage, type PageSection } from '@/components/inner/OnThisPage'
+import { RevealOnScroll } from '@/components/inner/RevealOnScroll'
+import { innerReveals } from '@/components/inner/innerReveals'
 import { ReadNext, type NextStep } from '@/components/inner/ReadNext'
 import { InnerEnding } from '@/components/inner/InnerEnding'
 import {
@@ -357,6 +359,9 @@ export default function FloorPlansPage() {
       </section>
 
       <ReadNext steps={readNext} />
+
+      {/* section reveals (motion, Considered); the price sections are left out on purpose, see innerReveals */}
+      <RevealOnScroll {...innerReveals('.sv', { lists: ['.sv-ways', '.sv-steps'], blocks: ['#included .sv-two > div + div', '#included .sv-callout'] })} />
 
       <div id="book">
         <InnerEnding variant="a" source="floor-plans" quote={q('bottom')}

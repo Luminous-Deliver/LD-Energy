@@ -6,6 +6,8 @@ import { Ico } from '@/components/sections/home/HomeIcon'
 import { OurPromise } from '@/components/sections/OurPromise'
 import { FiguresDrawer } from '@/components/inner/FiguresDrawer'
 import { OnThisPage, type PageSection } from '@/components/inner/OnThisPage'
+import { RevealOnScroll } from '@/components/inner/RevealOnScroll'
+import { innerReveals } from '@/components/inner/innerReveals'
 import { ReadNext, type NextStep } from '@/components/inner/ReadNext'
 import { InnerEnding } from '@/components/inner/InnerEnding'
 import { GROUPS, OGL, dataSource, period } from '@/components/sections/area/AreaBlocks'
@@ -345,6 +347,9 @@ export default function RatingsByBoroughPage() {
       </section>
 
       <ReadNext steps={readNext} />
+
+      {/* section reveals (motion, Considered); the price sections are left out on purpose, see innerReveals */}
+      <RevealOnScroll {...innerReveals('.rb', { blocks: ['.rb-about__caveats'], ending: 'b' })} />
 
       {/* Ending B, the price list (Abdul 23/10: the borough ratings page) */}
       <div id="prices">

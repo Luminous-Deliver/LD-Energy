@@ -5,6 +5,8 @@ import { OurPromise } from '@/components/sections/OurPromise'
 import { Container } from '@/components/ui/Container'
 import { Ico } from '@/components/sections/home/HomeIcon'
 import { OnThisPage, type PageSection } from '@/components/inner/OnThisPage'
+import { RevealOnScroll } from '@/components/inner/RevealOnScroll'
+import { innerReveals } from '@/components/inner/innerReveals'
 import { ReadNext, type NextStep } from '@/components/inner/ReadNext'
 import { InnerEnding } from '@/components/inner/InnerEnding'
 import { site, priceFrom, defaultOgImage } from '@/lib/site'
@@ -341,6 +343,9 @@ export default function EpcImprovementPlanPage() {
       </section>
 
       <ReadNext steps={readNext} />
+
+      {/* section reveals (motion, Considered); the price sections are left out on purpose, see innerReveals */}
+      <RevealOnScroll {...innerReveals('.sv', { lists: ['.sv-ways', '.sv-vs'], blocks: ['#what-it-covers .sv-two > div + div', '#what-it-covers .sv-callout'] })} />
 
       <div id="book">
         <InnerEnding variant="a" source="improvement-plan" quote={q('bottom')}

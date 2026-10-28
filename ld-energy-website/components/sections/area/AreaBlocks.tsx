@@ -16,6 +16,7 @@ import type { AreaChoice } from '@/lib/floor-area'
 import {
   bandEpcPrice, bandIndex, bandPhrase, fmt, london, oneIn, pct, rankLabel, statsSource, ukDate, whatsappQuoteHref,
 } from '@/lib/area-page'
+import { DATA_PAGE_PATH } from '@/lib/borough-ratings'
 import '@/app/inner.css'
 
 export const OGL = 'https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/'
@@ -133,7 +134,7 @@ export function AreaHeroD({ slug, name, s, parent, sections }: {
                 <span key={l.name} className="in-map__lb" style={{ left: `${l.x}%`, top: `${l.y}%` }}>{l.name}</span>
               ))}
               {AREA_MAPS[map].pin && (
-                <span className="in-map__pin" style={{ left: `${AREA_MAPS[map].pin!.x}%`, top: `${AREA_MAPS[map].pin!.y}%` }}>
+                <span className={AREA_MAPS[map].pin!.x > 55 ? 'in-map__pin in-map__pin--left' : 'in-map__pin'} style={{ left: `${AREA_MAPS[map].pin!.x}%`, top: `${AREA_MAPS[map].pin!.y}%` }}>
                   <i aria-hidden="true" />Our base, Stratford
                 </span>
               )}
@@ -245,21 +246,11 @@ function InMix({ label, s }: { label: string; s: AreaSummary }) {
   )
 }
 
-/** The method behind every figure, shown in the drawer (was the collapsed "About these figures" at the page end). */
+/** The drawer: the figures' source in one line and the method on the data page, where it is written once for every area. */
 function FiguresMethod() {
   return (
     <>
-      <dl className="in-srcdl">
-        <div><dt>Source</dt><dd>{statsSource.publisher}, <a href={statsSource.url} rel="noopener">{statsSource.title}</a></dd></div>
-        <div><dt>Period</dt><dd>RdSAP certificates for existing homes lodged {period}, from the file of {ukDate(statsSource.fileUpdated)}. We recalculate them when the file is updated.</dd></div>
-        <div><dt>Licence</dt><dd><a href={OGL} rel="noopener">{statsSource.licence}</a>. MHCLG does not endorse L&amp;D Energy.</dd></div>
-      </dl>
-      <p>
-        &ldquo;Rated A to C&rdquo; is the share of certificates with a current rating of A, B or C. Typical size is the median total
-        floor area. Private rentals are certificates whose tenure is recorded as rented (private).
-      </p>
-      <p className="in-eyebrow">Read these figures with care</p>
-      <ul className="in-caveats">{statsSource.caveats.map((c) => <li key={c}>{c}</li>)}</ul>
+      <p><Link href={`${DATA_PAGE_PATH}#about-figures`} className={linkCls}>How these figures are counted</Link>, and what to read with care.</p>
     </>
   )
 }
@@ -328,8 +319,7 @@ export function RatingMixSection({ slug, name, s, standout }: { slug: string; na
             </table>
           </div>
           <p className="in-note" style={{ marginTop: 12 }}>
-            The assessment method changed during these years and different homes are assessed each year, so a rise is not
-            proof that homes improved.
+            <Link href={`${DATA_PAGE_PATH}#about-figures`} className={linkCls}>How these figures are counted</Link>
           </p>
         </div>
       </Container>
@@ -358,10 +348,10 @@ function CouncilBlock({ section }: { section: CouncilSection }) {
 }
 
 /* 3. If you let here: the rental figures, then the council's own licensing rules. */
-export function LettingSection({ name, s, council }: { name: string; s: AreaSummary; council: CouncilSection[] }) {
+export function LettingSection({ name, s, council, band = true }: { name: string; s: AreaSummary; council: CouncilSection[]; band?: boolean }) {
   const prs = s.privateRented
   return (
-    <section className="in-sec in-sec--band" id="letting" aria-labelledby="letting-h">
+    <section className={band ? 'in-sec in-sec--band' : 'in-sec'} id="letting" aria-labelledby="letting-h">
       <Container>
         <div className="in-prose">
           <Eyebrow>Landlords</Eyebrow>
@@ -371,8 +361,7 @@ export function LettingSection({ name, s, council }: { name: string; s: AreaSumm
             rated below C, against {pct(london.privateRented.pctBelowC)} across London, and {fmt(prs.nFtoG)} were rated F or G.
           </p>
           <p>
-            A rental needs an E or better today unless a valid exemption is registered. Government has confirmed a higher standard equivalent to C for 1 October 2030, but the legislation for it is
-            still to be passed.
+            A rental needs an E or better today unless a valid exemption is registered.
           </p>
           <p>
             Read <Link href="/blog/epc-for-landlords-2026">the rules for landlords today</Link>,{' '}
@@ -387,7 +376,7 @@ export function LettingSection({ name, s, council }: { name: string; s: AreaSumm
 }
 
 /* 4. Why homes here rate as they do: age, walls and heating, then the local notes. */
-export function StockSection({ name, s, local, reading }: { name: string; s: AreaSummary; local: string[]; reading: string }) {
+export function StockSection({ name, s, local, reading, band = false }: { name: string; s: AreaSummary; local: string[]; reading: string; band?: boolean }) {
   const rows: { label: string; own: number; ldn: number }[] = [
     { label: 'Built before 1930', own: s.age.pct.pre1930, ldn: london.age.pct.pre1930 },
     { label: 'Solid walls, no added insulation', own: s.walls.pct.solidUninsulated, ldn: london.walls.pct.solidUninsulated },
@@ -397,7 +386,7 @@ export function StockSection({ name, s, local, reading }: { name: string; s: Are
     { label: 'Electric heating', own: s.heating.pct.electric, ldn: london.heating.pct.electric },
   ]
   return (
-    <section className="in-sec" id="homes" aria-labelledby="homes-h">
+    <section className={band ? 'in-sec in-sec--band' : 'in-sec'} id="homes" aria-labelledby="homes-h">
       <Container>
         <div className="in-prose">
           <Eyebrow>Homes in {name}</Eyebrow>
@@ -419,7 +408,6 @@ export function StockSection({ name, s, local, reading }: { name: string; s: Are
             On {pct(s.potential.pctBelowCCouldReachC)} of the certificates rated D or lower, the potential rating (every
             recommendation carried out) is C or better.
           </p>
-          <p className="in-src">{dataSource}</p>
         </div>
       </Container>
     </section>
@@ -466,7 +454,7 @@ export function CoverageSection({ name, slug, s, local }: { name: string; slug: 
           <p className="in-note">
             {crossBorder
               ? `${name} here means the ${(s as AreaSummary & { definedBy: string[] }).definedBy.join(' and ')} postcode districts. ${outside.map(([k, n]) => `${fmt(n)} of these certificates are for homes on the ${boroughMeta[k]?.name ?? k} side of E15`).join('; ')}.`
-              : `Only certificates for homes inside ${name} are counted, so a district that crosses the borough boundary shows its ${name} part.`}
+              : ''}
             {' '}Districts with fewer than 200 certificates are not listed{s.otherDistricts.n > 0 ? ` (${fmt(s.otherDistricts.n)} certificates in ${s.otherDistricts.districts} other ${s.otherDistricts.districts === 1 ? 'district' : 'districts'})` : ''}.
           </p>
         </div>
