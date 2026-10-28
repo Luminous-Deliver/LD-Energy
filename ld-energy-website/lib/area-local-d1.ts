@@ -42,13 +42,13 @@ function districtFaq(s: AreaSummary, name: string, extra = '') {
 const wandsworth = {
   licences: src('Wandsworth Council, check if you need a property licence', 'https://www.wandsworth.gov.uk/housing/private-housing/private-rented-property-licences/property-licence-check/'),
   fees: src('Wandsworth Council, property licence fees and discounts', 'https://www.wandsworth.gov.uk/housing/private-housing/private-rented-property-licences/property-licence-fees-discounts/'),
-  conservation: src('Wandsworth Council, conservation areas frequently asked questions', 'https://www.wandsworth.gov.uk/planning-and-building-control/building-conservation-and-design/conservation-areas/conservation-areas-faq/'),
-  article4: src('Wandsworth Council, Article 4 Directions', 'https://www.wandsworth.gov.uk/planning-and-building-control/permitted-development-and-article-4-directions/article-4-directions/'),
+  conservation: src('Wandsworth Council, conservation areas frequently asked questions', 'https://www.wandsworth.gov.uk/planning/conservation-and-urban-design/conservation-areas/conservation-areas-faq/'),
+  article4: src('Wandsworth Council, Article 4 Directions', 'https://www.wandsworth.gov.uk/planning/permitted-development-and-article-4-directions/article-4-directions/'),
 }
 
 const walthamForest = {
-  selective: src('Waltham Forest Council, selective licensing scheme', 'https://www.walthamforest.gov.uk/housing/private-sector-housing/private-rented-property-licensing-prpl/selective-licensing-scheme'),
-  fees: src('Waltham Forest Council, property licence fees', 'https://www.walthamforest.gov.uk/housing/private-sector-housing/private-rented-property-licensing-prpl/property-licence-fees'),
+  selective: src('Waltham Forest Council, selective licensing scheme', 'https://www.walthamforest.gov.uk/housing/private-rented-property-licensing-prpl/choose-type-property-licence-you-need/check-if-you-need-selective-licence-your-property'),
+  fees: src('Waltham Forest Council, property licence fees', 'https://www.walthamforest.gov.uk/housing/private-rented-property-licensing-prpl/apply-property-licence-and-licence-fees/check-how-much-property-licence-costs'),
   conservation: src('Waltham Forest Council, conservation areas and listed buildings', 'https://www.walthamforest.gov.uk/planning-and-building-control/design-and-conservation/conservation-areas-and-listed-buildings'),
 }
 
@@ -69,8 +69,8 @@ const brent = {
 }
 
 const towerHamlets = {
-  selective: src('Tower Hamlets Council, selective licensing', 'https://www.towerhamlets.gov.uk/lgnl/housing/Private-tenants-landlords-and-homeowners/Private-Landlords/Selective_Licensing.aspx'),
-  additional: src('Tower Hamlets Council, additional licensing', 'https://www.towerhamlets.gov.uk/lgnl/housing/Private-tenants-landlords-and-homeowners/Private-Landlords/Additional_Licensing_Scheme.aspx'),
+  selective: src('Tower Hamlets Council, selective licensing', 'https://www.towerhamlets.gov.uk/lgnl/housing/Private-tenants-landlords-and-homeowners/Property-licensing/Licences/Selective-licensing.aspx'),
+  additional: src('Tower Hamlets Council, additional licensing', 'https://www.towerhamlets.gov.uk/lgnl/housing/Private-tenants-landlords-and-homeowners/Property-licensing/Licences/Additional-licensing.aspx'),
   apply: src('Tower Hamlets Council, what do I need to make an application', 'https://www.towerhamlets.gov.uk/lgnl/housing/Private-tenants-landlords-and-homeowners/Property-licensing/Licences/What-do-I-need-to-make-an-application.aspx'),
   conservation: src('Tower Hamlets Council, conservation areas', 'https://www.towerhamlets.gov.uk/lgnl/planning_and_building_control/conservation_and_urban_design/conservation_areas.aspx'),
 }
@@ -241,7 +241,7 @@ export const d1Local: Record<string, AreaLocal> = {
         paragraphs: [
           'Royal Greenwich runs mandatory and additional HMO licensing across the whole borough. Additional licensing covers smaller HMOs, with three or four people from two or more households.',
           'Selective licensing, for a home let to one household or two individuals, applies in five wards: Woolwich Riverside, Woolwich Common, Shooters Hill, Plumstead Common and Plumstead Glyndon. A home with an HMO licence does not need a selective licence as well.',
-          'The council consulted from 21 July to 12 October 2026 on widening selective licensing to up to 18 wards. When we read its pages on 24/10/2026 they still described the proposal and showed no decision, so check the council’s page before relying on the five-ward list.',
+          'The council consulted from 21 July to 12 October 2026 on widening selective licensing to up to 18 wards. When we read its pages on 28/10/2026 they still described the proposal and showed no decision, so check the council’s page before relying on the five-ward list.',
         ],
         sources: [greenwich.check, greenwich.hmo],
       },
@@ -250,7 +250,7 @@ export const d1Local: Record<string, AreaLocal> = {
         heading: 'Conservation areas in Greenwich',
         paragraphs: [
           'Royal Greenwich has 23 conservation areas, including Blackheath, Greenwich Park, West Greenwich, East Greenwich, Charlton Village and Royal Arsenal Woolwich. The council marks Ashburnham Triangle, Progress Estate, Rectory Field and Shrewsbury Park Estate as under an Article 4 direction, with two directions each in East Greenwich and West Greenwich.',
-          'An Article 4 direction takes away some permitted development rights, so outside work such as windows or a front door can need planning permission. If an EPC recommendation involves the outside of a home in one of these areas, check with the council before booking the work.',
+          'An Article 4 direction takes away some permitted development rights, so outside work that would not normally need it may need planning permission. If an EPC recommendation involves the outside of a home in one of these areas, check with the council before booking the work.',
         ],
         sources: [greenwich.conservation],
       },
@@ -263,12 +263,12 @@ export const d1Local: Record<string, AreaLocal> = {
       },
       {
         q: 'Is Greenwich widening selective licensing?',
-        a: 'It has proposed it. The council consulted from 21 July to 12 October 2026 on covering up to 18 wards, and its pages showed no decision when we read them on 24/10/2026. Check its licensing page before you let.',
+        a: 'It has proposed it. The council consulted from 21 July to 12 October 2026 on covering up to 18 wards, and its pages showed no decision when we read them on 28/10/2026. Check its licensing page before you let.',
         links: [{ label: 'Greenwich HMO and licensing pages', href: greenwich.hmo.url, external: true }],
       },
       {
         q: 'Can you assess a Blackheath or West Greenwich home?',
-        a: 'Yes. Both are conservation areas with Article 4 directions in places, which affect outside work, not the assessment. We record the walls, windows and heating as they are on the visit.',
+        a: 'Yes. Both are conservation areas, and West Greenwich has two Article 4 directions. They affect outside work, not the assessment. We record the walls, windows and heating as they are on the visit.',
         links: [{ label: 'Greenwich conservation areas', href: greenwich.conservation.url, external: true }],
       },
       ...districtFaq(s, 'Greenwich'),
@@ -323,7 +323,7 @@ export const d1Local: Record<string, AreaLocal> = {
         id: 'lambeth-conservation',
         heading: 'Conservation areas in Lambeth',
         paragraphs: [
-          'Lambeth has 62 conservation areas, covering about 30% of the borough. The council says you can check whether a property is in one by searching its planning application database and opening the constraints tab. If the home is in one, outside changes such as new windows can need planning permission.',
+          'Lambeth has 62 conservation areas, covering about 30% of the borough. The council says you can check whether a property is in one by searching its planning application database and opening the constraints tab. If the home is in one, check with the council before changing the outside, such as the windows.',
         ],
         sources: [lambeth.conservation],
       },
@@ -393,7 +393,7 @@ export const d1Local: Record<string, AreaLocal> = {
         id: 'brent-conservation',
         heading: 'Conservation areas in Brent',
         paragraphs: [
-          'Brent has 22 conservation areas. Its page lists Article 4 directions for areas including Barn Hill, Brondesbury, Buck Lane, Homestead Park and Kensal Green. Where one applies, some outside work on a house, such as changing windows, can need planning permission.',
+          'Brent has 22 conservation areas. Its page lists Article 4 directions for areas including Barn Hill, Brondesbury, Buck Lane, Homestead Park and Kensal Green. Where one applies, some outside work on a house may need planning permission, so check with the council first.',
         ],
         sources: [brent.conservation],
       },
@@ -506,7 +506,7 @@ export const d1Local: Record<string, AreaLocal> = {
     },
     stock: [
       'Camden mixes the large stuccoed and brick houses of Hampstead, Belsize Park and Primrose Hill, mansion blocks in Bloomsbury and St John’s Wood, and Victorian terraces cut into flats in Kentish Town and Kilburn. Estates from the 1960s and 1970s sit among them, and new blocks have gone up around King’s Cross.',
-      'Half the borough is conservation area, so the outside of many homes cannot easily change. That does not alter the assessment: the certificate records the walls, glazing and heating as they stand. For mansion flats and estate flats, the heating controls and any communal system are what to have ready.',
+      'About half the borough is conservation area, so the outside of many homes cannot easily change. That does not alter the assessment: the certificate records the walls, glazing and heating as they stand. For mansion flats and estate flats, the heating controls and any communal system are what to have ready.',
     ],
     stockReading: (s, london) =>
       `${pct(s.age.pct.pre1930)} of Camden’s certificates are for homes built before 1930, against ${pct(london.age.pct.pre1930)} across London, and ${pct(s.walls.pct.solidUninsulated)} record solid walls with no added insulation, against ${pct(london.walls.pct.solidUninsulated)}. Fewer use a mains gas boiler (${pct(s.heating.pct.mainsGas)} against ${pct(london.heating.pct.mainsGas)}) and more have communal heating (${pct(s.heating.pct.communal)} against ${pct(london.heating.pct.communal)}).`,
@@ -585,7 +585,7 @@ export const d1Local: Record<string, AreaLocal> = {
         id: 'barkingdagenham-conservation',
         heading: 'Conservation areas in Barking & Dagenham',
         paragraphs: [
-          'The council lists four conservation areas: Abbey and Barking Town Centre, Abbey Road Riverside, Dagenham Village and Chadwell Heath Anti-aircraft Gun Site. Most of the borough, including the Becontree estate, is outside them, so changes such as new windows usually follow the normal planning rules there.',
+          'The council lists four conservation areas: Abbey and Barking Town Centre, Abbey Road Riverside, Dagenham Village and Chadwell Heath Anti-aircraft Gun Site. The Becontree estate is not one of them.',
         ],
         sources: [barking.conservation],
       },
