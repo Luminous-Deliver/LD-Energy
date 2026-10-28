@@ -46,13 +46,13 @@ if (!['localhost', '127.0.0.1'].includes(new URL(base).hostname)) throw new Erro
 
     // the property type is required: Continue lands focus on it with its error
     await choose('Homeowner')
-    await choose('Over 55–75 m², 2-bedroom flats and small homes, £' + pricing[2].epc)
+    await choose('56–75 m², 2-bedroom flats and small homes, £' + pricing[2].epc)
     await go()
     await page.waitForFunction(() => document.activeElement?.name === 'dwellingType')
     ok(await form.locator('#dwellingType-error').innerText() === 'Please tell us the property type', 'property type error, focus on it')
     await choose('Maisonette')
     const wa = decodeURIComponent(await form.locator('.bf__foot a').getAttribute('href'))
-    ok(wa.includes("Hi, I'd like a quote for an EPC.\nFull address:\nPostcode:\nService: Domestic EPC\nProperty type: Maisonette\nFloor area: Over 55–75 m²\nGuide price shown: £" + pricing[2].epc), `WhatsApp carries the choices (${wa})`)
+    ok(wa.includes("Hi, I'd like a quote for an EPC.\nFull address:\nPostcode:\nService: Domestic EPC\nProperty type: Maisonette\nFloor area: 56–75 m²\nGuide price shown: £" + pricing[2].epc), `WhatsApp carries the choices (${wa})`)
     await choose('Floor Plan')
     ok(decodeURIComponent(await form.locator('.bf__foot a').getAttribute('href')).includes("Hi, I'd like a quote for a floor plan.\nFull address:\nPostcode:\nService: Floor Plan"), 'WhatsApp opening follows the service')
     await choose('Domestic EPC')

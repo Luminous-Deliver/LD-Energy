@@ -69,7 +69,7 @@ const readNext: NextStep[] = [
   { kicker: 'Comparing homes', title: 'Why EPC ratings differ between similar homes', href: '/blog/why-is-my-epc-different',
     text: 'Floor area, outside walls, heating and evidence, side by side.' },
   { kicker: 'Prices', title: 'Every price, by floor area', href: '/pricing', go: true, cta: 'See the prices',
-    text: 'One price list for all of London, with no travel charges.' },
+    text: 'One price list for all of London, with no travel charges and no VAT to add.' },
 ]
 
 const schema = [

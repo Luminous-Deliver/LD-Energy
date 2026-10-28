@@ -75,7 +75,7 @@ const KEEP = [
     })
     const allowed = new Set([priceFrom.epc, priceFrom.bundle, priceFrom.floorPlan, priceFrom.preAssessment, maxBundleSaving, site.addOns.improvementPlan, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE,
       // the FAQ's portfolio answer is portfolioRatesText (24/10)
-      portfolioRates.smallOff, portfolioRates.largeOff, portfolioRates.sameAreaOff, portfolioRates.sameBuildingOff, portfolioRates.floor, portfolioRates.bundleFloor].map((n) => `£${n}`).concat('£5m'))
+      portfolioRates.sameDayOff, portfolioRates.floor].map((n) => `£${n}`).concat('£5m'))
     ok(typedPrices.every((p) => allowed.has(p)), `no typed price outside lib/site.ts (${typedPrices})`)
 
     // WhatsApp: the approved prefill, and nothing else, in the body

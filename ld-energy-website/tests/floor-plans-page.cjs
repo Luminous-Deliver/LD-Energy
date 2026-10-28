@@ -4,7 +4,7 @@
 const { checkServicePage, ids } = require('./service-page-checks.cjs')
 const epc = [65, 75, 85, 95, 105, 120]
 const fp = [65, 75, 85, 95, 105, 120]
-const both = [115, 130, 145, 160, 175, 200]
+const both = [115, 130, 145, 160, 175, 205]
 const disclaimer = 'Not to exact scale. Measurements are approximate and for guidance only, following RICS guidance; floor areas are calculated in accordance with RICS Property Measurement Standards. Do not rely on them for valuation, flooring or furnishing.'
 const q = (s, a) => `/quote?service=${s}&area=${a}&source=floor-plans&cta=pricing`
 

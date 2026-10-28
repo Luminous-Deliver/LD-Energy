@@ -32,10 +32,10 @@ fs.mkdirSync(out, { recursive: true })
       // The field opens from the control under the sizes; typing a figure selects its size and prices it.
       await form.getByRole('button', { name: 'Know the exact size? Enter it in m²' }).click()
       await exact.fill('134')
-      assert.equal(await tile('Over 115 m²').isChecked(), true)
+      assert.equal(await tile('116 m² and over').isChecked(), true)
       assert.match(await estimate(), /Guide estimate: From £120 · 134 m²/)
       // The selected tick must never sit on top of the size label.
-      const clash = await tile('Over 115 m²').evaluate(input => {
+      const clash = await tile('116 m² and over').evaluate(input => {
         const label = input.closest('label'), tick = label.querySelector('svg'), text = label.querySelector('span')
         if (!tick || !tick.getClientRects().length) return false
         const a = tick.getBoundingClientRect(), range = document.createRange(); range.selectNodeContents(text.firstChild)
@@ -45,15 +45,15 @@ fs.mkdirSync(out, { recursive: true })
       assert.equal(clash, false, 'tick overlaps size label')
       await form.screenshot({ path: path.join(out, `typed-134-${width}.png`) })
       await exact.fill('74.3')
-      assert.equal(await tile('Over 55–75 m²').isChecked(), true)
+      assert.equal(await tile('56–75 m²').isChecked(), true)
       assert.match(await estimate(), /£85 · 74\.3 m²/)
 
       // Choosing a size that contradicts the figure clears it; choosing a matching one keeps it.
-      await tile('Over 55–75 m²').check()
+      await tile('56–75 m²').check()
       assert.equal(await exact.inputValue(), '74.3')
-      await tile('Over 75–95 m²').check()
+      await tile('76–95 m²').check()
       assert.equal(await exact.inputValue(), '')
-      assert.match(await estimate(), /£95 · Over 75–95 m²/)
+      assert.match(await estimate(), /£95 · 76–95 m²/)
       await exact.fill('60')
       await tile('Not sure of floor area').check()
       assert.equal(await exact.inputValue(), '')

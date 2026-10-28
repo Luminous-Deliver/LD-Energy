@@ -10,13 +10,13 @@ if (!['localhost', '127.0.0.1'].includes(new URL(base).hostname)) throw new Erro
 const out = path.resolve(process.env.BOOKING_EVIDENCE_DIR || '../../../audits/website-growth-audit/ld-energy-pricing-2026-10-22')
 fs.mkdirSync(out, { recursive: true })
 
-const bands = ['Up to 40 m²', 'Over 40–55 m²', 'Over 55–75 m²', 'Over 75–95 m²', 'Over 95–115 m²', 'Over 115 m²']
+const bands = ['Up to 40 m²', '41–55 m²', '56–75 m²', '76–95 m²', '96–115 m²', '116 m² and over']
 // Abdul, 22/10/2026 (later): bedroom captions back under each band, kept muted and secondary to the m² label.
 const captions = ['Studios and compact flats', '1-bedroom flats', '2-bedroom flats and small homes', '2–3-bedroom homes', '3–4-bedroom houses', 'Large homes, 4+\u00a0bedrooms']
 const prices = {
   'Domestic EPC': ['£65', '£75', '£85', '£95', '£105', 'From £120'],
   'Floor Plan': ['£65', '£75', '£85', '£95', '£105', 'From £120'],
-  'EPC + Floor Plan': ['£115', '£130', '£145', '£160', '£175', 'From £200'],
+  'EPC + Floor Plan': ['£115', '£130', '£145', '£160', '£175', 'From £205'],
   'EPC Pre-Assessment': ['£90', '£100', '£110', '£120', '£130', 'From £145'],
 }
 const escape = text => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -115,7 +115,7 @@ const escape = text => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
       // §8B, §5, §7: a standard band, its saving, the plan's £35, and no "From".
       await chooseService('EPC + Floor Plan'); await go('price')
       eq(await plan.isChecked(), false, 'leaving for Floor Plan cleared the paid plan')
-      await chooseSize('Over 55–75 m²')
+      await chooseSize('56–75 m²')
       eq(await guide(), '£145', 'bundle 55-75'); ok(!/From/.test(await panel.locator('.bf__price').innerText()), 'no From on a standard band')
       ok(await panel.getByText('Save £25 compared with booking separately.').isVisible(), 'saving line')
       await togglePlan(); eq(await price(), '£180', 'bundle 55-75 + plan')
@@ -135,9 +135,9 @@ const escape = text => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
         // desktop, 72f7735 (Abdul 24/10/2026): a picked band opens the exact size under it, so the link gives way to the field
         eq(await link.count(), 0, 'a picked band replaces the link with the field')
         ok(await form.getByLabel('Internal floor area', { exact: true }).isVisible(), 'the field is open under the picked band')
-        eq(await field.getAttribute('placeholder'), 'e.g. 64', 'its example sits inside 55–75 m²')
+        eq(await field.getAttribute('placeholder'), 'e.g. 64', 'its example sits inside 56–75 m²')
       }
-      await chooseSize('Over 115 m²')
+      await chooseSize('116 m² and over')
       ok(await form.getByLabel('Approximate internal floor area').isVisible(), 'top band label')
       eq(await field.getAttribute('placeholder'), 'e.g. 145', 'top band placeholder')
       ok(await form.getByText('Include all floors. An estimate is fine.').isVisible(), 'top band help')
@@ -159,23 +159,23 @@ const escape = text => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
         eq(await form.getByText('Step 1 of 3').count(), 1, 'stays on step 1')
       }
       await form.getByRole('checkbox', { name: 'I don’t know the floor area' }).check()
-      eq(await size('Over 115 m²').isChecked(), true, 'unknown keeps the band')
+      eq(await size('116 m² and over').isChecked(), true, 'unknown keeps the band')
       if (width === 1440) await form.screenshot({ path: path.join(out, `top-band-${width}.png`) })
 
       // Typing keeps focus and the field even when the figure moves to a smaller band; decimals are never rounded.
       await field.click(); await field.pressSequentially('100')
       eq(await page.evaluate(() => document.activeElement?.id), 'floorArea', 'focus stays in the field while typing')
-      eq(await size('Over 95–115 m²').isChecked(), true, '100 m² selects 95-115')
+      eq(await size('96–115 m²').isChecked(), true, '100 m² selects 95-115')
       ok(await field.isVisible(), 'field stays open on a smaller band')
       eq(await form.getByRole('checkbox', { name: 'I don’t know the floor area' }).count(), 0, 'unknown option only on the top band')
       eq(await guide(), '£105', 'EPC 95-115')
       await go('size')
-      for (const [m2, band] of [['40', 'Up to 40 m²'], ['40.5', 'Over 40–55 m²'], ['55', 'Over 40–55 m²'], ['55.5', 'Over 55–75 m²'], ['75', 'Over 55–75 m²'], ['75.5', 'Over 75–95 m²'], ['95', 'Over 75–95 m²'], ['95.5', 'Over 95–115 m²'], ['115', 'Over 95–115 m²'], ['115.5', 'Over 115 m²']]) {
+      for (const [m2, band] of [['40', 'Up to 40 m²'], ['40.5', '41–55 m²'], ['55', '41–55 m²'], ['55.5', '56–75 m²'], ['75', '56–75 m²'], ['75.5', '76–95 m²'], ['95', '76–95 m²'], ['95.5', '96–115 m²'], ['115', '96–115 m²'], ['115.5', '116 m² and over']]) {
         await field.fill(m2); eq(await size(band).isChecked(), true, `${m2} m²`)
       }
       eq(await guide(), '£120', 'From £120 for 115.5 m²')
       // A manual pick of another band clears the figure; zero is rejected inline.
-      await chooseSize('Over 55–75 m²'); eq(await field.inputValue(), '', 'manual pick clears the figure')
+      await chooseSize('56–75 m²'); eq(await field.inputValue(), '', 'manual pick clears the figure')
       await field.fill('0')
       await (phone ? form.locator('.bf-st.is-open').getByRole('button', { name: 'Continue', exact: true }) : form.getByRole('button', { name: 'Continue' })).click()
       ok(await form.getByText('Enter a floor area greater than 0 m².').isVisible(), 'zero rejected')
@@ -189,8 +189,8 @@ const escape = text => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
       ok(!/£\d/.test(await panel.locator('.bf__price').innerText()), 'no invented total')
 
       // Keyboard: arrow keys move through the bands and the summary follows.
-      await go('size'); await size('Over 40–55 m²').focus(); await page.keyboard.press('ArrowRight')
-      eq(await size('Over 55–75 m²').isChecked(), true, 'arrow key moves the band')
+      await go('size'); await size('41–55 m²').focus(); await page.keyboard.press('ArrowRight')
+      eq(await size('56–75 m²').isChecked(), true, 'arrow key moves the band')
 
       // §12: submission and review carry the band id, the figure, the plan and the price.
       if (phone && !(await field.isVisible())) await link.click()

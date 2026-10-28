@@ -10,7 +10,7 @@ if (!['localhost', '127.0.0.1'].includes(new URL(base).hostname)) throw new Erro
 const norm = (s) => s.toLowerCase().replace(/[’']/g, "'")
 const ids = ['up-to-40', '40-55', '55-75', '75-95', '95-115', 'over-115']
 const epc = [65, 75, 85, 95, 105, 120]
-const rates = 'Three to five homes: £5 off each EPC or floor plan. Six or more: £10 off each. Homes in the same postcode area (like E15) on the same day: £10 off each after the first. Flats in the same building on the same day: £15 off each after the first. Only the biggest discount applies; they don\'t add up. With an EPC and floor plan together, you pay the bundle price and the discount comes off once per home. Never less than £55 for an EPC or a floor plan, or £100 for both. Faster options stay full price.'
+const { portfolioRatesText: rates } = require('../lib/site') // pinned word for word in portfolio-rates.test.cjs
 
 ;(async () => {
   const browser = await chromium.launch({ channel: 'msedge', headless: true })
