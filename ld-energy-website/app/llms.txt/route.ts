@@ -1,4 +1,4 @@
-import { site, pricing, priceFrom, formatPrice, bundleSaving, maxBundleSaving, topBand, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE } from '@/lib/site'
+import { site, pricing, priceFrom, formatPrice, bundleSaving, maxBundleSaving, topBand, largerHomesText, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE } from '@/lib/site'
 import { boroughMeta } from '@/lib/boroughs'
 
 export const runtime = 'edge'
@@ -53,14 +53,14 @@ exact quote is confirmed before the booking is accepted, never afterwards.
 Internal floor area (m²) is the main pricing factor; bedroom counts are shown only as a familiar
 reference for customers who do not know their floor area and do not set the price. Extensions,
 loft conversions, unusual layouts and multiple floors can affect the final quote. There are no travel
-or call-out charges.
+or call-out charges. L&D Energy is not VAT registered, so no VAT is added to any price.
 
 ${priceTable()}
 
 - Same-day lodgement (the EPC is lodged on the day of the visit): add £${SAME_DAY_LODGEMENT_SURCHARGE} to the EPC price above.
 - Next-day visit and lodgement (we visit the next day and lodge the EPC that day): add £${NEXT_DAY_VISIT_SURCHARGE} to the EPC price above.
 - Booking an EPC and floor plan together saves up to £${formatPrice(maxBundleSaving)} against booking them separately, because both are completed in a single property visit.
-- Properties ${topBand.areaLabel.toLowerCase()} vary considerably; that band is a starting point and an exact quote is always required.
+- Properties ${topBand.areaLabel.toLowerCase()} vary considerably; that band is a starting point and an exact quote is always required. ${largerHomesText}
 - EPC Improvement Plan add-on: £${site.addOns.improvementPlan}. Abdul’s personalised written plan explaining what is holding the rating back and which improvements to consider first, supported by the full Elmhurst Energy Report. Prepared after the visit. Energy costs and savings use standard occupancy assumptions; they are not actual household bills or guaranteed outcomes.
 - Standard EPCs include the software-generated recommendation report at no extra charge, unless there is no reasonable potential for improvement. Legitimate omissions follow assessment rules, not the customer’s choice of add-on.
 - EPC Pre-Assessment: a full RdSAP survey that is deliberately NOT lodged, so no certificate is published on the GOV.UK register. Priced on the same floor-area bands as an EPC, in its own column (from £${priceFrom.preAssessment}). The personalised written improvement plan is included in the price; a separate energy report is available at no extra charge on request. Lodging the same survey afterwards costs £${site.addOns.lodgeLater} with no second visit, provided nothing at the property has changed and the survey remains valid for lodgement under the applicable rules. It is NOT a substitute for an EPC where one is legally required — marketing a property for sale or rent, or MEES compliance.

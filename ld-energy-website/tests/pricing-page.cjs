@@ -7,14 +7,14 @@ const assert = require('node:assert/strict')
 const base = process.env.BOOKING_TEST_URL || 'http://localhost:3100'
 if (!['localhost', '127.0.0.1'].includes(new URL(base).hostname)) throw new Error('Local preview only')
 
-const bands = ['Up to 40 m²', 'Over 40–55 m²', 'Over 55–75 m²', 'Over 75–95 m²', 'Over 95–115 m²', 'Over 115 m²']
+const bands = ['Up to 40 m²', '41–55 m²', '56–75 m²', '76–95 m²', '96–115 m²', '116 m² and over']
 const ids = ['up-to-40', '40-55', '55-75', '75-95', '95-115', 'over-115']
 const captions = ['Studios and compact flats', '1-bedroom flats', '2-bedroom flats and small homes', '2–3-bedroom homes', '3–4-bedroom houses', 'Large homes, 4+ bedrooms']
 // Abdul's 22/10/2026 spec §2, column by column
 const services = [
   { id: 'epc', label: 'Domestic EPC', tab: 'EPC', prices: [65, 75, 85, 95, 105, 120] },
   { id: 'floor-plan', label: 'Floor plan', tab: 'Floor plan', prices: [65, 75, 85, 95, 105, 120] },
-  { id: 'bundle', label: 'EPC + floor plan', tab: 'EPC + plan', prices: [115, 130, 145, 160, 175, 200], save: [15, 20, 25, 30, 35] },
+  { id: 'bundle', label: 'EPC + floor plan', tab: 'EPC + plan', prices: [115, 130, 145, 160, 175, 205], save: [15, 20, 25, 30, 35] },
   { id: 'pre-assessment', label: 'Pre-Assessment', tab: 'Pre-Assessment', prices: [90, 100, 110, 120, 130, 145] },
 ]
 
@@ -66,17 +66,17 @@ const services = [
       ok(new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '[^£]*?' + price.replace(/[+£]/g, (c) => '\\' + c)).test(extras), `extra: ${label} ${price}`)
     }
     eq(await page.locator('#extras input').count(), 0, 'no checkboxes in the extras')
-    ok(/Domestic EPC, Over 55–75 m² £85 Same-day lodgement \+£15 Guide total £100/.test(extras), 'worked example adds up')
+    ok(/Domestic EPC, 56–75 m² £85 Same-day lodgement \+£15 Guide total £100/.test(extras), 'worked example adds up')
     ok(/Mon–Sun, 8am–8pm/.test(extras), 'faster options: standard hours')
 
     // Portfolio: Abdul's approved wording, word for word
-    ok((await page.locator('#portfolio').innerText()).includes('Three to five homes: £5 off each EPC or floor plan. Six or more: £10 off each. Homes in the same postcode area (like E15) on the same day: £10 off each after the first. Flats in the same building on the same day: £15 off each after the first. Only the biggest discount applies; they don\'t add up. With an EPC and floor plan together, you pay the bundle price and the discount comes off once per home. Never less than £55 for an EPC or a floor plan, or £100 for both. Faster options stay full price.'), 'portfolio rates, approved wording')
+    ok((await page.locator('#portfolio').innerText()).includes(require('../lib/site').portfolioRatesText), 'portfolio rates, approved wording')
 
     // Included / not included, carried over item for item
     const inc = await page.locator('#whats-included').innerText()
     for (const item of ['On-site assessment by an Elmhurst and Quidos accredited DEA', 'Official lodgement on the UK Government EPC Register',
       'Certificate link sent once lodged on the government register', 'Standard software-generated EPC recommendation report, where applicable',
-      'No travel or call-out charges', 'Optional personalised EPC Improvement Plan and full Elmhurst Energy Report, £35 extra',
+      'No travel or call-out charges', 'No VAT to add: we are not VAT registered, so the price is the total', 'Optional personalised EPC Improvement Plan and full Elmhurst Energy Report, £35 extra',
       'Re-visits due to access issues, charged at £25 per visit', 'For properties outside our service radius, contact us for a tailored quote.']) ok(inc.includes(item), `included: ${item}`)
 
     // Promise, FAQ (all nine, first open), schema

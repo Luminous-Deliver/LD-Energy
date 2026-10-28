@@ -80,6 +80,7 @@
 
 .pr-notes { margin-top: 22px; display: grid; gap: 10px; max-width: 78ch; font-size: 15px; line-height: 1.6; color: var(--ink-quiet); }
 .pr-notes b { font-weight: 500; color: var(--ink); }
+.pr-notes .pr-notes__small { font-size: 14px; }
 
 /* extras: a ledger, item left and price hard right, plus one worked example */
 .pr .pr-extras { display: grid; gap: 36px; }

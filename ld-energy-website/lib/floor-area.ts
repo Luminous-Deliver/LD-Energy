@@ -44,7 +44,7 @@ export function parseExactArea(value?: string): number | undefined {
 
 /**
  * The price band a known floor area falls in. Each band includes its ceiling and nothing below
- * the previous one, with no rounding: 40 is "Up to 40 m²", 40.5 is "Over 40–55 m²".
+ * the previous one, with no rounding: 40 is "Up to 40 m²", 40.5 is "41–55 m²".
  */
 export function bandForArea(m2: number): AreaBand {
   return areaBands[pricing.findIndex(band => band.areaMax === null || m2 <= band.areaMax)]

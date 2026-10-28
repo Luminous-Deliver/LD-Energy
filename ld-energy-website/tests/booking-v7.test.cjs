@@ -46,9 +46,9 @@ test('visit dates: never in the past (London calendar); today, tomorrow and next
 })
 
 test('WhatsApp from the form starts with the approved wording, then the choices', () => {
-  const text = whatsappFormText(whatsappQuoteText(), { services: ['Both (Bundle)'], dwellingType: 'House', areaLabel: 'Over 75–95 m²', guide: '£155' })
+  const text = whatsappFormText(whatsappQuoteText(), { services: ['Both (Bundle)'], dwellingType: 'House', areaLabel: '76–95 m²', guide: '£155' })
   assert.ok(text.startsWith("Hi, I'd like a quote for an EPC.\nFull address:\nPostcode:\n"))
-  assert.match(text, /Service: EPC \+ Floor Plan\nProperty type: House\nFloor area: Over 75–95 m²\nGuide price shown: £155\nPreferred date:$/)
+  assert.match(text, /Service: EPC \+ Floor Plan\nProperty type: House\nFloor area: 76–95 m²\nGuide price shown: £155\nPreferred date:$/)
   const bulk = whatsappFormText(whatsappQuoteText(), { services: [BULK] })
   assert.match(bulk, /Service: Agency \/ portfolio enquiry\nRoughly how many properties:\nPreferred date:$/)
   assert.doesNotMatch(bulk, /Property type|Floor area/)

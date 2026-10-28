@@ -125,6 +125,7 @@ export const site = {
    */
   sameAs: [
     'https://maps.google.com/?cid=14054711842511866215',
+    'https://www.linkedin.com/company/146771482/',
   ],
 } as const
 
@@ -208,25 +209,19 @@ export const floorPlanDisclaimer =
 export const portfolioMinHomes = 3
 
 /**
- * Portfolio rates. Approved by Abdul 24/10/2026 for EPCs (research: Abdul-2
- * projects/ld-energy-redesign-2026-10/research/portfolio-rates-2026-10-24.md); extended 28/10/2026 to floor plans
- * with a same-postcode-area tier ("Mirror + same-area tier"). One discount per home, the biggest that applies, never
- * stacked. A bundle pays its bundle price and the discount comes off once per home. `portfolioRatesText` is built
- * from these numbers so the two cannot drift; tests/portfolio-rates.test.cjs holds it to the approved sentence.
+ * Portfolio rates. Approved by Abdul 24/10/2026 for EPCs; reworked 28/10/2026 after an 11-home quote ("too much
+ * discount"): one rule for shared trips. Homes visited on the same day within 23 minutes' travel of each other (car or
+ * public transport; Abdul's figure), flats in one building included: the first at full price, £5 off each after it,
+ * on a single EPC or floor plan; never on top of a bundle (Abdul: no stacking). No volume-only discount. Never below £65 for a single service.
+ * `portfolioRatesText` is built from these numbers; tests/portfolio-rates.test.cjs holds it to the approved sentence.
  */
-export const portfolioRates = {
-  smallMin: 3, smallMax: 5, smallOff: 5, largeMin: 6, largeOff: 10, sameAreaOff: 10, sameBuildingOff: 15,
-  floor: 55, bundleFloor: 100,
-} as const
-const NUM: Record<number, string> = { 3: 'Three', 5: 'five', 6: 'Six' }
+export const portfolioRates = { sameDayOff: 5, travelMinutes: 23, floor: 65 } as const
 export const portfolioRatesText =
-  `${NUM[portfolioRates.smallMin]} to ${NUM[portfolioRates.smallMax]} homes: £${portfolioRates.smallOff} off each EPC or floor plan. ` +
-  `${NUM[portfolioRates.largeMin]} or more: £${portfolioRates.largeOff} off each. ` +
-  `Homes in the same postcode area (like E15) on the same day: £${portfolioRates.sameAreaOff} off each after the first. ` +
-  `Flats in the same building on the same day: £${portfolioRates.sameBuildingOff} off each after the first. ` +
-  "Only the biggest discount applies; they don't add up. " +
-  'With an EPC and floor plan together, you pay the bundle price and the discount comes off once per home. ' +
-  `Never less than £${portfolioRates.floor} for an EPC or a floor plan, or £${portfolioRates.bundleFloor} for both. ` +
+  `Homes visited on the same day within ${portfolioRates.travelMinutes} minutes' travel of each other, including flats in the same building: ` +
+  `the first is full price, then £${portfolioRates.sameDayOff} off each one after it. ` +
+  'This applies to an EPC or a floor plan booked on its own; ' +
+  'an EPC and floor plan booked together already have the bundle saving. ' +
+  `Never less than £${portfolioRates.floor} for an EPC or a floor plan. ` +
   'Faster options stay full price.'
 
 /**
@@ -241,7 +236,7 @@ export const portfolioRatesText =
  *
  * The four services share one set of bands. A band runs from just over the
  * previous band's ceiling up to and including its own `areaMax`, so 40 m² is
- * "Up to 40 m²" and 40.5 m² is "Over 40–55 m²".
+ * "Up to 40 m²" and 40.5 m² is "41–55 m²".
  *
  * Bundle prices are deliberately stored as explicit values rather than being
  * derived from a percentage of the EPC price. They used to be computed as
@@ -256,7 +251,7 @@ export const portfolioRatesText =
 export interface PricingBand {
   /** Stable identifier, sent with an enquiry. See `areaBands` in lib/floor-area.ts. */
   id: string
-  /** Primary pricing driver, e.g. 'Over 55–75 m²'. */
+  /** Primary pricing driver, e.g. '56–75 m²'. */
   areaLabel: string
   /** Familiar reference shown as a muted caption under `areaLabel`. Never lead with this. */
   typicalLabel: string
@@ -272,14 +267,28 @@ export interface PricingBand {
 
 export const pricing: PricingBand[] = [
   { id: 'up-to-40', areaLabel: 'Up to 40 m²',    typicalLabel: 'Studios and compact flats',       areaMax: 40,   epc: 65,  floorPlan: 65,  bundle: 115, preAssessment: 90 },
-  { id: '40-55',    areaLabel: 'Over 40–55 m²',  typicalLabel: '1-bedroom flats',                 areaMax: 55,   epc: 75,  floorPlan: 75,  bundle: 130, preAssessment: 100 },
-  { id: '55-75',    areaLabel: 'Over 55–75 m²',  typicalLabel: '2-bedroom flats and small homes', areaMax: 75,   epc: 85,  floorPlan: 85,  bundle: 145, preAssessment: 110 },
-  { id: '75-95',    areaLabel: 'Over 75–95 m²',  typicalLabel: '2–3-bedroom homes',               areaMax: 95,   epc: 95,  floorPlan: 95,  bundle: 160, preAssessment: 120 },
-  { id: '95-115',   areaLabel: 'Over 95–115 m²', typicalLabel: '3–4-bedroom houses',              areaMax: 115,  epc: 105, floorPlan: 105, bundle: 175, preAssessment: 130 },
-  { id: 'over-115', areaLabel: 'Over 115 m²',    typicalLabel: 'Large homes, 4+\u00a0bedrooms',  areaMax: null, epc: 120, floorPlan: 120, bundle: 200, preAssessment: 145, startingPrice: true },
+  { id: '40-55',    areaLabel: '41–55 m²',  typicalLabel: '1-bedroom flats',                 areaMax: 55,   epc: 75,  floorPlan: 75,  bundle: 130, preAssessment: 100 },
+  { id: '55-75',    areaLabel: '56–75 m²',  typicalLabel: '2-bedroom flats and small homes', areaMax: 75,   epc: 85,  floorPlan: 85,  bundle: 145, preAssessment: 110 },
+  { id: '75-95',    areaLabel: '76–95 m²',  typicalLabel: '2–3-bedroom homes',               areaMax: 95,   epc: 95,  floorPlan: 95,  bundle: 160, preAssessment: 120 },
+  { id: '95-115',   areaLabel: '96–115 m²', typicalLabel: '3–4-bedroom houses',              areaMax: 115,  epc: 105, floorPlan: 105, bundle: 175, preAssessment: 130 },
+  { id: 'over-115', areaLabel: '116 m² and over', typicalLabel: 'Large homes, 4+\u00a0bedrooms',  areaMax: null, epc: 120, floorPlan: 120, bundle: 205, preAssessment: 145, startingPrice: true },
 ]
 
 /** The bands with fixed guide prices, i.e. every band except the open-ended top one. */
+/**
+ * Larger homes (Abdul 28/10/2026): the top band's "from £120" covers 116–135 m²; each further 20 m² adds £15 to the EPC
+ * and to the floor plan (136–155 m² £135, 156–175 m² £150). The bundle saving stays £35 (never more). Shown as one
+ * quiet line, not more table rows ("I don't want my price list to go on and on").
+ */
+export const largerHomes = { firstMax: 135, step: 20, add: 15, bundleSaving: 35 } as const
+export function largerHomePrice(m2: number): number {
+  const top = 120
+  return m2 <= largerHomes.firstMax ? top : top + Math.ceil((m2 - largerHomes.firstMax) / largerHomes.step) * largerHomes.add
+}
+export const largerHomesText =
+  `Larger homes: the EPC and the floor plan each go up £${largerHomes.add} for every extra ${largerHomes.step} m² over ${largerHomes.firstMax} m² ` +
+  `(136–155 m² £${largerHomePrice(155)}, 156–175 m² £${largerHomePrice(175)}), and together they still save £${largerHomes.bundleSaving}.`
+
 export const standardBands = pricing.filter((p) => !p.startingPrice)
 
 /**

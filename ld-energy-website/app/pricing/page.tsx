@@ -11,7 +11,7 @@ import { ReadNext, type NextStep } from '@/components/inner/ReadNext'
 import { InnerEnding } from '@/components/inner/InnerEnding'
 import { PriceMatrix } from '@/components/inner/PriceMatrix'
 import {
-  pricing, site, formatPrice, maxBundleSaving, priceFrom, standardBands, topBand, portfolioMinHomes, portfolioRatesText,
+  pricing, site, formatPrice, maxBundleSaving, priceFrom, standardBands, topBand, portfolioMinHomes, portfolioRatesText, largerHomesText,
   SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE, defaultOgImage,
 } from '@/lib/site'
 import { quoteHref } from '@/lib/quote-context'
@@ -92,6 +92,7 @@ const included = [
   'Certificate link sent once lodged on the government register',
   'Standard software-generated EPC recommendation report, where applicable',
   'No travel or call-out charges',
+  'No VAT to add: we are not VAT registered, so the price is the total',
 ]
 const notIncluded = [
   `Optional personalised EPC Improvement Plan and full Elmhurst Energy Report, £${site.addOns.improvementPlan} extra`,
@@ -106,7 +107,7 @@ const faqs: Faq[] = [
   },
   {
     q: 'Are there any hidden fees?',
-    a: 'No. The price we confirm before booking is the price you pay. Quotes are worked out from your property size and condition, so there are no surprise add-ons or call-out charges. Anything that could change the figure, like extensions or an unusual layout, is priced into the quote up front. There are no travel or call-out charges.',
+    a: 'No. The price we confirm before booking is the price you pay. Quotes are worked out from your property size and condition, so there are no surprise add-ons or call-out charges. Anything that could change the figure, like extensions or an unusual layout, is priced into the quote up front. There are no travel or call-out charges, and no VAT to add because we are not VAT registered.',
   },
   {
     q: 'Does my EPC include improvement recommendations?',
@@ -134,7 +135,7 @@ const faqs: Faq[] = [
   },
   {
     q: `What if my property is larger than ${standardBands[standardBands.length - 1].areaMax} m²?`,
-    a: `Guide prices for homes ${topBand.areaLabel.toLowerCase()} start from £${topBand.epc} for the EPC, £${topBand.floorPlan} for a floor plan and £${topBand.bundle} for both together. Large properties vary a great deal in layout and complexity, so this band is a starting point rather than a typical figure. Send us the address and we will confirm the exact quote before you book.`,
+    a: `Guide prices for homes ${topBand.areaLabel.toLowerCase()} start from £${topBand.epc} for the EPC, £${topBand.floorPlan} for a floor plan and £${topBand.bundle} for both together. ${largerHomesText} Large properties vary a great deal in layout and complexity, so this band is a starting point rather than a typical figure. Send us the address and we will confirm the exact quote before you book.`,
   },
 ]
 
@@ -213,7 +214,7 @@ export default function PricingPage() {
               <h1 id="pr-h1">EPC and floor plan prices</h1>
               <p className="in-hd__answer">
                 One price list for all of London, set mainly by the home&apos;s internal floor area. EPCs from{' '}
-                <b className="num">£{priceFrom.epc}</b>, with no travel charges. Every figure is a guide: we confirm your exact price
+                <b className="num">£{priceFrom.epc}</b>, with no travel charges and no VAT to add. Every figure is a guide: we confirm your exact price
                 before you book, never after.
               </p>
               <div className="in-hd__acts">
@@ -265,6 +266,7 @@ export default function PricingPage() {
               the two services booked separately and booked together: up to <b className="num">£{formatPrice(maxBundleSaving)}</b> on one visit.{' '}
               <a className="in-link" href={q('inline')}>Request an exact quote</a>
             </p>
+            <p className="pr-notes__small">{largerHomesText}</p>
           </div>
         </Container>
       </section>

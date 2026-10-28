@@ -88,7 +88,7 @@ export function bandIndex(id: AreaBand): number {
   return pricing.findIndex((b) => b.id === id)
 }
 
-/** A band as a phrase inside a sentence: "55–75 m²", "up to 40 m²", "over 115 m²". */
+/** A band as a phrase inside a sentence: "56–75 m²", "up to 40 m²", "116 m² and over". */
 export function bandPhrase(id: AreaBand): string {
   const band = pricing[bandIndex(id)]
   if (band.startingPrice) return band.areaLabel.toLowerCase()
