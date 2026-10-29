@@ -201,9 +201,9 @@ function priceLines(data: BookingEmailInput, e: GuideEstimate): Array<[string, s
 }
 
 function priceStatus(e: GuideEstimate): string {
-  if (e.isBulk) return 'Portfolio: quoted home by home'
-  if (e.priceStatus === 'starting') return 'Starting price: large home, quote it from the address'
-  if (e.priceStatus === 'to-confirm') return 'No figure shown: size to confirm'
+  if (e.isBulk) return 'Quoted individually: a portfolio, priced home by home'
+  if (e.priceStatus === 'starting') return 'Starting price: a large home, quote it from the address'
+  if (e.priceStatus === 'to-confirm') return 'To be confirmed: no figure shown, the size is not known'
   return 'Standard guide price'
 }
 
@@ -271,16 +271,16 @@ export function buildBusinessEmail(data: BookingEmailInput, meta: BookingMeta) {
   ]
 
   const area = data.floorArea
-    ? `${areaLabel(data.areaBand, data.floorArea)} (their figure), ${areaLabel(data.areaBand)} band`
+    ? `${areaLabel(data.areaBand, data.floorArea)} (customer's figure), ${areaLabel(data.areaBand)} band`
     : `${areaLabel(data.areaBand || legacyArea(data.propertyType))}${data.areaBand === TOP_BAND && data.floorAreaUnknown ? ', they don’t know the floor area' : ''}`
   const job: Row[] = [
     ['Service', text(data.services.map(serviceLabel).join(' + '))],
     ...(e.isBulk
       ? [['Homes', text(data.propertyCount || 'Not given')] as Row]
-      : [['Property', text(data.dwellingType || 'Not given')] as Row, ['Floor area', text(area)] as Row]),
+      : [['Property type', text(data.dwellingType || 'Not given')] as Row, ['Floor area', text(area)] as Row]),
     ['Turnaround', text(turnaround(data, e))],
     ...(e.canHavePlan ? [['Improvement Plan', text(e.planIncluded ? 'Included' : e.improvementPlan ? `Added (+£${e.improvementPlan})` : 'Not added')] as Row] : []),
-    ...(e.productKind === 'preAssessment' ? [[ENERGY_REPORT_LABEL, text(e.energyReport ? 'Asked for (free)' : 'Not asked for')] as Row] : []),
+    ...(e.productKind === 'preAssessment' ? [[ENERGY_REPORT_LABEL, text(e.energyReport ? 'Requested (no extra charge)' : 'Not requested')] as Row] : []),
     ['Preferred date', text(formatPreferredDate(data.preferredDate) || 'None picked')],
   ]
 
@@ -338,7 +338,7 @@ export function buildBusinessEmail(data: BookingEmailInput, meta: BookingMeta) {
     ...details.map(([k, v]) => `${k}: ${plain(v)}`),
     '',
     `Call: ${tel}`,
-    `WhatsApp: ${whatsapp}`,
+    `Reply by WhatsApp: ${whatsapp}`,
   ].join('\n'))
 
   return { text: txt, html: page({ title: `New quote request: ${data.name}`, preheader: summary, body }) }
@@ -368,12 +368,15 @@ export function buildCustomerEmail(data: BookingEmailInput, meta: Pick<BookingMe
     request.push(['Homes', text(data.propertyCount || 'To be confirmed')])
     if (data.address) request.push(['Addresses', text(data.address)])
   } else {
-    if (data.dwellingType) request.push(['Property', text(data.dwellingType)])
+    if (data.dwellingType) request.push(['Property type', text(data.dwellingType)])
     request.push(['Floor area', text(areaLabel(data.areaBand || legacyArea(data.propertyType), data.floorArea))])
     request.push(['Address', text(`${data.address}, ${data.postcode}`)])
   }
   request.push(['Turnaround', text(turnaround(data, e))])
   request.push(['Booking as', text(data.customerType)])
+  if (e.planIncluded) request.push(['Included', text('Personalised written improvement plan')])
+  else if (e.improvementPlan > 0) request.push(['Add-on', text(`${PLAN_LABEL} (+£${e.improvementPlan})`)])
+  if (e.energyReport) request.push(['Also included', text(`${ENERGY_REPORT_LABEL}, at no extra charge`)])
   request.push(['Preferred date', text(formatPreferredDate(data.preferredDate) || 'None picked')])
   if (data.notes) request.push(['Your notes', text(data.notes)])
   // their own details, so a mistyped number is caught before Abdul tries to call it
@@ -381,8 +384,12 @@ export function buildCustomerEmail(data: BookingEmailInput, meta: Pick<BookingMe
 
   const intro = bulk
     ? `Thanks for your enquiry. Abdul will look at your list and reply during opening hours (${OPENING_HOURS}) with prices for each home.`
-    : `Thanks for your request. Abdul will check the details and reply the same working day with your exact price and a time for the visit (opening hours ${OPENING_HOURS}). Nothing is booked until you agree to both.`
-  const legal = 'This confirms we received your request. Your visit is booked only once you agree the price and time.'
+    // the timing lives in step 1 below, so the opening line doesn't repeat it
+    : 'Thanks for your request. Here is what you asked for, your guide price and what happens next. Nothing is booked until you agree the price and a time.'
+  const customerPriceNote = e.isStartingPrice
+    ? 'A starting price for a larger home, not the final price. Abdul confirms the exact price in writing before anything is booked.'
+    : 'A guide, not the final price. Abdul confirms the exact price in writing before anything is booked.'
+  const legal = 'This confirms we received your request. Your visit is confirmed only once you agree the price and time.'
 
   const label = (t: string) => `<p style="margin:0 0 10px;font-family:${MONO};font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:${SAGE}">${t}</p>`
   const bullets = (items: string[]) => `<table role="presentation" width="100%" cellpadding="0" cellspacing="0">${items.map((i) => `<tr>
@@ -407,10 +414,10 @@ export function buildCustomerEmail(data: BookingEmailInput, meta: Pick<BookingMe
           <p style="margin:0 0 10px;font-size:16px;color:${INK}">Hi ${escapeHtml(first)},</p>
           <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:${INK}">${escapeHtml(intro)}</p>
           ${card('Your request', rows(request))}
-          ${priceCard(data, e, { totalLabel: 'Guide price', note: 'A guide, not the final price. Abdul confirms the exact price in writing before anything is booked.' })}
+          ${priceCard(data, e, { totalLabel: 'Guide price', note: customerPriceNote })}
           ${box(`${label('What happens next')}<table role="presentation" width="100%" cellpadding="0" cellspacing="0">${stepRows}</table>`)}
           ${delivered.length ? box(`${label('What you receive')}${bullets(delivered)}`) : ''}
-          ${showPrep ? box(`${label('Before the visit')}${bullets(prepChecklist)}<p style="margin:2px 0 8px;font-size:14px"><a href="${prepUrl}" style="font-weight:600;color:${SAGE}">Please read before your visit</a></p>`, SAGE_50) : ''}
+          ${showPrep ? box(`${label('Before your visit')}${bullets(prepChecklist)}<p style="margin:2px 0 8px;font-size:14px"><a href="${prepUrl}" style="font-weight:600;color:${SAGE}">Please read before your visit</a></p>`, SAGE_50) : ''}
           ${tenanted ? box(`<p style="margin:0 0 8px;font-size:14px;line-height:1.55;color:${INK}"><strong>Tenanted property?</strong> ${escapeHtml(TENANT_NOTICE)}</p>`) : ''}
           ${bulk ? '' : box(`${label('When you pay')}<p style="margin:0 0 8px;font-size:14px;line-height:1.55;color:${INK}">After the visit, by cash, bank transfer or card. No VAT to add: we are not VAT registered, so the price is the total.</p>`)}
           ${bulk ? '' : box(`${label('Our promise')}${bullets(promiseLines)}<p style="margin:0 0 8px;font-size:13px"><a href="${SITE_URL}/terms#our-promise" style="color:${SAGE}">How it works</a></p>`)}
@@ -426,10 +433,12 @@ export function buildCustomerEmail(data: BookingEmailInput, meta: Pick<BookingMe
   const txt =
     `Hi ${first},\n\n${intro}\n\nYour reference: ${meta.reference}\n\nYour request:\n` +
     request.map(([k, v]) => `  ${k}: ${plain(v).replace(/\n/g, ' ')}`).join('\n') +
-    (lines.length ? `\n\nGuide price:\n${lines.map(([k, v]) => `  ${k}: ${v}`).join('\n')}\n  Total: ${guidePrice(e, e.total ?? 0)} (a guide; Abdul confirms the exact price in writing before anything is booked)` : '') +
+    (lines.length
+      ? `\n\nGuide price:\n${lines.map(([k, v]) => `  ${k}: ${v}`).join('\n')}\n  Total: ${guidePrice(e, e.total ?? 0)}. ${customerPriceNote}`
+      : `\n\nGuide price: ${bulk ? 'Quoted individually, home by home.' : 'Price to be confirmed. We’ll confirm the size and price from your property details.'}`) +
     `\n\nWhat happens next:\n${steps.map((s, i) => `  ${i + 1}. ${s}`).join('\n')}` +
     (delivered.length ? `\n\nWhat you receive:\n${delivered.map((d) => `  - ${d}`).join('\n')}` : '') +
-    (showPrep ? `\n\nBefore the visit:\n${prepChecklist.map((p) => `  - ${p}`).join('\n')}\n  Please read before your visit: ${prepUrl}` : '') +
+    (showPrep ? `\n\nBefore your visit:\n${prepChecklist.map((p) => `  - ${p}`).join('\n')}\n  Please read before your visit: ${prepUrl}` : '') +
     (tenanted ? `\n\nTenanted property? ${TENANT_NOTICE}` : '') +
     (bulk ? '' : `\n\nWhen you pay: after the visit, by cash, bank transfer or card. No VAT to add.`) +
     (bulk ? '' : `\n\nOur promise:\n${promiseLines.map((l) => `  - ${l}`).join('\n')}\n  How it works: ${SITE_URL}/terms#our-promise`) +

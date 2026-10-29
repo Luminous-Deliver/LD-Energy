@@ -55,7 +55,7 @@ const { contactSchema } = require('../lib/validators')
     if (name !== 'bulk') ok(biz.text.includes('Postcode check:'), `${name} business: postcode check row`)
   }
   const bundleBiz = buildBusinessEmail(cases.bundle, { reference: 'R', received: new Date(), turnstilePassed: true, postcodeCheck: checksFor.bundle }).text
-  ok(/Floor area: 150 m² \(their figure\), 116 m² and over band/.test(bundleBiz), 'bundle: their exact figure and the band')
+  ok(/Floor area: 150 m² \(customer's figure\), 116 m² and over band/.test(bundleBiz), 'bundle: their exact figure and the band')
   ok(/Price status: Starting price/.test(bundleBiz), 'bundle: starting-price status')
   ok(/Found us via: Bing \(bing\.com\)/.test(bundleBiz) && /First page: \/areas\/newham/.test(bundleBiz) && /Form used: pricing page, Newham, “hero” button/.test(bundleBiz), 'came from rows')
   ok(/Newham, Stratford Olympic Park ward · inside London · 0\.6 km/.test(bundleBiz), 'postcode check line')

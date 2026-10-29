@@ -74,6 +74,7 @@ test('the API: property type required and carried into both emails, with What yo
   let messages = []
   global.fetch = async (url, options) => {
     if (url.includes('siteverify')) return Response.json({ success: true })
+    if (url.includes('api.postcodes.io')) return Response.json({ status: 404 }, { status: 404 })
     messages.push(JSON.parse(options.body))
     return Response.json({ id: 'mock-message' })
   }
