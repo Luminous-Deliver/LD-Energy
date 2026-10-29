@@ -4,6 +4,8 @@
 
 @layer base {
   html {
+    /* Light-only (Abdul 29/10/2026): pairs with the color-scheme meta in app/layout.tsx. */
+    color-scheme: only light;
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
   }

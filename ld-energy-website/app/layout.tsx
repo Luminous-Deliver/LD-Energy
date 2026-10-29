@@ -80,6 +80,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: '#33507F',
+  // Light-only (Abdul 29/10/2026): stops phone browsers auto-darkening the cream sections.
+  colorScheme: 'only light',
   width: 'device-width',
   initialScale: 1,
 }
