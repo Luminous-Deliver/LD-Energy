@@ -106,7 +106,9 @@
 /* portfolio */
 .pr .pr-port { display: grid; gap: 28px; }
 .pr-port__acts { margin-top: 22px; }
-.pr-port__rates { font-size: 17px; line-height: 1.65; color: var(--ink); padding: 22px 24px; background: var(--card); border: 1px solid var(--hair); border-left: 3px solid var(--sage-700); border-radius: 0 8px 8px 0; max-width: 62ch; }
+.pr-port__rates { font-size: 17px; line-height: 1.65; color: var(--ink); padding: 22px 24px; background: var(--card); border: 1px solid var(--hair); border-left: 3px solid var(--sage-700); border-radius: 0 8px 8px 0; max-width: 62ch; list-style: none; margin: 0; display: grid; gap: 10px; }
+.pr-port__rates li { position: relative; padding-left: 18px; }
+.pr-port__rates li::before { content: ""; position: absolute; left: 0; top: 0.78em; width: 6px; height: 6px; border-radius: 50%; background: var(--sage-700); }
 @media (min-width: 900px) { .pr .pr-port { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 72px; align-items: center; } .pr-port__rates { font-size: 18px; } }
 
 /* included and not */

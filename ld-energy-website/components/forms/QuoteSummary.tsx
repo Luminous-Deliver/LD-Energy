@@ -56,6 +56,7 @@ export function QuoteSummaryPanel() {
   const estimate = guideEstimate({
     services: [service],
     areaBand: snapshot?.areaBand,
+    floorArea: snapshot?.floorArea,
     speed: snapshot?.speed,
     improvementPlan: snapshot?.improvementPlan,
     energyReport: snapshot?.energyReport,

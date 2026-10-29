@@ -216,13 +216,15 @@ export const portfolioMinHomes = 3
  * `portfolioRatesText` is built from these numbers; tests/portfolio-rates.test.cjs holds it to the approved sentence.
  */
 export const portfolioRates = { sameDayOff: 5, travelMinutes: 23, floor: 65 } as const
-export const portfolioRatesText =
+/** The same sentences as a list, for the /pricing panel (Abdul 28/10: a list, not a paragraph). */
+export const portfolioRatesList = [
   `Homes visited on the same day within ${portfolioRates.travelMinutes} minutes' travel of each other, including flats in the same building: ` +
-  `the first is full price, then £${portfolioRates.sameDayOff} off each one after it. ` +
-  'This applies to an EPC or a floor plan booked on its own; ' +
-  'an EPC and floor plan booked together already have the bundle saving. ' +
-  `Never less than £${portfolioRates.floor} for an EPC or a floor plan. ` +
-  'Faster options stay full price.'
+    `the first is full price, then £${portfolioRates.sameDayOff} off each one after it.`,
+  'This applies to an EPC or a floor plan booked on its own; an EPC and floor plan booked together already have the bundle saving.',
+  `Never less than £${portfolioRates.floor} for an EPC or a floor plan.`,
+  'Faster options stay full price.',
+] as const
+export const portfolioRatesText = portfolioRatesList.join(' ')
 
 /**
  * CANONICAL PRICING SOURCE.

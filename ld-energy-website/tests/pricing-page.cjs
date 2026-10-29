@@ -70,7 +70,9 @@ const services = [
     ok(/Mon–Sun, 8am–8pm/.test(extras), 'faster options: standard hours')
 
     // Portfolio: Abdul's approved wording, word for word
-    ok((await page.locator('#portfolio').innerText()).includes(require('../lib/site').portfolioRatesText), 'portfolio rates, approved wording')
+    // Abdul's approved wording, word for word, now one sentence per list item (28/10)
+    const rateItems = (await page.locator('#portfolio .pr-port__rates li').allInnerTexts()).map((t) => t.trim())
+    ok(rateItems.length === 4 && rateItems.join(' ') === require('../lib/site').portfolioRatesText, 'portfolio rates, approved wording, as a list')
 
     // Included / not included, carried over item for item
     const inc = await page.locator('#whats-included').innerText()

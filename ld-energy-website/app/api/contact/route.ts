@@ -94,6 +94,7 @@ function buildEmail(data: ParsedInput) {
   const estimate = guideEstimate({
     propertyType: data.propertyType,
     areaBand: data.areaBand,
+    floorArea: data.floorArea,
     services: data.services,
     speed: data.speed,
     improvementPlan: data.improvementPlan,
