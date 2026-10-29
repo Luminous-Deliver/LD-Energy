@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
+import { landingContext } from '@/lib/landing'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowRight, Mail, MessageCircle, Phone } from 'lucide-react'
@@ -42,7 +43,7 @@ export function EnquiryForm() {
     if (FORM_DRAFT) { done(); return }
     setStatus('submitting'); setProblem('')
     try {
-      const response = await fetch('/api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+      const response = await fetch('/api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...data, ...landingContext() }) })
       const body: { ok?: boolean; delivered?: boolean; code?: string } = await response.json().catch(() => ({}))
       if (response.ok && body.ok && body.delivered) { done(); return }
       resetTurnstile(); setStatus('error')

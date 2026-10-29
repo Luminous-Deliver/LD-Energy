@@ -77,7 +77,7 @@ const services = [
     // Included / not included, carried over item for item
     const inc = await page.locator('#whats-included').innerText()
     for (const item of ['On-site assessment by an Elmhurst and Quidos accredited DEA', 'Official lodgement on the UK Government EPC Register',
-      'Certificate link sent once lodged on the government register', 'Standard software-generated EPC recommendation report, where applicable',
+      'Certificate link sent once lodged on the government register', 'Suggested improvements listed on the certificate, where applicable',
       'No travel or call-out charges', 'No VAT to add: we are not VAT registered, so the price is the total', 'Optional personalised EPC Improvement Plan and full Elmhurst Energy Report, £35 extra',
       'Re-visits due to access issues, charged at £25 per visit', 'For properties outside our service radius, contact us for a tailored quote.']) ok(inc.includes(item), `included: ${item}`)
 

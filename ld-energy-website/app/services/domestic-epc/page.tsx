@@ -116,7 +116,7 @@ const options = [
       'Carried out by an accredited Domestic Energy Assessor',
       'Standard lodgement within 72 hours, same day available',
       'Certificate link sent as soon as it is live on the register',
-      'Standard EPC recommendation report included, where applicable',
+      'Suggested improvements listed on the certificate, where applicable',
     ],
   },
   {
@@ -437,7 +437,7 @@ export default function DomesticEpcPage() {
                 <div><dt>Standard lodgement<small>On the GOV.UK register within 72 hours of the visit</small></dt><dd className="is-muted">Included</dd></div>
                 <div><dt>Same-day lodgement<small>Lodged on the day of the visit</small></dt><dd className="num">+£{SAME_DAY_LODGEMENT_SURCHARGE}</dd></div>
                 <div><dt>Next-day visit and lodgement<small>We visit the next day and lodge it that day</small></dt><dd className="num">+£{NEXT_DAY_VISIT_SURCHARGE}</dd></div>
-                <div><dt>EPC recommendation report<small>Software-generated, on every EPC where improvements are possible</small></dt><dd className="is-muted">Included</dd></div>
+                <div><dt>Suggested improvements on your EPC<small>A short list on the certificate itself: each step, its typical cost and the rating after</small></dt><dd className="is-muted">Included</dd></div>
                 <div>
                   <dt>
                     <Link className="in-link" href="/services/epc-improvement-plan">EPC Improvement Plan</Link>

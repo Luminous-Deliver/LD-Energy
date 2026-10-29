@@ -13,7 +13,7 @@ checkServicePage({
   faqId: 'improvement-plan-faq', faqCount: 4,
   schemaTypes: ['Service', 'FAQPage', 'BreadcrumbList'],
   rows: [
-    { text: 'EPC recommendation report', href: '/services/domestic-epc' },
+    { text: 'Suggested improvements on your EPC', href: '/services/domestic-epc' },
     { text: '+£35', href: q('pricing') },
     { text: 'In an EPC Pre-Assessment', href: '/services/epc-pre-assessment' },
   ],

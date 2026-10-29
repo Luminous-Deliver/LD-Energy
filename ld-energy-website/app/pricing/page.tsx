@@ -61,7 +61,7 @@ const extras: Array<{ group: string; rows: Extra[] }> = [
   {
     group: 'Reports',
     rows: [
-      { label: 'EPC recommendation report', note: 'Software-generated, on every EPC where improvements are possible', price: 'Included', muted: true },
+      { label: 'Suggested improvements on your EPC', note: 'A short list on the certificate itself: each step, its typical cost and the rating after', price: 'Included', muted: true },
       { label: 'EPC Improvement Plan', note: 'Abdul\'s written priorities, with the full Elmhurst Energy Report', price: `+£${site.addOns.improvementPlan}` },
       { label: 'Lodging a held Pre-Assessment later', note: 'The same survey, no second visit, if nothing has changed', price: `+£${site.addOns.lodgeLater}` },
     ],
@@ -90,7 +90,7 @@ const included = [
   'On-site assessment by an Elmhurst and Quidos accredited DEA',
   'Official lodgement on the UK Government EPC Register',
   'Certificate link sent once lodged on the government register',
-  'Standard software-generated EPC recommendation report, where applicable',
+  'Suggested improvements listed on the certificate, where applicable',
   'No travel or call-out charges',
   'No VAT to add: we are not VAT registered, so the price is the total',
 ]

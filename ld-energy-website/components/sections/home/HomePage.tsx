@@ -265,7 +265,7 @@ function Services() {
             <p className="offer__for">For lettings, sales and your own home</p>
             <div className="offer__groups">
               <div><p className="offer__g">On the visit</p><Ticks items={['On-site assessment by an accredited Domestic Energy Assessor']} /></div>
-              <div><p className="offer__g">You receive</p><Ticks items={['Your EPC, lodged on the official GOV.UK EPC Register within 72 hours, same day available', 'A certificate link once it is live on the register', 'The standard recommendation report, where applicable', 'A certificate valid for 10 years']} /></div>
+              <div><p className="offer__g">You receive</p><Ticks items={['Your EPC, lodged on the official GOV.UK EPC Register within 72 hours, same day available', 'A certificate link once it is live on the register', 'Suggested improvements listed on the certificate, where applicable', 'A certificate valid for 10 years']} /></div>
               <div><p className="offer__g">Optional</p>
                 <ul className="ticks"><li><span className="plus" aria-hidden="true" />£{site.addOns.improvementPlan} Improvement Plan: your priorities, with the full Energy Report</li></ul></div>
             </div>
@@ -281,7 +281,7 @@ function Services() {
             <h3>EPC + Floor Plan</h3>
             <p className="offer__for">For sellers, re-lets and agents preparing a listing</p>
             <div className="offer__groups">
-              <div><p className="offer__g">Everything in the Domestic EPC</p><Ticks items={['Assessment, lodged EPC, certificate link and recommendation report']} /></div>
+              <div><p className="offer__g">Everything in the Domestic EPC</p><Ticks items={['Assessment, lodged EPC, certificate link and suggested improvements']} /></div>
               <div><p className="offer__g">Plus the floor plan</p><Ticks items={['Laser-measured plan for Rightmove, Zoopla and OnTheMarket', 'Total floor area, approximate room dimensions and labels', 'High-resolution JPEG and PDF files']} /></div>
               <div><p className="offer__g">Why together</p><Ticks items={['Both surveys are completed during the same property visit']} /></div>
             </div>

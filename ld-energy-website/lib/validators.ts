@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { sourcePages, ctaIds } from '@/lib/enquiry-attribution'
+import { REFERRER_HOST_RE, LANDING_PAGE_RE } from '@/lib/landing'
 import { submittedAreaChoices, bandForArea, legacyArea, parseExactArea, FLOOR_AREA_ERROR, TOP_BAND } from '@/lib/floor-area'
 import { propertyTypes, dwellingTypes, services, customerTypes, speeds, BULK, ukPostcodeRegex, LEGACY_EXPRESS_SPEED, SAME_DAY_LODGEMENT_SPEED, isPastVisitDate, PAST_DATE_ERROR } from '@/lib/booking-options'
 export { propertyTypes, dwellingTypes, services, customerTypes, speeds, BULK, PRE_ASSESSMENT, STANDARD_SPEED, SAME_DAY_LODGEMENT_SPEED, NEXT_DAY_VISIT_SPEED, LEGACY_EXPRESS_SPEED, ukPostcodeRegex } from '@/lib/booking-options'
@@ -36,6 +37,9 @@ export const contactSchema = z
   ctaId: z.enum(ctaIds).optional(),
   // Borough membership is checked against server-owned boroughMeta in the API.
   areaPage: z.string().max(64).optional(),
+  /** lib/landing.ts: the referring site's domain and the first page path, nothing more. Bad values are dropped, never fatal. */
+  referrerHost: z.string().regex(REFERRER_HOST_RE).optional().catch(undefined),
+  landingPage: z.string().regex(LANDING_PAGE_RE).optional().catch(undefined),
   services: z
     .array(z.enum(services))
     .min(1, 'Please choose at least one service'),
@@ -144,6 +148,9 @@ export const enquirySchema = z.object({
   email: z.string().trim().toLowerCase().email('Please enter a valid email address').max(200),
   phone: z.string().trim().max(30).regex(/^[\d\s+()-]*$/, 'Phone number contains invalid characters').optional().or(z.literal('')),
   message: z.string().trim().min(10, 'Please write a little more so we can help').max(3000, 'Please keep your message under 3,000 characters'),
+  /** lib/landing.ts: the referring site's domain and the first page path, nothing more. Bad values are dropped, never fatal. */
+  referrerHost: z.string().regex(REFERRER_HOST_RE).optional().catch(undefined),
+  landingPage: z.string().regex(LANDING_PAGE_RE).optional().catch(undefined),
   consent: z.boolean().refine(value => value, 'Please confirm you agree to be contacted'),
   /** Honeypot, must remain empty */
   website: z.string().max(0).optional().or(z.literal('')),

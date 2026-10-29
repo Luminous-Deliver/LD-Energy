@@ -199,6 +199,8 @@ test('contact API security, recalculation and both email representations with de
   let messages = [], verification = true, providerStatus = 200, confirmationStatus = 200
   global.fetch = async (url, options) => {
     if (url.includes('siteverify')) return Response.json({ success: verification })
+    // the postcode check (lib/postcode-check.ts) only informs Abdul; here it finds nothing
+    if (url.includes('api.postcodes.io')) return Response.json({ status: 404 }, { status: 404 })
     assert.equal(url, 'https://api.resend.com/emails')
     messages.push(JSON.parse(options.body))
     // The first send is the internal notification, the second the customer confirmation.
@@ -210,11 +212,10 @@ test('contact API security, recalculation and both email representations with de
     for (const [areaPage, area] of Object.entries(boroughMeta)) {
       messages = []
       assert.equal((await request({ ...sample, areaPage, sourcePage: 'area', ctaId: 'pricing' })).status, 200)
-      assert.ok(messages[0].text.includes(`Area page: ${area.name}`))
+      assert.ok(messages[0].text.includes(`Form used: area page, ${area.name}, “pricing” button`))
       assert.ok(messages[0].html.includes(area.name.replace(/&/g, '&amp;').replace(/'/g, '&#39;')))
-      assert.match(messages[0].text, /Source page: area\nCTA: pricing/)
-      assert.match(messages[0].text, /Internal floor area: 56–75 m²/)
-      assert.doesNotMatch(messages[1].text + messages[1].html, /Area page|Source page|>CTA</)
+      assert.match(messages[0].text, /Floor area: 56–75 m²/)
+      assert.doesNotMatch(messages[1].text + messages[1].html, /Found us via|Form used|First page|Postcode check/)
     }
     for (const areaPage of ['__proto__', '<img src=x onerror=alert(1)>', 'invented-borough', '']) {
       messages = []
@@ -237,35 +238,35 @@ test('contact API security, recalculation and both email representations with de
       for (const message of messages) {
         assert.doesNotMatch(message.html, /<Test Customer>|£null|£undefined|£0|£85/)
         assert.doesNotMatch(message.text, /undefined|NaN/)
-        assert.match(message.text, /quoted individually|exact quote after reviewing|price to be confirmed/i)
+        assert.match(message.text, /quoted individually|exact quote after reviewing|to be confirmed/i)
       }
     }
     messages = []
     assert.equal((await request({ ...sample, services: ['Both (Bundle)'], speed: SAME_DAY_LODGEMENT_SPEED, improvementPlan: true, total: 1 })).status, 200)
-    assert.match(messages[0].text, /£195 guide/)
-    assert.match(messages[1].text, /£195 guide/)
+    assert.match(messages[0].text, /Guide price shown: £195/)
+    assert.match(messages[1].text, /Total: £195\./)
 
     // A customer's own figure reaches Abdul with the band that priced the guide.
     messages = []
     assert.equal((await request({ ...sample, areaBand: 'over-115', floorArea: '134' })).status, 200)
     assert.equal(messages[0].subject, 'EPC booking: Test Customer — 134 m² (E15 1AA)')
-    assert.match(messages[0].text, /Internal floor area: 134 m² \(customer's figure\) · 116 m² and over band/)
-    assert.match(messages[0].text, /From £120 starting price/)
+    assert.match(messages[0].text, /Floor area: 134 m² \(customer's figure\), 116 m² and over band/)
+    assert.match(messages[0].text, /Guide price shown: From £120/)
     assert.match(messages[0].text, /Price status: Starting price/)
     assert.match(messages[1].text, /Floor area: 134 m²/)
-    assert.match(messages[1].text, /From £120, a starting price for a larger home/)
+    assert.match(messages[1].text, /Total: From £120\. A starting price for a larger home/)
     assert.equal((await request({ ...sample, areaBand: '55-75', floorArea: '134' })).status, 400)
     // A retired band from a cached page still reaches Abdul, named, with no figure priced from it.
     messages = []
     assert.equal((await request({ ...sample, areaBand: '53-70' })).status, 200)
-    assert.match(messages[0].text, /Internal floor area: 53–70 m² \(earlier price list\)/)
+    assert.match(messages[0].text, /Floor area: 53–70 m² \(earlier price list\)/)
     assert.match(messages[0].text, /Price status: To be confirmed/)
     assert.doesNotMatch(messages[0].text + messages[1].text, /£85/)
     // The Pre-Assessment's free energy report is recorded and shown; the price is unchanged.
     messages = []
     assert.equal((await request({ ...sample, services: [PRE_ASSESSMENT], areaBand: 'up-to-40', energyReport: true })).status, 200)
     assert.match(messages[0].text, /Separate energy report: Requested \(no extra charge\)/)
-    assert.match(messages[0].text, /£90 guide/)
+    assert.match(messages[0].text, /Guide price shown: £90/)
     assert.match(messages[1].text, /Also included: Separate energy report, at no extra charge/)
     assert.match(messages[1].text, /improvement plan and your separate energy report are sent within 72 hours/)
     messages = []
@@ -302,7 +303,7 @@ test('contact API security, recalculation and both email representations with de
     assert.equal((await request({ ...sample, customerType: 'Landlord (tenanted)', preferredDate: '2099-10-07', notes: 'Key with <neighbour>' })).status, 200)
     assert.match(messages[1].html, /Tenanted property\?/)
     assert.match(messages[1].text, /Preferred date: 07\/10\/2099/)
-    assert.match(messages[0].text, /Preferred Date: 07\/10\/2099/)
+    assert.match(messages[0].text, /Preferred date: 07\/10\/2099/)
     assert.match(messages[1].html, /Key with &lt;neighbour&gt;/)
 
     // The response says whether the customer's copy actually went, so the page never claims it did when it did not.
