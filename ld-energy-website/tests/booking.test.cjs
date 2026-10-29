@@ -321,7 +321,7 @@ test('contact API security, recalculation and both email representations with de
     // The response says whether the customer's copy actually went, so the page never claims it did when it did not.
     messages = []
     let response = await request(sample)
-    assert.deepEqual(await response.json(), { ok: true, delivered: true, confirmationSent: true })
+    assert.deepEqual(await response.json(), { ok: true, delivered: true, confirmationSent: true, confirmationId: 'mock-message' })
     messages = []; confirmationStatus = 500
     response = await request(sample)
     assert.equal(response.status, 200)

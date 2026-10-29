@@ -62,6 +62,7 @@ export function EnquiryForm() {
       {FORM_DRAFT && <p className="eq__draft">Draft preview: nothing was sent. On the live site this is where the customer lands.</p>}
       <h3 id="eq-done-h" className="eq__done-h">Thanks, {sentName}. Your message is with us.</h3>
       <p>We reply by email during opening hours, {site.hours.replace('Monday–Sunday', 'Monday to Sunday').replace('–', ' to ')}. Need us sooner? Call or WhatsApp {site.phone}.</p>
+      <p>Our reply sometimes lands in junk or spam, so check there if you don’t see it.</p>
     </div>
   )
 

@@ -23,6 +23,8 @@
 .bf__sent { display: grid; gap: 20px; }
 .bf__sent-h { font-family: var(--font-serif); font-size: 1.75rem; line-height: 1.15; }
 .bf__sent-copy { font-size: 16px; }
+.bf__sent-bounce { display: grid; gap: 8px; padding: 14px 16px; border-left: 3px solid #A83630; background: #fff; font-size: 16px; line-height: 1.5; }
+.bf__sent-bounce a { font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 .bf__sent-next { margin: 8px 0 0; padding: 0; list-style: none; counter-reset: s; display: grid; border-top: 1px solid rgba(13, 27, 51, .09); }
 .bf__sent-next li { counter-increment: s; display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 10px; padding: 12px 0; border-bottom: 1px solid rgba(13, 27, 51, .09); font-size: 16px; line-height: 1.5; }
 .bf__sent-next li::before { content: counter(s); font-family: var(--font-serif); font-size: 20px; line-height: 1.2; }

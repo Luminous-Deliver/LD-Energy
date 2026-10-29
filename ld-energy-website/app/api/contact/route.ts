@@ -6,6 +6,7 @@ import { boroughMeta } from '@/lib/boroughs'
 import { bookingReference, buildBusinessEmail, buildCustomerEmail, buildEnquiryEmail, type BookingEmailInput } from '@/lib/booking-emails'
 import { checkPostcode } from '@/lib/postcode-check'
 import { emailDomainCanReceive, EMAIL_UNREACHABLE_MESSAGE } from '@/lib/email-check'
+import { CONFIRMATION_SUBJECT } from '@/lib/email-delivery'
 
 export const runtime = 'edge'
 
@@ -272,6 +273,8 @@ export async function POST(req: Request) {
   //    failure here must not fail the request; just log it. The form only tells
   //    the customer a copy is on its way when this actually succeeded.
   let confirmationSent = false
+  // the thank-you screen asks /api/contact/delivery whether this copy bounced (lib/email-delivery.ts)
+  let confirmationId: string | undefined
   try {
     const res = await sendEmail({
       from,
@@ -279,11 +282,12 @@ export async function POST(req: Request) {
       reply_to: to,
       // Keep this subject exact: scripts/resend-send.py, scripts/booking-followup.py and
       // the /quote-reply skill in the parent repo match on it to thread replies.
-      subject: 'We’ve received your EPC request — L&D Energy',
+      subject: CONFIRMATION_SUBJECT,
       text: confirmation.text,
       html: confirmation.html,
     })
     confirmationSent = res.ok
+    if (res.ok) confirmationId = ((await res.json().catch(() => ({}))) as { id?: string }).id
     if (!res.ok) {
       console.error('[contact] confirmation email failed', res.status, await res.text())
     }
@@ -291,5 +295,5 @@ export async function POST(req: Request) {
     console.error('[contact] confirmation email fetch failed', err)
   }
 
-  return NextResponse.json({ ok: true, delivered: true, confirmationSent })
+  return NextResponse.json({ ok: true, delivered: true, confirmationSent, confirmationId })
 }

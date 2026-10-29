@@ -12,6 +12,7 @@ import { pricing, site, maxBundleSaving, formatPrice, SAME_DAY_LODGEMENT_SURCHAR
 import { areaBands, areaLabel, bandForArea, parseExactArea, TOP_BAND } from '@/lib/floor-area'
 import { RollingPrice } from './RollingPrice'
 import { EmailTypoHint } from './EmailTypoHint'
+import { CopyDelivery } from './CopyDelivery'
 import { EMAIL_UNREACHABLE_MESSAGE } from '@/lib/email-check'
 import { guideEstimate, guideEstimateRows, guidePrice, PLAN_LABEL, ENERGY_REPORT_LABEL } from '@/lib/pricing-estimate'
 import {
@@ -197,8 +198,8 @@ function SendProblemNotice({ problem, summary }: { problem: SendProblem; summary
   )
 }
 
-function RequestSent({ data, confirmationSent, focusRef, onReset, idPrefix = '' }: {
-  data: ContactInput; confirmationSent: boolean; focusRef: RefObject<HTMLDivElement | null>; onReset: () => void; idPrefix?: string
+function RequestSent({ data, confirmationSent, confirmationId, focusRef, onReset, idPrefix = '' }: {
+  data: ContactInput; confirmationSent: boolean; confirmationId?: string; focusRef: RefObject<HTMLDivElement | null>; onReset: () => void; idPrefix?: string
 }) {
   const estimate = guideEstimate(data)
   const kind = estimate.productKind
@@ -221,7 +222,9 @@ function RequestSent({ data, confirmationSent, focusRef, onReset, idPrefix = '' 
     <div ref={focusRef} tabIndex={-1} aria-labelledby={`${idPrefix}request-sent-heading`} className="bf__sent">
       {FORM_DRAFT && <p className="bf__draft">Draft preview: nothing was sent. On the live site this is where the customer lands.</p>}
       <h2 id={`${idPrefix}request-sent-heading`} className="bf__sent-h">Request sent. Thanks, {firstName}.</h2>
-      {confirmationSent && <p className="bf__sent-copy">We’ve emailed a copy to <strong>{data.email}</strong>.</p>}
+      {confirmationSent
+        ? <CopyDelivery email={data.email} confirmationId={confirmationId} />
+        : <p className="bf__sent-copy">Abdul will reply to <strong>{data.email}</strong> with your price. If you can’t see it, check your junk or spam folder.</p>}
 
       <div>
         <p className="bf__est-label">What happens next</p>
@@ -281,7 +284,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
   const [step, setStep] = useState(1)
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [problem, setProblem] = useState<SendProblem | null>(null)
-  const [sent, setSent] = useState<{ data: ContactInput; confirmationSent: boolean } | null>(null)
+  const [sent, setSent] = useState<{ data: ContactInput; confirmationSent: boolean; confirmationId?: string } | null>(null)
   const [showErrors, setShowErrors] = useState(false)
   // The shared floor-area field. "Over 115 m²" opens it; any other band opens it on request. Once
   // the customer types, it stays open even when their figure moves them to a smaller band.
@@ -566,10 +569,10 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
     setStatus('submitting'); setProblem(null)
     try {
       const response = await fetch('/api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...data, ...landingContext() }) })
-      const body: { ok?: boolean; delivered?: boolean; confirmationSent?: boolean; code?: string } = await response.json().catch(() => ({}))
+      const body: { ok?: boolean; delivered?: boolean; confirmationSent?: boolean; confirmationId?: string; code?: string } = await response.json().catch(() => ({}))
       if (response.ok && body.ok === true && body.delivered === true) {
         conversionEvent('enquiry_submitted', quoteContextFromForm(data))
-        setSent({ data, confirmationSent: body.confirmationSent === true })
+        setSent({ data, confirmationSent: body.confirmationSent === true, confirmationId: typeof body.confirmationId === 'string' ? body.confirmationId : undefined })
         setStatus('success')
         return
       }
@@ -595,7 +598,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
 
   if (status === 'success' && sent) return (
     <div className={shell}>
-      <RequestSent data={sent.data} confirmationSent={sent.confirmationSent} focusRef={successRef} idPrefix={idPrefix} onReset={startOver} />
+      <RequestSent data={sent.data} confirmationSent={sent.confirmationSent} confirmationId={sent.confirmationId} focusRef={successRef} idPrefix={idPrefix} onReset={startOver} />
     </div>
   )
 

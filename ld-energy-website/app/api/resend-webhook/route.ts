@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getRequestContext } from '@cloudflare/next-on-pages'
+import { CONFIRMATION_SUBJECT, fetchResendEmail, referenceIn } from '@/lib/email-delivery'
 
 export const runtime = 'edge'
 
@@ -55,6 +56,51 @@ async function verifySignature(
     .some((candidate) => constantTimeEqual(candidate, expected))
 }
 
+const NOTIFY_TO = 'contact@luminousanddeliver.co.uk'
+const FROM_DEFAULT = 'L&D Energy <bookings@luminousanddeliver.co.uk>'
+const BOUNCE_SUBJECT = 'Bounced:'
+
+/**
+ * Abdul 29/10/2026: a mistyped address means the customer never hears back. Every bounce (the form's copy, a quote,
+ * an invoice) is forwarded to the business inbox with the reference, so he can phone or WhatsApp instead. The address
+ * goes only into that email, never into the logs. An alert that itself bounces is not alerted again.
+ */
+async function alertBounce(emailId: string, reason: string | undefined, svixId: string, cfEnv: Record<string, string>): Promise<boolean> {
+  const apiKey = cfEnv.RESEND_API_KEY || process.env.RESEND_API_KEY
+  if (!apiKey) return false
+  const email = await fetchResendEmail(emailId, apiKey)
+  if (!email) return false
+  if (email.subject?.startsWith(BOUNCE_SUBJECT)) return true
+  const to = [email.to ?? []].flat().join(', ') || 'unknown address'
+  const reference = referenceIn(email.text)
+  const what = email.subject === CONFIRMATION_SUBJECT ? 'the form’s automatic copy' : `“${email.subject ?? 'an email'}”`
+  const text = [
+    `${what} to ${to} bounced${reason ? `: ${reason}` : '.'}`,
+    '',
+    'The address is probably mistyped or no longer used, so they will not get email from us.',
+    reference ? `Find their phone number in the booking email: search the inbox for ${reference}.` : 'Find their phone number in the booking or thread, then call or WhatsApp them.',
+    '',
+    `Resend id: ${emailId}`,
+  ].join('\n')
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json', 'Idempotency-Key': `bounce-${svixId}` },
+      body: JSON.stringify({
+        from: (cfEnv.RESEND_FROM || process.env.RESEND_FROM || FROM_DEFAULT).replace('@epc.luminousanddeliver.co.uk', '@luminousanddeliver.co.uk'),
+        to: cfEnv.RESEND_TO || process.env.RESEND_TO || NOTIFY_TO,
+        subject: `${BOUNCE_SUBJECT} ${reference ?? 'email'} to ${to} did not deliver`,
+        text,
+      }),
+    })
+    if (!res.ok) console.error('[resend-webhook] bounce alert failed', res.status)
+    return res.ok
+  } catch (err) {
+    console.error('[resend-webhook] bounce alert fetch failed', err)
+    return false
+  }
+}
+
 export async function POST(req: Request) {
   let cfEnv: Record<string, string> = {}
   try {
@@ -105,7 +151,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
   }
 
-  let event: { type?: string; data?: { email_id?: string } }
+  let event: { type?: string; data?: { email_id?: string; bounce?: { message?: string } } }
   try {
     event = JSON.parse(raw)
   } catch {
@@ -119,6 +165,12 @@ export async function POST(req: Request) {
     // the Resend dashboard already has it keyed on the same id if needed.
     const level = event.type === 'email.delivered' ? 'log' : 'warn'
     console[level](`[resend-webhook] ${event.type} — email_id=${event.data?.email_id ?? 'unknown'}`)
+  }
+
+  if (event.type === 'email.bounced' && event.data?.email_id) {
+    const alerted = await alertBounce(event.data.email_id, event.data.bounce?.message, svixId, cfEnv)
+    // a failed alert returns 500 so Resend retries; the idempotency key stops a second copy once one has gone
+    if (!alerted) return NextResponse.json({ error: 'Alert not sent' }, { status: 500 })
   }
 
   return NextResponse.json({ ok: true })
