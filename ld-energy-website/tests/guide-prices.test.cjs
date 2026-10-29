@@ -26,7 +26,7 @@ const ALLOWED = {
   'epc-for-landlords-2026.mdx': ['£5,000', '£30,000', '£2,000', '£4,000', '£3,500', '£10,000'], // MEES penalties and cap (re-checked after the 28/10 Budget: unchanged)
   'epc-for-selling-house.mdx': ['£200'], // SI 2012/3118 reg 38 penalty
   'epc-improvements-by-budget.mdx': ['£500', '£2,000', '£5,000', '£7,500'], // budget tiers in the frozen title; Boiler Upgrade Scheme (GOV.UK, checked 29/10)
-  'epc-vs-floor-plan-vs-survey.mdx': ['£5,000', '£400', '£1,000'], // MEES penalty cap; survey range (group 5 to source)
+  'epc-vs-floor-plan-vs-survey.mdx': ['£5,000'], // MEES penalty cap (unsourced survey range removed 29/10)
   'how-long-does-epc-last.mdx': ['£200', '£5,000'], // SI 2012/3118 reg 38 penalty; MEES total fine limit
   'how-to-improve-epc-rating.mdx': ['£7,500', '£5,000'], // Boiler Upgrade Scheme heat pump and biomass grants (GOV.UK, checked 29/10)
   'loft-insulation-epc-rating.mdx': ['£500'], // installer cost table removed 29/10 (unsourced)

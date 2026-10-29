@@ -118,6 +118,7 @@ const sections: PageSection[] = [
   { id: 'why-agents', heading: 'why-agents-h', label: 'Why London agents work with us' },
   { id: 'how-it-works', heading: 'how-it-works-h', label: 'How instructions work' },
   { id: 'portfolio', heading: 'portfolio-h', label: 'One home or a list' },
+  { id: 'agent-rules', heading: 'agent-rules-h', label: 'The EPC rules for agents' },
   { id: 'agent-faq', heading: 'agent-faq-h', label: 'Agent questions' },
   { id: 'book', heading: 'in-end-h', label: 'Get a quote' },
 ]
@@ -381,6 +382,46 @@ export default function EstateAgentsPage() {
 
       {/* Our promise, before the questions (Abdul 24/10) */}
       <OurPromise />
+
+      {/* THE EPC RULES FOR AGENTS (SI 2012/3118 regs 6, 7, 11 and 45, read 29/10/2026) */}
+      <section className="in-sec in-sec--band" id="agent-rules" aria-labelledby="agent-rules-h">
+        <Container>
+          <div className="in-prose">
+            <p className="in-eyebrow">Regulations</p>
+            <h2 className="in-h2" id="agent-rules-h">The EPC rules for agents</h2>
+            <p>
+              The Energy Performance of Buildings (England and Wales) Regulations 2012 put some duties on the agent as well as
+              the seller or landlord.
+            </p>
+            <h3 className="in-h3">Before you market the home</h3>
+            <p>
+              You must be satisfied that an EPC has been commissioned. If no valid EPC is ready when marketing starts, you and
+              your client must use all reasonable efforts to get one within 7 days, with a further 21 days only if those
+              efforts fail.
+            </p>
+            <h3 className="in-h3">In every advert</h3>
+            <p>Any advert in commercial media, including portal listings, must state the energy rating from the certificate.</p>
+            <h3 className="in-h3">For buyers and tenants</h3>
+            <p>
+              A valid EPC must be made available free of charge at the earliest opportunity, and at the latest when someone first
+              receives written details or views the home. The buyer or tenant who takes the home must be given the certificate.
+            </p>
+            <h3 className="in-h3">Access with someone living there</h3>
+            <p>
+              Anyone living in the home must allow the assessor the access reasonably needed to inspect it. Send us the occupier’s
+              details and we arrange the visit with them.
+            </p>
+            <p className="in-src">
+              Source: <a href="https://www.legislation.gov.uk/uksi/2012/3118/regulation/7" target="_blank" rel="noopener">regulation 7</a>,{' '}
+              <a href="https://www.legislation.gov.uk/uksi/2012/3118/regulation/11" target="_blank" rel="noopener">regulation 11</a>,{' '}
+              <a href="https://www.legislation.gov.uk/uksi/2012/3118/regulation/6" target="_blank" rel="noopener">regulation 6</a> and{' '}
+              <a href="https://www.legislation.gov.uk/uksi/2012/3118/regulation/45" target="_blank" rel="noopener">regulation 45</a> of SI 2012/3118,
+              read 29 October 2026. Our guide to <Link className="in-link" href="/blog/epc-for-selling-house">EPCs when selling</Link> covers the
+              exemptions.
+            </p>
+          </div>
+        </Container>
+      </section>
 
       {/* QUESTIONS */}
       <section className="in-sec" id="agent-faq" aria-labelledby="agent-faq-h">

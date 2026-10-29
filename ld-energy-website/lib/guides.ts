@@ -69,6 +69,7 @@ export const guideGroups: GuideGroup[] = [
       { slug: 'epc-improvements-by-budget', summary: 'What to look into at three budget levels.' },
       { slug: 'loft-insulation-epc-rating', summary: 'How loft insulation is recorded, and the evidence that helps.' },
       { slug: 'cavity-wall-insulation-epc', summary: 'Which walls can take cavity fill, and how it shows on an EPC.' },
+      { slug: 'electric-heating-storage-heaters-epc', summary: 'Storage heaters, electric radiators and heat pumps: how they are recorded and why the meter matters.' },
     ],
   },
   {
@@ -78,6 +79,7 @@ export const guideGroups: GuideGroup[] = [
     guides: [
       { slug: 'epc-vs-floor-plan-vs-survey', summary: 'What an EPC, a floor plan and a survey each do, and who needs which.' },
       { slug: 'epc-for-selling-house', summary: 'The rules and timing for an EPC when you sell.' },
+      { slug: 'epc-cost-who-pays', summary: 'What sets the price of an EPC, and who pays when you sell or let.' },
     ],
   },
 ]
