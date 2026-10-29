@@ -73,7 +73,7 @@ const whyAgents: { icon: Parameters<typeof Ico>[0]['name']; title: string; body:
 const steps = [
   { step: 'Send the instruction', detail: 'Address, property size, and the occupier’s contact details, by phone, WhatsApp, or email.' },
   { step: 'We arrange access', detail: 'We contact the vendor or tenant directly and confirm the appointment during our opening hours, Mon–Sun 8am–8pm.' },
-  { step: 'Assessment done', detail: '45 minutes to 2 hours on-site, evenings and weekends included.' },
+  { step: 'Assessment done', detail: '45 to 90 minutes on site, evenings and weekends included.' },
   { step: 'Certificate lodged', detail: 'Lodged on the GOV.UK EPC register within 72 hours, or the same day for urgent listings, with the certificate link sent to your branch once live.' },
 ]
 

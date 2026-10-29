@@ -350,7 +350,7 @@ export default function LandlordsPage() {
           </div>
           <ol className="lp-steps" data-reveal="list">
             <li><span className="lp-steps__n">1</span><div><h3 className="in-h3">You book</h3><p>Send the address and the floor area, or tell us you&apos;re not sure. We confirm the exact price and a time before you agree. Same working-day reply.</p></div></li>
-            <li><span className="lp-steps__n">2</span><div><h3 className="in-h3">We visit</h3><p>Every room is measured with a laser, and the insulation, heating, hot water, windows and lighting are recorded. About 45 minutes for a studio, up to 2 hours for a large home.</p></div></li>
+            <li><span className="lp-steps__n">2</span><div><h3 className="in-h3">We visit</h3><p>Every room is measured with a laser, and the insulation, heating, hot water, windows and lighting are recorded. About 45 minutes for a studio, up to 90 minutes for a large home.</p></div></li>
             <li><span className="lp-steps__n">3</span><div><h3 className="in-h3">Ready within 72 hours</h3><p>Your EPC goes on the GOV.UK register with its recommendations, and the link comes to you, or to your agent if you ask.</p></div></li>
           </ol>
         </Container>

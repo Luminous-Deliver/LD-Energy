@@ -52,7 +52,7 @@ const { portfolioRatesText: rates } = require('../lib/site') // pinned word for 
       'Agree a rate card once', 'Appointments 7 days a week, 8am–8pm', 'One appointment, both listing essentials',
       'A direct line, not a call centre', 'so your negotiators stay off the phone', 'ready to attach to the listing',
       'No portals, no forms, no friction', 'Address, property size, and the occupier’s contact details', 'Mon–Sun 8am–8pm',
-      '45 minutes to 2 hours on-site', 'or the same day for urgent listings', 'Everything a listing needs',
+      '45 to 90 minutes on site', 'or the same day for urgent listings', 'Everything a listing needs',
       'Professional floor plan, discounted with an EPC', 'High-resolution files sized for Rightmove and Zoopla',
       'Same-day lodgement (+£15) or a next-day visit (+£35) for urgent instructions', 'One supplier for all 32 boroughs, no travel charges',
       'Property photography', 'Coming soon', 'up to £35 less than booking them separately', 'Not to exact scale']) ok(norm(main).includes(norm(fact)), `fact: ${fact}`)

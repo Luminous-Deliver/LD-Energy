@@ -45,7 +45,7 @@ export function WhatToHaveReady({ heading = true }: { heading?: boolean } = {}) 
           heading="What to have ready"
         />
         <p className="mt-4 text-lg text-secondary-700 leading-relaxed">
-          Most surveys take 45–60 minutes when everything below is reachable, or around 2 hours for a
+          Most surveys take 45–60 minutes when everything below is reachable, or up to 90 minutes for a
           large 5+ bedroom home. A quick tidy beforehand
           genuinely helps — if a sofa is pushed against a radiator or a bed sits under a window, please
           move it before we arrive. If something isn’t accessible on the day it usually means a second visit.

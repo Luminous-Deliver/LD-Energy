@@ -86,7 +86,7 @@ const personas = [
 const process = [
   { title: 'Request your quote', body: 'Online form, phone, WhatsApp or email, whichever suits you.' },
   { title: 'We confirm details', body: 'We confirm time, address and any access requirements during our opening hours, Mon–Sun 8am–8pm.' },
-  { title: 'On-site assessment', body: 'Our DEA measures and records all required data. Typically 45 minutes to 2 hours depending on property size.' },
+  { title: 'On-site assessment', body: 'Our DEA measures and records all required data. Typically 45 to 90 minutes, depending on property size.' },
   { title: 'Software processing', body: 'The assessment data is processed through Elmhurst’s government-approved RdSAP software. The software calculates the rating and standard recommendations for the property.' },
   { title: 'Certificate delivered', body: 'Lodged on the official GOV.UK EPC register within 72 hours (or on the day of the visit with same-day lodgement), with your certificate link sent once it is live.' },
 ]
@@ -157,7 +157,7 @@ const faqs: ServiceFaq[] = [
   },
   {
     q: 'How long does an EPC assessment take?',
-    a: 'Assessments typically take 45 minutes for studios up to around 2 hours for larger 4–5 bedroom homes. You do not need to do any preparation, just normal access to all rooms.',
+    a: 'Assessments typically take 45 minutes for studios, up to 90 minutes for larger 4–5 bedroom homes. You do not need to do any preparation, just normal access to all rooms.',
   },
   {
     q: 'How quickly will I receive my EPC certificate?',

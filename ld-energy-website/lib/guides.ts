@@ -44,6 +44,7 @@ export const guideGroups: GuideGroup[] = [
     guides: [
       { slug: 'prepare-for-epc-assessment', summary: 'Access, paperwork and a checklist for the day of the visit.' },
       { slug: 'what-happens-during-epc-assessment', summary: 'What the assessor records, room by room, and how long it takes.' },
+      { slug: 'maisonette-epc', summary: 'Maisonettes and two-floor flats: both floors, what is above and below, corridors and shared heating.' },
     ],
   },
   {
