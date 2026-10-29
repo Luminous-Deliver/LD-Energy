@@ -108,6 +108,7 @@
 
 /* the title block: a drawing's title block repurposed as the price list */
 .in-tb { border: 1.5px solid var(--ink); background: var(--card); min-width: 0; }
+.in-tb__h { margin: 0; padding: 12px 12px 11px; border-bottom: 1.5px solid var(--ink); font: 400 1.125rem/1.25 var(--font-serif); color: var(--ink); text-wrap: balance; }
 .in-tb__head { display: grid; grid-template-columns: 1.2fr 1fr 1fr; border-bottom: 1.5px solid var(--ink); }
 .in-tb__head div { display: grid; gap: 2px; padding: 9px 12px; border-left: 1px solid var(--hair-strong); min-width: 0; }
 .in-tb__head div:first-child { border-left: 0; }
