@@ -218,7 +218,7 @@ export default function EpcImprovementPlanPage() {
               <ul className="in-tb__rows">
                 <li>
                   <Link href="/services/domestic-epc">
-                    <span className="in-tb__s">EPC recommendation report<small>Software-generated, on every EPC where improvements are possible</small></span>
+                    <span className="in-tb__s">Suggested improvements on your EPC<small>A short list on the certificate itself: each step, its typical cost and the rating after</small></span>
                     <span className="in-tb__p in-tb__p--tbc">Included</span>
                     <Ico name="arrow-right" size={16} />
                   </Link>

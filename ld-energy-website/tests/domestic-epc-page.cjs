@@ -47,7 +47,7 @@ const epc = [65, 75, 85, 95, 105, 120]
       eq(await page.locator(`#pricing a[href="/quote?service=${service}&source=domestic-epc&cta=pricing"]`).count(), 1, `${name}: quote link`)
     }
     ok(costs.includes('Up to £35 less than booking both separately'), 'bundle saving, maxBundleSaving')
-    for (const [label, price] of [['Same-day lodgement', '+£15'], ['Next-day visit and lodgement', '+£35'], ['EPC Improvement Plan', '+£35'], ['EPC recommendation report', 'Included'], ['Travel or call-out', 'None']]) {
+    for (const [label, price] of [['Same-day lodgement', '+£15'], ['Next-day visit and lodgement', '+£35'], ['EPC Improvement Plan', '+£35'], ['Suggested improvements on your EPC', 'Included'], ['Travel or call-out', 'None']]) {
       ok(new RegExp(label + '[^£]*?' + price.replace(/[+£]/g, (c) => '\\' + c)).test(costs), `extra: ${label} ${price}`)
     }
     ok(costs.includes('from £90') && costs.includes('guidance only, not an EPC'), 'Pre-Assessment alternative, guidance only')
