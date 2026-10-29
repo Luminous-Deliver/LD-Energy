@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
 import { getRequestContext } from '@cloudflare/next-on-pages'
-import { contactSchema, enquirySchema, type EnquiryInput } from '@/lib/validators'
+import { contactSchema, enquirySchema } from '@/lib/validators'
 import { areaLabel, legacyArea } from '@/lib/floor-area'
 import { boroughMeta } from '@/lib/boroughs'
-import { bookingReference, buildBusinessEmail, buildCustomerEmail, escapeHtml, type BookingEmailInput } from '@/lib/booking-emails'
+import { bookingReference, buildBusinessEmail, buildCustomerEmail, buildEnquiryEmail, type BookingEmailInput } from '@/lib/booking-emails'
+import { checkPostcode } from '@/lib/postcode-check'
 
 export const runtime = 'edge'
 
@@ -24,26 +25,6 @@ async function verifyTurnstile(token: string, secret: string, remoteip: string):
     console.error('[contact] Turnstile verification request failed', err)
     return false
   }
-}
-
-/** The general enquiry's notification: who, what about and the message; replying answers the sender. No customer confirmation. */
-function buildEnquiryEmail(data: EnquiryInput) {
-  const rows: Array<[string, string]> = [
-    ['Enquiry type', data.enquiryType],
-    ['Name', data.name],
-    ['Email', data.email],
-    ['Phone', data.phone || '—'],
-    ['Message', data.message],
-  ]
-  const text = rows.map(([k, v]) => `${k}: ${v}`).join('\n')
-  const html = `<!doctype html><html><body style="font-family:Inter,Arial,sans-serif;color:#1E293B;line-height:1.5">
-<h2 style="margin:0 0 16px;color:#0F172A">New website enquiry: ${escapeHtml(data.enquiryType)}</h2>
-<table cellpadding="8" cellspacing="0" border="0" style="border-collapse:collapse;width:100%;max-width:560px">
-${rows.map(([k, v]) => `<tr><td style="background:#F8FAFC;border:1px solid #E2E8F0;font-weight:600;width:32%">${escapeHtml(k)}</td><td style="border:1px solid #E2E8F0">${escapeHtml(v).replace(/\n/g, '<br>')}</td></tr>`).join('')}
-</table>
-<p style="margin-top:16px;font-size:12px;color:#64748B">Sent from the contact page on epc.luminousanddeliver.co.uk. Reply to this email to answer.</p>
-</body></html>`
-  return { text, html }
 }
 
 /**
@@ -80,7 +61,7 @@ async function handleEnquiry(req: Request, payload: unknown) {
   }
   const from = (cfEnv.RESEND_FROM || process.env.RESEND_FROM || FROM_DEFAULT).replace('@epc.luminousanddeliver.co.uk', '@luminousanddeliver.co.uk')
   const to = cfEnv.RESEND_TO || process.env.RESEND_TO || NOTIFY_TO
-  const { text, html } = buildEnquiryEmail(parsed.data)
+  const { text, html } = buildEnquiryEmail(parsed.data, { received: new Date(), turnstilePassed: !!turnstileSecret })
   try {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -198,6 +179,8 @@ export async function POST(req: Request) {
     areaPage: parsed.data.areaPage,
     sourcePage: parsed.data.sourcePage,
     ctaId: parsed.data.ctaId,
+    referrerHost: parsed.data.referrerHost,
+    landingPage: parsed.data.landingPage,
     propertyCount: parsed.data.propertyCount || undefined,
     customerType: parsed.data.customerType,
     services: parsed.data.services,
@@ -208,7 +191,14 @@ export async function POST(req: Request) {
   }
 
   // one reference for both emails, so Abdul and the customer can quote the same thing
-  const meta = { reference: bookingReference(), received: new Date(), turnstilePassed: !!turnstileSecret }
+  const bulk = data.services.includes('Bulk / Agency Enquiry')
+  const meta = {
+    reference: bookingReference(),
+    received: new Date(),
+    turnstilePassed: !!turnstileSecret,
+    // informs Abdul only: capped at 2.5 s and never fails the request (lib/postcode-check.ts)
+    postcodeCheck: bulk || !data.postcode ? undefined : await checkPostcode(data.postcode),
+  }
   const { text, html } = buildBusinessEmail(data, meta)
   // Bulk enquiries have no postcode; keep the "EPC booking:" prefix, booking-followup.py matches it.
   const subject = `EPC booking: ${data.name} — ${data.services.includes('Bulk / Agency Enquiry') ? 'Portfolio' : areaLabel(data.areaBand, data.floorArea)}${data.postcode ? ` (${data.postcode})` : ''}`
