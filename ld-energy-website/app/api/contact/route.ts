@@ -1,13 +1,9 @@
 import { NextResponse } from 'next/server'
 import { getRequestContext } from '@cloudflare/next-on-pages'
 import { contactSchema, enquirySchema, type EnquiryInput } from '@/lib/validators'
-import { site, promise } from '@/lib/site'
-import { areaLabel, legacyArea, TOP_BAND } from '@/lib/floor-area'
-import { bookingPriceRows, guideEstimate, guideEstimateLine, guidePrice, PLAN_LABEL, ENERGY_REPORT_LABEL } from '@/lib/pricing-estimate'
+import { areaLabel, legacyArea } from '@/lib/floor-area'
 import { boroughMeta } from '@/lib/boroughs'
-import { SAME_DAY_LODGEMENT_SPEED, NEXT_DAY_VISIT_SPEED } from '@/lib/booking-options'
-import { deliveredList, formatPreferredDate, hasPrepChecklist, nextSteps, OPENING_HOURS, prepChecklist, PREP_PATH, serviceLabel, TENANT_NOTICE } from '@/lib/booking-copy'
-import type { EnquiryAttribution } from '@/lib/enquiry-attribution'
+import { bookingReference, buildBusinessEmail, buildCustomerEmail, escapeHtml, type BookingEmailInput } from '@/lib/booking-emails'
 
 export const runtime = 'edge'
 
@@ -15,66 +11,6 @@ const NOTIFY_TO = 'contact@luminousanddeliver.co.uk'
 // Resend has only the root domain verified — sending from the epc.
 // subdomain is rejected with 403 "domain is not verified".
 const FROM_DEFAULT = 'L&D Energy <bookings@luminousanddeliver.co.uk>'
-const SITE_URL = 'https://epc.luminousanddeliver.co.uk'
-const LOGO_URL = `${SITE_URL}/logo-email.png`
-const PHONE = '07492 575 396'
-const PHONE_HREF = 'tel:+447492575396'
-const WHATSAPP_HREF = 'https://wa.me/447492575396'
-
-// Brand palette (inline hex — email clients don't support CSS variables)
-const NAVY = '#182848'
-const NAVY_DEEP = '#0D1729'
-const SAGE = '#47846E'
-const INK = '#1E293B'
-const MUTED = '#64748B'
-const LINE = '#E2E8F0'
-const CANVAS = '#F1F3F6'
-
-function escapeHtml(value: string) {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
-}
-
-/** International digits for wa.me. UK numbers arrive as 07…; the schema allows only digits, spaces, +, ( ) and -. */
-function whatsappDigits(phone: string): string {
-  const compact = phone.replace(/[^\d+]/g, '')
-  if (compact.startsWith('+')) return compact.slice(1).replace(/\D/g, '')
-  if (compact.startsWith('00')) return compact.slice(2)
-  if (compact.startsWith('0')) return `44${compact.slice(1)}`
-  return compact
-}
-
-interface ParsedInput extends EnquiryAttribution {
-  name: string
-  phone: string
-  email: string
-  address: string
-  postcode: string
-  propertyType?: string
-  /** Flat, maisonette, house or bungalow (v7). Never set on a bulk enquiry. */
-  dwellingType?: string
-  areaBand?: string
-  /** Customer-typed m², already checked against the band. Never set on a bulk enquiry. */
-  floorArea?: string
-  /** "I don't know the floor area", on the open-ended top band. */
-  floorAreaUnknown?: boolean
-  areaPage?: string
-  customerType: string
-  services: string[]
-  /** Bulk enquiries only — roughly how many properties. */
-  propertyCount?: string
-  improvementPlan?: boolean
-  /** Pre-Assessment only: the free separate energy report. */
-  energyReport?: boolean
-  speed: string
-  preferredDate?: string
-  notes?: string
-}
-
 async function verifyTurnstile(token: string, secret: string, remoteip: string): Promise<boolean> {
   try {
     const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
@@ -88,297 +24,6 @@ async function verifyTurnstile(token: string, secret: string, remoteip: string):
     console.error('[contact] Turnstile verification request failed', err)
     return false
   }
-}
-
-function buildEmail(data: ParsedInput) {
-  const estimate = guideEstimate({
-    propertyType: data.propertyType,
-    areaBand: data.areaBand,
-    floorArea: data.floorArea,
-    services: data.services,
-    speed: data.speed,
-    improvementPlan: data.improvementPlan,
-    energyReport: data.energyReport,
-  })
-
-  const rows: Array<[string, string]> = [
-    ['Name', data.name],
-    ['Phone', data.phone],
-    ['Email', data.email],
-    [estimate.isBulk ? 'Properties & postcodes' : 'Property Address', data.address || '—'],
-    ...(estimate.isBulk
-      ? ([['Property count', data.propertyCount || '—']] as Array<[string, string]>)
-      : ([['Postcode', data.postcode]] as Array<[string, string]>)),
-    // Bulk has no single property size; new clients submit explicit area bands.
-    ['Internal floor area', estimate.isBulk
-      ? 'Not applicable - bulk enquiry'
-      : data.floorArea
-        ? `${areaLabel(data.areaBand, data.floorArea)} (customer's figure) · ${areaLabel(data.areaBand)} band`
-        : `${areaLabel(data.areaBand || legacyArea(data.propertyType))}${data.areaBand === TOP_BAND && data.floorAreaUnknown ? ' · customer does not know the floor area' : ''}`],
-    ...(estimate.isBulk ? [] : [['Area band id', data.areaBand || '—'] as [string, string], ['Property type', data.dwellingType || '—'] as [string, string]]),
-    ['Customer type', data.customerType],
-    ['Service(s)', data.services.join(', ')],
-    ...(data.sourcePage ? [['Source page', data.sourcePage] as [string, string]] : []),
-    ...(data.ctaId ? [['CTA', data.ctaId] as [string, string]] : []),
-    ...(data.areaPage ? [['Area page', boroughMeta[data.areaPage].name] as [string, string]] : []),
-    [
-      'Speed',
-      estimate.isBulk
-        ? 'Agreed per property once quoted'
-        : estimate.isLodged
-          ? data.speed
-          : 'Within 72 hours — nothing lodged',
-    ],
-    ...bookingPriceRows(estimate),
-    ['Guide shown to customer', guideEstimateLine(estimate)],
-    ['Preferred Date', formatPreferredDate(data.preferredDate) || '—'],
-    ['Notes', data.notes || '—'],
-  ]
-
-  // One tap from the notification to the customer, instead of copying the number across.
-  const tel = `tel:${data.phone.replace(/[^\d+]/g, '')}`
-  const whatsapp = `https://wa.me/${whatsappDigits(data.phone)}`
-  const text = rows.map(([k, v]) => `${k}: ${v}`).join('\n') + `\n\nReply by WhatsApp: ${whatsapp}\nCall: ${tel}`
-  const replyLink = (href: string, label: string) =>
-    `<a href="${escapeHtml(href)}" style="display:inline-block;margin:0 8px 8px 0;padding:8px 14px;border:1px solid #CBD5E1;border-radius:8px;color:#182848;font-weight:600;text-decoration:none">${label}</a>`
-
-  const html = `<!doctype html><html><body style="font-family:Inter,Arial,sans-serif;color:#1E293B;line-height:1.5">
-<h2 style="margin:0 0 16px;font-family:'Plus Jakarta Sans',Inter,Arial,sans-serif;color:#0F172A">New EPC booking request</h2>
-<p style="margin:0 0 8px">${replyLink(whatsapp, 'WhatsApp customer')}${replyLink(tel, 'Call customer')}${replyLink(`mailto:${data.email}`, 'Email customer')}</p>
-<table cellpadding="8" cellspacing="0" border="0" style="border-collapse:collapse;width:100%;max-width:560px">
-${rows
-  .map(
-    ([k, v]) =>
-      `<tr><td style="background:#F8FAFC;border:1px solid #E2E8F0;font-weight:600;width:32%">${escapeHtml(k)}</td><td style="border:1px solid #E2E8F0">${escapeHtml(v).replace(/\n/g, '<br>')}</td></tr>`,
-  )
-  .join('')}
-</table>
-<p style="margin-top:16px;font-size:12px;color:#64748B">Submitted via epc.luminousanddeliver.co.uk</p>
-</body></html>`
-
-  return { text, html }
-}
-
-/**
- * Branded confirmation email sent to the customer after they submit the form.
- * Table-based, fully inlined styles — the only layout approach that renders
- * consistently across Gmail, Outlook, Apple Mail, and mobile clients.
- */
-function buildConfirmation(data: ParsedInput) {
-  const firstName = data.name.trim().split(/\s+/)[0] || 'there'
-  const estimate = guideEstimate(data)
-  const isBulkEnquiry = estimate.productKind === 'bulk'
-  const steps = nextSteps(estimate.productKind, data.speed, estimate.energyReport)
-  const showPrep = hasPrepChecklist(estimate.productKind)
-  const tenanted = !isBulkEnquiry && data.customerType === 'Landlord (tenanted)'
-  // Our promise (Abdul 24/10/2026): the lodgement line only where an EPC is lodged; terms section 7, #our-promise
-  const lodged = estimate.productKind === 'epc' || estimate.productKind === 'bundle'
-  const promiseLines = [
-    ...(lodged ? [`£${promise.lateLodgement} off if your EPC isn't on the GOV.UK register within 72 hours of the visit.`] : []),
-    `£${promise.lateChange} off if we move your visit with less than 24 hours' notice.`,
-  ]
-  // what the chosen service delivers (v7, approved 22/10/2026): the same list as the confirmation screen
-  const delivered = deliveredList(estimate.productKind, { improvementPlan: estimate.improvementPlan > 0, energyReport: estimate.energyReport })
-  const prepUrl = `${SITE_URL}${PREP_PATH}`
-
-  // Bulk has no single property and no agreed turnaround yet; an unlodged
-  // product has no lodgement to expedite. Both read off productKind so a new
-  // product cannot silently inherit the wrong line.
-  const summary: Array<[string, string]> = [['Service', data.services.map(serviceLabel).join(' + ')]]
-
-  if (isBulkEnquiry) {
-    summary.push(['Properties', data.propertyCount || 'To be confirmed'])
-    if (data.address) summary.push(['Addresses supplied', data.address])
-    summary.push(['Turnaround', 'Agreed per property once quoted'])
-  } else {
-    if (data.dwellingType) summary.push(['Property type', data.dwellingType])
-    summary.push(['Floor area', areaLabel(data.areaBand || legacyArea(data.propertyType), data.floorArea)])
-    summary.push(['Property', `${data.address}, ${data.postcode}`])
-    summary.push(['Turnaround', estimate.isLodged
-      ? data.speed === NEXT_DAY_VISIT_SPEED ? 'Next-day visit, lodged on the day of the visit' : data.speed === SAME_DAY_LODGEMENT_SPEED ? 'Same-day lodgement, on the day of the visit' : 'Standard lodgement, within 72 hours of the visit'
-      : 'Within 72 hours of the visit'])
-  }
-  summary.push(['Booking as', data.customerType])
-
-  if (estimate.planIncluded) {
-    summary.push(['Included', 'Personalised written improvement plan'])
-  } else if (estimate.improvementPlan > 0) {
-    summary.push(['Add-on', `${PLAN_LABEL} (+£${site.addOns.improvementPlan})`])
-  }
-  if (estimate.energyReport) summary.push(['Also included', `${ENERGY_REPORT_LABEL}, at no extra charge`])
-  summary.push(['Guide estimate', estimate.state === 'priced' && estimate.total !== null
-    ? estimate.isStartingPrice
-      ? `${guidePrice(estimate, estimate.total)}, a starting price for a larger home; exact quote confirmed before booking.`
-      : `£${estimate.total} guide; exact quote confirmed before booking.`
-    : isBulkEnquiry ? 'Quoted individually' : 'Price to be confirmed. We’ll confirm the size and price from your property details.'])
-  if (data.preferredDate) summary.push(['Preferred date', formatPreferredDate(data.preferredDate)])
-  if (data.notes) summary.push(['Your notes', data.notes])
-
-  const intro = isBulkEnquiry
-    ? `Thanks for your enquiry with L&D Energy. We've received it. Abdul will be in touch during our opening hours (${OPENING_HOURS}) with volume rates for your portfolio.`
-    : `Thanks for your quote request with L&D Energy. We've received it. Abdul will reply the same working day with your exact price and an available appointment (opening hours ${OPENING_HOURS}).`
-  const preheader = isBulkEnquiry
-    ? 'Abdul will reply with volume rates for your portfolio.'
-    : 'Abdul will reply with your exact price and available times.'
-  const legal = 'This confirms receipt of your enquiry. Your visit is confirmed only once you agree the price and appointment.'
-
-  const text =
-    `Hi ${firstName},\n\n` +
-    `${intro}\n\n` +
-    `Your request:\n` +
-    summary.map(([k, v]) => `  ${k}: ${v}`).join('\n') +
-    (delivered.length ? `\n\nWhat you receive:\n${delivered.map(item => `  - ${item}`).join('\n')}` : '') +
-    `\n\nWhat happens next:\n` +
-    steps.map((step, i) => `  ${i + 1}. ${step}`).join('\n') +
-    (showPrep ? `\n\nBefore your visit:\n${prepChecklist.map(item => `  - ${item}`).join('\n')}\n  Please read before your visit: ${prepUrl}` : '') +
-    (tenanted ? `\n\nTenanted property? ${TENANT_NOTICE}` : '') +
-    (isBulkEnquiry ? '' : `\n\nOur promise:\n${promiseLines.map(l => `  - ${l}`).join('\n')}\n  How it works: ${SITE_URL}/terms#our-promise`) +
-    `\n\nNeed us sooner, or want to change something? Reply to this email, call or text ${PHONE}, or message us on WhatsApp.\n\n` +
-    `L&D Energy, Elmhurst and Quidos accredited Domestic Energy Assessor\n` +
-    `Covering all 32 London boroughs · ${SITE_URL}\n\n` +
-    legal
-
-  const sectionLabel = (label: string) =>
-    `<p style="margin:0 0 10px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:${SAGE}">${label}</p>`
-
-  const summaryRows = summary
-    .map(
-      ([k, v], i) =>
-        `<tr>
-          <td style="padding:12px 16px;${i > 0 ? `border-top:1px solid ${LINE};` : ''}font-size:12px;font-weight:600;color:${MUTED};text-transform:uppercase;letter-spacing:.04em;width:36%;vertical-align:top">${escapeHtml(k)}</td>
-          <td style="padding:12px 16px;${i > 0 ? `border-top:1px solid ${LINE};` : ''}font-size:14px;color:${INK};font-weight:600">${escapeHtml(v).replace(/\n/g, '<br>')}</td>
-        </tr>`,
-    )
-    .join('')
-
-  const stepRows = steps
-    .map(
-      (step, i) =>
-        `<tr>
-          <td style="width:28px;padding:0 12px 12px 0;vertical-align:top">
-            <div style="width:24px;height:24px;border-radius:999px;background:${NAVY};color:#ffffff;font-size:12px;font-weight:700;line-height:24px;text-align:center">${i + 1}</div>
-          </td>
-          <td style="padding:2px 0 12px;font-size:14px;line-height:1.55;color:${INK};vertical-align:top">${escapeHtml(step)}</td>
-        </tr>`,
-    )
-    .join('')
-
-  const prepBlock = showPrep ? `
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F1F6F3;border-radius:12px;margin:0 0 24px">
-                <tr><td style="padding:18px 20px">
-                  ${sectionLabel('Before your visit')}
-                  <ul style="margin:0 0 12px;padding:0 0 0 18px;font-size:14px;line-height:1.55;color:${INK}">
-                    ${prepChecklist.map(item => `<li style="margin:0 0 6px">${escapeHtml(item)}</li>`).join('')}
-                  </ul>
-                  <a href="${prepUrl}" style="font-size:14px;font-weight:700;color:${NAVY}">Please read before your visit</a>
-                </td></tr>
-              </table>` : ''
-
-  const tenantBlock = tenanted ? `
-              <p style="margin:0 0 24px;padding:14px 16px;border-left:3px solid ${SAGE};background:#F8FAFC;font-size:14px;line-height:1.55;color:${INK}">
-                <strong>Tenanted property?</strong> ${escapeHtml(TENANT_NOTICE)}
-              </p>` : ''
-
-  const html = `<!doctype html>
-<html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light only"><title>We've received your request</title></head>
-<body style="margin:0;padding:0;background:${CANVAS};font-family:Inter,Arial,Helvetica,sans-serif;-webkit-text-size-adjust:100%">
-  <div style="display:none;max-height:0;overflow:hidden;opacity:0">${preheader}</div>
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${CANVAS};font-family:Inter,Arial,Helvetica,sans-serif">
-    <tr><td align="center" style="padding:28px 12px">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%">
-
-        <!-- Logo -->
-        <tr><td align="center" style="padding:8px 0 22px">
-          <img src="${LOGO_URL}" width="200" alt="L&amp;D Energy" style="display:block;border:0;width:200px;max-width:60%;height:auto">
-        </td></tr>
-
-        <!-- Card -->
-        <tr><td style="background:#ffffff;border:1px solid ${LINE};border-radius:16px;overflow:hidden">
-
-          <!-- Header band -->
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-            <tr><td style="background:${NAVY};padding:30px 32px" align="center">
-              <table role="presentation" cellpadding="0" cellspacing="0"><tr>
-                <td style="width:44px;height:44px;background:${SAGE};border-radius:999px;text-align:center;vertical-align:middle;font-size:24px;line-height:44px;color:#ffffff;font-weight:700">&#10003;</td>
-              </tr></table>
-              <h1 style="margin:16px 0 4px;font-family:Georgia,'Times New Roman',serif;font-size:24px;line-height:1.25;color:#ffffff;font-weight:700">Request received</h1>
-              <p style="margin:0;font-size:14px;color:#C4D2E8">${isBulkEnquiry ? "We'll come back with volume rates" : "We'll confirm your slot and exact price"}</p>
-            </td></tr>
-          </table>
-
-          <!-- Body -->
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-            <tr><td style="padding:30px 32px 8px">
-              <p style="margin:0 0 14px;font-size:16px;color:${INK}">Hi ${escapeHtml(firstName)},</p>
-              <p style="margin:0 0 22px;font-size:15px;line-height:1.6;color:${INK}">${escapeHtml(intro)}</p>
-
-              <!-- Summary -->
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${LINE};border-radius:12px;overflow:hidden;margin:0 0 24px">
-                <tr><td style="background:#F8FAFC;padding:10px 16px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:${SAGE};border-bottom:1px solid ${LINE}">Your request</td></tr>
-                <tr><td style="padding:0">
-                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${summaryRows}</table>
-                </td></tr>
-              </table>
-
-              <!-- What you receive -->
-              ${delivered.length ? `${sectionLabel('What you receive')}
-              <ul style="margin:0 0 24px;padding:0 0 0 18px;font-size:14px;line-height:1.55;color:${INK}">
-                ${delivered.map(item => `<li style="margin:0 0 6px">${escapeHtml(item)}</li>`).join('')}
-              </ul>` : ''}
-
-              <!-- Next steps -->
-              ${sectionLabel('What happens next')}
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 12px">${stepRows}</table>
-${prepBlock}${tenantBlock}${isBulkEnquiry ? '' : `
-              ${sectionLabel('Our promise')}
-              <ul style="margin:0 0 8px;padding:0 0 0 18px;font-size:14px;line-height:1.55;color:${INK}">
-                ${promiseLines.map(l => `<li style="margin:0 0 6px">${escapeHtml(l)}</li>`).join('')}
-              </ul>
-              <p style="margin:0 0 24px;font-size:13px;line-height:1.5"><a href="${SITE_URL}/terms#our-promise" style="color:${NAVY}">How it works</a></p>`}
-              <!-- CTA row -->
-              <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 6px">
-                <tr>
-                  <td style="border-radius:10px;background:${SAGE}">
-                    <a href="${PHONE_HREF}" style="display:inline-block;padding:12px 22px;font-size:14px;font-weight:700;color:#ffffff;text-decoration:none;white-space:nowrap">Call us</a>
-                  </td>
-                  <td style="width:10px">&nbsp;</td>
-                  <td style="border-radius:10px;border:1px solid ${LINE}">
-                    <a href="${WHATSAPP_HREF}" style="display:inline-block;padding:12px 22px;font-size:14px;font-weight:700;color:${NAVY};text-decoration:none;white-space:nowrap">WhatsApp us</a>
-                  </td>
-                </tr>
-              </table>
-              <p style="margin:14px 0 4px;font-size:13px;line-height:1.6;color:${MUTED}">
-                Need us sooner, or want to change something? Just reply to this email or call ${PHONE}.
-              </p>
-            </td></tr>
-          </table>
-
-          <!-- Footer -->
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-            <tr><td style="background:${NAVY_DEEP};padding:22px 32px">
-              <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:#ffffff">L&amp;D Energy</p>
-              <p style="margin:0 0 2px;font-size:12px;line-height:1.6;color:#9BB2D4">Elmhurst and Quidos accredited Domestic Energy Assessor · Stratford, East London</p>
-              <p style="margin:0;font-size:12px;line-height:1.6;color:#9BB2D4">Covering all 32 London boroughs · <a href="${SITE_URL}" style="color:#95BFAD;text-decoration:none">epc.luminousanddeliver.co.uk</a></p>
-            </td></tr>
-          </table>
-
-        </td></tr>
-
-        <!-- Legal note -->
-        <tr><td style="padding:18px 20px 4px" align="center">
-          <p style="margin:0;font-size:11px;line-height:1.5;color:${MUTED}">
-            ${legal}
-            You're receiving this because you submitted a request at epc.luminousanddeliver.co.uk.
-          </p>
-        </td></tr>
-
-      </table>
-    </td></tr>
-  </table>
-</body></html>`
-
-  return { text, html }
 }
 
 /** The general enquiry's notification: who, what about and the message; replying answers the sender. No customer confirmation. */
@@ -538,7 +183,7 @@ export async function POST(req: Request) {
     console.warn('[contact] TURNSTILE_SECRET_KEY not set — verification skipped in local development only.')
   }
 
-  const data: ParsedInput = {
+  const data: BookingEmailInput = {
     name: parsed.data.name,
     phone: parsed.data.phone,
     email: parsed.data.email,
@@ -562,10 +207,12 @@ export async function POST(req: Request) {
     notes: parsed.data.notes || undefined,
   }
 
-  const { text, html } = buildEmail(data)
+  // one reference for both emails, so Abdul and the customer can quote the same thing
+  const meta = { reference: bookingReference(), received: new Date(), turnstilePassed: !!turnstileSecret }
+  const { text, html } = buildBusinessEmail(data, meta)
   // Bulk enquiries have no postcode; keep the "EPC booking:" prefix, booking-followup.py matches it.
   const subject = `EPC booking: ${data.name} — ${data.services.includes('Bulk / Agency Enquiry') ? 'Portfolio' : areaLabel(data.areaBand, data.floorArea)}${data.postcode ? ` (${data.postcode})` : ''}`
-  const confirmation = buildConfirmation(data)
+  const confirmation = buildCustomerEmail(data, meta)
 
   const apiKey = cfEnv.RESEND_API_KEY || process.env.RESEND_API_KEY
   const configuredFrom = cfEnv.RESEND_FROM || process.env.RESEND_FROM || FROM_DEFAULT
