@@ -56,6 +56,7 @@ export const guideGroups: GuideGroup[] = [
       { slug: 'epc-c-by-2030', summary: 'The 2030 standard for rented homes: what is settled and what still needs legislation.' },
       { slug: 'mees-regulations-2026', summary: 'Penalty limits, the exemption types and the evidence each one needs.' },
       { slug: 'mees-timeline-2026-2030', summary: 'The steps between today’s E minimum and October 2030.' },
+      { slug: 'property-licence-epc-floor-plan', summary: 'What London councils ask for with a licence application: the EPC, the floor plan and room sizes.' },
     ],
   },
   {
