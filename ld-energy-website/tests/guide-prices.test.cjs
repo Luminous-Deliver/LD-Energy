@@ -22,8 +22,8 @@ const ldValues = new Set([
 const ALLOWED = {
   'cavity-wall-insulation-epc.mdx': ['£500'], // budget comparison (group 3)
   'cheapest-ways-improve-epc.mdx': ['£500', '£5,000', '£20,000', '£15', '£30', '£5', '£10', '£25', '£20', '£9,000'], // title, installer and DIY cost ranges
-  'epc-c-by-2030.mdx': ['£10,000', '£3,500', '£5,400'], // 2030 policy cost cap, current cap, impact assessment average
-  'epc-for-landlords-2026.mdx': ['£5,000', '£30,000', '£2,000', '£4,000', '£3,500', '£10,000'], // MEES penalties and cap (refresh after 28/10)
+  'epc-c-by-2030.mdx': ['£10,000', '£3,500', '£5,400', '£30,000', '£5,000'], // 2030 cost cap, current cap, impact assessment average, proposed and current maximum fine (GOV.UK, checked 29/10)
+  'epc-for-landlords-2026.mdx': ['£5,000', '£30,000', '£2,000', '£4,000', '£3,500', '£10,000'], // MEES penalties and cap (re-checked after the 28/10 Budget: unchanged)
   'epc-for-selling-house.mdx': ['£200'], // SI 2012/3118 reg 38 penalty
   'epc-improvements-by-budget.mdx': ['£500', '£2,000', '£5,000'], // budget tiers in the frozen title
   'epc-vs-floor-plan-vs-survey.mdx': ['£5,000', '£400', '£1,000'], // MEES penalty cap; survey range (group 5 to source)
