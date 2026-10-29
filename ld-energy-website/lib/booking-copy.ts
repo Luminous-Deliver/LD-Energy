@@ -235,8 +235,8 @@ export function contactStepIntro(kind: ProductKind): string {
  */
 export function whatYouGet(kind: ProductKind): string[] {
   switch (kind) {
-    case 'epc': return ['Your EPC, lodged on the official GOV.UK EPC Register', 'The standard recommendation report, where applicable', 'A certificate valid for 10 years']
-    case 'bundle': return ['Assessment, lodged EPC, certificate link and recommendation report', 'Laser-measured plan for Rightmove, Zoopla and OnTheMarket', 'Both surveys are completed during the same property visit']
+    case 'epc': return ['Your EPC, lodged on the official GOV.UK EPC Register', 'Suggested improvements listed on the certificate, where applicable', 'A certificate valid for 10 years']
+    case 'bundle': return ['Assessment, lodged EPC, certificate link and suggested improvements', 'Laser-measured plan for Rightmove, Zoopla and OnTheMarket', 'Both surveys are completed during the same property visit']
     case 'floorPlan': return ['Total floor area, as gross internal area', 'Approximate room dimensions and room labels', 'High-resolution JPEG and PDF files']
     case 'preAssessment': return includedList('preAssessment')
     case 'bulk': return includedList('bulk').slice(0, 3)
@@ -252,8 +252,8 @@ export function whatYouGet(kind: ProductKind): string[] {
 export function deliveredList(kind: ProductKind, opts: { improvementPlan?: boolean; energyReport?: boolean } = {}): string[] {
   const plan = opts.improvementPlan && (kind === 'epc' || kind === 'bundle') ? ['Personalised EPC Improvement Plan: your priorities, with the full Energy Report'] : []
   switch (kind) {
-    case 'epc': return ['Your EPC, lodged on the official GOV.UK EPC Register', 'A certificate link once it is live on the register', 'The standard recommendation report, where applicable', 'A certificate valid for 10 years', ...plan]
-    case 'bundle': return ['Assessment, lodged EPC, certificate link and recommendation report', 'Laser-measured plan for Rightmove, Zoopla and OnTheMarket', 'Total floor area, approximate room dimensions and labels', 'High-resolution JPEG and PDF files', ...plan]
+    case 'epc': return ['Your EPC, lodged on the official GOV.UK EPC Register', 'A certificate link once it is live on the register', 'Suggested improvements listed on the certificate, where applicable', 'A certificate valid for 10 years', ...plan]
+    case 'bundle': return ['Assessment, lodged EPC, certificate link and suggested improvements', 'Laser-measured plan for Rightmove, Zoopla and OnTheMarket', 'Total floor area, approximate room dimensions and labels', 'High-resolution JPEG and PDF files', ...plan]
     case 'floorPlan': return ['Total floor area, as gross internal area', 'Approximate room dimensions and room labels', 'High-resolution JPEG and PDF files', 'A plan suitable for Rightmove, Zoopla and OnTheMarket']
     case 'preAssessment': return ['Property energy assessment', 'Personalised written improvement plan', ...(opts.energyReport ? ['Separate energy report'] : [])]
     case 'bulk':

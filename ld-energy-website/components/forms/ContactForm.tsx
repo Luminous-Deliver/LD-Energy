@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent, type ReactNode, type RefObject } from 'react'
+import { landingContext } from '@/lib/landing'
 import { usePathname } from 'next/navigation'
 import { Controller, useForm, type FieldErrors } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -562,7 +563,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
     submitting.current = true
     setStatus('submitting'); setProblem(null)
     try {
-      const response = await fetch('/api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+      const response = await fetch('/api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...data, ...landingContext() }) })
       const body: { ok?: boolean; delivered?: boolean; confirmationSent?: boolean; code?: string } = await response.json().catch(() => ({}))
       if (response.ok && body.ok === true && body.delivered === true) {
         conversionEvent('enquiry_submitted', quoteContextFromForm(data))

@@ -57,7 +57,7 @@ test('WhatsApp from the form starts with the approved wording, then the choices'
 test('What you get (step 1) and What you receive (confirmation) follow the service', () => {
   assert.equal(whatYouGet('epc').length, 3)
   assert.equal(whatYouGet('none').length, 0)
-  assert.deepEqual(deliveredList('epc'), ['Your EPC, lodged on the official GOV.UK EPC Register', 'A certificate link once it is live on the register', 'The standard recommendation report, where applicable', 'A certificate valid for 10 years'])
+  assert.deepEqual(deliveredList('epc'), ['Your EPC, lodged on the official GOV.UK EPC Register', 'A certificate link once it is live on the register', 'Suggested improvements listed on the certificate, where applicable', 'A certificate valid for 10 years'])
   assert.equal(deliveredList('bundle', { improvementPlan: true }).at(-1), 'Personalised EPC Improvement Plan: your priorities, with the full Energy Report')
   assert.equal(deliveredList('floorPlan', { improvementPlan: true }).some((l) => /Improvement Plan/.test(l)), false, 'no plan on a floor plan')
   assert.deepEqual(deliveredList('preAssessment', { energyReport: true }), ['Property energy assessment', 'Personalised written improvement plan', 'Separate energy report'])
@@ -74,6 +74,7 @@ test('the API: property type required and carried into both emails, with What yo
   let messages = []
   global.fetch = async (url, options) => {
     if (url.includes('siteverify')) return Response.json({ success: true })
+    if (url.includes('api.postcodes.io')) return Response.json({ status: 404 }, { status: 404 })
     messages.push(JSON.parse(options.body))
     return Response.json({ id: 'mock-message' })
   }
@@ -87,7 +88,7 @@ test('the API: property type required and carried into both emails, with What yo
     assert.equal((await request({ ...sample, services: ['Both (Bundle)'], improvementPlan: true })).status, 200)
     assert.match(messages[0].text, /Property type: Maisonette/)
     assert.match(messages[1].text, /Property type: Maisonette/)
-    assert.match(messages[1].text, /What you receive:\n {2}- Assessment, lodged EPC, certificate link and recommendation report/)
+    assert.match(messages[1].text, /What you receive:\n {2}- Assessment, lodged EPC, certificate link and suggested improvements/)
     assert.match(messages[1].text, /Personalised EPC Improvement Plan: your priorities, with the full Energy Report/)
     assert.match(messages[1].html, /What you receive/)
 

@@ -39,7 +39,7 @@ export function Pricing({ sourcePage }: { sourcePage: SourcePage }) {
             'Carried out by an accredited Domestic Energy Assessor',
             'Standard lodgement within 72 hours, same day available',
             'Certificate link sent as soon as it is live on the register',
-            'Standard EPC recommendation report included, where applicable',
+            'Suggested improvements listed on the certificate, where applicable',
             `Optional personalised Improvement Plan with full Energy Report: £${site.addOns.improvementPlan}`,
           ]}
           href={quoteHref({ service: 'epc', sourcePage, ctaId: 'pricing' })}
