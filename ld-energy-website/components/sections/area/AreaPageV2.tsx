@@ -39,6 +39,21 @@ const approvedJobNotes: Record<string, { heading: string; paragraphs: string[] }
       'The recommendations started with internal wall insulation, then floor insulation and a room thermostat. With all of them carried out, including solar panels, the potential rating was C (78).',
     ],
   },
+  // Abdul 29/10/2026: further notes from Ledger and his lodged certificates, shipped on judgement.
+  'waltham-forest': {
+    heading: 'A recent job in Waltham Forest',
+    paragraphs: [
+      'July 2026, Leyton E10. A four-bedroom semi-detached house of 121 m² with a room in the roof, booked with a floor plan, rated D (56). The main walls are solid brick with no added insulation. The loft had 225 mm of insulation, but a flat roof section and the room in the roof had none recorded. Heating is a gas boiler with a programmer and room thermostat.',
+      'The recommendations started with flat roof insulation, then internal wall insulation, floor insulation and radiator valves. With all of them carried out, including solar panels, the potential rating was C (74).',
+    ],
+  },
+  southwark: {
+    heading: 'A recent job in Southwark',
+    paragraphs: [
+      'July 2026, Surrey Docks SE16. A top-floor flat of 50 m², rated D (64). The cavity walls and roof were recorded as insulated and the windows are fully double glazed. Heating is electric room heaters, with hot water from an off-peak electric immersion.',
+      'The only recommendation was high heat retention storage heaters with a dual immersion cylinder and a dual rate meter. With that carried out, the potential rating was C (76).',
+    ],
+  },
 }
 
 /** Two short questions every area page answers the same way; the local ones come first. */

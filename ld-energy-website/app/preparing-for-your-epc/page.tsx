@@ -104,7 +104,7 @@ const breadcrumbSchema = {
 }
 
 const inShort = [
-  { Icon: Clock, text: 'Most visits take 45 to 60 minutes. A large home with 5 or more bedrooms takes around 2 hours.' },
+  { Icon: Clock, text: 'Most visits take 45 to 60 minutes. A large home with 5 or more bedrooms takes up to 90 minutes.' },
   { Icon: KeyRound, text: 'You or your representative lets us in at the booked time.' },
   { Icon: Home, text: 'Every room, the loft hatch (if there is one), the boiler and the meters easy to reach.' },
   { Icon: FileText, text: 'Any paperwork for improvements out ready.' },

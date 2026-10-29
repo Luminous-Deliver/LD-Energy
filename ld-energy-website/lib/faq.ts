@@ -34,7 +34,7 @@ export const homepageFaq: FaqItem[] = [
   },
   {
     q: 'How long does an EPC assessment take?',
-    a: 'Most assessments take 45–60 minutes for a flat or standard house, rising to around 2 hours for a large 5+ bedroom property. It goes fastest when every room, the loft hatch (if there is one), the boiler and the meters are accessible. We’ll give you an accurate time estimate when you book.',
+    a: 'Most assessments take 45–60 minutes for a flat or standard house, rising to up to 90 minutes for a large 5+ bedroom property. It goes fastest when every room, the loft hatch (if there is one), the boiler and the meters are accessible. We’ll give you an accurate time estimate when you book.',
   },
   {
     q: 'How quickly will I receive my EPC certificate?',
@@ -298,7 +298,7 @@ export const fullFaq: FaqCategory[] = [
       },
       {
         q: 'How long does the assessment take?',
-        a: 'Typically 45 minutes for a studio and up to 2 hours for a 5+ bedroom property. We’ll provide an accurate time estimate when you book.',
+        a: 'Typically 45 minutes for a studio and up to 90 minutes for a 5+ bedroom property. We’ll provide an accurate time estimate when you book.',
         links: [{ label: 'What happens during an EPC assessment', href: '/blog/what-happens-during-epc-assessment' }],
       },
       {

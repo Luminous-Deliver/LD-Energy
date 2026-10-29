@@ -176,7 +176,7 @@ function HowItWorks() {
                 <div className="tl__body">
                   <h3>Your assessor visits</h3>
                   <p>Every room is measured with a laser, and the insulation, heating, hot water, windows and ventilation are recorded.</p>
-                  <p className="tl__fact"><Ico name="clock" />45 minutes for a studio, up to 2 hours for a large home.</p>
+                  <p className="tl__fact"><Ico name="clock" />45 minutes for a studio, up to 90 minutes for a large home.</p>
                   <div className="prep" id="before-the-visit">
                     <h4>Before your visit</h4>
                     <ul className="ticks">{prep.map((p) => <li key={p}><Ico name="check" />{p}</li>)}</ul>
