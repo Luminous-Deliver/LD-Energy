@@ -263,3 +263,21 @@ html { font-synthesis-weight: none; }
   .pill, .pill[data-on="true"] { transform: translate(-50%, 0); transition: opacity .15s linear, visibility 0s linear .15s; }
   .pill[data-on="true"] { transition: opacity .15s linear, visibility 0s; }
 }
+
+/* Footer map (components/layout/CompactFooter.tsx): every borough a link, Newham filled, a pin at Stratford. */
+.cf-b path { fill: #DCE5DF; stroke: #F1EFE8; stroke-width: 2; transition: fill .15s; }
+.cf-b path.cf-home { fill: var(--sage-700); }
+.cf-b:hover path, .cf-b:focus-visible path { fill: #94B4A2; }
+.cf-b:hover path.cf-home, .cf-b:focus-visible path.cf-home { fill: var(--sage-800); }
+.cf-b:focus-visible { outline: none; }
+.cf-pulse { transform-box: fill-box; transform-origin: center; animation: cf-pulse 2.4s ease-out infinite; }
+@keyframes cf-pulse { 0% { transform: scale(.6); opacity: .45; } 100% { transform: scale(1.6); opacity: 0; } }
+
+/* Sign-off above the footer (components/layout/SignOff.tsx): the signature is revealed left to right once in view. */
+.signoff__name { display: inline-block; font-size: clamp(60px, 8.5vw, 108px); line-height: 1.1; color: var(--sage-800); padding-inline: .1em; clip-path: inset(0 100% 0 0); }
+.signoff__wrap[data-in="true"] .signoff__name { animation: signoff-write 2.2s cubic-bezier(.45,.05,.35,1) .2s forwards; }
+@keyframes signoff-write { to { clip-path: inset(0 0 0 0); } }
+@media (prefers-reduced-motion: reduce) {
+  .signoff__name { clip-path: none; }
+  .signoff__wrap[data-in="true"] .signoff__name, .cf-pulse { animation: none; }
+}
