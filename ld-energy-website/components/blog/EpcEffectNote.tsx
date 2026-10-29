@@ -26,16 +26,16 @@ export function EpcEffectNote({ measure = 'these measures' }: { measure?: string
             The effect on your EPC is property-specific.
           </strong>{' '}
           How much {measure} change a rating is calculated by the approved methodology from the whole
-          dwelling — existing construction and services, starting rating, dimensions, fuel and
+          dwelling: existing construction and services, starting rating, dimensions, fuel and
           heating system. No measure adds a fixed number of points.
         </p>
         <p>
-          Your EPC recommendation report shows an indicative rating after the recommended measures{' '}
+          The suggested improvements on your EPC show an indicative rating after the recommended measures{' '}
           <em>for that particular property</em>, which is the figure worth working from.
         </p>
         <p className="q">
           We carry out the EPC assessment. We do not quote for or install insulation, glazing,
-          heating systems or other retrofit work — always get quotes from suitably qualified
+          heating systems or other retrofit work. Always get quotes from suitably qualified
           installers.
         </p>
       </div>
