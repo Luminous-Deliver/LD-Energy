@@ -6,7 +6,7 @@ import { PhoneDock } from '@/components/layout/PhoneDock'
 import { HashScroll } from '@/components/layout/HashScroll'
 import { QuoteDialog } from '@/components/forms/QuoteDialog'
 import { WebAnalytics } from '@/components/layout/WebAnalytics'
-import { LondonSkyline } from '@/components/ui/LondonSkyline'
+import { SignOff } from '@/components/layout/SignOff'
 import { site, pricing, priceFrom, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE } from '@/lib/site'
 import { areaServedLondon } from '@/lib/boroughs'
 import { assessorSchema } from '@/lib/assessor-schema'
@@ -206,8 +206,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main id="main" className="flex-1">
           {children}
         </main>
-        {/* The street drawing above the footer, in the night token: the paper ground runs into the footer */}
-        <LondonSkyline className="site-skyline text-night -mb-1" />
+        {/* The assessor's sign-off above the footer (29/10/2026; replaced the skyline drawing) */}
+        <SignOff />
         <CompactFooter />
         <PhoneDock waHref={waHref} />
         <HashScroll />

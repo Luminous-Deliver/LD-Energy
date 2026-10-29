@@ -12,8 +12,8 @@ const BOOKED_PATHS = ['/preparing-for-your-epc']
 const BOOKED_WA = `${site.whatsappHref}?text=${encodeURIComponent('Hi, I have a question about my EPC visit.')}`
 
 // Covered by the dock rules: a booking form (the shared form's card, the contact page's form, any form in main),
-// the footer and its street drawing, and a cookie banner if one is ever added (mark it data-cookie-banner).
-const COVERS = 'main form, .qc, footer, .site-skyline, [data-cookie-banner]'
+// the footer, and a cookie banner if one is ever added (mark it data-cookie-banner).
+const COVERS = 'main form, .qc, footer, [data-cookie-banner]'
 
 /** The section holding the page's H1; the H1 itself when that section is taller than a screen and a half. */
 function heroOf(main: Element | null): Element | null {

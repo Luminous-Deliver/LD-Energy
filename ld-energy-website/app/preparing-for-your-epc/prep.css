@@ -152,7 +152,7 @@
 @media print {
   @page { margin: 14mm 14mm 16mm; }
   html, body { background: #fff !important; }
-  header.sh, footer, .site-skyline, [data-dock], .mnav, .gd-toc, .pp-acts, .pp-check__bar, .pp-check__saved, .pp-end,
+  header.sh, footer, .signoff, [data-dock], .mnav, .gd-toc, .pp-acts, .pp-check__bar, .pp-check__saved, .pp-end,
   .gd-crumbs, [data-cookie-banner] { display: none !important; }
   .gd { background: #fff; color: #000; font-size: 11pt; }
   .gd-w { padding-inline: 0; max-width: none; }
