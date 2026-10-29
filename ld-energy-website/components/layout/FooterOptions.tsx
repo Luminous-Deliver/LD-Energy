@@ -6,6 +6,8 @@ import { site } from '@/lib/site'
 import { boroughMeta } from '@/lib/boroughs'
 import londonMap from '@/lib/london-map.json'
 import { quoteHref } from '@/lib/quote-context'
+import { Reveal } from '@/components/layout/Reveal'
+import { signature } from '@/app/footer-options/signature-font'
 import {
   footerAreaCount, footerAreas, footerCompany, footerGuides, footerServices, type FooterLink,
 } from '@/lib/footer-links'
@@ -219,5 +221,123 @@ export function FooterC() {
         <div className="mt-4"><Legal tone="light" /></div>
       </div>
     </footer>
+  )
+}
+
+/* ─── Round 2 (Abdul 29/10: "overall C is the best", "B I only like the map"): C with B's map ─── */
+function LightMap() {
+  const newham = MAP.b.find((b) => b.slug === 'newham')!
+  return (
+    <svg viewBox={`0 0 ${MAP.w} ${MAP.h}`} className="h-auto w-full" role="group" aria-label={`Map of the ${MAP.b.length} London areas we cover. Each one links to its page.`}>
+      {MAP.b.map((b) => {
+        const name = boroughMeta[b.slug]?.name ?? b.slug
+        return (
+          <a key={b.slug} href={`/areas/${b.slug}`} aria-label={`EPC in ${name}`} className="fo-lb">
+            <title>{name}</title>
+            <path d={b.d} className={b.slug === 'newham' ? 'fo-home' : undefined} />
+          </a>
+        )
+      })}
+      <g aria-hidden="true" transform={`translate(${newham.cx - 18} ${newham.cy - 26})`}>
+        <circle r="26" fill="#3A624E" opacity=".18" className="fo-pulse" />
+        <circle r="9" fill="#fff" stroke="#3A624E" strokeWidth="4" />
+      </g>
+    </svg>
+  )
+}
+
+export function FooterCMap() {
+  return (
+    <footer className="fo-footer border-t border-stone-200 bg-stone-100 text-stone-700 [overflow-wrap:anywhere]">
+      <div className="mx-auto max-w-[1216px] px-4 pb-[calc(5rem+env(safe-area-inset-bottom))] pt-10 sm:px-6 md:pb-8 lg:px-8 lg:pt-14">
+        <div className="grid gap-6 rounded-[28px] bg-sage-700 p-6 text-white sm:p-8 lg:grid-cols-[minmax(0,1.2fr)_auto] lg:items-center lg:p-10">
+          <div>
+            <p className="font-serif text-[1.7rem] leading-[1.15] lg:text-[2.2rem]">Questions before you book?</p>
+            <p className="mt-2 max-w-[48ch] text-[15px] leading-6 text-white/85">Call or message Abdul, the assessor who does the visit. Every day, 8am to 8pm.</p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
+            <a href={site.phoneHref} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-white px-5 text-[15px] font-semibold text-sage-800 hover:bg-stone-100"><Phone aria-hidden="true" className="h-4 w-4" /> {site.phone}</a>
+            <a href={site.whatsappHref} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-sage-800 px-5 text-[15px] font-semibold text-white hover:bg-[#233B2F]"><MessageCircle aria-hidden="true" className="h-4 w-4" /> WhatsApp</a>
+            <Link prefetch={false} href={quoteHref()} className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/60 px-5 text-[15px] font-semibold text-white hover:bg-white/10">Get a quote</Link>
+          </div>
+        </div>
+
+        {/* where we work: the map (33 borough links) beside the busiest areas as text links */}
+        <div className="grid gap-8 border-b border-stone-300 py-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:items-center lg:gap-14">
+          <LightMap />
+          <div>
+            <p className="font-sans text-label font-medium uppercase text-stone-500">Where we work</p>
+            <p className="mt-3 max-w-[22ch] font-serif text-[1.75rem] leading-[1.15] text-stone-900 lg:text-[2.1rem]">Every London borough, from Stratford, E15.</p>
+            <p className="mt-3 max-w-[46ch] text-[15px] leading-6 text-stone-700">Domestic EPCs and floor plans in all 32 London boroughs and the City of London. One price in every borough, with no travel charges.</p>
+            <div className="mt-6"><Group tone="light" heading="Busiest areas" items={footerAreas} more={[`All ${footerAreaCount} London areas`, '/areas']} cols={2} /></div>
+          </div>
+        </div>
+
+        <div className="grid gap-8 pt-12 sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1.2fr_1fr] lg:gap-10">
+          <div>
+            <LogoLockup />
+            <address className="mt-4 text-[15px] not-italic leading-7 text-stone-700">
+              Stratford, London E15<br />
+              Every day, 8am to 8pm<br />
+              <a href={site.emailHref} className="whitespace-nowrap text-[14px] text-sage-700 underline underline-offset-4">{site.email}</a>
+            </address>
+            <GoogleRating className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-stone-700 hover:text-sage-700" />
+          </div>
+          <Group tone="light" heading="Services" items={footerServices} />
+          <Group tone="light" heading="Guides" items={footerGuides} more={['All guides', '/blog']} />
+          <Group tone="light" heading="Company" items={footerCompany} />
+        </div>
+        <div className="mt-12 border-t border-stone-300 pt-6"><Accreditation tone="light" /></div>
+        <div className="mt-4"><Legal tone="light" /></div>
+      </div>
+    </footer>
+  )
+}
+
+/* ─── Above the footer, P1: the assessor's own sign-off, the signature writing itself in when it scrolls into view ─── */
+export function PreSignature() {
+  return (
+    <section className="fo-pre bg-stone-50 py-16 lg:py-24" aria-label="Your assessor">
+      <div className="mx-auto grid max-w-[1216px] gap-8 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-end lg:px-8">
+        <div>
+          <p className="font-sans text-label font-medium uppercase text-sage-700">Who comes to your home</p>
+          <p className="mt-4 max-w-[26ch] font-serif text-[1.9rem] leading-[1.15] text-stone-900 lg:text-[2.6rem]">
+            Your visit is with me, Abdul Motaleb Taher.
+          </p>
+          <p className="mt-4 max-w-[52ch] text-[16px] leading-7 text-stone-700">
+            I&rsquo;m an accredited Domestic Energy Assessor based in Stratford. I measure the home, record what&rsquo;s there and
+            lodge the EPC on the government register, usually within 72 hours.
+          </p>
+          <Link prefetch={false} href="/about" className="mt-4 inline-flex min-h-11 items-center text-[15px] font-semibold text-sage-700 underline-offset-4 hover:underline">More about me →</Link>
+        </div>
+        <div className="lg:justify-self-end">
+          {/* observe the wrapper: an element clipped to nothing never counts as on screen, so it would never start */}
+          <Reveal className="fo-signwrap" hidden>
+            <span className={`fo-sign ${signature.className}`}>Abdul Taher</span>
+          </Reveal>
+          <p className="mt-2 text-[14px] text-stone-600">Abdul Motaleb Taher · {elmhurst.short} {elmhurst.number} · {quidos.short} {quidos.number}</p>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ─── Above the footer, P2: the night terrace from the page endings, with the lamp and windows coming on ─── */
+// x, y, w, h in the 1600 × 900 artwork: upper floor, then ground floor
+const WINDOWS: [number, number, number, number][] = [
+  [175, 570, 42, 70], [400, 570, 42, 70], [625, 570, 42, 70], [1085, 570, 42, 70], [1315, 570, 42, 70], [1545, 570, 42, 70],
+  [190, 700, 42, 76], [880, 700, 42, 76], [1110, 700, 42, 76], [1405, 700, 42, 76],
+]
+const pct = (n: number, of: number) => `${(n / of) * 100}%`
+export function PreStreet() {
+  return (
+    <Reveal className="fo-street relative" hidden>
+      {/* eslint-disable-next-line @next/next/no-img-element -- the shared end-band artwork */}
+      <img src="/inner/end-band-1600.webp" srcSet="/inner/end-band-900.webp 900w, /inner/end-band-1600.webp 1600w" sizes="100vw" width={1600} height={900} alt="" loading="lazy" decoding="async" className="block h-auto w-full" />
+      {WINDOWS.map(([x, y, w, h], i) => (
+        <span key={i} className="fo-win" style={{ left: pct(x, 1600), top: pct(y, 900), width: pct(w, 1600), height: pct(h, 900), animationDelay: `${0.25 + i * 0.22}s` }} />
+      ))}
+      <span className="fo-lamp" style={{ left: pct(703, 1600), top: pct(645, 900) }} />
+    </Reveal>
   )
 }

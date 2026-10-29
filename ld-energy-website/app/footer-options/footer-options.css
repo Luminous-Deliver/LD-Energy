@@ -5,3 +5,30 @@ body:has(.fo-page) footer:not(.fo-footer) { display: none; }
 .fo-borough path.fo-home { fill: #3A624E; }
 .fo-borough:hover path, .fo-borough:focus-visible path { fill: #B7CEC1; }
 .fo-borough:focus-visible { outline: none; }
+
+/* round 2: light map, signature, lit street */
+.fo-lb path { fill: #DCE5DF; stroke: #F1EFE8; stroke-width: 2; transition: fill .15s; }
+.fo-lb path.fo-home { fill: #3A624E; }
+.fo-lb:hover path, .fo-lb:focus-visible path { fill: #94B4A2; }
+.fo-lb:hover path.fo-home { fill: #2C4A3B; }
+.fo-lb:focus-visible { outline: none; }
+.fo-pulse { transform-box: fill-box; transform-origin: center; animation: fo-pulse 2.4s ease-out infinite; }
+@keyframes fo-pulse { 0% { transform: scale(.6); opacity: .45; } 100% { transform: scale(1.6); opacity: 0; } }
+
+.fo-sign { display: inline-block; font-size: clamp(64px, 9vw, 112px); line-height: 1.1; color: #2C4A3B; padding-inline: .1em; clip-path: inset(0 100% 0 0); }
+.fo-signwrap[data-in="true"] .fo-sign { animation: fo-write 2.2s cubic-bezier(.45,.05,.35,1) .2s forwards; }
+@keyframes fo-write { to { clip-path: inset(0 0 0 0); } }
+
+.fo-street .fo-win { position: absolute; background: #F0A048; opacity: 0; box-shadow: 0 0 18px 4px rgba(240,160,72,.45); border-radius: 1px; }
+.fo-street[data-in="true"] .fo-win { animation: fo-light .5s ease-out forwards; }
+@keyframes fo-light { 0% { opacity: 0; } 40% { opacity: .9; } 55% { opacity: .5; } 100% { opacity: .82; } }
+.fo-street .fo-lamp { position: absolute; width: 12%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; background: radial-gradient(circle, rgba(255,214,140,.55), rgba(255,214,140,0) 65%); opacity: .35; pointer-events: none; }
+.fo-street[data-in="true"] .fo-lamp { animation: fo-lamp 4s ease-in-out .3s infinite alternate; }
+@keyframes fo-lamp { from { opacity: .35; } to { opacity: .8; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .fo-sign { clip-path: none; }
+  .fo-signwrap[data-in="true"] .fo-sign { animation: none; }
+  .fo-street .fo-win { opacity: .82; }
+  .fo-street[data-in="true"] .fo-win, .fo-street[data-in="true"] .fo-lamp, .fo-pulse { animation: none; }
+}
