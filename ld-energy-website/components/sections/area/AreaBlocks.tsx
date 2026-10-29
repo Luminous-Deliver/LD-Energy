@@ -155,7 +155,9 @@ export function AreaHeroD({ slug, name, s, parent, sections }: {
           </figcaption>
         </figure>
 
-        <aside className="in-tb" aria-label={`Domestic EPC guide prices in ${name}`}>
+        <aside className="in-tb" aria-labelledby="price-h">
+          {/* the question people search ("cost of an EPC in <borough>", Search Console 29/10/2026), answered by the list below */}
+          <h2 id="price-h" className="in-tb__h">How much is an EPC in {name}?</h2>
           <div className="in-tb__head">
             <div><span>Service</span><b>Domestic EPC</b></div>
             <div><span>Area</span><b>{name}</b></div>

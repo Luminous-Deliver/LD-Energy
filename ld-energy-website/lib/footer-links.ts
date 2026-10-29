@@ -18,6 +18,8 @@ export const footerServices: FooterLink[] = [
 ]
 
 export const footerGuides: FooterLink[] = [
+  ['Do I need an EPC?', '/blog/do-i-need-an-epc'],
+  ['Find and check your EPC', '/blog/find-check-download-epc'],
   ['EPC, floor plan or survey?', '/blog/epc-vs-floor-plan-vs-survey'],
   ['EPC ratings explained', '/blog/epc-ratings-explained'],
   ['What an EPC costs, and who pays', '/blog/epc-cost-who-pays'],
