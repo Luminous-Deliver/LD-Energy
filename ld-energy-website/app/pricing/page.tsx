@@ -11,7 +11,7 @@ import { ReadNext, type NextStep } from '@/components/inner/ReadNext'
 import { InnerEnding } from '@/components/inner/InnerEnding'
 import { PriceMatrix } from '@/components/inner/PriceMatrix'
 import {
-  pricing, site, formatPrice, maxBundleSaving, priceFrom, standardBands, topBand, portfolioMinHomes, portfolioRatesText, largerHomesText,
+  pricing, site, formatPrice, maxBundleSaving, priceFrom, standardBands, topBand, portfolioMinHomes, portfolioRatesText, portfolioRatesList, largerHomesText,
   SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE, defaultOgImage,
 } from '@/lib/site'
 import { quoteHref } from '@/lib/quote-context'
@@ -324,7 +324,7 @@ export default function PricingPage() {
             </div>
           </div>
           {/* Abdul's approved portfolio rates (24/10), word for word from lib/site.ts */}
-          <p className="pr-port__rates">{portfolioRatesText}</p>
+          <ul className="pr-port__rates">{portfolioRatesList.map((r) => <li key={r}>{r}</li>)}</ul>
         </Container>
       </section>
 

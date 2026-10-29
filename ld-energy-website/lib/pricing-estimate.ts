@@ -1,6 +1,6 @@
-import { pricing, priceFrom, site, type PricingBand } from '@/lib/site'
+import { pricing, priceFrom, site, largerHomes, largerHomePrice, type PricingBand } from '@/lib/site'
 import { PRE_ASSESSMENT, speedSurcharge, speedName } from '@/lib/booking-options'
-import { areaBands, isRetiredArea, legacyArea, type AreaBand } from '@/lib/floor-area'
+import { areaBands, isRetiredArea, legacyArea, parseExactArea, type AreaBand } from '@/lib/floor-area'
 
 /**
  * The product a booking resolves to. Exhaustive by design — see `productKind`.
@@ -113,6 +113,8 @@ export interface GuideEstimate {
 export function guideEstimate(opts: {
   propertyType?: string
   areaBand?: string
+  /** Exact m² typed in the form. Above `largerHomes.firstMax` it lifts the top band's EPC and floor plan. */
+  floorArea?: string
   services: readonly string[]
   speed?: string
   improvementPlan?: boolean
@@ -130,14 +132,19 @@ export function guideEstimate(opts: {
   const wantsFloorPlan =
     opts.services.includes('Floor Plan') || opts.services.includes('Both (Bundle)')
 
-  const epc = wantsEpc ? (band?.epc ?? 0) : 0
-  const floorPlan = wantsFloorPlan ? (band?.floorPlan ?? 0) : 0
+  // Larger homes (lib/site.ts): an exact size over 135 m² adds £15 per 20 m² to the EPC and to the floor plan each;
+  // the bundle keeps its £35 saving, so it rises by both. Still a "From" price: the top band is quoted per address.
+  const exact = isStartingPrice ? parseExactArea(opts.floorArea) : undefined
+  const uplift = exact !== undefined ? largerHomePrice(exact) - largerHomePrice(largerHomes.firstMax) : 0
+
+  const epc = wantsEpc ? (band?.epc ?? 0) + uplift : 0
+  const floorPlan = wantsFloorPlan ? (band?.floorPlan ?? 0) + uplift : 0
 
   let bundleDiscount = 0
   let total: number
   if (wantsEpc && wantsFloorPlan) {
-    total = (band?.bundle ?? 0)
-    bundleDiscount = (band?.epc ?? 0) + (band?.floorPlan ?? 0) - (band?.bundle ?? 0)
+    total = (band?.bundle ?? 0) + 2 * uplift
+    bundleDiscount = epc + floorPlan - total
   } else {
     total = epc + floorPlan
   }
