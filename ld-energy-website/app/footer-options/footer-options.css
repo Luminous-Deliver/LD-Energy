@@ -1,0 +1,7 @@
+/* The review page shows the three options in place of the live skyline and footer. */
+body:has(.fo-page) .site-skyline,
+body:has(.fo-page) footer:not(.fo-footer) { display: none; }
+.fo-borough path { fill: #22314B; stroke: #0B1528; stroke-width: 1.5; transition: fill .15s; }
+.fo-borough path.fo-home { fill: #3A624E; }
+.fo-borough:hover path, .fo-borough:focus-visible path { fill: #B7CEC1; }
+.fo-borough:focus-visible { outline: none; }
