@@ -657,15 +657,6 @@
   }
 }
 
-/* On the homepage the dusk close is the skyline and already carries the contact details,
-   so the drawn skyline and the footer's contact column step aside. Unlayered on purpose:
-   it has to beat the footer's Tailwind utilities. */
-body:has(.hc-close) .site-skyline,
-body:has(.hc-close) .cf-contact { display: none; }
-body:has(.hc-close) .cf-grid { border-top: 1px solid rgba(241, 244, 242, .12); }
-/* Phones keep the logo and rating too (the rating is desktop-only on other pages). */
-@media (max-width: 1023px) { body:has(.hc-close) .cf-proof { display: block; } }
-
 /* Borough ratings data page (components/sections/ratings/BoroughExplorer.tsx): all 33 panels are in the HTML;
    one shows. Without JavaScript the tile links target a panel; with it, the component styles the chosen one. */
 .bx-panel { display: none; }
