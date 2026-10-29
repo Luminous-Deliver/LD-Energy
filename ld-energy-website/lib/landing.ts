@@ -8,11 +8,17 @@
  */
 const OWN_HOST = /(^|\.)luminousanddeliver\.co\.uk$|\.pages\.dev$|^localhost$|^127\.0\.0\.1$/
 
-export interface LandingContext { referrerHost?: string; landingPage?: string }
+export interface LandingContext { referrerHost?: string; landingPage?: string; sourceTag?: string }
+
+/** The one link tag kept (29/10/2026): `utm_source`, from links Abdul controls, such as `?utm_source=gbp` on the
+ *  Google Business Profile website button. Apps (Maps, Gmail, WhatsApp) send no referrer, so a tag is the only signal. */
+export const SOURCE_TAG_RE = /^[a-z0-9_-]{1,40}$/
 
 function capture(): LandingContext {
   if (typeof window === 'undefined') return {}
   const out: LandingContext = { landingPage: window.location.pathname.slice(0, 120) }
+  const tag = new URLSearchParams(window.location.search).get('utm_source')?.trim().toLowerCase()
+  if (tag && SOURCE_TAG_RE.test(tag)) out.sourceTag = tag
   try {
     const host = document.referrer ? new URL(document.referrer).hostname.toLowerCase().replace(/^www\./, '') : ''
     if (host && !OWN_HOST.test(host)) out.referrerHost = host.slice(0, 100)
@@ -38,9 +44,12 @@ export function landingContext(): LandingContext {
 export const REFERRER_HOST_RE = /^[a-z0-9.-]{1,100}$/
 export const LANDING_PAGE_RE = /^\/[a-z0-9\-/]{0,119}$/
 
-/** "Google", "Bing" and so on for the business email; any other site by its domain. */
-export function referrerLabel(host?: string): string {
-  if (!host) return 'Direct, or the browser did not say'
+const TAG_LABELS: Record<string, string> = { gbp: 'Google Business Profile', google: 'Google', bing: 'Bing', facebook: 'Facebook', instagram: 'Instagram', whatsapp: 'WhatsApp', nextdoor: 'Nextdoor', checkatrade: 'Checkatrade' }
+
+/** "Google", "Bing" and so on for the business email; any other site by its domain. A link tag wins over the referrer. */
+export function referrerLabel(host?: string, tag?: string): string {
+  if (tag) return `${TAG_LABELS[tag] ?? tag} (link tag utm_source=${tag})`
+  if (!host) return 'Unknown: an app link (Google Maps, Gmail, WhatsApp), a bookmark or a typed address'
   const known: Array<[RegExp, string]> = [
     [/(^|\.)google\.[a-z.]+$/, 'Google'], [/(^|\.)bing\.com$/, 'Bing'], [/(^|\.)duckduckgo\.com$/, 'DuckDuckGo'],
     [/(^|\.)yahoo\.[a-z.]+$/, 'Yahoo'], [/(^|\.)ecosia\.org$/, 'Ecosia'], [/(^|\.)search\.brave\.com$/, 'Brave Search'],

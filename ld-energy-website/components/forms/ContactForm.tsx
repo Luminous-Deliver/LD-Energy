@@ -11,6 +11,8 @@ import { cn } from '@/lib/cn'
 import { pricing, site, maxBundleSaving, formatPrice, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE, promise } from '@/lib/site'
 import { areaBands, areaLabel, bandForArea, parseExactArea, TOP_BAND } from '@/lib/floor-area'
 import { RollingPrice } from './RollingPrice'
+import { EmailTypoHint } from './EmailTypoHint'
+import { EMAIL_UNREACHABLE_MESSAGE } from '@/lib/email-check'
 import { guideEstimate, guideEstimateRows, guidePrice, PLAN_LABEL, ENERGY_REPORT_LABEL } from '@/lib/pricing-estimate'
 import {
   turnaroundCopy, includedList, contactStepIntro, serviceChoices, serviceLabel, customerTypeChoices, nextSteps,
@@ -313,7 +315,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
   const serviceTouched = useRef(false)
   const quietReset = useRef(false)
   const defaultCta: CtaId = variant === 'hero' ? 'hero-form' : dedicated ? 'direct' : 'embedded'
-  const { register, handleSubmit, control, reset, watch, getValues, setValue, trigger, clearErrors, getFieldState, formState: { errors } } = useForm<ContactInput>({
+  const { register, handleSubmit, control, reset, watch, getValues, setValue, setError, trigger, clearErrors, getFieldState, formState: { errors } } = useForm<ContactInput>({
     resolver: zodResolver(contactSchema),
     shouldFocusError: false,
     defaultValues: {
@@ -569,6 +571,14 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
         conversionEvent('enquiry_submitted', quoteContextFromForm(data))
         setSent({ data, confirmationSent: body.confirmationSent === true })
         setStatus('success')
+        return
+      }
+      // A domain that takes no mail (lib/email-check.ts): show it on the field. Turnstile ran after this check, so
+      // the visitor's tick is still good and they only fix the address.
+      if (body.code === 'email') {
+        setStatus('idle')
+        setError('email', { type: 'server', message: EMAIL_UNREACHABLE_MESSAGE })
+        railError({ email: { type: 'server', message: EMAIL_UNREACHABLE_MESSAGE } })
         return
       }
       retryChallenge(); setStatus('error')
@@ -896,7 +906,10 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
     <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">
       <Field label="Full name" htmlFor={fid('name')} required error={errors.name?.message}><Input id={fid('name')} autoComplete="name" {...register('name')} /></Field>
       <Field label="Phone number" htmlFor={fid('phone')} required error={errors.phone?.message}><Input id={fid('phone')} type="tel" inputMode="tel" autoComplete="tel" {...register('phone')} /></Field>
-      <Field label="Email address" htmlFor={fid('email')} required error={errors.email?.message} className="sm:col-span-2"><Input id={fid('email')} type="email" inputMode="email" autoComplete="email" {...register('email')} /></Field>
+      <div className="flex min-w-0 flex-col gap-1.5 sm:col-span-2">
+        <Field label="Email address" htmlFor={fid('email')} required error={errors.email?.message}><Input id={fid('email')} type="email" inputMode="email" autoComplete="email" {...register('email')} /></Field>
+        <EmailTypoHint id={fid('email-typo')} className="text-sm text-secondary-700" email={watch('email')} onAccept={fixed => setValue('email', fixed, { shouldValidate: true })} />
+      </div>
       {isBulk && <Field label="How many properties?" htmlFor={fid('propertyCount')} required error={errors.propertyCount?.message} hint="A rough number is fine." className="sm:col-span-2"><Input id={fid('propertyCount')} placeholder="e.g. 12, or 20+" {...register('propertyCount')} /></Field>}
       <Field label={isBulk ? 'Properties and postcodes' : 'Property address'} htmlFor={fid('address')} required={!isBulk} error={errors.address?.message}
         hint={isBulk ? 'Optional. Paste a list if you have one, or supply it later.' : undefined} className="sm:col-span-2">

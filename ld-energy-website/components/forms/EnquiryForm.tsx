@@ -2,6 +2,8 @@
 
 import { useRef, useState } from 'react'
 import { landingContext } from '@/lib/landing'
+import { EmailTypoHint } from './EmailTypoHint'
+import { EMAIL_UNREACHABLE_MESSAGE } from '@/lib/email-check'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowRight, Mail, MessageCircle, Phone } from 'lucide-react'
@@ -22,7 +24,7 @@ export function EnquiryForm() {
   const [problem, setProblem] = useState('')
   const [sentName, setSentName] = useState('')
   const doneRef = useRef<HTMLDivElement>(null)
-  const { register, handleSubmit, watch, setValue, setFocus, formState: { errors } } = useForm<EnquiryInput>({
+  const { register, handleSubmit, watch, setValue, setFocus, setError, formState: { errors } } = useForm<EnquiryInput>({
     resolver: zodResolver(enquirySchema),
     defaultValues: {
       kind: 'enquiry', enquiryType: '' as EnquiryInput['enquiryType'], name: '', email: '', phone: '', message: '',
@@ -46,6 +48,7 @@ export function EnquiryForm() {
       const response = await fetch('/api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...data, ...landingContext() }) })
       const body: { ok?: boolean; delivered?: boolean; code?: string } = await response.json().catch(() => ({}))
       if (response.ok && body.ok && body.delivered) { done(); return }
+      if (body.code === 'email') { setStatus('idle'); setError('email', { type: 'server', message: EMAIL_UNREACHABLE_MESSAGE }); setFocus('email'); return }
       resetTurnstile(); setStatus('error')
       setProblem(body.code === 'security' ? 'The security check expired. Tick it again, then send. Your message is still here.' : 'We couldn’t send this online. Your message is still here, or reach us another way below.')
     } catch {
@@ -92,6 +95,7 @@ export function EnquiryForm() {
               <label htmlFor="eq-email">Email address <span aria-hidden="true">*</span></label>
               <input id="eq-email" type="email" inputMode="email" autoComplete="email" className="eq__control" aria-invalid={!!errors.email} aria-describedby={errors.email ? 'eq-email-error' : undefined} {...register('email')} />
               {errors.email && <p id="eq-email-error" className="eq__error" role="alert">{errors.email.message}</p>}
+              <EmailTypoHint id="eq-email-typo" className="eq__hint" email={watch('email')} onAccept={fixed => setValue('email', fixed, { shouldValidate: true })} />
             </div>
             <div className="eq__field">
               <label htmlFor="eq-phone">Phone number <span className="eq__opt">Optional</span></label>

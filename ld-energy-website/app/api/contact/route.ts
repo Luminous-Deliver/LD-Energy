@@ -5,6 +5,7 @@ import { areaLabel, legacyArea } from '@/lib/floor-area'
 import { boroughMeta } from '@/lib/boroughs'
 import { bookingReference, buildBusinessEmail, buildCustomerEmail, buildEnquiryEmail, type BookingEmailInput } from '@/lib/booking-emails'
 import { checkPostcode } from '@/lib/postcode-check'
+import { emailDomainCanReceive, EMAIL_UNREACHABLE_MESSAGE } from '@/lib/email-check'
 
 export const runtime = 'edge'
 
@@ -12,6 +13,9 @@ const NOTIFY_TO = 'contact@luminousanddeliver.co.uk'
 // Resend has only the root domain verified — sending from the epc.
 // subdomain is rejected with 403 "domain is not verified".
 const FROM_DEFAULT = 'L&D Energy <bookings@luminousanddeliver.co.uk>'
+/** Checked before Turnstile, so the visitor's security tick survives fixing a typo. */
+const emailRefused = () => NextResponse.json({ error: EMAIL_UNREACHABLE_MESSAGE, code: 'email' }, { status: 400 })
+
 async function verifyTurnstile(token: string, secret: string, remoteip: string): Promise<boolean> {
   try {
     const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
@@ -38,6 +42,7 @@ async function handleEnquiry(req: Request, payload: unknown) {
     return NextResponse.json({ error: 'Validation failed', issues: parsed.error.flatten() }, { status: 400 })
   }
   if (parsed.data.website) return NextResponse.json({ ok: true })
+  if (!(await emailDomainCanReceive(parsed.data.email))) return emailRefused()
 
   let cfEnv: Record<string, string> = {}
   try { cfEnv = getRequestContext().env as Record<string, string> } catch { /* process.env when running locally */ }
@@ -130,6 +135,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true })
   }
 
+  // a quote that can never reach them is a lost lead: refuse a domain DNS says takes no mail (lib/email-check.ts)
+  if (!(await emailDomainCanReceive(parsed.data.email))) return emailRefused()
+
   // On Cloudflare Pages, runtime secrets are in the Worker env bindings, not process.env
   let cfEnv: Record<string, string> = {}
   try {
@@ -181,6 +189,7 @@ export async function POST(req: Request) {
     ctaId: parsed.data.ctaId,
     referrerHost: parsed.data.referrerHost,
     landingPage: parsed.data.landingPage,
+    sourceTag: parsed.data.sourceTag,
     propertyCount: parsed.data.propertyCount || undefined,
     customerType: parsed.data.customerType,
     services: parsed.data.services,

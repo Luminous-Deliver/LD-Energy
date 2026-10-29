@@ -201,6 +201,8 @@ test('contact API security, recalculation and both email representations with de
     if (url.includes('siteverify')) return Response.json({ success: verification })
     // the postcode check (lib/postcode-check.ts) only informs Abdul; here it finds nothing
     if (url.includes('api.postcodes.io')) return Response.json({ status: 404 }, { status: 404 })
+    // the email check (lib/email-check.ts): one domain has no mail, everything else does
+    if (url.includes('cloudflare-dns.com')) return Response.json(url.includes('no-mail.example') ? { Status: 3 } : { Status: 0, Answer: [{ type: 15, data: '10 mx.example.com.' }] })
     assert.equal(url, 'https://api.resend.com/emails')
     messages.push(JSON.parse(options.body))
     // The first send is the internal notification, the second the customer confirmation.
@@ -217,6 +219,16 @@ test('contact API security, recalculation and both email representations with de
       assert.match(messages[0].text, /Floor area: 56–75 m²/)
       assert.doesNotMatch(messages[1].text + messages[1].html, /Found us via|Form used|First page|Postcode check/)
     }
+    // a domain DNS says takes no mail is refused before Turnstile and before any email goes out
+    messages = []
+    const refused = await request({ ...sample, email: 'someone@no-mail.example' })
+    assert.equal(refused.status, 400)
+    assert.equal((await refused.json()).code, 'email')
+    assert.equal(messages.length, 0)
+    messages = []
+    const enquiryRefused = await request({ kind: 'enquiry', enquiryType: 'General question', name: 'Jo', email: 'jo@no-mail.example', message: 'Hello there', consent: true, turnstileToken: 'mock-token', website: '' })
+    assert.equal(enquiryRefused.status, 400)
+    assert.equal(messages.length, 0)
     for (const areaPage of ['__proto__', '<img src=x onerror=alert(1)>', 'invented-borough', '']) {
       messages = []
       assert.equal((await request({ ...sample, areaPage })).status, 400)

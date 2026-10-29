@@ -109,6 +109,11 @@ const londonTime = new Intl.DateTimeFormat('en-GB', {
   timeZone: 'Europe/London', weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
 })
 
+/** The GOV.UK register's postcode search, filled in, so Abdul can find the current certificate in one tap. */
+export function epcRegisterHref(postcode: string): string {
+  return `https://find-energy-certificate.service.gov.uk/find-a-certificate/search-by-postcode?postcode=${encodeURIComponent(postcode.trim().toUpperCase())}`
+}
+
 // ---------------------------------------------------------------- shared parts
 
 /** A value cell: escaped text, or a trusted fragment built in this file. */
@@ -235,7 +240,7 @@ function cameFrom(data: EnquiryAttribution & LandingContext & { areaPage?: strin
     data.ctaId ? `“${data.ctaId}” button` : '',
   ].filter(Boolean).join(', ')
   return [
-    ['Found us via', text(referrerLabel(data.referrerHost))],
+    ['Found us via', text(referrerLabel(data.referrerHost, data.sourceTag))],
     ['First page', text(data.landingPage || 'Not recorded')],
     ['Form used', text(form || 'Not recorded')],
   ]
@@ -289,7 +294,7 @@ export function buildBusinessEmail(data: BookingEmailInput, meta: BookingMeta) {
     ? [['Addresses', text(data.address || 'Not given')]]
     : [
         ['Address', { html: `${escapeHtml(data.address)}<br><a href="${escapeHtml(mapsHref)}" style="color:${SAGE};font-weight:600;font-size:13px">Open in Google Maps</a>` }],
-        ['Postcode', text(data.postcode)],
+        ['Postcode', { html: `${escapeHtml(data.postcode)}<br><a href="${escapeHtml(epcRegisterHref(data.postcode))}" style="color:${SAGE};font-weight:600;font-size:13px">Check existing EPCs on GOV.UK</a>` }],
         ...(pc ? [['Postcode check', pc.status === 'ok' && pc.inLondon ? text(postcodeCheckLine(pc)) : flag(postcodeCheckLine(pc))] as Row] : []),
       ]
   home.push(['Access notes', text(data.notes || 'None')])
@@ -298,8 +303,8 @@ export function buildBusinessEmail(data: BookingEmailInput, meta: BookingMeta) {
     ['Reference', text(meta.reference)],
     ['Received', text(`${londonTime.format(meta.received)}, UK time`)],
     ...cameFrom(data),
-    ['Security check', text(meta.turnstilePassed ? 'Passed (Cloudflare Turnstile)' : 'Skipped (local test only)')],
-    ['Consent', text('Ticked: agreed to be contacted about this request')],
+    // the form cannot send without the security check or the consent tick, so neither earns a row unless skipped locally
+    ...(meta.turnstilePassed ? [] : [['Security check', flag('Skipped (local test only)')] as Row]),
   ]
 
   const body = `
@@ -339,6 +344,7 @@ export function buildBusinessEmail(data: BookingEmailInput, meta: BookingMeta) {
     '',
     `Call: ${tel}`,
     `Reply by WhatsApp: ${whatsapp}`,
+    ...(e.isBulk || !data.postcode ? [] : [`Existing EPCs: ${epcRegisterHref(data.postcode)}`]),
   ].join('\n'))
 
   return { text: txt, html: page({ title: `New quote request: ${data.name}`, preheader: summary, body }) }
@@ -467,9 +473,9 @@ export function buildEnquiryEmail(data: EnquiryInput, meta: Pick<BookingMeta, 'r
   ]
   const details: Row[] = [
     ['Received', text(`${londonTime.format(meta.received)}, UK time`)],
-    ['Found us via', text(referrerLabel(data.referrerHost))],
+    ['Found us via', text(referrerLabel(data.referrerHost, data.sourceTag))],
     ['First page', text(data.landingPage || 'Not recorded')],
-    ['Security check', text(meta.turnstilePassed ? 'Passed (Cloudflare Turnstile)' : 'Skipped (local test only)')],
+    ...(meta.turnstilePassed ? [] : [['Security check', flag('Skipped (local test only)')] as Row]),
   ]
   const body = `
         <tr><td style="padding:0 2px 18px">${logo(200, 'left')}</td></tr>
