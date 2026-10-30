@@ -70,6 +70,7 @@ export const guideGroups: GuideGroup[] = [
       { slug: 'cheapest-ways-improve-epc', summary: 'Five lower-cost measures, cheapest first.' },
       { slug: 'epc-improvements-by-budget', summary: 'What to look into at three budget levels.' },
       { slug: 'loft-insulation-epc-rating', summary: 'How loft insulation is recorded, and the evidence that helps.' },
+      { slug: 'solar-panels-epc-rating', summary: 'How many points solar panels add, worked through the RdSAP 10 method, and the evidence the assessor needs.' },
       { slug: 'cavity-wall-insulation-epc', summary: 'Which walls can take cavity fill, and how it shows on an EPC.' },
       { slug: 'electric-heating-storage-heaters-epc', summary: 'Storage heaters, electric radiators and heat pumps: how they are recorded and why the meter matters.' },
     ],
