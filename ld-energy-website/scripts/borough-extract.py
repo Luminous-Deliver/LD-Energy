@@ -25,7 +25,8 @@ INFO = API + '/info'
 KEEP = ['certificate_number', 'local_authority', 'property_type', 'built_form', 'tenure', 'transaction_type',
         'report_type', 'total_floor_area', 'number_habitable_rooms', 'lodgement_date', 'current_energy_rating',
         'potential_energy_rating', 'construction_age_band', 'walls_description', 'mainheat_description',
-        'main_fuel']
+        'main_fuel', 'current_energy_efficiency', 'heating_cost_current', 'hot_water_cost_current',
+        'lighting_cost_current', 'photo_supply']
 OUTWARD = re.compile(r'^[A-Z]{1,2}[0-9][A-Z0-9]?$')
 
 

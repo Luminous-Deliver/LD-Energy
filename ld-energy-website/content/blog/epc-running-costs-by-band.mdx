@@ -1,0 +1,80 @@
+---
+title: "EPC Running Costs by Band: What London Homes Rated B to G Cost"
+description: "The yearly and monthly running costs on recent London EPCs, band by band, for flats and houses, from {cost:total} certificates on the GOV.UK register. What the figures include, and how to read your own."
+answer: "On EPCs lodged in London from {cost:from} to {cost:to}, the typical estimated running cost for heating, hot water and lighting was {cost:C.median} a year for a home rated C, {cost:D.median} for D and {cost:E.median} for E. That is about {cost:C.monthly}, {cost:D.monthly} and {cost:E.monthly} a month. Homes rated F or G came to {cost:FtoG.median}. These are the certificates' own estimates at standard use, not bills, and they leave out appliances and cooking."
+slug: "epc-running-costs-by-band"
+category: "epc-basics"
+tags: ["EPC rating", "running costs", "London data"]
+publishedAt: "2026-10-30"
+updatedAt: "2026-10-30"
+author: "abdul-taher"
+featured: false
+keywords:
+  - "EPC rating running costs"
+  - "EPC rating D monthly cost"
+  - "EPC rating C vs D cost difference"
+  - "how much does an E rated house cost to run"
+  - "EPC band energy costs"
+keyTakeaways:
+  - "A typical London home rated D had an estimated running cost of {cost:D.median} a year on recent EPCs, against {cost:C.median} for C: a gap of {cost:D-C}."
+  - "The figures cover heating, hot water and lighting at standard use. Appliances and cooking are not included, and real bills depend on how the home is used."
+  - "Flats cost less to run than houses in every band, partly because they are smaller and lose less heat to the outside."
+  - "Certificate costs are worked out at the fuel prices in force when each EPC was lodged, so only certificates on the latest prices are pooled here."
+  - "Your own EPC shows the estimated costs for your home and what the suggested improvements could save."
+faqs:
+  - question: "How much does a D-rated home cost to run?"
+    answer: "On London EPCs lodged from {cost:from} to {cost:to}, the typical estimate for a home rated D was {cost:D.median} a year, about {cost:D.monthly} a month, for heating, hot water and lighting. The middle half of D-rated homes came between {cost:D.q1} and {cost:D.q3}."
+  - question: "How much cheaper is a C than a D?"
+    answer: "The typical C-rated home's estimate was {cost:D-C} a year lower than the typical D-rated home's. Part of that gap is because C-rated homes in London are more often smaller flats, so per square metre the difference is {cost:C.perM2} against {cost:D.perM2}."
+  - question: "Is the cost on my EPC what I will actually pay?"
+    answer: "No. The EPC estimates the cost of heating, hot water and lighting with standard heating hours and a standard number of occupants for the floor area. It leaves out appliances and cooking, and the prices are those set for EPC calculations when the certificate was lodged."
+  - question: "How much does an E-rated home cost to run?"
+    answer: "The typical estimate for a London home rated E was {cost:E.median} a year, about {cost:E.monthly} a month, on EPCs lodged from {cost:from} to {cost:to}."
+relatedPosts:
+  - "epc-ratings-explained"
+  - "how-to-improve-epc-rating"
+  - "what-epc-rating-do-i-need"
+  - "solar-panels-epc-rating"
+sources:
+  - title: "Get energy performance of buildings data: domestic certificates"
+    publisher: "MHCLG"
+    url: "https://get-energy-performance-data.communities.gov.uk/"
+    checked: "2026-10-30"
+    note: "Estimated heating, hot water and lighting costs and the current rating on every London RdSAP certificate in the file of 13 October 2026. Open Government Licence v3.0."
+  - title: "SAP 10.2 specification (14 March 2025): sections 1 and 13, Appendix L and Table 1b"
+    publisher: "BRE for DESNZ"
+    url: "https://bregroup.com/documents/d/bre-group/sap-10-2-14-03-2025"
+    checked: "2026-10-30"
+    note: "The costs the method counts (space heating, water heating, ventilation and lighting), and occupancy assumed from floor area."
+---
+
+Every EPC estimates what the home costs a year to heat, to provide hot water and to light. We took those estimates from {cost:total} certificates lodged for existing London homes from {cost:from} to {cost:to}, and grouped them by rating.
+
+## Running costs by band
+
+<RunningCostTable />
+
+"Typical" is the median: half the homes in the band cost less and half cost more. The middle half is the range from the lower to the upper quartile. Band A is left out because only a handful of certificates were lodged, and F and G are combined for the same reason.
+
+## Flats, houses and what the money goes on
+
+<RunningCostTable view="types" />
+
+Flats cost less to run than houses in every band. They are smaller, and a flat with homes above, below and beside it loses less heat through its walls, floor and roof. Heating is the largest part of the cost in every band, and it is the figure that rises most from one band to the next.
+
+## C against D
+
+A typical home rated C came to {cost:C.median} a year and a typical home rated D to {cost:D.median}, a difference of {cost:D-C}. These are different homes, though, and C-rated homes in London are more often smaller flats. Per square metre of floor area, the typical C-rated home came to {cost:C.perM2} a year and the typical D-rated home to {cost:D.perM2}.
+
+For your own home, the EPC shows the estimated cost now and what its suggested improvements could save. Our guide on [how to improve your EPC rating](/blog/how-to-improve-epc-rating) covers the measures.
+
+## What the figures include
+
+- **Heating, hot water and lighting only.** Appliances, cooking and other electricity use are not included.
+- **Standard use.** The method assumes standard heating hours and a number of occupants worked out from the floor area, not how your household uses the home.
+- **The prices used for EPCs.** The fuel prices behind certificate costs are updated from time to time, and the costs on certificates move when they are. In the register data the latest change came on {cost:from}, so only certificates lodged from then are pooled here.
+- **Existing homes in London.** New-build certificates are left out, and a home lodged twice in the period counts twice.
+
+The rating itself works from the same kind of cost estimate, at a fixed set of prices written into the method. [EPC ratings explained](/blog/epc-ratings-explained) covers how the bands are set.
+
+To get a current EPC with estimated costs for your own home, [request your exact quote](/quote?source=blog&cta=inline).

@@ -31,6 +31,7 @@ const ALLOWED = {
   'how-to-improve-epc-rating.mdx': ['£7,500', '£5,000'], // Boiler Upgrade Scheme heat pump and biomass grants (GOV.UK, checked 29/10)
   'loft-insulation-epc-rating.mdx': ['£500'], // installer cost table removed 29/10 (unsourced)
   'mees-regulations-2026.mdx': ['£2,000', '£4,000', '£1,000', '£3,500', '£5,000', '£30,000', '£10,000'], // MEES penalties, caps
+  'what-epc-rating-do-i-need.mdx': ['£7,500', '£36,000', '£150'], // BUS grant, Warm Homes: Local Grant income limit, Warm Home Discount (GOV.UK, checked 30/10)
   'mees-timeline-2026-2030.mdx': ['£10,000', '£3,500', '£2,000', '£4,000', '£1,000', '£5,000', '£30,000'], // MEES penalties, caps
 }
 
