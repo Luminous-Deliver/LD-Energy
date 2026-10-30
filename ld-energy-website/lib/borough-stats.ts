@@ -8086,6 +8086,90 @@ export const boroughStats: BoroughStatsData = {
    "waltham-forest": 543
   }
  },
+ "runningCosts": {
+  "from": "2026-08-23",
+  "to": "2026-10-12",
+  "n": 33985,
+  "minN": 100,
+  "excluded": 35,
+  "bands": [
+   {
+    "id": "B",
+    "n": 2237,
+    "median": 513,
+    "q1": 446,
+    "q3": 656,
+    "monthly": 43,
+    "perM2": 7.49,
+    "medianArea": 69,
+    "heating": 254,
+    "hotWater": 207,
+    "lighting": 47,
+    "flats": 494,
+    "houses": 953
+   },
+   {
+    "id": "C",
+    "n": 21212,
+    "median": 741,
+    "q1": 593,
+    "q3": 938,
+    "monthly": 62,
+    "perM2": 11.2,
+    "medianArea": 67,
+    "heating": 494,
+    "hotWater": 188,
+    "lighting": 46,
+    "flats": 660,
+    "houses": 1013
+   },
+   {
+    "id": "D",
+    "n": 9273,
+    "median": 1160,
+    "q1": 933,
+    "q3": 1429,
+    "monthly": 97,
+    "perM2": 14.8,
+    "medianArea": 77,
+    "heating": 856,
+    "hotWater": 207,
+    "lighting": 53,
+    "flats": 947,
+    "houses": 1345
+   },
+   {
+    "id": "E",
+    "n": 1018,
+    "median": 1698,
+    "q1": 1344,
+    "q3": 2136,
+    "monthly": 142,
+    "perM2": 23.63,
+    "medianArea": 70,
+    "heating": 1242,
+    "hotWater": 339,
+    "lighting": 52,
+    "flats": 1452,
+    "houses": 2106
+   },
+   {
+    "id": "FtoG",
+    "n": 210,
+    "median": 2796,
+    "q1": 2135,
+    "q3": 3423,
+    "monthly": 233,
+    "perM2": 36.7,
+    "medianArea": 77,
+    "heating": 2166,
+    "hotWater": 456,
+    "lighting": 64,
+    "flats": 2256,
+    "houses": 3014
+   }
+  ]
+ },
  "thresholds": {
   "districtMin": 200
  },
@@ -8098,7 +8182,7 @@ export const boroughStats: BoroughStatsData = {
   "fileUpdated": "2026-10-13",
   "from": "2023-01-01",
   "to": "2026-10-12",
-  "generated": "2026-10-22",
+  "generated": "2026-10-30",
   "caveats": [
    "Counts are certificates, not homes: a home lodged twice in the period is counted twice.",
    "Homes get an EPC when they are let, sold or surveyed, so these figures describe homes that were, not every home.",

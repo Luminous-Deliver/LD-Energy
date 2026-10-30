@@ -84,11 +84,46 @@ export interface StratfordSummary extends AreaSummary {
   localAuthorities: Record<string, number>
 }
 
+/** One rating group's estimated running costs (£ a year unless stated), from the certificates' own cost figures. */
+export interface RunningCostBand {
+  id: 'B' | 'C' | 'D' | 'E' | 'FtoG'
+  n: number
+  /** Median of heating + hot water + lighting. */
+  median: number
+  /** Lower and upper quartiles of the same total: the middle half of homes. */
+  q1: number
+  q3: number
+  /** median / 12. */
+  monthly: number
+  /** Median of total cost per m² of floor area. */
+  perM2: number
+  medianArea: number | null
+  heating: number
+  hotWater: number
+  lighting: number
+  /** Medians for flats and maisonettes, houses and bungalows; null below 50 certificates. */
+  flats: number | null
+  houses: number | null
+}
+
+export interface RunningCosts {
+  /** First lodgement date pooled: the latest change of the price list behind certificate costs. */
+  from: string
+  to: string
+  n: number
+  /** Smallest group published on its own. */
+  minN: number
+  /** Band A certificates in the period, left out as too few. */
+  excluded: number
+  bands: RunningCostBand[]
+}
+
 export interface BoroughStatsData {
   /** The 33 London local authorities, keyed by area-page slug. */
   boroughs: Record<string, AreaSummary>
   london: AreaSummary
   stratford: StratfordSummary
+  runningCosts: RunningCosts
   thresholds: { districtMin: number }
   source: {
     title: string

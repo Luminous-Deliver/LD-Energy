@@ -3,6 +3,7 @@ import path from 'node:path'
 import matter from 'gray-matter'
 import readingTime from 'reading-time'
 import { fillPrices } from './guide-prices'
+import { fillCosts } from './guide-costs'
 
 export interface PostFaq {
   question: string
@@ -53,8 +54,9 @@ function readPostFile(slug: string): Post | null {
   const data = parsed.data
   // L&D prices are written as {price:key} tokens and filled from lib/site.ts (lib/guide-prices.ts).
   // The body is filled too, so tokens inside component props such as CTABanner's body work.
-  const content = fillPrices(parsed.content)
-  const text = (v: unknown) => fillPrices(String(v ?? ''))
+  // Running-cost figures are {cost:...} tokens filled from lib/borough-stats.ts (lib/guide-costs.ts).
+  const content = fillCosts(fillPrices(parsed.content))
+  const text = (v: unknown) => fillCosts(fillPrices(String(v ?? '')))
   const stats = readingTime(content)
 
   return {

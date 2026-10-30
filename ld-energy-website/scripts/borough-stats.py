@@ -6,6 +6,7 @@ Refresh runbook (monthly; the GOV.UK file is regenerated on the 1st of each mont
   1. py -I scripts/borough-extract.py --env-file <path to the .env holding EPC_DATA_BEARER_TOKEN> [--cache DIR]
      (streams ~1.1 GB, about 2.5 minutes; writes london-borough-extract.csv.gz and its .stats.json to DIR)
   2. py -I scripts/borough-stats.py [--cache DIR]   -> rewrites lib/borough-stats.ts
+     Before this, check COST_FROM (running costs) against the latest price-list step; see the note above it.
   3. node --require ./tests/register.cjs --test tests/borough-stats.test.cjs
      The total-certificates check is pinned to one file date; when the file changes, update the pinned date and
      total in the test after checking the new figure is plausible (London adds roughly 20,000 RdSAP a month).
@@ -195,6 +196,51 @@ def summarise(rows, slug, name, code, full_years, districts=True):
     return out
 
 
+# Running costs by band (guide /blog/epc-running-costs-by-band). Certificate costs are worked out at the price list
+# in force when each certificate was lodged, so only certificates on the latest list are pooled. Weekly medians of
+# band D cost per m2 stepped from about £16.6 to £14.7 on 23/08/2026, the latest change in the 13/10/2026 file.
+# On each refresh, re-check for a newer step (weekly median £/m2 for band D) and move COST_FROM to it.
+COST_FROM = '2026-08-23'
+COST_GROUPS = [('B', 'B'), ('C', 'C'), ('D', 'D'), ('E', 'E'), ('FtoG', 'FG')]
+COST_MIN = 100
+
+
+def running_costs(rows):
+    def cost(r):
+        try:
+            return sum(float(r[k]) for k in ('heating_cost_current', 'hot_water_cost_current', 'lighting_cost_current'))
+        except (KeyError, ValueError):
+            return None
+
+    def quart(v, p):
+        v = sorted(v)
+        return round(v[int(p * (len(v) - 1))])
+
+    rs = [r for r in rows if r['lodgement_date'][:10] >= COST_FROM and cost(r) is not None]
+    bands = []
+    for gid, letters in COST_GROUPS:
+        g = [r for r in rs if r['current_energy_rating'] in letters]
+        if len(g) < COST_MIN:
+            raise SystemExit(f'running costs: only {len(g)} certificates in {gid} since {COST_FROM}')
+        t = [cost(r) for r in g]
+        kind = {}
+        for k, types in (('flats', ('Flat', 'Maisonette')), ('houses', ('House', 'Bungalow'))):
+            kt = [cost(r) for r in g if r['property_type'] in types]
+            kind[k] = round(statistics.median(kt)) if len(kt) >= 50 else None
+        bands.append({
+            'id': gid, 'n': len(g), 'median': round(statistics.median(t)), 'q1': quart(t, .25), 'q3': quart(t, .75),
+            'monthly': round(statistics.median(t) / 12),
+            'perM2': round(statistics.median([cost(r) / r['area'] for r in g if r['area'] > 0]), 2),
+            'medianArea': median([r['area'] for r in g if r['area'] > 0]),
+            'heating': round(statistics.median(float(r['heating_cost_current']) for r in g)),
+            'hotWater': round(statistics.median(float(r['hot_water_cost_current']) for r in g)),
+            'lighting': round(statistics.median(float(r['lighting_cost_current']) for r in g)),
+            **kind,
+        })
+    return {'from': COST_FROM, 'to': max(r['lodgement_date'][:10] for r in rs), 'n': len(rs), 'minN': COST_MIN,
+            'excluded': sum(1 for r in rs if r['current_energy_rating'] == 'A'), 'bands': bands}
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--cache', default=os.path.join(tempfile.gettempdir(), 'ld-borough-stats'))
@@ -240,6 +286,7 @@ def main():
         'boroughs': boroughs,
         'london': summarise(rows, 'london', 'London', None, full_years, districts=False),
         'stratford': stratford,
+        'runningCosts': running_costs(rows),
         'thresholds': {'districtMin': DISTRICT_MIN},
         'source': {
             'title': 'Get energy performance of buildings data: domestic certificates',

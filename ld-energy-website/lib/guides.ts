@@ -33,6 +33,8 @@ export const guideGroups: GuideGroup[] = [
     guides: [
       { slug: 'epc-ratings-explained', summary: 'What each band from A to G means, and the SAP score range behind it.' },
       { slug: 'do-i-need-an-epc', summary: 'Selling, letting, lodgers, HMOs, holiday lets, extensions and the exemptions, each with the rule behind it.' },
+      { slug: 'what-epc-rating-do-i-need', summary: 'The rating needed to sell, to let, for a green mortgage and for each grant scheme.' },
+      { slug: 'epc-running-costs-by-band', summary: 'What recent London EPCs estimate each band costs to run, for flats and houses.' },
       { slug: 'find-check-download-epc', summary: 'Look up any EPC on the free register, check it is genuine and in date, and save a copy.' },
       { slug: 'why-is-my-epc-different', summary: 'Why two similar homes get different ratings, and when a rating can be changed.' },
       { slug: 'rdsap-10-what-changed-2025', summary: 'The RdSAP 10 method since June 2025 and the conventions update of August 2026.' },

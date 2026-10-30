@@ -7,6 +7,7 @@ import { EpcEffectNote } from './EpcEffectNote'
 import { Price } from './Price'
 import { LondonPotentialShare } from './LondonPotentialShare'
 import { LondonRatingShare } from './LondonRatingShare'
+import { RunningCostTable } from './RunningCosts'
 
 type AnchorProps = React.AnchorHTMLAttributes<HTMLAnchorElement>
 type TableProps = React.TableHTMLAttributes<HTMLTableElement>
@@ -67,6 +68,7 @@ const components = {
   Price,
   LondonPotentialShare,
   LondonRatingShare,
+  RunningCostTable,
 }
 
 interface PostContentProps {
