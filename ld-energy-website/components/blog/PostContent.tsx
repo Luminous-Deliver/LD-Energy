@@ -5,6 +5,7 @@ import remarkGfm from 'remark-gfm'
 import { CTABanner } from './CTABanner'
 import { EpcEffectNote } from './EpcEffectNote'
 import { Price } from './Price'
+import { LondonPotentialShare } from './LondonPotentialShare'
 import { LondonRatingShare } from './LondonRatingShare'
 
 type AnchorProps = React.AnchorHTMLAttributes<HTMLAnchorElement>
@@ -64,6 +65,7 @@ const components = {
   CTABanner,
   EpcEffectNote,
   Price,
+  LondonPotentialShare,
   LondonRatingShare,
 }
 
