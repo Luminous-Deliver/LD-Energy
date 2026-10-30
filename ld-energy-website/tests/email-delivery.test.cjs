@@ -51,9 +51,10 @@ test('webhook forwards a bounce to the business inbox once, and never alerts on 
   const previous = { fetch: global.fetch, secret: process.env.RESEND_WEBHOOK_SECRET, key: process.env.RESEND_API_KEY }
   process.env.RESEND_WEBHOOK_SECRET = 'whsec_' + secretBytes.toString('base64')
   process.env.RESEND_API_KEY = 'test-only-key'
-  let stored = {}, sent = [], sendStatus = 200
+  let stored = {}, sent = [], sendStatus = 200, canRead = true
   global.fetch = async (url, options = {}) => {
-    if (url === `https://api.resend.com/emails/${ID}`) return Response.json(stored)
+    // production's key is sending-only: reading an email back is refused
+    if (url === `https://api.resend.com/emails/${ID}`) return canRead ? Response.json(stored) : Response.json({ message: 'restricted' }, { status: 401 })
     assert.equal(url, 'https://api.resend.com/emails')
     sent.push({ body: JSON.parse(options.body), headers: options.headers })
     return Response.json({ id: 'alert' }, { status: sendStatus })
@@ -67,8 +68,8 @@ test('webhook forwards a bounce to the business inbox once, and never alerts on 
     }))
   }
   try {
-    stored = { id: ID, subject: CONFIRMATION_SUBJECT, to: ['fazmin@gmial.com'], text: 'Your reference LD-URBE6F.' }
-    let res = await deliver({ type: 'email.bounced', data: { email_id: ID, bounce: { message: 'Mailbox does not exist' } } }, 'msg_one')
+    canRead = false
+    let res = await deliver({ type: 'email.bounced', data: { email_id: ID, to: ['fazmin@gmial.com'], subject: CONFIRMATION_SUBJECT, tags: { reference: 'LD-URBE6F' }, bounce: { message: 'Mailbox does not exist' } } }, 'msg_one')
     assert.equal(res.status, 200)
     assert.equal(sent.length, 1)
     assert.equal(sent[0].body.to, 'contact@luminousanddeliver.co.uk')
@@ -78,6 +79,11 @@ test('webhook forwards a bounce to the business inbox once, and never alerts on 
     assert.equal(sent[0].headers['Idempotency-Key'], 'bounce-msg_one', 'a Resend retry cannot send a second alert')
 
     sent = []
+    await deliver({ type: 'email.bounced', data: { email_id: ID, to: 'a@b.com', subject: CONFIRMATION_SUBJECT, tags: [{ name: 'reference', value: 'LD-7K3QX9' }] } })
+    assert.match(sent[0].body.subject, /^Bounced: LD-7K3QX9 to a@b\.com/, 'tags as a list work too')
+
+    sent = []
+    canRead = true
     stored = { id: ID, subject: 'Re: EPCs - 43 Elvaston Place, SW7', to: ['louis@example.com'], text: 'Hi Louis' }
     await deliver({ type: 'email.bounced', data: { email_id: ID } })
     assert.equal(sent.length, 1, 'a quote reply bounce is forwarded too')
@@ -98,5 +104,34 @@ test('webhook forwards a bounce to the business inbox once, and never alerts on 
   } finally {
     global.fetch = previous.fetch
     for (const [name, value] of [['RESEND_WEBHOOK_SECRET', previous.secret], ['RESEND_API_KEY', previous.key]]) value === undefined ? delete process.env[name] : process.env[name] = value
+  }
+})
+
+test('with a sending-only key, the bounce the webhook records is what the thank-you screen sees', async () => {
+  const secretBytes = crypto.randomBytes(24)
+  const kv = new Map()
+  const previous = { fetch: global.fetch }
+  global.__cfEnv = {
+    RESEND_WEBHOOK_SECRET: 'whsec_' + secretBytes.toString('base64'), RESEND_API_KEY: 'sending-only',
+    BOUNCES: { get: async (k) => kv.get(k) ?? null, put: async (k, v, o) => { assert.equal(o.expirationTtl, 3600); kv.set(k, v) } },
+  }
+  global.fetch = async (url) => {
+    if (url.startsWith('https://api.resend.com/emails/')) return Response.json({ message: 'restricted' }, { status: 401 })
+    return Response.json({ id: 'alert' })
+  }
+  const ask = async (id = ID) => (await GET(new Request(`https://epc.luminousanddeliver.co.uk/api/contact/delivery?id=${id}`))).json()
+  try {
+    assert.deepEqual(await ask(), { state: 'pending' }, 'nothing recorded and nothing readable: still waiting')
+    const body = JSON.stringify({ type: 'email.bounced', data: { email_id: ID, to: ['x@y.com'], subject: CONFIRMATION_SUBJECT, tags: { reference: 'LD-URBE6F' } } })
+    const ts = String(Math.floor(Date.now() / 1000))
+    const sig = crypto.createHmac('sha256', secretBytes).update(`msg_kv.${ts}.${body}`).digest('base64')
+    const res = await webhook.POST(new Request('https://epc.luminousanddeliver.co.uk/api/resend-webhook', { method: 'POST', body, headers: { 'svix-id': 'msg_kv', 'svix-timestamp': ts, 'svix-signature': `v1,${sig}`, 'content-length': String(body.length) } }))
+    assert.equal(res.status, 200)
+    assert.equal(kv.get(ID), 'bounced')
+    assert.deepEqual(await ask(), { state: 'bounced' })
+    assert.deepEqual(await ask('01a18a19-ad29-7e49-83e5-5a849650ae27'), { state: 'pending' }, 'another copy is not affected')
+  } finally {
+    delete global.__cfEnv
+    global.fetch = previous.fetch
   }
 })

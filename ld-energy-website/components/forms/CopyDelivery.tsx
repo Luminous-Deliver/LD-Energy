@@ -5,10 +5,12 @@ import { site } from '@/lib/site'
 import type { DeliveryState } from '@/lib/email-delivery'
 
 const EVERY_MS = 5000
-const TRIES = 18 // 90 seconds: a mailbox that does not exist bounces within seconds, nearly always
+// 2 minutes: a missing mailbox bounces within seconds, and the recorded bounce can take up to a minute to reach
+// every Cloudflare location (KV)
+const TRIES = 24
 
 /**
- * The thank-you screen's line about the emailed copy (Abdul 29/10/2026). It watches for about a minute and a half: a
+ * The thank-you screen's line about the emailed copy (Abdul 29/10/2026). It watches for about two minutes: a
  * bounce means the address is wrong, so the customer is told now, while they are still here, and given the phone.
  * Abdul gets the same bounce by email from the Resend webhook.
  */

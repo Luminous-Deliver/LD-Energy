@@ -5,7 +5,8 @@ const Module = require('node:module')
 const ts = require('typescript')
 const load = Module._load
 Module._load = function (id, ...rest) {
-  if (id === '@cloudflare/next-on-pages') return { getRequestContext() { throw new Error('Test runner has no Worker bindings') } }
+  // a test may set global.__cfEnv to stand in for the Worker bindings (KV and the like)
+  if (id === '@cloudflare/next-on-pages') return { getRequestContext() { if (global.__cfEnv) return { env: global.__cfEnv }; throw new Error('Test runner has no Worker bindings') } }
   return load.call(this, id, ...rest)
 }
 const resolve = Module._resolveFilename

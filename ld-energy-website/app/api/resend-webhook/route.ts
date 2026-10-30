@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getRequestContext } from '@cloudflare/next-on-pages'
-import { CONFIRMATION_SUBJECT, fetchResendEmail, referenceIn } from '@/lib/email-delivery'
+import { BOUNCE_TTL_SECONDS, CONFIRMATION_SUBJECT, fetchResendEmail, referenceIn, RESEND_ID_RE, type BounceStore } from '@/lib/email-delivery'
 
 export const runtime = 'edge'
 
@@ -65,15 +65,27 @@ const BOUNCE_SUBJECT = 'Bounced:'
  * an invoice) is forwarded to the business inbox with the reference, so he can phone or WhatsApp instead. The address
  * goes only into that email, never into the logs. An alert that itself bounces is not alerted again.
  */
-async function alertBounce(emailId: string, reason: string | undefined, svixId: string, cfEnv: Record<string, string>): Promise<boolean> {
+/** What Resend puts in the bounce event itself: enough for the alert without reading the email back. */
+type BouncePayload = { email_id?: string; to?: string[] | string; subject?: string; tags?: Record<string, string> | Array<{ name: string; value: string }>; bounce?: { message?: string } }
+
+function tagValue(tags: BouncePayload['tags'], name: string): string | undefined {
+  if (Array.isArray(tags)) return tags.find((t) => t?.name === name)?.value
+  return tags?.[name]
+}
+
+async function alertBounce(data: BouncePayload & { email_id: string }, svixId: string, cfEnv: Record<string, string>): Promise<boolean> {
   const apiKey = cfEnv.RESEND_API_KEY || process.env.RESEND_API_KEY
   if (!apiKey) return false
-  const email = await fetchResendEmail(emailId, apiKey)
-  if (!email) return false
-  if (email.subject?.startsWith(BOUNCE_SUBJECT)) return true
-  const to = [email.to ?? []].flat().join(', ') || 'unknown address'
-  const reference = referenceIn(email.text)
-  const what = email.subject === CONFIRMATION_SUBJECT ? 'the form’s automatic copy' : `“${email.subject ?? 'an email'}”`
+  // The site's key may be sending-only (it is in production, 29/10/2026), so reading the email back is a bonus, never
+  // a requirement: the event already carries the address and subject, and the form tags its copy with the reference.
+  const email = data.to && data.subject ? null : await fetchResendEmail(data.email_id, apiKey)
+  const subject = data.subject ?? email?.subject
+  if (subject?.startsWith(BOUNCE_SUBJECT)) return true
+  const emailId = data.email_id
+  const reason = data.bounce?.message
+  const to = [data.to ?? email?.to ?? []].flat().join(', ') || 'unknown address'
+  const reference = tagValue(data.tags, 'reference') ?? referenceIn(email?.text)
+  const what = subject === CONFIRMATION_SUBJECT ? 'the form’s automatic copy' : `“${subject ?? 'an email'}”`
   const text = [
     `${what} to ${to} bounced${reason ? `: ${reason}` : '.'}`,
     '',
@@ -104,7 +116,7 @@ async function alertBounce(emailId: string, reason: string | undefined, svixId: 
 export async function POST(req: Request) {
   let cfEnv: Record<string, string> = {}
   try {
-    cfEnv = getRequestContext().env as Record<string, string>
+    cfEnv = getRequestContext().env as unknown as Record<string, string>
   } catch {
     // fallback to process.env when running locally
   }
@@ -151,7 +163,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
   }
 
-  let event: { type?: string; data?: { email_id?: string; bounce?: { message?: string } } }
+  let event: { type?: string; data?: BouncePayload }
   try {
     event = JSON.parse(raw)
   } catch {
@@ -168,7 +180,12 @@ export async function POST(req: Request) {
   }
 
   if (event.type === 'email.bounced' && event.data?.email_id) {
-    const alerted = await alertBounce(event.data.email_id, event.data.bounce?.message, svixId, cfEnv)
+    // the thank-you screen reads this to tell the customer while they are still on the page (app/api/contact/delivery)
+    const store = (cfEnv as unknown as { BOUNCES?: BounceStore }).BOUNCES
+    if (store && RESEND_ID_RE.test(event.data.email_id)) {
+      try { await store.put(event.data.email_id, 'bounced', { expirationTtl: BOUNCE_TTL_SECONDS }) } catch (err) { console.error('[resend-webhook] bounce record failed', err) }
+    }
+    const alerted = await alertBounce({ ...event.data, email_id: event.data.email_id }, svixId, cfEnv)
     // a failed alert returns 500 so Resend retries; the idempotency key stops a second copy once one has gone
     if (!alerted) return NextResponse.json({ error: 'Alert not sent' }, { status: 500 })
   }

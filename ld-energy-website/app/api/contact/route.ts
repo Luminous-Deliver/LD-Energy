@@ -283,6 +283,8 @@ export async function POST(req: Request) {
       // Keep this subject exact: scripts/resend-send.py, scripts/booking-followup.py and
       // the /quote-reply skill in the parent repo match on it to thread replies.
       subject: CONFIRMATION_SUBJECT,
+      // the bounce alert reads the reference from here: the site's key cannot read an email back (app/api/resend-webhook)
+      tags: [{ name: 'reference', value: meta.reference }],
       text: confirmation.text,
       html: confirmation.html,
     })

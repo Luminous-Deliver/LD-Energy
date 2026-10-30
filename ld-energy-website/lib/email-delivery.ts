@@ -12,6 +12,16 @@ export const RESEND_ID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0
 
 export type DeliveryState = 'pending' | 'delivered' | 'bounced'
 
+/**
+ * The site's Resend key is sending-only in production, so it cannot read an email's status back. The webhook records
+ * each bounce here instead (Pages KV binding BOUNCES, namespace ld-energy-bounces, set 30/10/2026) for an hour.
+ */
+export interface BounceStore {
+  get(key: string): Promise<string | null>
+  put(key: string, value: string, options?: { expirationTtl?: number }): Promise<void>
+}
+export const BOUNCE_TTL_SECONDS = 3600
+
 export interface ResendEmail { id?: string; to?: string[] | string; subject?: string; text?: string; last_event?: string; created_at?: string }
 
 export async function fetchResendEmail(id: string, apiKey: string): Promise<ResendEmail | null> {
