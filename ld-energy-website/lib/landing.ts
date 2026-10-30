@@ -12,7 +12,7 @@ export interface LandingContext { referrerHost?: string; landingPage?: string; s
 
 /** The one link tag kept (29/10/2026): `utm_source`, from links Abdul controls, such as `?utm_source=gbp` on the
  *  Google Business Profile website button. Apps (Maps, Gmail, WhatsApp) send no referrer, so a tag is the only signal. */
-export const SOURCE_TAG_RE = /^[a-z0-9_-]{1,40}$/
+export const SOURCE_TAG_RE = /^[a-z0-9._-]{1,40}$/  // dots: ChatGPT tags its links utm_source=chatgpt.com
 
 function capture(): LandingContext {
   if (typeof window === 'undefined') return {}
@@ -44,13 +44,17 @@ export function landingContext(): LandingContext {
 export const REFERRER_HOST_RE = /^[a-z0-9.-]{1,100}$/
 export const LANDING_PAGE_RE = /^\/[a-z0-9\-/]{0,119}$/
 
-const TAG_LABELS: Record<string, string> = { gbp: 'Google Business Profile', google: 'Google', bing: 'Bing', facebook: 'Facebook', instagram: 'Instagram', whatsapp: 'WhatsApp', nextdoor: 'Nextdoor', checkatrade: 'Checkatrade' }
+const TAG_LABELS: Record<string, string> = { gbp: 'Google Business Profile', 'chatgpt.com': 'ChatGPT', 'perplexity.ai': 'Perplexity', copilot: 'Microsoft Copilot', google: 'Google', bing: 'Bing', facebook: 'Facebook', instagram: 'Instagram', whatsapp: 'WhatsApp', nextdoor: 'Nextdoor', checkatrade: 'Checkatrade' }
 
 /** "Google", "Bing" and so on for the business email; any other site by its domain. A link tag wins over the referrer. */
 export function referrerLabel(host?: string, tag?: string): string {
   if (tag) return `${TAG_LABELS[tag] ?? tag} (link tag utm_source=${tag})`
   if (!host) return 'Unknown: an app link (Google Maps, Gmail, WhatsApp), a bookmark or a typed address'
+  // the specific Google hosts first: Gemini, Maps and the Android apps would otherwise all read as "Google"
   const known: Array<[RegExp, string]> = [
+    [/^gemini\.google\.com$/, 'Gemini'], [/^(maps\.google\.[a-z.]+|maps\.app\.goo\.gl)$/, 'Google Maps'],
+    [/^com\.google\.android\.gm$/, 'the Gmail app'], [/^com\.google\.android\.googlequicksearchbox$/, 'the Google app'],
+    [/^com\.google\.android\.apps\.maps$/, 'the Google Maps app'], [/(^|\.)copilot\.microsoft\.com$/, 'Microsoft Copilot'],
     [/(^|\.)google\.[a-z.]+$/, 'Google'], [/(^|\.)bing\.com$/, 'Bing'], [/(^|\.)duckduckgo\.com$/, 'DuckDuckGo'],
     [/(^|\.)yahoo\.[a-z.]+$/, 'Yahoo'], [/(^|\.)ecosia\.org$/, 'Ecosia'], [/(^|\.)search\.brave\.com$/, 'Brave Search'],
     [/(^|\.)(chatgpt\.com|openai\.com)$/, 'ChatGPT'], [/(^|\.)perplexity\.ai$/, 'Perplexity'], [/(^|\.)claude\.ai$/, 'Claude'],

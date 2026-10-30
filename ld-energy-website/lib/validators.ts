@@ -3,6 +3,11 @@ import { sourcePages, ctaIds } from '@/lib/enquiry-attribution'
 import { REFERRER_HOST_RE, LANDING_PAGE_RE, SOURCE_TAG_RE } from '@/lib/landing'
 import { submittedAreaChoices, bandForArea, legacyArea, parseExactArea, FLOOR_AREA_ERROR, TOP_BAND } from '@/lib/floor-area'
 import { propertyTypes, dwellingTypes, services, customerTypes, speeds, BULK, ukPostcodeRegex, LEGACY_EXPRESS_SPEED, SAME_DAY_LODGEMENT_SPEED, isPastVisitDate, PAST_DATE_ERROR } from '@/lib/booking-options'
+
+export const foundViaChoices = [
+  'Google search', 'Google Maps', 'Bing or another search engine', 'ChatGPT or another AI assistant',
+  'Recommended by someone', 'An estate or letting agent', 'Social media', 'Other',
+] as const
 export { propertyTypes, dwellingTypes, services, customerTypes, speeds, BULK, PRE_ASSESSMENT, STANDARD_SPEED, SAME_DAY_LODGEMENT_SPEED, NEXT_DAY_VISIT_SPEED, LEGACY_EXPRESS_SPEED, ukPostcodeRegex } from '@/lib/booking-options'
 
 export const contactSchema = z
@@ -41,6 +46,8 @@ export const contactSchema = z
   referrerHost: z.string().regex(REFERRER_HOST_RE).optional().catch(undefined),
   landingPage: z.string().regex(LANDING_PAGE_RE).optional().catch(undefined),
   sourceTag: z.string().regex(SOURCE_TAG_RE).optional().catch(undefined),
+  /** Optional "How did you find us?" (Abdul 30/10/2026): catches word of mouth and AI answers that leave no referrer. */
+  foundVia: z.union([z.enum(foundViaChoices), z.literal('')]).optional().catch(''),
   services: z
     .array(z.enum(services))
     .min(1, 'Please choose at least one service'),

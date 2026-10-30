@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation'
 import { Controller, useForm, type FieldErrors } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowLeft, ArrowRight, Check, HelpCircle, KeyRound, Mail, MessageCircle, Phone, ShieldAlert, WifiOff } from 'lucide-react'
-import { Field, Input, Textarea } from '@/components/ui/Input'
+import { Field, Input, Select, Textarea } from '@/components/ui/Input'
 import { cn } from '@/lib/cn'
 import { pricing, site, maxBundleSaving, formatPrice, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE, promise } from '@/lib/site'
 import { areaBands, areaLabel, bandForArea, parseExactArea, TOP_BAND } from '@/lib/floor-area'
@@ -30,7 +30,7 @@ import { restoredCustomerType, rememberCustomerType } from '@/lib/customer-type-
 import { useTurnstile } from '@/lib/useTurnstile'
 import { usePublishQuote } from '@/components/forms/QuoteSummary'
 import { useOptionalHomeQuote } from '@/components/sections/home/HomeQuoteContext'
-import { contactSchema, BULK, PRE_ASSESSMENT, SAME_DAY_LODGEMENT_SPEED, NEXT_DAY_VISIT_SPEED, type ContactInput } from '@/lib/validators'
+import { contactSchema, foundViaChoices, BULK, PRE_ASSESSMENT, SAME_DAY_LODGEMENT_SPEED, NEXT_DAY_VISIT_SPEED, type ContactInput } from '@/lib/validators'
 import { FORM_DRAFT } from '@/lib/form-layout'
 import './booking-v7.css'
 
@@ -325,7 +325,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
       name: '', phone: '', email: '', address: '', postcode: '', services: ['EPC Certificate'], dwellingType: '',
       areaBand: '', floorArea: '', floorAreaUnknown: false, customerType: '', improvementPlan: false, energyReport: false, speed: 'Standard (72 hours)',
       areaPage, sourcePage: sourcePage || sourcePageForPath(pathname), ctaId: defaultCta,
-      propertyCount: '', preferredDate: '', notes: '', website: '', turnstileToken: FORM_DRAFT ? 'draft-preview' : '', consent: false,
+      propertyCount: '', preferredDate: '', notes: '', foundVia: '', website: '', turnstileToken: FORM_DRAFT ? 'draft-preview' : '', consent: false,
     },
   })
 
@@ -919,6 +919,12 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
         <Textarea id={fid('address')} rows={isBulk ? 5 : 2} autoComplete={isBulk ? 'off' : 'street-address'} {...register('address')} />
       </Field>
       {!isBulk && <Field label="Postcode" htmlFor={fid('postcode')} required error={errors.postcode?.message}><Input id={fid('postcode')} autoComplete="postal-code" {...register('postcode')} /></Field>}
+      <Field label="How did you find us?" htmlFor={fid('foundVia')} hint="Optional. It helps us know what's working." className="sm:col-span-2">
+        <Select id={fid('foundVia')} {...register('foundVia')}>
+          <option value="">Choose one (optional)</option>
+          {foundViaChoices.map(choice => <option key={choice} value={choice}>{choice}</option>)}
+        </Select>
+      </Field>
       {/* a portfolio skips step 2, so its notes come here */}
       {isBulk && <Field label="Access notes or other instructions" htmlFor={fid('notes')} hint="Optional. Access, parking or anything about the properties." error={errors.notes?.message} className="sm:col-span-2">
         <Textarea id={fid('notes')} rows={2} {...register('notes')} />

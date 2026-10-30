@@ -46,6 +46,7 @@ export interface BookingEmailInput extends EnquiryAttribution, LandingContext {
   speed: string
   preferredDate?: string
   notes?: string
+  foundVia?: string
 }
 
 /** What the route knows about the request itself, for the business email. */
@@ -56,6 +57,8 @@ export interface BookingMeta {
   turnstilePassed: boolean
   /** Absent for a portfolio enquiry, which has no single postcode. */
   postcodeCheck?: PostcodeCheck
+  /** "Phone · Safari · iOS", from the request (lib/device.ts). */
+  device?: string
 }
 
 export const SITE_URL = 'https://epc.luminousanddeliver.co.uk'
@@ -233,7 +236,7 @@ function priceCard(data: BookingEmailInput, e: GuideEstimate, opts: { totalLabel
 }
 
 /** "Bing (bing.com), landed on /areas/newham; form on the pricing page, “hero” button". */
-function cameFrom(data: EnquiryAttribution & LandingContext & { areaPage?: string }): Row[] {
+function cameFrom(data: EnquiryAttribution & LandingContext & { areaPage?: string; foundVia?: string }, device?: string): Row[] {
   const form = [
     data.sourcePage ? `${data.sourcePage} page` : '',
     data.areaPage && boroughMeta[data.areaPage] ? boroughMeta[data.areaPage].name : '',
@@ -243,6 +246,8 @@ function cameFrom(data: EnquiryAttribution & LandingContext & { areaPage?: strin
     ['Found us via', text(referrerLabel(data.referrerHost, data.sourceTag))],
     ['First page', text(data.landingPage || 'Not recorded')],
     ['Form used', text(form || 'Not recorded')],
+    ...(data.foundVia ? [['They said they found us via', text(data.foundVia)] as Row] : []),
+    ...(device ? [['Device', text(device)] as Row] : []),
   ]
 }
 
@@ -302,7 +307,7 @@ export function buildBusinessEmail(data: BookingEmailInput, meta: BookingMeta) {
   const details: Row[] = [
     ['Reference', text(meta.reference)],
     ['Received', text(`${londonTime.format(meta.received)}, UK time`)],
-    ...cameFrom(data),
+    ...cameFrom(data, meta.device),
     // the form cannot send without the security check or the consent tick, so neither earns a row unless skipped locally
     ...(meta.turnstilePassed ? [] : [['Security check', flag('Skipped (local test only)')] as Row]),
   ]

@@ -7,6 +7,7 @@ import { bookingReference, buildBusinessEmail, buildCustomerEmail, buildEnquiryE
 import { checkPostcode } from '@/lib/postcode-check'
 import { emailDomainCanReceive, EMAIL_UNREACHABLE_MESSAGE } from '@/lib/email-check'
 import { CONFIRMATION_SUBJECT } from '@/lib/email-delivery'
+import { deviceLabel } from '@/lib/device'
 
 export const runtime = 'edge'
 
@@ -191,6 +192,7 @@ export async function POST(req: Request) {
     referrerHost: parsed.data.referrerHost,
     landingPage: parsed.data.landingPage,
     sourceTag: parsed.data.sourceTag,
+    foundVia: parsed.data.foundVia || undefined,
     propertyCount: parsed.data.propertyCount || undefined,
     customerType: parsed.data.customerType,
     services: parsed.data.services,
@@ -206,6 +208,7 @@ export async function POST(req: Request) {
     reference: bookingReference(),
     received: new Date(),
     turnstilePassed: !!turnstileSecret,
+    device: deviceLabel(req.headers.get('user-agent')),
     // informs Abdul only: capped at 2.5 s and never fails the request (lib/postcode-check.ts)
     postcodeCheck: bulk || !data.postcode ? undefined : await checkPostcode(data.postcode),
   }

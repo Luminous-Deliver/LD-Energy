@@ -92,3 +92,17 @@ export async function emailDomainCanReceive(email: string, timeoutMs = 2500): Pr
 }
 
 export const EMAIL_UNREACHABLE_MESSAGE = 'This email address can’t receive emails. Please check it for a typo.'
+
+/** The endings offered as soon as "@" is typed: the UK's most used providers, in rough order of use. */
+const QUICK_DOMAINS = ['gmail.com', 'hotmail.co.uk', 'outlook.com', 'icloud.com', 'yahoo.co.uk', 'hotmail.com', 'live.co.uk', 'btinternet.com']
+
+/** "fazmin@" → five full addresses; "fazmin@ho" → the hotmail ones. Empty once a dot is typed or nothing matches. */
+export function emailDomainCompletions(email: string, max = 5): string[] {
+  const value = email.trim()
+  const at = value.indexOf('@')
+  if (at < 1 || value.indexOf('@', at + 1) !== -1) return []
+  const local = value.slice(0, at)
+  const partial = value.slice(at + 1).toLowerCase()
+  if (partial.includes('.')) return []
+  return QUICK_DOMAINS.filter((d) => d.startsWith(partial)).slice(0, max).map((d) => `${local}@${d}`)
+}
