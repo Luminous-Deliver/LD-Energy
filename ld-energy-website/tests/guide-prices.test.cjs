@@ -23,7 +23,7 @@ const ALLOWED = {
   'cavity-wall-insulation-epc.mdx': ['£500'], // budget comparison (group 3)
   'cheapest-ways-improve-epc.mdx': ['£500'], // budget in the frozen title (cost ranges removed 29/10, unsourced)
   'epc-c-by-2030.mdx': ['£10,000', '£3,500', '£5,400', '£30,000', '£5,000'], // 2030 cost cap, current cap, impact assessment average, proposed and current maximum fine (GOV.UK, checked 29/10)
-  'epc-for-landlords-2026.mdx': ['£5,000', '£30,000', '£2,000', '£4,000', '£3,500', '£10,000'], // MEES penalties and cap (re-checked after the 28/10 Budget: unchanged)
+  'epc-for-landlords-2026.mdx': ['£5,000', '£30,000', '£2,000', '£4,000', '£3,500', '£10,000', '£65', '£7,000'], // MEES penalties and cap (re-checked after the 28/10 Budget: unchanged); landlord register fee per property and penalty (GOV.UK MHCLG, checked 31/10; £65 is the register fee, not an L&D price)
   'epc-for-selling-house.mdx': ['£200'], // SI 2012/3118 reg 38 penalty
   'epc-improvements-by-budget.mdx': ['£500', '£2,000', '£5,000', '£7,500'], // budget tiers in the frozen title; Boiler Upgrade Scheme (GOV.UK, checked 29/10)
   'epc-vs-floor-plan-vs-survey.mdx': ['£5,000'], // MEES penalty cap (unsourced survey range removed 29/10)
@@ -43,13 +43,18 @@ function figures(raw) {
     value: Number(m[0].slice(1).replace(/,/g, '')),
     // A figure inside a range ("£15–£30") is a third-party cost, never an L&D price.
     inRange: /[–-]\s*$/.test(raw.slice(Math.max(0, m.index - 2), m.index)) || /^\s*[–-]/.test(raw.slice(m.index + m[0].length, m.index + m[0].length + 2)),
+    // A third-party fee that happens to equal an L&D price, named by the words that follow it.
+    notLd: NOT_LD.some((re) => re.test(raw.slice(m.index, m.index + 40))),
   }))
 }
+
+// The landlord register's annual fee (GOV.UK MHCLG, checked 31/10) is £65, the same as the smallest EPC band.
+const NOT_LD = [/^£65 a year per property/]
 
 test('no guide types an L&D price', () => {
   const hits = []
   for (const { file, raw } of posts) {
-    for (const f of figures(raw)) if (ldValues.has(f.value) && !f.inRange) hits.push(`${file}: ${f.text}`)
+    for (const f of figures(raw)) if (ldValues.has(f.value) && !f.inRange && !f.notLd) hits.push(`${file}: ${f.text}`)
   }
   assert.deepEqual(hits, [], `typed L&D prices; use <Price item="..." /> or {price:key}:\n${hits.join('\n')}`)
 })
