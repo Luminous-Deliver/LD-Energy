@@ -14,7 +14,11 @@ const CHECKED = '2026-10-24'
 
 const CHECKED_28 = '2026-10-28'
 
+const CHECKED_NOV = '2026-11-01'
+
 const srcNow = (label: string, url: string): CouncilSource => ({ label, url, checked: CHECKED_28 })
+
+const srcNov = (label: string, url: string): CouncilSource => ({ label, url, checked: CHECKED_NOV })
 
 const src = (label: string, url: string): CouncilSource => ({ label, url, checked: CHECKED })
 
@@ -275,7 +279,7 @@ export const d1Local: Record<string, AreaLocal> = {
         paragraphs: [
           'Royal Greenwich runs mandatory and additional HMO licensing across the whole borough. Additional licensing covers smaller HMOs, with three or four people from two or more households.',
           'Selective licensing, for a home let to one household or two individuals, applies in five wards: Woolwich Riverside, Woolwich Common, Shooters Hill, Plumstead Common and Plumstead Glyndon. A home with an HMO licence does not need a selective licence as well.',
-          'The council consulted from 21 July to 12 October 2026 on widening selective licensing to up to 18 wards. When we read its pages on 28/10/2026 they still described the proposal and showed no decision, so check the council’s page before relying on the five-ward list.',
+          'The council consulted from 21 July to 12 October 2026 on widening selective licensing to up to 18 wards. When we read its pages on 01/11/2026 they still described the proposal and showed no decision, so check the council’s page before relying on the five-ward list.',
         ],
         sources: [greenwich.check, greenwich.hmo],
       },
@@ -307,7 +311,7 @@ export const d1Local: Record<string, AreaLocal> = {
       },
       {
         q: 'Is Greenwich widening selective licensing?',
-        a: 'It has proposed it. The council consulted from 21 July to 12 October 2026 on covering up to 18 wards, and its pages showed no decision when we read them on 28/10/2026. Check its licensing page before you let.',
+        a: 'It has proposed it. The council consulted from 21 July to 12 October 2026 on covering up to 18 wards, and its pages showed no decision when we read them on 01/11/2026. Check its licensing page before you let.',
         links: [{ label: 'Greenwich HMO and licensing pages', href: greenwich.hmo.url, external: true }],
       },
       {
@@ -703,11 +707,11 @@ export const d1Local: Record<string, AreaLocal> = {
         heading: 'The Becontree estate, listings and landlord expectations in Barking & Dagenham',
         paragraphs: [
           'The council describes the Becontree estate as uniform terraces and cottages, mostly two to three storeys with pitched roofs. Common features are red brick or rendered facades, tall brick chimneys and tiled pitched roofs. It says there are about 29,000 homes on the estate. Becontree is not a conservation area: the council’s Local Plan treats it as a non-designated heritage asset.',
-          'The council says new Article 4 Directions will be introduced in November 2026. One removes permitted development rights for porches across the Becontree estate, and another covers side and roof alterations on corner blocks. The council’s November 2025 figures put a porch at £528 for a householder application, against £264 for a lawful development certificate. Cabinet approved the directions in November 2025, so ask the planning team before starting work.',
+          'The council made two new Article 4 Directions in November 2025. One removes permitted development rights for porches across the Becontree estate, and another covers side and roof alterations on corner blocks. Both say they come into force on 19 November 2026 if the council confirms them. The council’s November 2025 figures put a porch at £528 for a householder application, against £264 for a lawful development certificate. Ask the planning team whether the directions have been confirmed before starting work.',
           'Elsewhere, the borough has 45 statutory listed buildings and a local list of 123. In a conservation area, changing the profile of a roof, such as adding a dormer, and cladding in a different material need the council’s consent. A separate Article 4 Direction has applied across the borough since 22 February 2022 to additional storeys on homes.',
           'The council tells landlords the property must be at EPC band E or better unless an exemption applies, and an EPC is one of the documents a licence application needs. Its Housing Strategy 2026 to 2031 says licensing and targeted inspections will be used to require minimum energy-efficiency expectations, with part-grant funding for landlords who need support.',
         ],
-        sources: [barking.conservation, srcNow('Barking and Dagenham Council, Article 4 Directions', 'https://www.lbbd.gov.uk/planning-building-control-and-local-land-charges/planning-guidance-and-policies/article-4'), srcNow('Barking and Dagenham Council, draft Becontree Estate design code consultation', 'https://www.lbbd.gov.uk/sites/default/files/2025-11/Draft%20Becontree%20Estate%20Supplementary%20Planning%20Document%20and%20Design%20Code%20Public%20Consultation.pdf'), srcNow('Barking and Dagenham Council, housing standards', 'https://www.lbbd.gov.uk/private-sector-housing/housing-standards'), srcNow('Barking and Dagenham Council, licence application process', 'https://www.lbbd.gov.uk/private-sector-housing/property-licensing/application-process'), srcNow('Barking and Dagenham Council, Housing Strategy 2026 to 2031', 'https://www.lbbd.gov.uk/sites/default/files/2026-03/Barking%20and%20Dagenham%20Housing%20Strategy%202026-2031.pdf')],
+        sources: [barking.conservation, srcNow('Barking and Dagenham Council, Article 4 Directions', 'https://www.lbbd.gov.uk/planning-building-control-and-local-land-charges/planning-guidance-and-policies/article-4'), srcNov('Barking and Dagenham Council, Becontree porches Article 4 Direction', 'https://www.lbbd.gov.uk/sites/default/files/2025-11/Direction%20%28Porches%29.pdf'),srcNow('Barking and Dagenham Council, draft Becontree Estate design code consultation', 'https://www.lbbd.gov.uk/sites/default/files/2025-11/Draft%20Becontree%20Estate%20Supplementary%20Planning%20Document%20and%20Design%20Code%20Public%20Consultation.pdf'), srcNow('Barking and Dagenham Council, housing standards', 'https://www.lbbd.gov.uk/private-sector-housing/housing-standards'), srcNow('Barking and Dagenham Council, licence application process', 'https://www.lbbd.gov.uk/private-sector-housing/property-licensing/application-process'), srcNow('Barking and Dagenham Council, Housing Strategy 2026 to 2031', 'https://www.lbbd.gov.uk/sites/default/files/2026-03/Barking%20and%20Dagenham%20Housing%20Strategy%202026-2031.pdf')],
       },
     ],
     faqs: (s) => [
@@ -727,7 +731,7 @@ export const d1Local: Record<string, AreaLocal> = {
       },
       {
         q: 'Will the Becontree porch rule affect my home?',
-        a: 'If the council confirms it, planning permission will be needed to add a porch to any Becontree estate house, instead of the lawful development certificate used today. The council expects the directions in November 2026. Ask the planning team to confirm the status before you start work.',
+        a: 'If the council confirms it, planning permission will be needed to add a porch to any Becontree estate house, instead of the lawful development certificate used today. The direction says it comes into force on 19 November 2026 if confirmed. Ask the planning team to confirm the status before you start work.',
         links: [{ label: 'Barking and Dagenham Article 4 Directions', href: 'https://www.lbbd.gov.uk/planning-building-control-and-local-land-charges/planning-guidance-and-policies/article-4', external: true }],
       },
       {
