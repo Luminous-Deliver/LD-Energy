@@ -705,7 +705,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
       <><p className="bf__price bf__price--text"><b>Quote</b></p><p className="bf__for">Several properties are quoted individually.</p></>
     ) : estimate.state === 'priced' && band && estimate.total !== null ? (
       <>
-        <p className="bf__price">{estimate.isStartingPrice && <small>From</small>}<b data-price className="tabular-nums"><RollingPrice text={`£${formatPrice(estimate.total)}`} /></b><span>{isLodged || productKind === 'preAssessment' ? 'inc. assessment' : 'inc. on-site measuring'}{isLodged ? ' and GOV.UK lodgement' : ''}</span></p>
+        <p className="bf__price">{estimate.isStartingPrice && <small>From</small>}<b data-price className="tabular-nums"><RollingPrice text={`£${formatPrice(estimate.total)}`} /></b><span>{isLodged || productKind === 'preAssessment' ? 'inc. assessment' : 'inc. on-site measuring'}{isLodged ? ' and GOV.UK lodgement' : ''}, no VAT to add</span></p>
         <p className="bf__for">{areaLabel(values.areaBand, values.floorArea)}</p>
         {estimate.isStartingPrice && <p className="bf__for">Final price depends on property size and complexity. We&rsquo;ll confirm your exact quote before booking.</p>}
         {estimate.saving > 0 && <p className="bf__save">Save £{estimate.saving} compared with booking separately.</p>}
