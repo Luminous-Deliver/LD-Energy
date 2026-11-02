@@ -488,7 +488,7 @@ export function buildDigitalEmail(data: Pick<BookingEmailInput, 'name'>) {
   const intro = 'You ticked the box on the L&D Energy form asking for details about L&D Digital and L&D Builds, so here they are.'
   const who = "L&D Digital is the other half of my business. I'm Abdul, and I built the L&D Energy website and the form you just used. I do the same for other businesses:"
   // L&D Builds is labour only (Abdul 02/11/2026): the customer buys the parts, Abdul is paid for the build
-  const builds = 'I also run L&D Builds. I build custom PCs from parts you choose, for gaming or for studio work like video editing, music and design. You buy the parts and pay me for the build.'
+  const builds = 'I also run L&D Builds. I build custom PCs from parts you choose, for gaming or for studio work like video editing and design. You buy the parts and pay me for the build.'
   const ask = 'If any of this would help, reply to this email and tell me what you have in mind.'
   const legal = "This is the only email about L&D Digital or L&D Builds we'll send unless you reply. You got it because you ticked the box on epc.luminousanddeliver.co.uk."
   const p = (t: string, extra = '') => `<p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:${INK}${extra}">${escapeHtml(t)}</p>`
