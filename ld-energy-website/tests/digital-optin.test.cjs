@@ -3,7 +3,7 @@
 const { test } = require('node:test')
 const assert = require('node:assert/strict')
 const { contactSchema } = require('../lib/validators.ts')
-const { buildDigitalEmail, DIGITAL_SUBJECT, DIGITAL_URL } = require('../lib/booking-emails.ts')
+const { buildDigitalEmail, DIGITAL_SUBJECT, DIGITAL_URL, BUILDS_URL } = require('../lib/booking-emails.ts')
 const { POST } = require('../app/api/contact/route.ts')
 const { site } = require('../lib/site.ts')
 
@@ -20,7 +20,9 @@ test('the details email: services, link, the opt-out line, no prices', () => {
   assert.equal(e.subject, DIGITAL_SUBJECT)
   for (const body of [e.text, e.html]) {
     assert.ok(body.includes(DIGITAL_URL))
-    assert.match(body, /only email about L&(amp;)?D Digital we('|&#39;)ll send unless you reply/)
+    assert.ok(body.includes(BUILDS_URL))
+    assert.match(body, /You buy the parts and pay me for the build/)
+    assert.match(body, /only email about L&(amp;)?D Digital or L&(amp;)?D Builds we('|&#39;)ll send unless you reply/)
     assert.match(body, /Business cards and print design/)
     assert.doesNotMatch(body, /£|undefined|NaN/)
   }
@@ -51,11 +53,11 @@ test('route: unticked sends two emails, ticked sends a third to the customer as 
     messages = []
     assert.equal((await request({ ...sample, digitalOptIn: true })).status, 200)
     assert.equal(messages.length, 3)
-    assert.match(messages[0].text, /L&D Digital: Ticked "Send me more details about L&D Digital"/)
+    assert.match(messages[0].text, /L&D Digital: Ticked "Send me more details about L&D Digital \.\.\. and L&D Builds"/)
     const digital = messages[2]
     assert.equal(digital.to, sample.email)
     assert.equal(digital.subject, DIGITAL_SUBJECT)
-    assert.match(digital.from, /^L&D Digital <[^>]+@luminousanddeliver\.co\.uk>$/)
+    assert.match(digital.from, /^Luminous & Deliver <[^>]+@luminousanddeliver\.co\.uk>$/)
     assert.equal(digital.reply_to, messages[0].to)
 
     // a failed details email never fails the booking

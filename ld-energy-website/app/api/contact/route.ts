@@ -301,12 +301,12 @@ export async function POST(req: Request) {
     console.error('[contact] confirmation email fetch failed', err)
   }
 
-  // 3) L&D Digital details: only when the optional box was ticked. Best-effort, after the booking is safe.
+  // 3) L&D Digital and L&D Builds details: only when the optional box was ticked. Best-effort, after the booking is safe.
   if (data.digitalOptIn) {
     try {
       const digital = buildDigitalEmail(data)
       const res = await sendEmail({
-        from: from.replace(/^[^<]*</, 'L&D Digital <'),
+        from: from.replace(/^[^<]*</, 'Luminous & Deliver <'),
         to: data.email,
         reply_to: to,
         subject: digital.subject,

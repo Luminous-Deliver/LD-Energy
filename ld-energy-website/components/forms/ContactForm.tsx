@@ -941,7 +941,7 @@ export function ContactForm({ areaPage, sourcePage, variant = 'page', context, i
     {/* optional and unticked (PECR consent for L&D Digital, a different service): one email, see app/api/contact/route.ts */}
     <label className="flex min-h-[48px] cursor-pointer items-start gap-3 py-2 text-base">
       <input id={fid('digitalOptIn')} type="checkbox" className="mt-1 h-5 w-5 shrink-0 accent-primary-700" {...register('digitalOptIn')} />
-      <span>Send me more details about L&amp;D Digital (websites, SEO, business cards, custom software). Optional.</span>
+      <span>Send me more details about L&amp;D Digital (websites, SEO, business cards, custom software) and L&amp;D Builds (custom PC builds). Optional.</span>
     </label>
     {FORM_DRAFT ? <p className="bf__draft">Draft preview: the security check is skipped and nothing is sent.</p> : (
       <div id={fid('security-check')} tabIndex={-1} aria-describedby={errors.turnstileToken ? fid('turnstileToken-error') : undefined}>

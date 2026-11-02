@@ -281,7 +281,7 @@ export function buildBusinessEmail(data: BookingEmailInput, meta: BookingMeta) {
     ['Phone', link(tel, data.phone)],
     ['Email', link(`mailto:${data.email}`, data.email)],
     // the consent record: this email is kept, so it shows when and what they ticked
-    ...(data.digitalOptIn ? [['L&D Digital', text('Ticked "Send me more details about L&D Digital". One details email sent.')] as Row] : []),
+    ...(data.digitalOptIn ? [['L&D Digital', text('Ticked "Send me more details about L&D Digital ... and L&D Builds". One details email sent.')] as Row] : []),
   ]
 
   const area = data.floorArea
@@ -470,7 +470,8 @@ export function buildCustomerEmail(data: BookingEmailInput, meta: Pick<BookingMe
 // ---------------------------------------------------------------- L&D Digital details (customer, opt-in only)
 
 export const DIGITAL_URL = 'https://digital.luminousanddeliver.co.uk/'
-export const DIGITAL_SUBJECT = 'L&D Digital: the details you asked for'
+export const DIGITAL_SUBJECT = 'L&D Digital and L&D Builds: the details you asked for'
+export const BUILDS_URL = 'https://builds.luminousanddeliver.co.uk/'
 export const DIGITAL_SERVICES = [
   'Websites, designed and coded from scratch',
   'SEO, so local customers find you on Google',
@@ -484,10 +485,12 @@ export const DIGITAL_SERVICES = [
  */
 export function buildDigitalEmail(data: Pick<BookingEmailInput, 'name'>) {
   const first = data.name.trim().split(/\s+/)[0] || 'there'
-  const intro = 'You ticked the box on the L&D Energy form asking for details about L&D Digital, so here they are.'
+  const intro = 'You ticked the box on the L&D Energy form asking for details about L&D Digital and L&D Builds, so here they are.'
   const who = "L&D Digital is the other half of my business. I'm Abdul, and I built the L&D Energy website and the form you just used. I do the same for other businesses:"
-  const ask = 'If any of that would help your business, reply to this email and tell me what you have in mind.'
-  const legal = "This is the only email about L&D Digital we'll send unless you reply. You got it because you ticked the box on epc.luminousanddeliver.co.uk."
+  // L&D Builds is labour only (Abdul 02/11/2026): the customer buys the parts, Abdul is paid for the build
+  const builds = 'I also run L&D Builds. I build custom PCs from parts you choose, for gaming or for studio work like video editing, music and design. You buy the parts and pay me for the build.'
+  const ask = 'If any of this would help, reply to this email and tell me what you have in mind.'
+  const legal = "This is the only email about L&D Digital or L&D Builds we'll send unless you reply. You got it because you ticked the box on epc.luminousanddeliver.co.uk."
   const p = (t: string, extra = '') => `<p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:${INK}${extra}">${escapeHtml(t)}</p>`
   const list = `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 16px">${DIGITAL_SERVICES.map((s) => `<tr>
       <td style="width:18px;padding:0 0 8px;vertical-align:top;font-size:15px;line-height:1.55;color:${SAGE};font-weight:700">&#10003;</td>
@@ -500,14 +503,17 @@ export function buildDigitalEmail(data: Pick<BookingEmailInput, 'name'>) {
           ${list}
           ${buttons([[DIGITAL_URL, 'See L&D Digital', true]])}
           <div style="height:12px"></div>
+          ${p(builds)}
+          ${buttons([[BUILDS_URL, 'See L&D Builds', false]])}
+          <div style="height:12px"></div>
           ${p(ask)}
-          <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:${INK}">Abdul<br>L&amp;D Digital, part of ${escapeHtml(site.parentBrand)}</p>
+          <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:${INK}">Abdul<br>L&amp;D Digital and L&amp;D Builds, part of ${escapeHtml(site.parentBrand)}</p>
         </td></tr>
         <tr><td style="padding:16px 12px 4px;border-top:1px solid ${HAIR}" align="center">
           <p style="margin:0;font-size:11px;line-height:1.55;color:${MUTED}">${escapeHtml(legal)} <a href="${SITE_URL}/privacy-policy" style="color:${MUTED}">Privacy notice</a></p>
         </td></tr>`
-  const txt = `Hi ${first},\n\n${intro}\n\n${who}\n${DIGITAL_SERVICES.map((s) => `  - ${s}`).join('\n')}\n\nSee L&D Digital: ${DIGITAL_URL}\n\n${ask}\n\nAbdul\nL&D Digital, part of ${site.parentBrand}\n\n${legal}\nPrivacy notice: ${SITE_URL}/privacy-policy`
-  return { subject: DIGITAL_SUBJECT, text: txt, html: page({ title: DIGITAL_SUBJECT, preheader: 'Websites, SEO, business cards and custom software.', body }) }
+  const txt = `Hi ${first},\n\n${intro}\n\n${who}\n${DIGITAL_SERVICES.map((s) => `  - ${s}`).join('\n')}\n\nSee L&D Digital: ${DIGITAL_URL}\n\n${builds}\nSee L&D Builds: ${BUILDS_URL}\n\n${ask}\n\nAbdul\nL&D Digital and L&D Builds, part of ${site.parentBrand}\n\n${legal}\nPrivacy notice: ${SITE_URL}/privacy-policy`
+  return { subject: DIGITAL_SUBJECT, text: txt, html: page({ title: DIGITAL_SUBJECT, preheader: 'Websites, SEO, business cards, custom software and custom PC builds.', body }) }
 }
 
 // ---------------------------------------------------------------- /contact enquiry notification (business)
