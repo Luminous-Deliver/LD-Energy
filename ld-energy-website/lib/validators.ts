@@ -67,6 +67,8 @@ export const contactSchema = z
    */
   propertyCount: z.string().trim().max(60).optional().or(z.literal('')),
   consent: z.boolean().refine(value => value, 'Please confirm you agree to be contacted'),
+  /** Optional, unticked by default (Abdul 02/11/2026): one email about L&D Digital. PECR consent, never assumed. */
+  digitalOptIn: z.boolean().optional().default(false),
   /** Honeypot, must remain empty */
   website: z.string().max(0).optional().or(z.literal('')),
   turnstileToken: z.string().min(1, 'Please complete the security check'),

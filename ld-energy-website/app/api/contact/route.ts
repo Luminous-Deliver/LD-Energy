@@ -3,7 +3,7 @@ import { getRequestContext } from '@cloudflare/next-on-pages'
 import { contactSchema, enquirySchema } from '@/lib/validators'
 import { areaLabel, legacyArea } from '@/lib/floor-area'
 import { boroughMeta } from '@/lib/boroughs'
-import { bookingReference, buildBusinessEmail, buildCustomerEmail, buildEnquiryEmail, type BookingEmailInput } from '@/lib/booking-emails'
+import { bookingReference, buildBusinessEmail, buildCustomerEmail, buildDigitalEmail, buildEnquiryEmail, type BookingEmailInput } from '@/lib/booking-emails'
 import { checkPostcode } from '@/lib/postcode-check'
 import { emailDomainCanReceive, EMAIL_UNREACHABLE_MESSAGE } from '@/lib/email-check'
 import { CONFIRMATION_SUBJECT } from '@/lib/email-delivery'
@@ -200,6 +200,7 @@ export async function POST(req: Request) {
     speed: parsed.data.speed,
     preferredDate: parsed.data.preferredDate || undefined,
     notes: parsed.data.notes || undefined,
+    digitalOptIn: parsed.data.digitalOptIn,
   }
 
   // one reference for both emails, so Abdul and the customer can quote the same thing
@@ -298,6 +299,25 @@ export async function POST(req: Request) {
     }
   } catch (err) {
     console.error('[contact] confirmation email fetch failed', err)
+  }
+
+  // 3) L&D Digital details: only when the optional box was ticked. Best-effort, after the booking is safe.
+  if (data.digitalOptIn) {
+    try {
+      const digital = buildDigitalEmail(data)
+      const res = await sendEmail({
+        from: from.replace(/^[^<]*</, 'L&D Digital <'),
+        to: data.email,
+        reply_to: to,
+        subject: digital.subject,
+        tags: [{ name: 'reference', value: meta.reference }],
+        text: digital.text,
+        html: digital.html,
+      })
+      if (!res.ok) console.error('[contact] L&D Digital email failed', res.status, await res.text())
+    } catch (err) {
+      console.error('[contact] L&D Digital email fetch failed', err)
+    }
   }
 
   return NextResponse.json({ ok: true, delivered: true, confirmationSent, confirmationId })

@@ -46,7 +46,7 @@ export default function PrivacyPolicyPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageSchema) }} />
       <LegalPage
       title="Privacy Policy"
-      lastUpdated="20 October 2026"
+      lastUpdated="2 November 2026"
       breadcrumbs={[
         { href: '/', label: 'Home' },
         { href: '/privacy-policy', label: 'Privacy Policy' },
@@ -81,6 +81,7 @@ export default function PrivacyPolicyPage() {
       <h2>3. How we use your data</h2>
       <ul>
         <li>To respond to your enquiry and arrange your appointment</li>
+        <li>If you tick the optional L&amp;D Digital box on the quote form, to send you one email about L&amp;D Digital, our web and software service</li>
         <li>To carry out the EPC assessment and lodge your certificate on the UK Government EPC Register</li>
         <li>To send you your certificate and any related documents</li>
         <li>To invoice and collect payment</li>
@@ -92,6 +93,7 @@ export default function PrivacyPolicyPage() {
         We use information needed to prepare your requested quote and arrange or deliver a service to take steps at your request before a contract, or to perform that contract. We rely on legitimate interests to answer other business enquiries, protect the website, keep proportionate service records and handle complaints. We rely on legal obligations where tax or other applicable law requires records or disclosures.
       </p>
       <p>The form&rsquo;s contact agreement confirms that you want a reply about your request. It is not permission for unrelated marketing. Where we rely on consent for any separate optional purpose, you can withdraw that consent.</p>
+      <p>The L&amp;D Digital box is unticked unless you tick it. If you do, we rely on your consent to send one email about L&amp;D Digital, which is part of the same business, Luminous &amp; Deliver. We send nothing more about it unless you reply. To withdraw, reply to that email or contact us.</p>
 
       <h2>5. Sharing your data</h2>
       <p>We share your data only where required to deliver the service:</p>
