@@ -1,7 +1,7 @@
 import { ContactSection } from '@/components/sections/ContactSection'
 import { ReadNext, type NextStep } from '@/components/inner/ReadNext'
 import { InnerEnding } from '@/components/inner/InnerEnding'
-import { boroughMeta } from '@/lib/boroughs'
+import { boroughMeta, boroughPlace } from '@/lib/boroughs'
 import { areaLocal } from '@/lib/area-local'
 import { getPostBySlug } from '@/lib/blog'
 import type { AreaSummary } from '@/lib/borough-stats-types'
@@ -128,7 +128,7 @@ export async function AreaPageV2({ slug }: { slug: string }) {
       '@type': 'WebPage',
       '@id': `${url}#webpage`,
       url,
-      name: `EPC Certificates in ${name}`,
+      name: `EPC Certificates in ${boroughPlace(slug, name)}`,
       author: { '@id': `${site.url}/about#assessor` },
       dateModified: statsSource.generated,
       about: { '@id': `${url}#service` },

@@ -5,7 +5,7 @@ import { Ico } from '@/components/sections/home/HomeIcon'
 import { FiguresDrawer } from '@/components/inner/FiguresDrawer'
 import { OnThisPage, type PageSection } from '@/components/inner/OnThisPage'
 import { TERRACE_SVG } from '@/components/inner/terrace-svg'
-import { boroughMeta } from '@/lib/boroughs'
+import { boroughMeta, boroughPlace } from '@/lib/boroughs'
 import areaMaps from '@/lib/area-maps.json'
 import type { AreaSummary, RatingGroup } from '@/lib/borough-stats-types'
 import type { AreaLocal, CouncilSection } from '@/lib/area-local'
@@ -60,7 +60,8 @@ const AREA_MAPS = areaMaps as Record<string, AreaMap>
 const mapSlug = (slug: string) => (AREA_MAPS[slug] ? slug : boroughMeta[slug]?.partOf && AREA_MAPS[boroughMeta[slug].partOf!] ? boroughMeta[slug].partOf! : null)
 
 /* 1. Hero D: the answer and the quote on the left, the drawn terrace with four numbered notes on the right, the
-   title-block price list under the answer, and On this page beside it. Title and H1 are unchanged (frozen until 14/12). */
+   title-block price list under the answer, and On this page beside it. The H1 names the main town where the borough
+   has one (`boroughPlace`, brought forward from the 14/12 review on 04/11). */
 export function AreaHeroD({ slug, name, s, parent, sections }: {
   slug: string; name: string; s: AreaSummary; parent?: { slug: string; name: string }
   sections: PageSection[]
@@ -86,7 +87,7 @@ export function AreaHeroD({ slug, name, s, parent, sections }: {
               <li><span aria-current="page">{name}</span></li>
             </ol>
           </nav>
-          <h1 id="area-h1">EPC Certificates in {name}</h1>
+          <h1 id="area-h1">EPC Certificates in {boroughPlace(slug, name)}</h1>
           <p className="in-hd__answer">
             <b className="num">{bandEpcPrice(band.id)}</b> for the commonest home in {name}, {bandPhrase(band.id)}: {oneIn(band.pct)} certificates
             here. Studios start at £{priceFrom.epc}. No travel charge from our Stratford base, ready within 72 hours, and your

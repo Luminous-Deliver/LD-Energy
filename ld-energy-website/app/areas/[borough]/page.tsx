@@ -10,7 +10,7 @@ import { ContactSection } from '@/components/sections/ContactSection'
 import { quoteHref } from '@/lib/quote-context'
 import { InnerEnding } from '@/components/inner/InnerEnding'
 import { Accordion } from '@/components/ui/Accordion'
-import { boroughMeta, boroughIntent, type BoroughIntent } from '@/lib/boroughs'
+import { boroughMeta, boroughIntent, boroughPlace, type BoroughIntent } from '@/lib/boroughs'
 import { site, topBand, pricing, priceFrom, formatPrice, maxBundleSaving, SAME_DAY_LODGEMENT_SURCHARGE, NEXT_DAY_VISIT_SURCHARGE, defaultOgImage } from '@/lib/site'
 import type { FaqItem } from '@/lib/faq'
 import { usesAreaV2 } from '@/lib/area-page'
@@ -38,8 +38,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     // and never mentioned cost. The title now answers the question that is
     // actually being asked, and the neighbourhood signal moves into the
     // description where it still earns the long tail.
-    title: { absolute: boroughTitle(data.name, intent, data.metaTitle) },
-    description: boroughDescription(data.name, intent),
+    title: { absolute: boroughTitle(boroughPlace(slug, data.name), intent, data.metaTitle) },
+    description: boroughDescription(boroughPlace(slug, data.name), intent),
     alternates: { canonical: `${site.url}/areas/${slug}` },
     openGraph: {
       images: [defaultOgImage],
@@ -74,7 +74,7 @@ function fit(core: string, suffix: string): string {
 
 function boroughTitle(name: string, intent: BoroughIntent, fallback: string): string {
   if (intent === 'cost') return fit(`EPC Cost in ${name} | Prices from £${priceFrom.epc}`, 'L&D Energy')
-  if (intent === 'balanced') return fit(`EPC ${name} | Cost from £${priceFrom.epc}`, 'Elmhurst Accredited')
+  if (intent === 'balanced') return fit(`EPC ${name} | Cost from £${priceFrom.epc}`, 'L&D Energy')
   return fallback
 }
 
