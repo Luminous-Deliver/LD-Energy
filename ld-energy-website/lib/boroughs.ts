@@ -442,7 +442,7 @@ export const boroughMeta: Record<string, BoroughMeta> = {
     transport:
       'Southern and Thameslink rail, plus the extensive Tramlink network, give us good access across this large southern borough.',
     neighbours: ['bromley', 'lambeth', 'merton', 'sutton'],
-    metaTitle: "EPC Assessor Croydon | Thornton Heath CR7, Purley CR2",
+    metaTitle: "EPC Assessor Croydon | Thornton Heath CR7, Purley CR8",
     areasCovered:
       "Our accredited energy assessor provides EPCs across the entire London Borough of Croydon. We cover all local districts including Croydon (CR0), Thornton Heath (CR7), South Norwood (SE25) and Purley (CR2).",
     postcodeFaq: {
@@ -816,6 +816,31 @@ export const priorityBoroughs = priorityBoroughSlugs
  * badly. Re-derive when fresh GSC data is available rather than editing by hand.
  */
 export type BoroughIntent = 'cost' | 'balanced' | 'service'
+
+/**
+ * The town people search by, where it is not the borough's own name. Search Console (90 days to
+ * 01/11/2026) showed no "Ilford" impressions at all while the Redbridge title said only "Redbridge".
+ * The title and H1 name the town first and keep the borough, so both searches match.
+ */
+export const boroughTown: Record<string, string> = {
+  'redbridge': 'Ilford',
+  'waltham-forest': 'Walthamstow',
+  'brent': 'Wembley',
+  'haringey': 'Tottenham',
+  'lambeth': 'Brixton',
+  'wandsworth': 'Battersea',
+  'tower-hamlets': 'Canary Wharf',
+  'greenwich': 'Woolwich',
+  'havering': 'Romford',
+  'hillingdon': 'Uxbridge',
+  'bexley': 'Bexleyheath',
+  'merton': 'Wimbledon',
+}
+
+export function boroughPlace(slug: string, name: string): string {
+  const town = boroughTown[slug]
+  return town ? `${town} & ${name}` : name
+}
 
 export const boroughIntent: Record<string, BoroughIntent> = {
   'stratford': 'cost',
