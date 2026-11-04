@@ -93,7 +93,9 @@ const localBusinessSchema = {
   '@type': ['LocalBusiness', 'HomeAndConstructionBusiness'],
   '@id': `${site.url}/#business`,
   name: site.name,
-  alternateName: ['LD Energy', 'L and D Energy'],
+  // 'L&D EPC Energy' is the Google Business Profile and Bing Places name (Abdul's choice, 04/11/2026), listed so
+  // search engines and AI tools join the profiles and the site into one business.
+  alternateName: ['L&D EPC Energy', 'LD Energy', 'L and D Energy'],
   description: site.description,
   url: site.url,
   image: `${site.url}/logo.webp`,
