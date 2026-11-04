@@ -6,8 +6,9 @@ import './home-v7.css'
 import './booking-v7.css'
 
 export const metadata: Metadata = {
-  title: { absolute: `EPC London from £${priceFrom.epc} | Elmhurst Accredited | L&D Energy` },
-  description: `Domestic EPCs across London from an Elmhurst and Quidos accredited assessor based in Stratford. Guide prices from £${priceFrom.epc}, based on floor area. Exact quote before booking.`,
+  // GSC 90 days to 02/11/2026: "domestic epc/energy assessor" 127 impressions at positions 35-49; "epc london" kept (both words stay).
+  title: { absolute: `Domestic EPC Assessor in London from £${priceFrom.epc} | L&D Energy` },
+  description: `Domestic EPC assessor in Stratford, E15. Elmhurst (${site.assessor.accreditations[0].number}) and Quidos (${site.assessor.accreditations[1].number}) accredited. EPCs across London from £${priceFrom.epc}, exact quote before you book.`,
   keywords: [
     'EPC London',
     'domestic EPC',
