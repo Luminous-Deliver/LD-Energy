@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params
   const post = await getPostBySlug(slug)
   if (!post) return {}
-  const url = `${site.url}/blog/${post.slug}`
+  const url = `${site.url}/guides/${post.slug}`
   const ogImage = post.ogImage ? `${site.url}${post.ogImage}` : `${site.url}/opengraph-image`
   return {
     title: post.title,
@@ -89,14 +89,12 @@ export default async function BlogPostPage({ params }: PageProps) {
 
   const breadcrumbs = [
     { href: '/', label: 'Home' },
-    { href: '/blog', label: 'Guides' },
-    ...(category
-      ? [{ href: `/blog/category/${category.slug}`, label: category.name }]
-      : []),
-    { href: `/blog/${post.slug}`, label: post.title },
+    // The category crumb went with the category pages (04/11/2026); they 301 to their /guides group.
+    { href: '/guides', label: 'Guides' },
+    { href: `/guides/${post.slug}`, label: post.title },
   ]
 
-  const url = `${site.url}/blog/${post.slug}`
+  const url = `${site.url}/guides/${post.slug}`
 
   const steps: NextStep[] = [
     ...related.map((r) => {
@@ -105,7 +103,7 @@ export default async function BlogPostPage({ params }: PageProps) {
         kicker: g?.group.heading ?? 'Guide',
         title: r.title,
         text: g?.summary ?? r.description,
-        href: `/blog/${r.slug}`,
+        href: `/guides/${r.slug}`,
         img: g ? GROUP_IMAGE[g.group.id] : undefined,
         meta: `${r.readingTime} min read`,
       }

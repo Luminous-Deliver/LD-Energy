@@ -128,7 +128,7 @@ const readNext: NextStep[] = [
     text: 'Where a rental stands against the E minimum, and what to do if it comes back F or G.' },
   { kicker: 'Selling for a vendor', title: 'EPCs for selling a home', href: '/sellers', img: '/inner/rn-seller.svg',
     text: 'When the EPC has to be commissioned, and the time limits once a home is on the market.' },
-  { kicker: 'Letting and MEES', title: 'The rules and the fines, in full', href: '/blog/mees-regulations-2026',
+  { kicker: 'Letting and MEES', title: 'The rules and the fines, in full', href: '/guides/epc-for-landlords-2026',
     text: 'Who the minimum covers, how exemptions work and what councils can charge.' },
   { kicker: 'Every price', title: 'Prices by floor area', href: '/pricing', go: true, cta: 'Pricing',
     text: 'EPC, floor plan and both together, for every size, with the extras.' },
@@ -416,7 +416,7 @@ export default function EstateAgentsPage() {
               <a href="https://www.legislation.gov.uk/uksi/2012/3118/regulation/11" target="_blank" rel="noopener">regulation 11</a>,{' '}
               <a href="https://www.legislation.gov.uk/uksi/2012/3118/regulation/6" target="_blank" rel="noopener">regulation 6</a> and{' '}
               <a href="https://www.legislation.gov.uk/uksi/2012/3118/regulation/45" target="_blank" rel="noopener">regulation 45</a> of SI 2012/3118,
-              read 29 October 2026. Our guide to <Link className="in-link" href="/blog/epc-for-selling-house">EPCs when selling</Link> covers the
+              read 29 October 2026. Our guide to <Link className="in-link" href="/guides/epc-for-selling-house">EPCs when selling</Link> covers the
               exemptions.
             </p>
           </div>

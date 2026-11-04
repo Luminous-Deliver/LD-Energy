@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Calendar, CheckCircle2, Clock, RefreshCw, ShieldCheck } from 'lucide-react'
 import { getCategory } from '@/lib/blog-categories'
+import { guideGroupOf } from '@/lib/guides'
 import { getAuthor } from '@/lib/authors'
 import { site } from '@/lib/site'
 import { GuideCrumbs, type Crumb } from './GuideCrumbs'
@@ -60,6 +61,7 @@ export function PostHeader({
   keyTakeaways,
 }: PostHeaderProps) {
   const cat = getCategory(category)
+  const group = guideGroupOf(slug)
   const a = getAuthor(author)
   const showUpdated = updatedAt && updatedAt !== publishedAt
   const scale = showsScale(slug)
@@ -69,9 +71,9 @@ export function PostHeader({
       <div className="gd-w gd-hero__in">
         <div className="gd-hero__copy">
           <GuideCrumbs items={crumbs} />
-          {cat && (
-            <Link href={`/blog/category/${cat.slug}`} className="gd-eyebrow gd-hero__kick">
-              {cat.name}
+          {(group || cat) && (
+            <Link href={group ? `/guides#${group.id}` : '/guides'} className="gd-eyebrow gd-hero__kick">
+              {group?.heading ?? cat?.name}
             </Link>
           )}
           <h1>{title}</h1>

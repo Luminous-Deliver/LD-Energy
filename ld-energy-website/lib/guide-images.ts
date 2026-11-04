@@ -50,7 +50,7 @@ const PAGE: Record<string, string[]> = {
 /** Candidate pictures for a card's link, best first; empty when the link has none of its own. */
 export function guideImages(href: string): string[] {
   const path = href.split(/[?#]/)[0]
-  const blog = path.match(/^\/blog\/([^/]+)$/)
+  const blog = path.match(/^\/guides\/([^/]+)$/)
   if (blog) return GUIDE[blog[1]] ?? []
   return PAGE[path] ?? []
 }

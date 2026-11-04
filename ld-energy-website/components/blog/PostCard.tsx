@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Clock } from 'lucide-react'
 import { getCategory } from '@/lib/blog-categories'
+import { guideGroupOf } from '@/lib/guides'
 import { getAuthor } from '@/lib/authors'
 import type { Post } from '@/lib/blog'
 
@@ -11,6 +12,7 @@ interface PostCardProps {
 
 export function PostCard({ post, featured = false }: PostCardProps) {
   const cat = getCategory(post.category)
+  const group = guideGroupOf(post.slug)
   const author = getAuthor(post.author)
   return (
     <article
@@ -19,12 +21,12 @@ export function PostCard({ post, featured = false }: PostCardProps) {
       }`}
     >
       <div className={`flex flex-col flex-1 p-5 md:p-6 ${featured ? 'md:p-8' : ''}`}>
-        {cat && (
+        {(group || cat) && (
           <Link
-            href={`/blog/category/${cat.slug}`}
+            href={group ? `/guides#${group.id}` : '/guides'}
             className="relative z-10 text-xs uppercase tracking-wide font-semibold text-primary-700 hover:text-primary-800 self-start"
           >
-            {cat.name}
+            {group?.heading ?? cat?.name}
           </Link>
         )}
         <h3
@@ -32,7 +34,7 @@ export function PostCard({ post, featured = false }: PostCardProps) {
             featured ? 'text-2xl md:text-3xl' : 'text-lg md:text-xl'
           }`}
         >
-          <Link href={`/blog/${post.slug}`} className="after:absolute after:inset-0">
+          <Link href={`/guides/${post.slug}`} className="after:absolute after:inset-0">
             {post.title}
           </Link>
         </h3>

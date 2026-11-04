@@ -25,7 +25,7 @@ const out = path.resolve(process.env.BOOKING_EVIDENCE_DIR || '../../../audits/we
       await page.screenshot({ path: path.join(out, `production-quote-${width}.png`) })
       measurements.push({ width, height, firstControlTop: y })
     }
-    for (const route of ['/services/domestic-epc','/services/floor-plans','/services/epc-pre-assessment','/services/epc-improvement-plan','/blog','/landlords','/sellers','/estate-agents','/areas/stratford','/about','/areas','/faq','/domestic-energy-assessor-london']) {
+    for (const route of ['/services/domestic-epc','/services/floor-plans','/services/epc-pre-assessment','/services/epc-improvement-plan','/guides','/landlords','/sellers','/estate-agents','/areas/stratford','/about','/areas','/faq','/domestic-energy-assessor-london']) {
       await page.goto(base + route, { waitUntil: 'networkidle' })
       // Exempt: Read next's "Ready to book?" quote card, a logged design (decisions/log.md 23/10/2026 late, "Correction:
       // Read next is A's image cards plus C's quote card only")

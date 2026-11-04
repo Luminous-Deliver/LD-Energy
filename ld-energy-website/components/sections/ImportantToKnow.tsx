@@ -143,7 +143,7 @@ export function ImportantToKnow({ govUkHref }: { govUkHref: string }) {
             GOV.UK
           </a>
           . For the longer explanation, see{' '}
-          <Link href="/blog/why-is-my-epc-different" className="font-semibold text-primary-700 underline underline-offset-2 hover:text-primary-800">
+          <Link href="/guides/why-is-my-epc-different" className="font-semibold text-primary-700 underline underline-offset-2 hover:text-primary-800">
             why EPC ratings differ between similar homes
           </Link>
           .

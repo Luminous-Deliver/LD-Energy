@@ -79,13 +79,13 @@ const shareLinks = [
 ]
 
 const readNext: NextStep[] = [
-  { kicker: 'On the day', title: 'What happens during an EPC assessment', href: '/blog/what-happens-during-epc-assessment',
+  { kicker: 'On the day', title: 'What happens during an EPC assessment', href: '/guides/prepare-for-epc-assessment',
     text: 'What your assessor records, room by room, and how long it takes.' },
-  { kicker: 'Comparing ratings', title: 'Why your EPC differs from your neighbour’s', href: '/blog/why-is-my-epc-different',
+  { kicker: 'Comparing ratings', title: 'Why your EPC differs from your neighbour’s', href: '/guides/why-is-my-epc-different',
     text: 'Terrace position, insulation, evidence and the method, explained.' },
-  { kicker: 'The method', title: 'RdSAP 10: what changed in 2025', href: '/blog/rdsap-10-what-changed-2025',
+  { kicker: 'The method', title: 'RdSAP 10: what changed in 2025', href: '/guides/rdsap-10-what-changed-2025',
     text: 'Why a new EPC may not match an older one, and the August 2026 update.' },
-  { kicker: 'After your EPC', title: 'How to improve your EPC rating', href: '/blog/how-to-improve-epc-rating',
+  { kicker: 'After your EPC', title: 'How to improve your EPC rating', href: '/guides/how-to-improve-epc-rating',
     text: 'Which measures to look at first, and what affects how much they count.' },
 ]
 
@@ -466,7 +466,7 @@ export default function PreparingPage() {
                     <p>
                       <strong>Evidence changes what can be recorded, not what the rating will be.</strong> It means a
                       real improvement is less likely to be missed.{' '}
-                      <Link href="/blog/prepare-for-epc-assessment" className="gd-link">
+                      <Link href="/guides/prepare-for-epc-assessment" className="gd-link">
                         The full preparation and evidence guide
                       </Link>
                     </p>
@@ -562,7 +562,7 @@ export default function PreparingPage() {
                 </ul>
                 <p>
                   Comparing EPCs? Compare the property details on each certificate, not just the letter.{' '}
-                  <Link href="/blog/why-is-my-epc-different">Why EPC ratings differ between similar homes</Link>
+                  <Link href="/guides/why-is-my-epc-different">Why EPC ratings differ between similar homes</Link>
                 </p>
 
                 <h4 id="rdsap-10">The method changed in June 2025: RdSAP 10</h4>
@@ -599,7 +599,7 @@ export default function PreparingPage() {
                   Older EPCs can also hold different assumptions or recorded information. If an older certificate
                   looks inconsistent with the home, compare the property details on it rather than the letter alone.
                   Genuine errors are possible, though they shouldn’t be presumed.{' '}
-                  <Link href="/blog/rdsap-10-what-changed-2025">What changed in RdSAP 10</Link>
+                  <Link href="/guides/rdsap-10-what-changed-2025">What changed in RdSAP 10</Link>
                   {' · '}
                   <a href={govUk.methodologyNotice} target="_blank" rel="noopener noreferrer">
                     GOV.UK notice of approval

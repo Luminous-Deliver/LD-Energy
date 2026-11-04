@@ -48,7 +48,7 @@ export function GuideList({ groups }: { groups: GuideListGroup[] }) {
           <ol className="gd-list">
             {g.guides.map((guide, i) => (
               <li key={guide.slug}>
-                <Link href={`/blog/${guide.slug}`} className="gd-row">
+                <Link href={`/guides/${guide.slug}`} className="gd-row">
                   <span className="gd-row__n num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
                   <span className="gd-row__b">
                     {i === 0 && (

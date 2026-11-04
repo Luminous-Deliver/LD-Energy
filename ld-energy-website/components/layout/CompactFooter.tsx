@@ -114,7 +114,7 @@ export function CompactFooter() {
             <GoogleRating className="mt-2 flex max-w-[16rem] flex-wrap items-center gap-x-2 gap-y-1 text-sm text-stone-700 hover:text-sage-700" />
           </div>
           <Group heading="Services" items={footerServices} />
-          <Group heading="Guides" items={footerGuides} more={['All guides', '/blog']} />
+          <Group heading="Guides" items={footerGuides} more={['All guides', '/guides']} />
           <Group heading="Company" items={footerCompany} />
         </div>
 

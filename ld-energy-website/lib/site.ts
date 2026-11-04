@@ -140,7 +140,7 @@ export const navLinks = [
   { href: '/areas', label: 'Areas' },
   { href: '/pricing', label: 'Pricing' },
   { href: '/faq', label: 'FAQ' },
-  { href: '/blog', label: 'Blog' },
+  { href: '/guides', label: 'Guides' },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
 ] as const
@@ -150,8 +150,8 @@ export const topNav = [
   { href: '/areas', label: 'Areas' },
   { href: '/pricing', label: 'Pricing' },
   { href: '/faq', label: 'FAQ' },
-  // The URL stays /blog for good; "Guides" is the label (plan PLAN-AREAS-GUIDES-2026-10-22 §8.1).
-  { href: '/blog', label: 'Guides' },
+  // /blog until 04/11/2026; /blog/* now 301s to /guides/* (plan PLAN-AREAS-GUIDES-2026-10-22 §12).
+  { href: '/guides', label: 'Guides' },
   { href: '/contact', label: 'Contact' },
 ] as const
 

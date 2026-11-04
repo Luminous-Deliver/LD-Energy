@@ -116,9 +116,9 @@ const sections: PageSection[] = [
 ]
 
 const readNext: NextStep[] = [
-  { kicker: 'Letting and MEES', title: 'The rules and the fines, in full', href: '/blog/mees-regulations-2026',
+  { kicker: 'Letting and MEES', title: 'The rules and the fines, in full', href: '/guides/epc-for-landlords-2026',
     text: 'Who the minimum covers, how exemptions work and what councils can charge.' },
-  { kicker: 'What\'s coming', title: 'The 2030 standard for rented homes', href: '/blog/epc-c-by-2030',
+  { kicker: 'What\'s coming', title: 'The 2030 standard for rented homes', href: '/guides/epc-c-by-2030',
     text: `What is settled, what still needs legislation, and the ${gbp(COST_CAP_2030)} cap.` },
   { kicker: 'Borough figures', title: 'EPC ratings in every borough', href: '/epc-ratings-by-borough',
     text: 'How homes rate across all 33 London councils, from GOV.UK data.' },
@@ -283,7 +283,7 @@ export default function LandlordsPage() {
             <p>
               Government has confirmed a higher standard, equivalent to C, from 1 October 2030, with a {gbp(COST_CAP_2030)} cost cap per
               property. It still needs legislation. Until then the minimum stays at E.{' '}
-              <Link className="in-link" href="/blog/epc-c-by-2030">What the 2030 standard means</Link>
+              <Link className="in-link" href="/guides/epc-c-by-2030">What the 2030 standard means</Link>
             </p>
           </div>
           <p className="in-src" data-reveal>
@@ -410,7 +410,7 @@ export default function LandlordsPage() {
             <h2 className="in-h2" id="questions-h">Before you book</h2>
             <p className="in-note lp-faqside">
               Not covered here? <a className="in-link" href={site.whatsappHref} target="_blank" rel="noopener">WhatsApp us</a>, or read
-              the <Link className="in-link" href="/blog/mees-regulations-2026">full guide to the rules</Link>.
+              the <Link className="in-link" href="/guides/epc-for-landlords-2026">full guide to the rules</Link>.
             </p>
           </div>
           <div className="in-faq" data-reveal>

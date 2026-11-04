@@ -64,9 +64,9 @@ const sections: PageSection[] = [
 const readNext: NextStep[] = [
   { kicker: 'Before the visit', title: 'Preparing for your EPC', href: '/preparing-for-your-epc',
     text: 'What to have ready, so the rating counts everything you have done.' },
-  { kicker: 'Ratings', title: 'EPC ratings explained', href: '/blog/epc-ratings-explained',
+  { kicker: 'Ratings', title: 'EPC ratings explained', href: '/guides/epc-ratings-explained',
     text: 'What each band means, and how the score behind it is worked out.' },
-  { kicker: 'Comparing homes', title: 'Why EPC ratings differ between similar homes', href: '/blog/why-is-my-epc-different',
+  { kicker: 'Comparing homes', title: 'Why EPC ratings differ between similar homes', href: '/guides/why-is-my-epc-different',
     text: 'Floor area, outside walls, heating and evidence, side by side.' },
   { kicker: 'Prices', title: 'Every price, by floor area', href: '/pricing', go: true, cta: 'See the prices',
     text: 'One price list for all of London, with no travel charges and no VAT to add.' },

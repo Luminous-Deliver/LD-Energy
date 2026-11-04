@@ -104,7 +104,7 @@ quote before booking.
 - EPC ratings by London borough (GOV.UK register figures): ${site.url}/epc-ratings-by-borough
 - Preparing for your EPC: ${site.url}/preparing-for-your-epc
 - FAQ: ${site.url}/faq
-- Blog and guides: ${site.url}/blog
+- Blog and guides: ${site.url}/guides
 - About: ${site.url}/about
 - Exact quote: ${site.url}/quote
 - Contact and general questions: ${site.url}/contact

@@ -63,7 +63,7 @@ const { portfolioRatesText: rates } = require('../lib/site') // pinned word for 
     ok(await page.locator('.op').getByText('If we’re late, you pay less.').isVisible(), 'our promise shown')
     eq(await page.locator('#agent-faq details').count(), 6, 'six agent questions')
     eq(await page.locator('#agent-faq details[open]').count(), 1, 'first question open')
-    for (const href of ['/landlords', '/sellers', '/blog/mees-regulations-2026', '/pricing']) eq(await page.locator(`.in-rn a[href="${href}"]`).count(), 1, `read next: ${href}`)
+    for (const href of ['/landlords', '/sellers', '/guides/epc-for-landlords-2026', '/pricing']) eq(await page.locator(`.in-rn a[href="${href}"]`).count(), 1, `read next: ${href}`)
     eq(await page.locator('#book a.ld-btn').getAttribute('href'), '/quote?service=bulk&source=estate-agents&cta=bottom', 'ending: agency (bulk) quote')
     ok(/Add a reliable EPC supplier to your panel/.test(await page.locator('#book').innerText()), 'ending heading carried over')
 

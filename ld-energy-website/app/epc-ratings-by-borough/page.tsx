@@ -152,13 +152,13 @@ const sections: PageSection[] = [
 ]
 
 const readNext: NextStep[] = [
-  { kicker: 'Ratings', title: 'EPC ratings explained', href: '/blog/epc-ratings-explained',
+  { kicker: 'Ratings', title: 'EPC ratings explained', href: '/guides/epc-ratings-explained',
     text: 'What each band means, and how the score behind it is worked out.' },
-  { kicker: 'Comparing homes', title: 'Why EPC ratings differ between similar homes', href: '/blog/why-is-my-epc-different',
+  { kicker: 'Comparing homes', title: 'Why EPC ratings differ between similar homes', href: '/guides/why-is-my-epc-different',
     text: 'Floor area, outside walls, heating and evidence, side by side.' },
   { kicker: 'Letting a home', title: 'EPCs for landlords', href: '/landlords',
     text: 'Where your rental stands against the E minimum, one let or a portfolio.' },
-  { kicker: 'What’s coming', title: 'The 2030 standard for rented homes', href: '/blog/epc-c-by-2030',
+  { kicker: 'What’s coming', title: 'The 2030 standard for rented homes', href: '/guides/epc-c-by-2030',
     text: 'What is settled for rented homes, and what still needs legislation.' },
 ]
 

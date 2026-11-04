@@ -9,7 +9,7 @@ function withoutEarlierArticleUpdate(value) {
   if (typeof value === 'string' && value.startsWith('RdSAP 10: What Changed in 2025')) return 'RdSAP article title updated in ff9efbf'
   if (Array.isArray(value)) return value.map(withoutEarlierArticleUpdate)
   if (value && typeof value === 'object') {
-    if (['BlogPosting', 'Article'].includes(value['@type']) && JSON.stringify(value).includes('/blog/rdsap-10-what-changed-2025')) return 'Article updated before Stage 1: ff9efbf'
+    if (['BlogPosting', 'Article'].includes(value['@type']) && JSON.stringify(value).includes('/guides/rdsap-10-what-changed-2025')) return 'Article updated before Stage 1: ff9efbf'
     return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, withoutEarlierArticleUpdate(item)]))
   }
   return value

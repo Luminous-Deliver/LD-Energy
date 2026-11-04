@@ -136,9 +136,9 @@ const sections: PageSection[] = [
 ]
 
 const readNext: NextStep[] = [
-  { kicker: 'Comparing homes', title: 'Why EPC ratings differ between similar homes', href: '/blog/why-is-my-epc-different',
+  { kicker: 'Comparing homes', title: 'Why EPC ratings differ between similar homes', href: '/guides/why-is-my-epc-different',
     text: 'Floor area, outside walls, heating and evidence, side by side.' },
-  { kicker: 'The method', title: 'RdSAP 10: what changed in 2025', href: '/blog/rdsap-10-what-changed-2025',
+  { kicker: 'The method', title: 'RdSAP 10: what changed in 2025', href: '/guides/rdsap-10-what-changed-2025',
     text: 'Why a new EPC may not match an old one, even when nothing has changed.' },
   { kicker: 'Before the visit', title: 'Preparing for your EPC', href: '/preparing-for-your-epc',
     text: 'What to have ready, so the rating counts everything you have done.' },

@@ -1,8 +1,9 @@
 /**
- * Guides (the /blog posts) as readers see them: the hub's five reader-intent groups and the
+ * Guides (the /guides posts) as readers see them: the hub's five reader-intent groups and the
  * "In your area" links on each post. Plan PLAN-AREAS-GUIDES-2026-10-22 §8.1, §8.2 and §10.
  *
- * The URLs stay at /blog for good (Abdul 22/10/2026); "Guides" is only the label.
+ * Moved from /blog to /guides on 04/11/2026 (plan §12; Abdul 29/10 reversed the 22/10 "keep /blog"). Every old
+ * /blog URL 301s here from next.config.js; merged posts and category pages go straight to their final address.
  */
 
 /**
@@ -15,6 +16,11 @@ export const BOROUGH_DATA_PAGE = {
   live: true,
 } as const
 
+/** The hub group a guide sits in, for the post's eyebrow link (`/guides#<id>`). */
+export function guideGroupOf(slug: string): GuideGroup | undefined {
+  return guideGroups.find((g) => g.guides.some((x) => x.slug === slug))
+}
+
 export interface GuideGroup {
   id: string
   heading: string
@@ -24,7 +30,7 @@ export interface GuideGroup {
   guides: { slug: string; summary: string }[]
 }
 
-/** The five groups on /blog, pillar first in each (plan §8.1 table). Every post appears exactly once. */
+/** The five groups on /guides, pillar first in each (plan §8.1 table). Every post appears exactly once. */
 export const guideGroups: GuideGroup[] = [
   {
     id: 'understand-your-epc',

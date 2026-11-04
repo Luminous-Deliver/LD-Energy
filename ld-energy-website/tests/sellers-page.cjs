@@ -61,7 +61,7 @@ const epc = [65, 75, 85, 95, 105, 120]
     ok(await page.locator('.op').getByText('If we’re late, you pay less.').isVisible(), 'our promise shown')
     eq(await page.locator('#seller-faq details').count(), 5, 'five seller questions')
     eq(await page.locator('#seller-faq details[open]').count(), 1, 'first question open')
-    for (const href of ['/blog/epc-for-selling-house', '/blog/how-long-does-epc-last', '/landlords', '/estate-agents']) eq(await page.locator(`.in-rn a[href="${href}"]`).count(), 1, `read next: ${href}`)
+    for (const href of ['/guides/epc-for-selling-house', '/guides/how-long-does-epc-last', '/landlords', '/estate-agents']) eq(await page.locator(`.in-rn a[href="${href}"]`).count(), 1, `read next: ${href}`)
     eq(await page.locator('#book a.ld-btn').getAttribute('href'), '/quote?service=epc&source=sellers&cta=bottom', 'ending quote link')
     ok(/same-day lodgement for £15 extra, or a next-day visit for £35 extra/.test(await page.locator('#book').innerText()), 'ending: speed options as extras')
 

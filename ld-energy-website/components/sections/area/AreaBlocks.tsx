@@ -367,9 +367,9 @@ export function LettingSection({ name, s, council, band = true }: { name: string
             A rental needs an E or better today unless a valid exemption is registered.
           </p>
           <p>
-            Read <Link href="/blog/epc-for-landlords-2026">the rules for landlords today</Link>,{' '}
-            <Link href="/blog/epc-c-by-2030">what the 2030 standard means</Link>,{' '}
-            <Link href="/blog/property-licence-epc-floor-plan">what a licence application asks for</Link>, or{' '}
+            Read <Link href="/guides/epc-for-landlords-2026">the rules for landlords today</Link>,{' '}
+            <Link href="/guides/epc-c-by-2030">what the 2030 standard means</Link>,{' '}
+            <Link href="/guides/property-licence-epc-floor-plan">what a licence application asks for</Link>, or{' '}
             <Link href="/landlords">how we work with landlords</Link>.
           </p>
         </div>
