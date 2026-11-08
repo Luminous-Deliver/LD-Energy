@@ -124,7 +124,7 @@ export default async function BoroughPage({ params }: PageProps) {
 
   if (!data) notFound()
 
-  // Rebuilt template (pilot: Stratford, Newham, Croydon). Title and H1 are unchanged until 14/12.
+  // Rebuilt template (pilot: Stratford, Newham, Croydon). Title and H1 are unchanged until the 14/12 review (done 08/11/2026, brought forward).
   if (usesAreaV2(slug)) return <AreaPageV2 slug={slug} />
 
   const parentBorough = data.partOf ? boroughMeta[data.partOf] : undefined

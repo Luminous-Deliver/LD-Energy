@@ -23,7 +23,7 @@ import './assessor.css'
  * and verification page (areas plan §9), both schemes shown with their GOV.UK register checks. Visits: Abdul does them
  * and sometimes sends a trusted, experienced colleague when he is ill or unable, telling the customer in advance
  * (23/10/2026), so nothing here says "always Abdul". No home address: Stratford (E15) only. Title and descriptions stay
- * frozen until 14/12; only the H1 changes.
+ * frozen until the 14/12 review (done 08/11/2026, brought forward); only the H1 changes.
  */
 const PATH = '/domestic-energy-assessor-london'
 

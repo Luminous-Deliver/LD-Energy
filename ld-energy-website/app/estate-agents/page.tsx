@@ -23,7 +23,7 @@ import './estate-agents.css'
 /*
  * /estate-agents, rebuilt 24/10/2026 on the /landlords template (approved 23/10): hero with the title-block price list
  * and On this page, the agency sections, Our promise, FAQ, Read next and ending A. One name for the audience, "Agents"
- * (decision 23/10); the URL stays. Title and descriptions stay frozen until 14/12; only the H1 changes, to sentence
+ * (decision 23/10); the URL stays. Title and descriptions stay frozen until the 14/12 review (done 08/11/2026, brought forward); only the H1 changes, to sentence
  * case. Parity record: Abdul-2 projects/ld-energy-redesign-2026-10/research/estate-agents-parity-2026-10-24.md.
  */
 export const metadata: Metadata = {

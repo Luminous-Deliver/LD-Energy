@@ -19,7 +19,7 @@ import './faq.css'
  * /faq, redesigned 24/10/2026 on the inner-page parts (/landlords, /pricing). Every question, group and link comes from
  * lib/faq.ts unchanged, so the visible answers and the FAQPage schema are one array and can't drift. Group ids
  * (#about-epcs, #legal-requirements, #process, #pricing, #your-rating, #improvements) stay. Title and descriptions stay
- * frozen until 14/12; only the H1 changes.
+ * frozen until the 14/12 review (done 08/11/2026, brought forward); only the H1 changes.
  */
 export const metadata: Metadata = {
   title: 'EPC FAQ | Common Questions in London',

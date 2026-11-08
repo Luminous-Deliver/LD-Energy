@@ -22,7 +22,7 @@ import '../services.css'
 /*
  * /services/floor-plans, rebuilt 24/10/2026 on the inner-page parts, as /services/domestic-epc: the floor plan column of
  * the price list as a title block, the RICS disclaimer wherever a plan is offered, the saving against booking separately
- * from bundleSaving(). Title and descriptions stay frozen until 14/12; only the H1 changes. Section ids kept.
+ * from bundleSaving(). Title and descriptions stay frozen until the 14/12 review (done 08/11/2026, brought forward); only the H1 changes. Section ids kept.
  * Parity: Abdul-2 projects/ld-energy-redesign-2026-10/research/floor-plans-parity-2026-10-24.md
  */
 export const metadata: Metadata = {

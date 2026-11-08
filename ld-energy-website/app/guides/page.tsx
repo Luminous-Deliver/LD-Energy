@@ -9,7 +9,7 @@ import { getAllPosts, type Post } from '@/lib/blog'
 import { BOROUGH_DATA_PAGE, guideGroups } from '@/lib/guides'
 import { site, defaultOgImage } from '@/lib/site'
 
-// Title and H1 are frozen until the 14/12 review (references/local-seo.md); the body is the Guides hub
+// Title and H1 settled at the 14/12 review, brought forward to 08/11/2026; the body is the Guides hub
 // of plan PLAN-AREAS-GUIDES-2026-10-22 §8.1.
 export const metadata: Metadata = {
   title: 'EPC Guides for London Homeowners & Landlords',
@@ -18,14 +18,14 @@ export const metadata: Metadata = {
   alternates: { canonical: `${site.url}/guides` },
   openGraph: {
     images: [defaultOgImage],
-    title: 'EPC Insights & Guides | L&D Energy Blog',
+    title: 'EPC Guides for London Homeowners & Landlords | L&D Energy',
     description:
       'Expert EPC guidance for London homeowners, landlords, and estate agents. Written by a working Elmhurst and Quidos accredited DEA.',
     url: `${site.url}/guides`,
   },
   twitter: {
     images: [defaultOgImage.url],
-    title: 'EPC Insights & Guides',
+    title: 'EPC Guides for London Homeowners & Landlords',
     description:
       'Expert EPC guidance for London homeowners, landlords, and estate agents.',
   },
@@ -100,7 +100,7 @@ export default async function BlogIndexPage() {
         <header className="gd-hub-hero">
           <div className="gd-w gd-hub-hero__in">
             <GuideCrumbs items={breadcrumbs} />
-            <h1>EPC Insights &amp; Guides for London Homeowners &amp; Landlords</h1>
+            <h1>EPC guides for London homeowners and landlords</h1>
             <p className="gd-hub-hero__lede">{OPENING_ANSWER}</p>
             <p className="gd-hub-hero__by">
               <span>
