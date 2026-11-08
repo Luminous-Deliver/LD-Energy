@@ -20,6 +20,11 @@ export const metadata: Metadata = {
   title,
   description,
   alternates: { canonical: `${site.url}/quote` },
+  // noindex, follow (08/11/2026): Google chose a tracking-parameter variant
+  // (/quote?service=epc&...&page=stratford) as its own canonical from the menu links on every area page, and the two
+  // took 144 impressions and no clicks in 28 days while competing with the area and pricing pages for "cost of an
+  // EPC in ..." searches. The form still works from every link; it just isn't a search landing page.
+  robots: { index: false, follow: true },
   openGraph: { title: `${title} | L&D Energy`, description, url: `${site.url}/quote`, images: [defaultOgImage] },
   twitter: { title: `${title} | L&D Energy`, description, images: [defaultOgImage.url] },
 }
