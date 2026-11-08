@@ -28,7 +28,7 @@ import '../services.css'
  */
 export const metadata: Metadata = {
   title: `Domestic EPC Certificates in London`,
-  description: `Domestic EPC certificate in London from £${priceFrom.epc}. Elmhurst and Quidos accredited assessor, property visit and lodged certificate. Exact quote and timing confirmed before booking.`,
+  description: `Domestic EPC certificate in London from £${priceFrom.epc}. Elmhurst and Quidos accredited assessor, home visit and lodged certificate. Exact quote before booking.`,
   alternates: { canonical: `${site.url}/services/domestic-epc` },
   openGraph: {
     images: [defaultOgImage],

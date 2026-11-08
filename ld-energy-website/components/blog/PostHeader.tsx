@@ -15,8 +15,6 @@ const SCALE_GUIDES = new Set([
   'epc-ratings-explained',
   'why-is-my-epc-different',
   'epc-for-landlords-2026',
-  'mees-regulations-2026',
-  'mees-timeline-2026-2030',
   'epc-c-by-2030',
   'how-to-improve-epc-rating',
 ])

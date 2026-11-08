@@ -28,13 +28,13 @@ import './sellers.css'
 export const metadata: Metadata = {
   title: `EPC for Selling Your Home London | From £${priceFrom.epc}`,
   description:
-    `EPC certificates for selling your London home. Generally commissioned before marketing; exemptions apply. Lodged within 72 hours, next-day visits available. Guide prices from £${priceFrom.epc}.`,
+    `EPC certificates for selling your London home, commissioned before marketing. Lodged within 72 hours, next-day visits available. From £${priceFrom.epc}.`,
   alternates: { canonical: `${site.url}/sellers` },
   openGraph: {
     images: [defaultOgImage],
     title: `EPC for Selling Your Home London | From £${priceFrom.epc} | L&D Energy`,
     description:
-      `EPC certificates for selling your London home. Generally commissioned before marketing; exemptions apply. Lodged within 72 hours, next-day visits available. Guide prices from £${priceFrom.epc}.`,
+      `EPC certificates for selling your London home, commissioned before marketing. Lodged within 72 hours, next-day visits available. From £${priceFrom.epc}.`,
     url: `${site.url}/sellers`,
   },
   twitter: {

@@ -111,10 +111,10 @@ export const site = {
    * it satisfies Google's real-world-name policy, is a manual review item.
    */
   reviews: {
-    // Visible Google Maps listing, checked 19/10/2026: 5.0 from 6 reviews. Update by hand
+    // Google Maps listing: 7 reviews on 04/11/2026 (GBP dashboard); 5.0 last read 19/10/2026. Update by hand
     // when the count changes; it is shown as text only, never as review markup.
     ratingValue: 5,
-    reviewCount: 6,
+    reviewCount: 7,
     // Canonical place link (CID read from the listing 19/10/2026). In schema since 28/10/2026.
     profileUrl: 'https://maps.google.com/?cid=14054711842511866215',
     writeUrl: 'https://g.page/r/CWdJZan0XQzDEAI/review',

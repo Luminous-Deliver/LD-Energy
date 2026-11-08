@@ -29,7 +29,7 @@ const PLAN_PRICE = `£${site.addOns.improvementPlan}`
 export const metadata: Metadata = {
   title: `EPC Improvement Plan London | ${PLAN_PRICE}`,
   description:
-    `Abdul's personalised plan explaining what is holding your EPC rating back and which improvements to consider first, supported by the full Elmhurst Energy Report. ${PLAN_PRICE} extra.`,
+    `Abdul's plan explaining what holds your EPC rating back and which improvements to consider first, with the full Elmhurst Energy Report. ${PLAN_PRICE} extra.`,
   alternates: { canonical: `${site.url}/services/epc-improvement-plan` },
   openGraph: {
     images: [defaultOgImage],

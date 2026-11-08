@@ -83,7 +83,7 @@ export default async function BlogIndexPage() {
   const feat = bySlug.get('epc-ratings-explained')
   // the two picture cards: the visit and the house in section (AI illustrations, imagery policy checked 23/10/2026)
   const sides = [
-    { slug: 'what-happens-during-epc-assessment', img: '/guides/assessor-room', w: 1200, h: 800 },
+    { slug: 'prepare-for-epc-assessment', img: '/guides/assessor-room', w: 1200, h: 800 },
     { slug: 'how-to-improve-epc-rating', img: '/guides/house-section', w: 1200, h: 667 },
   ].flatMap((x) => {
     const p = bySlug.get(x.slug)

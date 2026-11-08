@@ -37,7 +37,7 @@ const city = boroughsAtoZ.find((b) => b.slug === 'city-of-london')
 
 export const metadata: Metadata = {
   title: `EPC Ratings by London Borough, ${firstYear}–${lastYear}`,
-  description: `How homes in each of London's ${boroughCount} boroughs rate on their EPCs: ${pct(atoC(london))} of ${fmt(london.certificates)} certificates since ${firstYear} are A to C. ${top.name} is highest at ${pct(atoC(top))}, ${bottom.name} lowest at ${pct(atoC(bottom))}.`,
+  description: `How homes in London's ${boroughCount} boroughs rate on their EPCs: ${pct(atoC(london))} of ${fmt(london.certificates)} certificates are A to C. ${top.name} is highest at ${pct(atoC(top))}, ${bottom.name} lowest at ${pct(atoC(bottom))}.`,
   alternates: { canonical: url },
   openGraph: {
     images: [defaultOgImage],

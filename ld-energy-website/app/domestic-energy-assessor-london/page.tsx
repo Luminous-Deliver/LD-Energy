@@ -30,13 +30,13 @@ const PATH = '/domestic-energy-assessor-london'
 export const metadata: Metadata = {
   title: 'Domestic Energy Assessor in London',
   description:
-    `Elmhurst and Quidos accredited domestic energy assessor in Stratford, covering all 32 London boroughs. Official EPC certificates from £${priceFrom.epc}, next-day visits available.`,
+    `Elmhurst and Quidos accredited domestic energy assessor in Stratford, covering all 32 London boroughs. EPC certificates from £${priceFrom.epc}, next-day visits available.`,
   alternates: { canonical: `${site.url}${PATH}` },
   openGraph: {
     images: [defaultOgImage],
     title: 'Domestic Energy Assessor London | Elmhurst Accredited | L&D Energy',
     description:
-      `Elmhurst and Quidos accredited domestic energy assessor covering all 32 London boroughs. Official EPC certificates from £${priceFrom.epc}, next-day visits available.`,
+      `Elmhurst and Quidos accredited domestic energy assessor covering all 32 London boroughs. EPC certificates from £${priceFrom.epc}, next-day visits available.`,
     url: `${site.url}${PATH}`,
   },
   twitter: {

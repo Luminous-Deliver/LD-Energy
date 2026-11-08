@@ -15,7 +15,7 @@ import { ReadNext, type NextStep } from '@/components/inner/ReadNext'
 import { InnerEnding } from '@/components/inner/InnerEnding'
 import { BOROUGH_DATA_PAGE, guideAreas, guideGroups } from '@/lib/guides'
 import { quoteHref } from '@/lib/quote-context'
-import { getAllSlugs, getPostBySlug, getRelatedPosts } from '@/lib/blog'
+import { getAllSlugs, getPostBySlug, getRelatedPosts, postMeta } from '@/lib/blog'
 import { getCategory } from '@/lib/blog-categories'
 import { getAuthor } from '@/lib/authors'
 import { site } from '@/lib/site'
@@ -35,15 +35,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!post) return {}
   const url = `${site.url}/guides/${post.slug}`
   const ogImage = post.ogImage ? `${site.url}${post.ogImage}` : `${site.url}/opengraph-image`
+  const meta = postMeta(post)
   return {
-    title: post.title,
-    description: post.description,
+    title: meta.title,
+    description: meta.description,
     keywords: post.keywords,
     alternates: { canonical: url },
     openGraph: {
       type: 'article',
-      title: post.title,
-      description: post.description,
+      title: meta.full,
+      description: meta.description,
       url,
       publishedTime: post.publishedAt,
       modifiedTime: post.updatedAt,
@@ -52,8 +53,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     twitter: {
       card: 'summary_large_image',
-      title: post.title,
-      description: post.description,
+      title: meta.full,
+      description: meta.description,
       images: [ogImage],
     },
   }

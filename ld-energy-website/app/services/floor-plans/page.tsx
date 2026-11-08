@@ -27,7 +27,7 @@ import '../services.css'
  */
 export const metadata: Metadata = {
   title: `Property Floor Plans London | From £${priceFrom.floorPlan}`,
-  description: `Professional property floor plans across London. Laser-measured, high-resolution files for estate agents. Guide prices from £${priceFrom.floorPlan}, better value when booked alongside an EPC.`,
+  description: `Property floor plans across London. Laser-measured, high-resolution files for estate agents. From £${priceFrom.floorPlan}, better value booked with an EPC.`,
   alternates: { canonical: `${site.url}/services/floor-plans` },
   openGraph: {
     images: [defaultOgImage],

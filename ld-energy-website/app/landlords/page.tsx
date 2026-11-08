@@ -24,8 +24,8 @@ import './landlords.css'
  * 14/12; only the H1 changes. MEES figures re-checked against GOV.UK on 23/10/2026 (govUk in lib/site.ts).
  */
 export const metadata: Metadata = {
-  title: 'EPC for Landlords London | Domestic MEES Compliance',
-  description: `Domestic EPC assessments for London landlords. See where your rental stands against the current band E requirement. Guide prices from £${priceFrom.epc}, exact quote before booking.`,
+  title: 'EPC for Landlords London | MEES Compliance',
+  description: `Domestic EPCs for London landlords. See where your rental stands against the band E minimum. From £${priceFrom.epc}, exact quote before booking.`,
   alternates: { canonical: `${site.url}/landlords` },
   openGraph: {
     images: [defaultOgImage],
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     images: [defaultOgImage.url],
-    title: 'EPC for Landlords London | Domestic MEES Compliance',
+    title: 'EPC for Landlords London | MEES Compliance',
     description:
       'Domestic EPC assessments for London landlords. Check where your rental stands against the current band E requirement.',
   },

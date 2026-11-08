@@ -29,7 +29,7 @@ import './estate-agents.css'
 export const metadata: Metadata = {
   title: 'EPC Provider for Estate & Letting Agents London',
   description:
-    'Reliable EPC and floor plan partner for London estate and letting agents. Fast turnaround on new instructions, volume rates, direct line to your assessor. Taking on new agencies now.',
+    'EPC and floor plan partner for London estate and letting agents. Fast turnaround on new instructions, volume rates and a direct line to your assessor.',
   alternates: { canonical: `${site.url}/estate-agents` },
   openGraph: {
     images: [defaultOgImage],

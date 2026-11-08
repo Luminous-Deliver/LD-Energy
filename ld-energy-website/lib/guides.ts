@@ -52,8 +52,7 @@ export const guideGroups: GuideGroup[] = [
     heading: 'Before and on the day',
     intro: 'Getting ready for the visit and what the assessor does while there.',
     guides: [
-      { slug: 'prepare-for-epc-assessment', summary: 'Access, paperwork and a checklist for the day of the visit.' },
-      { slug: 'what-happens-during-epc-assessment', summary: 'What the assessor records, room by room, and how long it takes.' },
+      { slug: 'prepare-for-epc-assessment', summary: 'Access, paperwork, a checklist, and what the assessor does on the day.' },
       { slug: 'maisonette-epc', summary: 'Maisonettes and two-floor flats: both floors, what is above and below, corridors and shared heating.' },
     ],
   },
@@ -62,10 +61,8 @@ export const guideGroups: GuideGroup[] = [
     heading: 'Letting and MEES',
     intro: 'The minimum rating for rented homes now, and the higher standard planned for 2030.',
     guides: [
-      { slug: 'epc-for-landlords-2026', summary: 'The band E minimum, exemptions and what a landlord has to do now.' },
-      { slug: 'epc-c-by-2030', summary: 'The 2030 standard for rented homes: what is settled and what still needs legislation.' },
-      { slug: 'mees-regulations-2026', summary: 'Penalty limits, the exemption types and the evidence each one needs.' },
-      { slug: 'mees-timeline-2026-2030', summary: 'The steps between today’s E minimum and October 2030.' },
+      { slug: 'epc-for-landlords-2026', summary: 'The band E minimum, penalties, exemptions and what a landlord has to do now.' },
+      { slug: 'epc-c-by-2030', summary: 'The 2030 standard for rented homes, the steps to get there, and what still needs legislation.' },
       { slug: 'property-licence-epc-floor-plan', summary: 'What London councils ask for with a licence application: the EPC, the floor plan and room sizes.' },
     ],
   },
@@ -75,8 +72,7 @@ export const guideGroups: GuideGroup[] = [
     intro: 'Measures to look into, and what decides how much each one helps your home.',
     guides: [
       { slug: 'how-to-improve-epc-rating', summary: 'Measures from lighting to heat pumps, and routes from D to C for common London homes.' },
-      { slug: 'cheapest-ways-improve-epc', summary: 'Five lower-cost measures, cheapest first.' },
-      { slug: 'epc-improvements-by-budget', summary: 'What to look into at three budget levels.' },
+      { slug: 'cheapest-ways-improve-epc', summary: 'Five lower-cost measures, cheapest first, then what bigger budgets buy.' },
       { slug: 'loft-insulation-epc-rating', summary: 'How loft insulation is recorded, and the evidence that helps.' },
       { slug: 'solar-panels-epc-rating', summary: 'How many points solar panels add, worked through the RdSAP 10 method, and the evidence the assessor needs.' },
       { slug: 'cavity-wall-insulation-epc', summary: 'Which walls can take cavity fill, and how it shows on an EPC.' },

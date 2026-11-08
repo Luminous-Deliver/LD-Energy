@@ -23,16 +23,13 @@ const ALLOWED = {
   'cavity-wall-insulation-epc.mdx': ['£500'], // budget comparison (group 3)
   'cheapest-ways-improve-epc.mdx': ['£500'], // budget in the frozen title (cost ranges removed 29/10, unsourced)
   'epc-c-by-2030.mdx': ['£10,000', '£3,500', '£5,400', '£30,000', '£5,000'], // 2030 cost cap, current cap, impact assessment average, proposed and current maximum fine (GOV.UK, checked 29/10)
-  'epc-for-landlords-2026.mdx': ['£5,000', '£30,000', '£2,000', '£4,000', '£3,500', '£10,000', '£65', '£7,000'], // MEES penalties and cap (re-checked after the 28/10 Budget: unchanged); landlord register fee per property and penalty (GOV.UK MHCLG, checked 31/10; £65 is the register fee, not an L&D price)
+  'epc-for-landlords-2026.mdx': ['£5,000', '£30,000', '£2,000', '£4,000', '£3,500', '£10,000', '£65', '£7,000', '£1,000'], // MEES penalties and cap (£1,000 and £2,000: compliance-notice rows from the mees-regulations merge, 08/11) (re-checked after the 28/10 Budget: unchanged); landlord register fee per property and penalty (GOV.UK MHCLG, checked 31/10; £65 is the register fee, not an L&D price)
   'epc-for-selling-house.mdx': ['£200'], // SI 2012/3118 reg 38 penalty
-  'epc-improvements-by-budget.mdx': ['£500', '£2,000', '£5,000', '£7,500'], // budget tiers in the frozen title; Boiler Upgrade Scheme (GOV.UK, checked 29/10)
   'epc-vs-floor-plan-vs-survey.mdx': ['£5,000'], // MEES penalty cap (unsourced survey range removed 29/10)
   'how-long-does-epc-last.mdx': ['£200', '£5,000'], // SI 2012/3118 reg 38 penalty; MEES total fine limit
   'how-to-improve-epc-rating.mdx': ['£7,500', '£5,000'], // Boiler Upgrade Scheme heat pump and biomass grants (GOV.UK, checked 29/10)
   'loft-insulation-epc-rating.mdx': ['£500'], // installer cost table removed 29/10 (unsourced)
-  'mees-regulations-2026.mdx': ['£2,000', '£4,000', '£1,000', '£3,500', '£5,000', '£30,000', '£10,000'], // MEES penalties, caps
   'what-epc-rating-do-i-need.mdx': ['£7,500', '£36,000', '£150'], // BUS grant, Warm Homes: Local Grant income limit, Warm Home Discount (GOV.UK, checked 30/10)
-  'mees-timeline-2026-2030.mdx': ['£10,000', '£3,500', '£2,000', '£4,000', '£1,000', '£5,000', '£30,000'], // MEES penalties, caps
 }
 
 const MONEY = /£\d{1,3}(?:,\d{3})+|£\d+/g
