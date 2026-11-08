@@ -312,7 +312,8 @@
 .gd-chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
 .gd-chip[aria-pressed="true"] .num { color: rgba(255, 255, 255, .72); }
 .gd-count { margin-top: 12px; font-size: 14px; color: var(--slate-500); }
-.gd-grp { margin-top: 40px; }
+/* old category URLs land on /guides#<group> (04/11/2026); keep the group clear of the floating header */
+.gd-grp { margin-top: 40px; scroll-margin-top: calc(var(--head-h) + 20px); }
 .gd-grp[hidden] { display: none; }
 .gd-grp__h { display: grid; gap: 4px; margin-bottom: 12px; }
 .gd-grp__h h3 { font-size: 26px; }
