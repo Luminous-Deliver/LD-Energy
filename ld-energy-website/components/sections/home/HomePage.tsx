@@ -16,6 +16,8 @@ import { PickService } from './PickService'
 import { HomeQuoteBar } from './HomeQuoteBar'
 import { Ico } from './HomeIcon'
 import { HERO_PLAN_SVG } from './v7-assets'
+import { Reveal } from '@/components/layout/Reveal'
+import { signature } from '@/lib/signature-font'
 
 /*
  * The homepage body, ported from the approved prototype v7.2 (Abdul 22/10/2026): the rooftop hero with the rating
@@ -481,7 +483,20 @@ function Close() {
     <section className="sec close" id="quote" aria-labelledby="close-title">
       <div className="wrap">
         <div className="close__grid">
-          <h2 className="statement" id="close-title">Get a quote for your property</h2>
+          {/* one ending (Abdul 08/11/2026, from the Refero comparison): the page closed three times (this close, the
+              site-wide sign-off, the footer's green band). The sign-off folds in here and the other two are hidden on
+              this page only (home-v7.css, body:has(.hp)) */}
+          <div className="close__main">
+            <h2 className="statement" id="close-title">Get a quote for your property</h2>
+            <div className="close__who">
+              <p className="eyebrow">Who comes to your home</p>
+              <p>Your visit is with me, Abdul Motaleb Taher. I&rsquo;m an accredited Domestic Energy Assessor based in Stratford: I measure the home, record what&rsquo;s there and lodge the EPC on the government register, usually within 72 hours.</p>
+              <Reveal className="signoff__wrap close__sig" hidden>
+                <span className={`signoff__name ${signature.className}`}>Abdul M Taher</span>
+              </Reveal>
+              <Link prefetch={false} className="link arrow-link" href="/about">More about me <Ico name="arrow-right" /></Link>
+            </div>
+          </div>
           <div className="close__side">
             <p>Send the address and floor area, or tell us you’re not sure. We confirm your exact price before anyone visits, and you pay once the assessment is done.</p>
             <a className="btn btn-primary" id="close-quote" href="#prices">Get my exact quote</a>
@@ -492,7 +507,6 @@ function Close() {
             </ul>
           </div>
         </div>
-        <p className="signature">{site.assessor.name}, Domestic Energy Assessor. {elmhurst.short} Energy <span className="acc">{elmhurst.number}</span>, {quidos.short} <span className="acc">{quidos.number}</span>.</p>
       </div>
     </section>
   )

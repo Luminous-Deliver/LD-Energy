@@ -256,6 +256,43 @@ function darkness(t: number): number {
   return 1 - (1 - (1 - p) * (1 - p)) // ease out to fully lit
 }
 
+// Option C (Abdul 08/11/2026, "do 1 and 2"): more life in the drawn street instead of a background video: smoke from
+// four chimneys. Master pixels, measured on a 100 px grid over hero-dusk-2560. (A car's headlights up the road were
+// tried and dropped: on desktop the road sits under the price strip, so they ran out of sight.)
+const CHIMNEYS = [
+  { x: 2544, y: 112, rate: 1 }, { x: 1524, y: 360, rate: 0.8 }, { x: 1256, y: 516, rate: 0.7 }, { x: 916, y: 724, rate: 0.6 },
+]
+const SMOKE_EVERY = 520, SMOKE_LIFE = 7600
+const hash = (a: number, b: number) => { const s = Math.sin(a * 127.1 + b * 311.7) * 43758.5453; return s - Math.floor(s) }
+let puff: HTMLCanvasElement | null = null
+function puffSprite(): HTMLCanvasElement {
+  if (puff) return puff
+  puff = document.createElement('canvas'); puff.width = puff.height = 128
+  const g = puff.getContext('2d')!, r = g.createRadialGradient(64, 64, 0, 64, 64, 64)
+  r.addColorStop(0, 'rgba(206,212,232,1)'); r.addColorStop(0.45, 'rgba(196,204,228,.55)'); r.addColorStop(1, 'rgba(190,198,224,0)')
+  g.fillStyle = r; g.fillRect(0, 0, 128, 128)
+  return puff
+}
+/** Stateless: every puff's age comes from the clock, so a skipped frame or a hidden tab never piles puffs up. */
+function drawSmoke(ctx: CanvasRenderingContext2D, t: number) {
+  const sp = puffSprite()
+  CHIMNEYS.forEach((c, ci) => {
+    const every = SMOKE_EVERY / c.rate, newest = Math.floor(t / every)
+    for (let k = newest; k > newest - SMOKE_LIFE / every; k--) {
+      const age = t - k * every
+      if (age < 0 || k < 0) continue
+      const p = age / SMOKE_LIFE, j = hash(ci, k)
+      // rises and slows, leans downwind (to the right), widens; in quickly, out slowly
+      const rise = 230 * (1 - (1 - p) ** 1.7), drift = 150 * p ** 1.4 + 18 * Math.sin(p * 5 + j * 6)
+      const size = 26 + 120 * p + 20 * j
+      const a = 0.3 * Math.min(1, p / 0.12) * (1 - p) ** 1.5 * c.rate
+      if (a < 0.004) continue
+      ctx.globalAlpha = a
+      ctx.drawImage(sp, c.x + drift - size / 2 + (j - 0.5) * 10, c.y - rise - size / 2, size, size)
+    }
+  })
+  ctx.globalAlpha = 1
+}
 export function HeroSky() {
   const ref = useRef<HTMLCanvasElement>(null)
 
@@ -344,6 +381,9 @@ export function HeroSky() {
         ctx!.globalAlpha = a
         ctx!.drawImage(shade, fl.x, fl.y, fl.w, fl.h)
       })
+
+      // option C: the street's own life, only in the full sequence and never in the still frame
+      if (fx === 'all' && !still && t0Set) drawSmoke(ctx!, t)
 
       // the rooms are all on: the plane's warm bloom fades in (CSS, .pl--mid[data-lit])
       if (!lit && shades.length && (still || t > LIGHTS_START + (FLOORS.length - 1) * LIGHTS_GAP + 300)) {

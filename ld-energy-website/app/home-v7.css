@@ -646,3 +646,64 @@ body:has(.hp) .dock { display: none !important; }
   .hp .how__head .lede-l { grid-column: 2; grid-row: 2; margin: 0; padding-bottom: 6px; }
   .hp .how__grid { margin-top: 56px; }
 }
+
+/* ================================================== one scale, one radius, one ending === */
+/* Sample for review (Abdul 08/11/2026, "do 1 and 2", from the Refero comparison in
+   projects/ld-energy-redesign-2026-10/audits/refero-comparison-2026-11-08.md). The page used 31 font sizes and seven
+   section-heading sizes; the references hold 4 to 10 and one. Steps from 760 px: 12 / 14 / 16 / 19 / 24 / 32 / 40 / 48,
+   plus the hero's display line (unchanged). Every section statement is 48, a sub-statement 32. One corner, --r-sm
+   (6 px); circles stay round. The booking form keeps its own scale (15 / 17 / 26 / 36), shared with /quote: it moves
+   in both places at once if this is approved, never on one page only. One block, so the whole
+   sample can be judged on staging and taken out in one edit; folded into the rules above once approved. */
+.hp .statement, .hp .proof__big .statement, .hp .close .statement, .hp .guides__head .statement, .hp .faq__title {
+  font-size: clamp(30px, 3.4vw, 48px); line-height: 1.06; letter-spacing: -.012em; }
+.hp .op__h { font-size: clamp(26px, 2.3vw, 32px); }
+.hp .op__list span { font-size: 16px; }
+.hp .lede-l, .hp .prices__head p.lede { font-size: 19px; }
+.hp .tl__body h3 { font-size: clamp(26px, 2.3vw, 32px); }
+.hp .tl__n { font-size: 48px; }
+.hp .op__k { font-size: 12px; }
+.hp .op__amt { font-size: clamp(30px, 3vw, 40px); }
+.hp .offer__price small { font-size: 14px; }
+.hp .tc__key i { font-size: 12px; }
+.hp .tl__body > p, .hp .pre__body > p, .hp .creds p, .hp .close__side p { font-size: 19px; }
+.hp .notes h4, .hp .faq details p, .hp .contact a, .hp .btn { font-size: 16px; }
+.hp .break figcaption, .hp .tc__cap { font-size: 14px; }
+.hp .offer__flag, .hp .tc__key b { font-size: 12px; }
+.hp .offer__save, .hp .pre__body > p.pre__fine, .hp .tc__key span, .hp .quote figcaption, .hp .boroughs, .hp .guides__list span { font-size: 16px; }
+.hp .creds h3 { font-size: 24px; }
+.hp .quote blockquote { font-size: clamp(19px, 1.7vw, 24px); }
+.hp .faq summary { font-size: 19px; }
+.hp .guides__list b { font-size: 19px; }
+.hp .lde-rating { font-size: 16px; }
+.hp .lde-rating b { font-size: 24px; }
+@media (max-width: 899px) { .hp .guides__list b { font-size: 16px; } }
+@media (max-width: 759px) { .hp .tl__body > p, .hp .pre__body > p, .hp .creds p, .hp .close__side p, .hp .lede-l { font-size: 18px; } }
+
+.hp .lde-rating, .hp .offer__flag, .hp-hero .res, .hp .break--scene img { border-radius: var(--r-sm); }
+@media (min-width: 900px) { .hp .guides__list a, .hp .guides__list li + li a { border-radius: var(--r-sm); } }
+/* the floating pill nav keeps its shape: it is the header's own form (kept 14/10, chip approved 24/10) */
+body:has(.hp) footer .rounded-full { border-radius: var(--r-sm); }
+
+/* one ending: the sign-off sits inside the close, under its statement; the site-wide sign-off and the footer's band
+   are not shown on this page. body:has(.hp), so the rule leaves with the homepage on a client-side navigation */
+body:has(.hp) .signoff, body:has(.hp) .footer-band { display: none; }
+.hp .close__main { display: grid; gap: 40px; align-content: start; }
+.hp .close__who { display: grid; gap: 12px; justify-items: start; max-width: 46ch; padding-top: 24px; border-top: 1px solid var(--hair-strong); }
+.hp .close__who > p:not(.eyebrow) { font-size: 16px; line-height: 1.6; color: var(--ink); }
+.hp .close__sig .signoff__name { font-size: 48px; line-height: 1.1; }
+.hp .close__who .arrow-link { font-size: 16px; }
+/* phones: the quote button and contacts come before the sign-off */
+@media (max-width: 759px) {
+  .hp .close__main { display: contents; }
+  .hp .close .statement { order: 1; }
+  .hp .close__side { order: 2; }
+  .hp .close__who { order: 3; margin-top: 16px; }
+}
+
+/* hero option C (Abdul 08/11/2026): a very slow push into the street, 3.5% over 38 s and back. The picture and the sky
+   canvas share one box, origin and clock, so the lit rooms stay registered with their windows. Desktop with motion only */
+@media (min-width: 760px) and (prefers-reduced-motion: no-preference) {
+  .hp-hero--dusk .pl--mid img, .hp-hero--dusk .pl--mid .hero__sky { transform-origin: 70% 100%; animation: hero-push 38s ease-in-out infinite alternate; }
+}
+@keyframes hero-push { from { transform: scale(1); } to { transform: scale(1.035); } }
