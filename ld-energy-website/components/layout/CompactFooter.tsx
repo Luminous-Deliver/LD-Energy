@@ -80,7 +80,7 @@ export function CompactFooter() {
   return (
     <footer className="border-t border-stone-200 bg-stone-100 text-stone-700 [overflow-wrap:anywhere]">
       <div className="mx-auto max-w-[1216px] px-4 pb-[calc(5rem+env(safe-area-inset-bottom))] pt-10 sm:px-6 md:pb-8 lg:px-8 lg:pt-14">
-        <div className="grid gap-6 rounded-[28px] bg-sage-700 p-6 text-white sm:p-8 lg:grid-cols-[minmax(0,1.2fr)_auto] lg:items-center lg:p-10">
+        <div className="footer-band grid gap-6 rounded-[28px] bg-sage-700 p-6 text-white sm:p-8 lg:grid-cols-[minmax(0,1.2fr)_auto] lg:items-center lg:p-10">
           <div>
             <p className="font-serif text-[1.7rem] leading-[1.15] lg:text-[2.2rem]">Questions before you book?</p>
             <p className="mt-2 max-w-[48ch] text-[15px] leading-6 text-white/85">Call or message Abdul, the assessor who does the visit. Every day, 8am to 8pm.</p>
