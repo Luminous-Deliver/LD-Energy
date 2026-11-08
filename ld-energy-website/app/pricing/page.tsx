@@ -22,7 +22,7 @@ import './pricing.css'
  * /pricing, redesigned 24/10/2026 on the inner-page parts (/landlords) and the board-v3 pricing rules
  * (projects/ld-energy-redesign-2026-10/references/board-v3/pricing/README.md): every price visible up front, receipt
  * alignment, extras stated rather than ticked, no favourite column, no anchors or urgency. Title and descriptions stay
- * frozen until 14/12; only the H1 changes. Section ids #pricing-table, #whats-included and #pricing-faq are linked from
+ * frozen until the 14/12 review (done 08/11/2026, brought forward); only the H1 changes. Section ids #pricing-table, #whats-included and #pricing-faq are linked from
  * lib/faq.ts, so they stay.
  */
 export const metadata: Metadata = {

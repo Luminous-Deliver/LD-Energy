@@ -14,7 +14,7 @@ export type NextStep = { kicker?: string; title: string; text: string; href: str
 function linkLabel(s: NextStep): string {
   if (s.cta) return s.cta
   if (s.meta) return s.meta
-  if (s.href.startsWith('/blog')) return 'Read the guide'
+  if (s.href.startsWith('/guides')) return 'Read the guide'
   if (s.href.startsWith('/epc-ratings-by-borough')) return 'See the figures'
   return 'Find out more'
 }

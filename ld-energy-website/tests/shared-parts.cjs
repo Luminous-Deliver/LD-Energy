@@ -7,7 +7,7 @@ const { whatsappQuoteHref } = require('../lib/area-page.ts')
 const base = process.env.BOOKING_TEST_URL || 'http://localhost:3103'
 if (!['localhost', '127.0.0.1'].includes(new URL(base).hostname)) throw new Error('Local preview only')
 
-const pages = ['/', '/pricing', '/areas/newham', '/blog/how-long-does-epc-last', '/contact', '/landlords']
+const pages = ['/', '/pricing', '/areas/newham', '/guides/how-long-does-epc-last', '/contact', '/landlords']
 
 ;(async () => {
   const browser = await chromium.launch({ channel: 'msedge', headless: true })
@@ -112,7 +112,7 @@ const pages = ['/', '/pricing', '/areas/newham', '/blog/how-long-does-epc-last',
         ok(await page.evaluate(() => document.activeElement?.getAttribute('aria-label')) === 'Close menu', `${w}: focus on Close`)
         ok((await state()).on === 'false', `${w}: dock hidden while the menu is open`)
         const reachable = await page.locator('#mobile-nav-panel a').evaluateAll((as) => as.map((a) => a.getAttribute('href')))
-        for (const href of ['/areas', '/pricing', '/faq', '/blog', '/contact', '/about', '/landlords', '/sellers', '/estate-agents', '/services/domestic-epc', '/services/floor-plans']) ok(reachable.includes(href), `${w}: menu reaches ${href}`)
+        for (const href of ['/areas', '/pricing', '/faq', '/guides', '/contact', '/about', '/landlords', '/sellers', '/estate-agents', '/services/domestic-epc', '/services/floor-plans']) ok(reachable.includes(href), `${w}: menu reaches ${href}`)
         await page.keyboard.press('Shift+Tab')
         ok(await page.evaluate(() => !!document.activeElement?.closest('#mobile-nav-panel')), `${w}: Tab stays in the menu`)
         await page.keyboard.press('Escape'); await page.waitForTimeout(300)

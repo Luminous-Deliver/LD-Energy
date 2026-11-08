@@ -25,15 +25,11 @@ const GUIDE: Record<string, string[]> = {
   'how-long-does-epc-last': [A.report, A.scale],
   'why-is-my-epc-different': [A.twoHouses, A.street],
   'rdsap-10-what-changed-2025': [A.report, A.assessor, A.scale],
-  'what-happens-during-epc-assessment': [A.assessor, A.access],
   'prepare-for-epc-assessment': [A.access, A.assessor],
   'epc-for-landlords-2026': [A.landlord, A.evening],
-  'mees-regulations-2026': [A.evening, A.landlord],
-  'mees-timeline-2026-2030': [A.landlord, A.evening],
   'epc-c-by-2030': [A.cutaway, A.landlord],
   'how-to-improve-epc-rating': [A.section, A.cutaway],
   'cheapest-ways-improve-epc': [A.cutaway, A.section],
-  'epc-improvements-by-budget': [A.cutaway, A.section],
   'loft-insulation-epc-rating': [A.section, A.cutaway],
   'cavity-wall-insulation-epc': [A.street, A.cutaway],
   'epc-for-selling-house': [A.seller, A.street],
@@ -50,7 +46,7 @@ const PAGE: Record<string, string[]> = {
 /** Candidate pictures for a card's link, best first; empty when the link has none of its own. */
 export function guideImages(href: string): string[] {
   const path = href.split(/[?#]/)[0]
-  const blog = path.match(/^\/blog\/([^/]+)$/)
+  const blog = path.match(/^\/guides\/([^/]+)$/)
   if (blog) return GUIDE[blog[1]] ?? []
   return PAGE[path] ?? []
 }

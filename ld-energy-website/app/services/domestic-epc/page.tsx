@@ -22,13 +22,13 @@ import '../services.css'
 /*
  * /services/domestic-epc, rebuilt 24/10/2026 on the inner-page parts (/landlords, approved 23/10): hero with the EPC
  * column of the price list as a title block, On this page, Our promise under the prices, Read next, ending A. Title and
- * descriptions stay frozen until 14/12; only the H1 changes. #epc-process is linked from lib/faq.ts and #pricing from
+ * descriptions stay frozen until the 14/12 review (done 08/11/2026, brought forward); only the H1 changes. #epc-process is linked from lib/faq.ts and #pricing from
  * tests/booking-navigation.cjs, so both ids stay, as do the old page's other section ids.
  * Parity: Abdul-2 projects/ld-energy-redesign-2026-10/research/domestic-epc-parity-2026-10-24.md
  */
 export const metadata: Metadata = {
   title: `Domestic EPC Certificates in London`,
-  description: `Domestic EPC certificate in London from £${priceFrom.epc}. Elmhurst and Quidos accredited assessor, property visit and lodged certificate. Exact quote and timing confirmed before booking.`,
+  description: `Domestic EPC certificate in London from £${priceFrom.epc}. Elmhurst and Quidos accredited assessor, home visit and lodged certificate. Exact quote before booking.`,
   alternates: { canonical: `${site.url}/services/domestic-epc` },
   openGraph: {
     images: [defaultOgImage],

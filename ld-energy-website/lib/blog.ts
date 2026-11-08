@@ -24,6 +24,10 @@ export interface Post {
   slug: string
   title: string
   description: string
+  /** Search-result title when `title` (the H1) is too long for one: at most 60 characters. Optional. */
+  metaTitle?: string
+  /** Meta description when `description` (the visible lede) runs past 160 characters. Optional. */
+  metaDescription?: string
   /** The 60-90 word direct answer shown under the H1 (plan §8.2). Empty until a post is refreshed. */
   answer: string
   category: string
@@ -46,6 +50,23 @@ export interface Post {
 
 const BLOG_DIR = path.join(process.cwd(), 'content', 'blog')
 
+/** The layout appends " | L&D Energy"; Google cuts titles at about 60 characters. */
+export const TITLE_SUFFIX = ' | L&D Energy'
+export const TITLE_MAX = 60
+export const DESCRIPTION_MAX = 160
+
+/**
+ * The <title> and meta description for a guide (14/12 review, brought forward 04/11/2026). The H1 and lede
+ * stay as written; `metaTitle`/`metaDescription` shorten only what search results show. The brand suffix is
+ * kept when it fits and dropped when it doesn't, because Google shows the site name above the result anyway.
+ */
+export function postMeta(post: Pick<Post, 'title' | 'description' | 'metaTitle' | 'metaDescription'>) {
+  const t = post.metaTitle ?? post.title
+  const title = (t + TITLE_SUFFIX).length <= TITLE_MAX ? t : { absolute: t }
+  const full = typeof title === 'string' ? t + TITLE_SUFFIX : t
+  return { title, full, description: post.metaDescription ?? post.description }
+}
+
 function readPostFile(slug: string): Post | null {
   const filePath = path.join(BLOG_DIR, `${slug}.mdx`)
   if (!fs.existsSync(filePath)) return null
@@ -63,6 +84,8 @@ function readPostFile(slug: string): Post | null {
     slug,
     title: String(data.title ?? ''),
     description: text(data.description),
+    metaTitle: data.metaTitle ? String(data.metaTitle) : undefined,
+    metaDescription: data.metaDescription ? text(data.metaDescription) : undefined,
     answer: text(data.answer),
     category: String(data.category ?? ''),
     tags: Array.isArray(data.tags) ? data.tags.map(String) : [],

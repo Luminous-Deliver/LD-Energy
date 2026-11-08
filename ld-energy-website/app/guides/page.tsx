@@ -9,23 +9,23 @@ import { getAllPosts, type Post } from '@/lib/blog'
 import { BOROUGH_DATA_PAGE, guideGroups } from '@/lib/guides'
 import { site, defaultOgImage } from '@/lib/site'
 
-// Title and H1 are frozen until the 14/12 review (references/local-seo.md); the body is the Guides hub
+// Title and H1 settled at the 14/12 review, brought forward to 08/11/2026; the body is the Guides hub
 // of plan PLAN-AREAS-GUIDES-2026-10-22 §8.1.
 export const metadata: Metadata = {
   title: 'EPC Guides for London Homeowners & Landlords',
   description:
     'Expert guidance on Energy Performance Certificates, MEES compliance, and improving your EPC rating, written by an Elmhurst and Quidos accredited London DEA.',
-  alternates: { canonical: `${site.url}/blog` },
+  alternates: { canonical: `${site.url}/guides` },
   openGraph: {
     images: [defaultOgImage],
-    title: 'EPC Insights & Guides | L&D Energy Blog',
+    title: 'EPC Guides for London Homeowners & Landlords | L&D Energy',
     description:
       'Expert EPC guidance for London homeowners, landlords, and estate agents. Written by a working Elmhurst and Quidos accredited DEA.',
-    url: `${site.url}/blog`,
+    url: `${site.url}/guides`,
   },
   twitter: {
     images: [defaultOgImage.url],
-    title: 'EPC Insights & Guides',
+    title: 'EPC Guides for London Homeowners & Landlords',
     description:
       'Expert EPC guidance for London homeowners, landlords, and estate agents.',
   },
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 
 const breadcrumbs = [
   { href: '/', label: 'Home' },
-  { href: '/blog', label: 'Guides' },
+  { href: '/guides', label: 'Guides' },
 ]
 
 const breadcrumbSchema = {
@@ -41,7 +41,7 @@ const breadcrumbSchema = {
   '@type': 'BreadcrumbList',
   itemListElement: [
     { '@type': 'ListItem', position: 1, name: 'Home', item: site.url },
-    { '@type': 'ListItem', position: 2, name: 'Guides', item: `${site.url}/blog` },
+    { '@type': 'ListItem', position: 2, name: 'Guides', item: `${site.url}/guides` },
   ],
 }
 
@@ -55,7 +55,7 @@ export default async function BlogIndexPage() {
   const blogSchema = {
     '@context': 'https://schema.org',
     '@type': 'Blog',
-    '@id': `${site.url}/blog`,
+    '@id': `${site.url}/guides`,
     name: 'L&D Energy Guides',
     description:
       'Guidance on EPCs, MEES compliance and improving energy efficiency from a working London DEA.',
@@ -63,7 +63,7 @@ export default async function BlogIndexPage() {
     blogPost: allPosts.slice(0, 20).map((p) => ({
       '@type': 'BlogPosting',
       headline: p.title,
-      url: `${site.url}/blog/${p.slug}`,
+      url: `${site.url}/guides/${p.slug}`,
       datePublished: p.publishedAt,
     })),
   }
@@ -83,7 +83,7 @@ export default async function BlogIndexPage() {
   const feat = bySlug.get('epc-ratings-explained')
   // the two picture cards: the visit and the house in section (AI illustrations, imagery policy checked 23/10/2026)
   const sides = [
-    { slug: 'what-happens-during-epc-assessment', img: '/guides/assessor-room', w: 1200, h: 800 },
+    { slug: 'prepare-for-epc-assessment', img: '/guides/assessor-room', w: 1200, h: 800 },
     { slug: 'how-to-improve-epc-rating', img: '/guides/house-section', w: 1200, h: 667 },
   ].flatMap((x) => {
     const p = bySlug.get(x.slug)
@@ -100,7 +100,7 @@ export default async function BlogIndexPage() {
         <header className="gd-hub-hero">
           <div className="gd-w gd-hub-hero__in">
             <GuideCrumbs items={breadcrumbs} />
-            <h1>EPC Insights &amp; Guides for London Homeowners &amp; Landlords</h1>
+            <h1>EPC guides for London homeowners and landlords</h1>
             <p className="gd-hub-hero__lede">{OPENING_ANSWER}</p>
             <p className="gd-hub-hero__by">
               <span>
@@ -117,7 +117,7 @@ export default async function BlogIndexPage() {
         <section className="gd-w" aria-label="Start here">
           <div className="gd-top">
             {feat && (
-              <Link href={`/blog/${feat.slug}`} className="gd-feat">
+              <Link href={`/guides/${feat.slug}`} className="gd-feat">
                 <div className="gd-feat__art">
                   <GuideScale art minimum={false} />
                 </div>
@@ -137,7 +137,7 @@ export default async function BlogIndexPage() {
             )}
             <div className="gd-sides">
               {sides.map(({ slug, img, w, h, post }) => (
-                <Link key={slug} href={`/blog/${slug}`} className="gd-side">
+                <Link key={slug} href={`/guides/${slug}`} className="gd-side">
                   <span className="gd-side__img">
                     {/* eslint-disable-next-line @next/next/no-img-element -- next/image is unoptimised on Pages */}
                     <img src={`${img}-720.webp`} srcSet={`${img}-720.webp 720w, ${img}-1200.webp 1200w`} sizes="(max-width: 899px) 116px, 30vw" alt="" width={w} height={h} loading="lazy" decoding="async" />

@@ -21,7 +21,7 @@ import '../services.css'
  * price, so the hero's title block states it beside what every EPC already includes rather than listing sizes. Every
  * standard EPC includes its recommendations; the £35 plan is extra interpretation (memory
  * epc-recommendations-policy-corrected). Our promise applies: the plan always comes with a lodged EPC.
- * Title and descriptions stay frozen until 14/12; only the H1 changes. Section ids kept.
+ * Title and descriptions stay frozen until the 14/12 review (done 08/11/2026, brought forward); only the H1 changes. Section ids kept.
  * Parity: Abdul-2 projects/ld-energy-redesign-2026-10/research/epc-improvement-plan-parity-2026-10-24.md
  */
 const PLAN_PRICE = `£${site.addOns.improvementPlan}`
@@ -29,7 +29,7 @@ const PLAN_PRICE = `£${site.addOns.improvementPlan}`
 export const metadata: Metadata = {
   title: `EPC Improvement Plan London | ${PLAN_PRICE}`,
   description:
-    `Abdul's personalised plan explaining what is holding your EPC rating back and which improvements to consider first, supported by the full Elmhurst Energy Report. ${PLAN_PRICE} extra.`,
+    `Abdul's plan explaining what holds your EPC rating back and which improvements to consider first, with the full Elmhurst Energy Report. ${PLAN_PRICE} extra.`,
   alternates: { canonical: `${site.url}/services/epc-improvement-plan` },
   openGraph: {
     images: [defaultOgImage],

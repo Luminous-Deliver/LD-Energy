@@ -23,20 +23,20 @@ import './assessor.css'
  * and verification page (areas plan §9), both schemes shown with their GOV.UK register checks. Visits: Abdul does them
  * and sometimes sends a trusted, experienced colleague when he is ill or unable, telling the customer in advance
  * (23/10/2026), so nothing here says "always Abdul". No home address: Stratford (E15) only. Title and descriptions stay
- * frozen until 14/12; only the H1 changes.
+ * frozen until the 14/12 review (done 08/11/2026, brought forward); only the H1 changes.
  */
 const PATH = '/domestic-energy-assessor-london'
 
 export const metadata: Metadata = {
   title: 'Domestic Energy Assessor in London',
   description:
-    `Elmhurst and Quidos accredited domestic energy assessor in Stratford, covering all 32 London boroughs. Official EPC certificates from £${priceFrom.epc}, next-day visits available.`,
+    `Elmhurst and Quidos accredited domestic energy assessor in Stratford, covering all 32 London boroughs. EPC certificates from £${priceFrom.epc}, next-day visits available.`,
   alternates: { canonical: `${site.url}${PATH}` },
   openGraph: {
     images: [defaultOgImage],
     title: 'Domestic Energy Assessor London | Elmhurst Accredited | L&D Energy',
     description:
-      `Elmhurst and Quidos accredited domestic energy assessor covering all 32 London boroughs. Official EPC certificates from £${priceFrom.epc}, next-day visits available.`,
+      `Elmhurst and Quidos accredited domestic energy assessor covering all 32 London boroughs. EPC certificates from £${priceFrom.epc}, next-day visits available.`,
     url: `${site.url}${PATH}`,
   },
   twitter: {
@@ -136,9 +136,9 @@ const sections: PageSection[] = [
 ]
 
 const readNext: NextStep[] = [
-  { kicker: 'Comparing homes', title: 'Why EPC ratings differ between similar homes', href: '/blog/why-is-my-epc-different',
+  { kicker: 'Comparing homes', title: 'Why EPC ratings differ between similar homes', href: '/guides/why-is-my-epc-different',
     text: 'Floor area, outside walls, heating and evidence, side by side.' },
-  { kicker: 'The method', title: 'RdSAP 10: what changed in 2025', href: '/blog/rdsap-10-what-changed-2025',
+  { kicker: 'The method', title: 'RdSAP 10: what changed in 2025', href: '/guides/rdsap-10-what-changed-2025',
     text: 'Why a new EPC may not match an old one, even when nothing has changed.' },
   { kicker: 'Before the visit', title: 'Preparing for your EPC', href: '/preparing-for-your-epc',
     text: 'What to have ready, so the rating counts everything you have done.' },

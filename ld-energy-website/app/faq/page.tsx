@@ -19,7 +19,7 @@ import './faq.css'
  * /faq, redesigned 24/10/2026 on the inner-page parts (/landlords, /pricing). Every question, group and link comes from
  * lib/faq.ts unchanged, so the visible answers and the FAQPage schema are one array and can't drift. Group ids
  * (#about-epcs, #legal-requirements, #process, #pricing, #your-rating, #improvements) stay. Title and descriptions stay
- * frozen until 14/12; only the H1 changes.
+ * frozen until the 14/12 review (done 08/11/2026, brought forward); only the H1 changes.
  */
 export const metadata: Metadata = {
   title: 'EPC FAQ | Common Questions in London',
@@ -64,9 +64,9 @@ const sections: PageSection[] = [
 const readNext: NextStep[] = [
   { kicker: 'Before the visit', title: 'Preparing for your EPC', href: '/preparing-for-your-epc',
     text: 'What to have ready, so the rating counts everything you have done.' },
-  { kicker: 'Ratings', title: 'EPC ratings explained', href: '/blog/epc-ratings-explained',
+  { kicker: 'Ratings', title: 'EPC ratings explained', href: '/guides/epc-ratings-explained',
     text: 'What each band means, and how the score behind it is worked out.' },
-  { kicker: 'Comparing homes', title: 'Why EPC ratings differ between similar homes', href: '/blog/why-is-my-epc-different',
+  { kicker: 'Comparing homes', title: 'Why EPC ratings differ between similar homes', href: '/guides/why-is-my-epc-different',
     text: 'Floor area, outside walls, heating and evidence, side by side.' },
   { kicker: 'Prices', title: 'Every price, by floor area', href: '/pricing', go: true, cta: 'See the prices',
     text: 'One price list for all of London, with no travel charges and no VAT to add.' },

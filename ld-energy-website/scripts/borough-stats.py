@@ -196,7 +196,7 @@ def summarise(rows, slug, name, code, full_years, districts=True):
     return out
 
 
-# Running costs by band (guide /blog/epc-running-costs-by-band). Certificate costs are worked out at the price list
+# Running costs by band (guide /guides/epc-running-costs-by-band). Certificate costs are worked out at the price list
 # in force when each certificate was lodged, so only certificates on the latest list are pooled. Weekly medians of
 # band D cost per m2 stepped from about £16.6 to £14.7 on 23/08/2026, the latest change in the 13/10/2026 file.
 # On each refresh, re-check for a newer step (weekly median £/m2 for band D) and move COST_FROM to it.

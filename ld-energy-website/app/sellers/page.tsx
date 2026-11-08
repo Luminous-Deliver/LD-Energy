@@ -28,13 +28,13 @@ import './sellers.css'
 export const metadata: Metadata = {
   title: `EPC for Selling Your Home London | From £${priceFrom.epc}`,
   description:
-    `EPC certificates for selling your London home. Generally commissioned before marketing; exemptions apply. Lodged within 72 hours, next-day visits available. Guide prices from £${priceFrom.epc}.`,
+    `EPC certificates for selling your London home, commissioned before marketing. Lodged within 72 hours, next-day visits available. From £${priceFrom.epc}.`,
   alternates: { canonical: `${site.url}/sellers` },
   openGraph: {
     images: [defaultOgImage],
     title: `EPC for Selling Your Home London | From £${priceFrom.epc} | L&D Energy`,
     description:
-      `EPC certificates for selling your London home. Generally commissioned before marketing; exemptions apply. Lodged within 72 hours, next-day visits available. Guide prices from £${priceFrom.epc}.`,
+      `EPC certificates for selling your London home, commissioned before marketing. Lodged within 72 hours, next-day visits available. From £${priceFrom.epc}.`,
     url: `${site.url}/sellers`,
   },
   twitter: {
@@ -128,9 +128,9 @@ const sections: PageSection[] = [
 ]
 
 const readNext: NextStep[] = [
-  { kicker: 'Selling', title: 'EPCs for selling a house, in full', href: '/blog/epc-for-selling-house',
+  { kicker: 'Selling', title: 'EPCs for selling a house, in full', href: '/guides/epc-for-selling-house',
     text: 'The time limits, who has to show the EPC, and what to do if the rating is low.' },
-  { kicker: 'Validity', title: 'How long an EPC lasts', href: '/blog/how-long-does-epc-last',
+  { kicker: 'Validity', title: 'How long an EPC lasts', href: '/guides/how-long-does-epc-last',
     text: 'Ten years, when you need a new one, and how to check the one you have.' },
   { kicker: 'Letting instead?', title: 'EPCs for London landlords', href: '/landlords',
     text: 'Where a rental stands against the E minimum, one let or a portfolio.' },
@@ -374,7 +374,7 @@ export default function SellersPage() {
             <h2 className="in-h2" id="seller-faq-h">Before you list</h2>
             <p className="in-note lp-faqside">
               Not covered here? <a className="in-link" href={site.whatsappHref} target="_blank" rel="noopener">WhatsApp us</a>, or read
-              the <Link className="in-link" href="/blog/epc-for-selling-house">full guide to selling</Link>.
+              the <Link className="in-link" href="/guides/epc-for-selling-house">full guide to selling</Link>.
             </p>
           </div>
           <div className="in-faq">

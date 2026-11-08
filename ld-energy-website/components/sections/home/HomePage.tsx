@@ -437,7 +437,7 @@ function Faq() {
 
 const guides = [
   { slug: 'epc-c-by-2030', title: 'What the 2030 standard means for landlords', line: 'A rented home needs E or better today, unless a valid exemption is registered. A standard equivalent to C is confirmed from 1 October 2030; it still needs legislation.' },
-  { slug: 'what-happens-during-epc-assessment', title: 'What happens during an EPC assessment', line: 'What an EPC assessor records during a visit: walls, heating, windows, lighting.' },
+  { slug: 'prepare-for-epc-assessment', title: 'Preparing for your EPC assessment', line: 'What the assessor needs to reach, the paperwork that helps, and what happens on the day.' },
   { slug: 'why-is-my-epc-different', title: 'Why EPC ratings can differ', line: 'Two near-identical London homes can score differently on an EPC.' },
   { slug: 'epc-vs-floor-plan-vs-survey', title: 'EPC, floor plan or survey: what each provides', line: 'What each document does, who needs one when selling, letting or buying, and which are legally required.' },
 ]
@@ -455,10 +455,10 @@ function Guides() {
           {/* each guide with its own picture (lib/guide-images.ts) and an arrow: on a phone the heading above read as one
               more guide in the list (Abdul 24/10) */}
           {guides.map((g, i) => {
-            const pics = guideImages(`/blog/${g.slug}`)
-            const img = pics.find((x) => !guides.slice(0, i).some((h) => guideImages(`/blog/${h.slug}`)[0] === x)) ?? pics[0]
+            const pics = guideImages(`/guides/${g.slug}`)
+            const img = pics.find((x) => !guides.slice(0, i).some((h) => guideImages(`/guides/${h.slug}`)[0] === x)) ?? pics[0]
             return (
-              <li key={g.slug}><Link prefetch={false} href={`/blog/${g.slug}`}>
+              <li key={g.slug}><Link prefetch={false} href={`/guides/${g.slug}`}>
                 {/* eslint-disable-next-line @next/next/no-img-element -- decorative; next/image is unoptimised on Pages */}
                 {img && <span className="guides__img"><img src={img} alt="" width={640} height={360} loading="lazy" decoding="async" /></span>}
                 <span className="guides__t"><b>{g.title}</b><span>{g.line}</span></span>
@@ -468,8 +468,8 @@ function Guides() {
           })}
         </ul>
         <p className="guides__more">
-          <Link prefetch={false} className="link arrow-link" href="/blog">Browse all EPC guides <Ico name="arrow-right" /></Link>
-          <Link prefetch={false} className="link arrow-link" href="/blog/mees-timeline-2026-2030">MEES timeline, now to 2030 <Ico name="arrow-right" /></Link>
+          <Link prefetch={false} className="link arrow-link" href="/guides">Browse all EPC guides <Ico name="arrow-right" /></Link>
+          <Link prefetch={false} className="link arrow-link" href="/guides/epc-c-by-2030">MEES timeline, now to 2030 <Ico name="arrow-right" /></Link>
         </p>
       </div>
     </section>

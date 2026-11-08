@@ -17,7 +17,7 @@ export function sourcePageForPath(path: string): SourcePage {
     '/services/floor-plans': 'floor-plans', '/services/epc-pre-assessment': 'pre-assessment',
     '/services/epc-improvement-plan': 'improvement-plan',
   }
-  if (path === '/blog' || path.startsWith('/blog/')) return 'blog'
+  if (path === '/guides' || path.startsWith('/guides/')) return 'blog'
   // Category only; geographic identity always comes from the server page prop.
   if (path.startsWith('/areas/')) return 'area'
   return Object.hasOwn(pages, path) ? pages[path] : 'other'

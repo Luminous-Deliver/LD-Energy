@@ -191,22 +191,22 @@ export const fullFaq: FaqCategory[] = [
       {
         q: 'Can an EPC assessor change or improve my rating?',
         a: 'No. The assessor surveys the property, records its measurements, construction, heating, glazing and lighting, and verifies any evidence they can accept. The rating is then calculated from that data by government-approved software. There is no field an assessor can edit to reach a requested result, and doing so would put their accreditation at risk. What an assessor can do is make sure everything genuinely present is recorded and evidenced.',
-        links: [{ label: 'Why EPC ratings differ between similar homes', href: '/blog/why-is-my-epc-different' }],
+        links: [{ label: 'Why EPC ratings differ between similar homes', href: '/guides/why-is-my-epc-different' }],
       },
       {
         q: 'Why is my EPC different from my neighbour’s?',
         a: 'EPC ratings are specific to the individual property. Position in the terrace is a common reason: a mid-terrace home has two exposed external walls where an end-terrace or semi has three, which changes heat loss before anything else is considered. Floor area, extensions, insulation, glazing, heating, renewables and the evidence available on the day all vary between neighbouring homes too.',
-        links: [{ label: 'Why EPC ratings differ between similar homes', href: '/blog/why-is-my-epc-different' }],
+        links: [{ label: 'Why EPC ratings differ between similar homes', href: '/guides/why-is-my-epc-different' }],
       },
       {
         q: 'Why is my new EPC different from my old one?',
         a: 'Existing dwellings in England and Wales have been assessed under the RdSAP 10 methodology since 15 June 2025, the first substantial change to the calculation in over a decade. A new certificate will not necessarily reproduce an older one even where the property is unchanged. There is no published rule that the update moves ratings up or down. It depends on the property. Previous certificates can also record different assumptions or information.',
-        links: [{ label: 'RdSAP 10: what changed in 2025', href: '/blog/rdsap-10-what-changed-2025' }],
+        links: [{ label: 'RdSAP 10: what changed in 2025', href: '/guides/rdsap-10-what-changed-2025' }],
       },
       {
         q: 'What is RdSAP 10?',
         a: 'RdSAP is the methodology used to calculate EPCs for existing homes. RdSAP 10 became the approved methodology for existing dwellings in England and Wales on 15 June 2025. It collects more detail about the property and calculates a number of things differently from the version it replaced.',
-        links: [{ label: 'RdSAP 10: what changed in 2025', href: '/blog/rdsap-10-what-changed-2025' }],
+        links: [{ label: 'RdSAP 10: what changed in 2025', href: '/guides/rdsap-10-what-changed-2025' }],
       },
       {
         q: 'What documents should I have ready for my EPC assessment?',
@@ -232,17 +232,17 @@ export const fullFaq: FaqCategory[] = [
       {
         q: 'What is an EPC?',
         a: 'An Energy Performance Certificate (EPC) is an official UK government document that rates a property’s energy efficiency from A (most efficient) to G (least efficient). It shows current and potential energy efficiency, estimated annual energy costs, CO₂ emissions, and recommendations for improvement.',
-        links: [{ label: 'EPC ratings explained', href: '/blog/epc-ratings-explained' }, { label: 'Domestic EPC service', href: '/services/domestic-epc' }],
+        links: [{ label: 'EPC ratings explained', href: '/guides/epc-ratings-explained' }, { label: 'Domestic EPC service', href: '/services/domestic-epc' }],
       },
       {
         q: 'How long is an EPC valid?',
         a: 'An EPC is valid for 10 years from the date of issue. After 10 years, you’ll need a new EPC if you’re selling or letting the property.',
-        links: [{ label: 'How long an EPC lasts', href: '/blog/how-long-does-epc-last' }],
+        links: [{ label: 'How long an EPC lasts', href: '/guides/how-long-does-epc-last' }],
       },
       {
         q: 'What information is on an EPC?',
         a: 'Your EPC shows the current rating (A–G), the potential rating after recommended improvements, estimated annual energy costs, CO₂ emissions, and a list of specific improvement recommendations with estimated costs and savings.',
-        links: [{ label: 'EPC ratings explained', href: '/blog/epc-ratings-explained' }],
+        links: [{ label: 'EPC ratings explained', href: '/guides/epc-ratings-explained' }],
       },
       {
         q: 'Who can issue an EPC?',
@@ -252,7 +252,7 @@ export const fullFaq: FaqCategory[] = [
       {
         q: 'How is the EPC rating calculated?',
         a: 'The rating is calculated using the Reduced data Standard Assessment Procedure (RdSAP), currently RdSAP 10. The assessor records construction details, insulation, heating, hot water, lighting, windows, and ventilation. The software calculates a Standard Assessment Procedure (SAP) score from 1–100, which maps to a band from A to G.',
-        links: [{ label: 'How your EPC rating is calculated', href: '/preparing-for-your-epc#how-your-epc-rating-is-calculated' }, { label: 'RdSAP 10: what changed in 2025', href: '/blog/rdsap-10-what-changed-2025' }],
+        links: [{ label: 'How your EPC rating is calculated', href: '/preparing-for-your-epc#how-your-epc-rating-is-calculated' }, { label: 'RdSAP 10: what changed in 2025', href: '/guides/rdsap-10-what-changed-2025' }],
       },
     ],
   },
@@ -263,27 +263,27 @@ export const fullFaq: FaqCategory[] = [
       {
         q: 'Do I need an EPC to sell my home?',
         a: 'Generally, an EPC must be commissioned before marketing a home for sale in England and Wales. Reasonable efforts must be made to obtain it within seven days; a further 21 days is allowed if those efforts do not succeed. Exemptions apply. Provide it to prospective buyers as required.',
-        links: [{ label: 'EPCs for sellers', href: '/sellers' }, { label: 'EPC guide for selling a house', href: '/blog/epc-for-selling-house' }],
+        links: [{ label: 'EPCs for sellers', href: '/sellers' }, { label: 'EPC guide for selling a house', href: '/guides/epc-for-selling-house' }],
       },
       {
         q: 'Do I need an EPC to rent out my property?',
         a: 'For domestic rentals within MEES scope in England and Wales, the minimum is EPC E unless a valid exemption is registered. Current MEES financial penalties are capped at £5,000 per property in total. EPC provision duties and their penalties are separate.',
-        links: [{ label: 'EPCs for landlords', href: '/landlords' }, { label: 'EPC guide for landlords', href: '/blog/epc-for-landlords-2026' }],
+        links: [{ label: 'EPCs for landlords', href: '/landlords' }, { label: 'EPC guide for landlords', href: '/guides/epc-for-landlords-2026' }],
       },
       {
         q: 'What are MEES regulations?',
         a: 'For domestic rentals covered by MEES in England and Wales, the current minimum is EPC E unless a valid exemption is registered. Government has confirmed a higher standard equivalent to C for 1 October 2030, using reformed EPC metrics, but implementing legislation is still required. There is one compliance date for tenancies in scope, not an earlier new-tenancy phase.',
-        links: [{ label: 'MEES regulations explained', href: '/blog/mees-regulations-2026' }, { label: 'MEES timeline to 2030', href: '/blog/mees-timeline-2026-2030' }],
+        links: [{ label: 'MEES regulations explained', href: '/guides/epc-for-landlords-2026' }, { label: 'MEES timeline to 2030', href: '/guides/epc-c-by-2030' }],
       },
       {
         q: 'What if my property is below an E rating?',
         a: 'If the property is covered by domestic MEES, you must improve it to E or register a valid exemption before letting or continuing to let it. Your standard recommendation report helps identify relevant measures.',
-        links: [{ label: 'How to improve your EPC rating', href: '/blog/how-to-improve-epc-rating' }, { label: 'EPC Improvement Plan', href: '/services/epc-improvement-plan' }, { label: 'EPC Pre-Assessment', href: '/services/epc-pre-assessment' }],
+        links: [{ label: 'How to improve your EPC rating', href: '/guides/how-to-improve-epc-rating' }, { label: 'EPC Improvement Plan', href: '/services/epc-improvement-plan' }, { label: 'EPC Pre-Assessment', href: '/services/epc-pre-assessment' }],
       },
       {
         q: 'Are there any exemptions?',
         a: 'Yes, limited exemptions exist (for example, all relevant improvements completed but rating still below E, third-party consent refused, or wall insulation that would damage the fabric of the property). MEES exemptions require evidence and registration on the PRS Exemptions Register; most last five years, but duration depends on the exemption.',
-        links: [{ label: 'MEES exemptions and registration', href: '/blog/mees-regulations-2026#exemptions-evidence-and-registration' }],
+        links: [{ label: 'MEES exemptions and registration', href: '/guides/epc-for-landlords-2026#exemptions-evidence-and-registration' }],
       },
     ],
   },
@@ -299,7 +299,7 @@ export const fullFaq: FaqCategory[] = [
       {
         q: 'How long does the assessment take?',
         a: 'Typically 45 minutes for a studio and up to 90 minutes for a 5+ bedroom property. We’ll provide an accurate time estimate when you book.',
-        links: [{ label: 'What happens during an EPC assessment', href: '/blog/what-happens-during-epc-assessment' }],
+        links: [{ label: 'What happens during an EPC assessment', href: '/guides/prepare-for-epc-assessment' }],
       },
       {
         q: 'What do I need to prepare?',
@@ -361,17 +361,17 @@ export const fullFaq: FaqCategory[] = [
       {
         q: 'How can I improve my EPC rating?',
         a: 'Your standard EPC includes its software-generated recommendation report where applicable. Insulation, heating, lighting and other measures may be suggested depending on the property. Seek appropriate installation advice before proceeding; a particular rating or saving is not guaranteed.',
-        links: [{ label: 'How to improve your EPC rating', href: '/blog/how-to-improve-epc-rating' }, { label: 'EPC Improvement Plan', href: '/services/epc-improvement-plan' }],
+        links: [{ label: 'How to improve your EPC rating', href: '/guides/how-to-improve-epc-rating' }, { label: 'EPC Improvement Plan', href: '/services/epc-improvement-plan' }],
       },
       {
         q: 'Which improvements give the best return?',
         a: 'For most London properties, the highest-return upgrades are LED lighting (low cost, immediate impact), loft insulation, a modern condensing boiler with proper controls, and cavity wall insulation where applicable. Solar PV and heat pumps deliver bigger rating jumps but require larger investment.',
-        links: [{ label: 'EPC improvements by budget', href: '/blog/epc-improvements-by-budget' }, { label: 'Cheapest ways to improve an EPC', href: '/blog/cheapest-ways-improve-epc' }],
+        links: [{ label: 'EPC improvements by budget', href: '/guides/cheapest-ways-improve-epc' }, { label: 'Cheapest ways to improve an EPC', href: '/guides/cheapest-ways-improve-epc' }],
       },
       {
         q: 'Will I need a new EPC after improvements?',
         a: 'Your current EPC remains valid for 10 years regardless of improvements. However, if you want the new, higher rating to appear on the EPC Register (for example to prove MEES compliance or support a sale), you’ll need a fresh assessment.',
-        links: [{ label: 'When a new EPC may be worth getting', href: '/blog/how-long-does-epc-last#when-you-might-want-a-new-epc-without-being-legally-required' }],
+        links: [{ label: 'When a new EPC may be worth getting', href: '/guides/how-long-does-epc-last#when-you-might-want-a-new-epc-without-being-legally-required' }],
       },
     ],
   },

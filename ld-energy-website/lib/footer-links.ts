@@ -18,15 +18,15 @@ export const footerServices: FooterLink[] = [
 ]
 
 export const footerGuides: FooterLink[] = [
-  ['Do I need an EPC?', '/blog/do-i-need-an-epc'],
-  ['Find and check your EPC', '/blog/find-check-download-epc'],
-  ['EPC, floor plan or survey?', '/blog/epc-vs-floor-plan-vs-survey'],
-  ['EPC ratings explained', '/blog/epc-ratings-explained'],
-  ['What an EPC costs, and who pays', '/blog/epc-cost-who-pays'],
-  ['Preparing for the visit', '/blog/prepare-for-epc-assessment'],
-  ['Improving your rating', '/blog/how-to-improve-epc-rating'],
-  ['Why ratings differ', '/blog/why-is-my-epc-different'],
-  ['EPCs for landlords', '/blog/epc-for-landlords-2026'],
+  ['Do I need an EPC?', '/guides/do-i-need-an-epc'],
+  ['Find and check your EPC', '/guides/find-check-download-epc'],
+  ['EPC, floor plan or survey?', '/guides/epc-vs-floor-plan-vs-survey'],
+  ['EPC ratings explained', '/guides/epc-ratings-explained'],
+  ['What an EPC costs, and who pays', '/guides/epc-cost-who-pays'],
+  ['Preparing for the visit', '/guides/prepare-for-epc-assessment'],
+  ['Improving your rating', '/guides/how-to-improve-epc-rating'],
+  ['Why ratings differ', '/guides/why-is-my-epc-different'],
+  ['EPCs for landlords', '/guides/epc-for-landlords-2026'],
 ]
 
 export const footerCompany: FooterLink[] = [

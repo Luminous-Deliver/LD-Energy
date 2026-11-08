@@ -80,9 +80,9 @@ function boroughTitle(name: string, intent: BoroughIntent, fallback: string): st
 
 function boroughDescription(name: string, intent: BoroughIntent): string {
   if (intent === 'service') {
-    return `Elmhurst and Quidos accredited EPC assessor covering ${name}. Guide prices from £${priceFrom.epc}, set by internal floor area, with your exact quote confirmed before booking.`
+    return `Elmhurst and Quidos accredited EPC assessor covering ${name}. From £${priceFrom.epc}, set by floor area, with your exact quote confirmed before booking.`
   }
-  return `EPC cost in ${name}: guide prices from £${priceFrom.epc}, set by internal floor area. Elmhurst and Quidos accredited assessor, exact quote before booking.`
+  return `EPC cost in ${name}: from £${priceFrom.epc}, set by floor area. Elmhurst and Quidos accredited assessor, exact quote before booking.`
 }
 
 function boroughFaq(name: string, postcodeFaq: { q: string; a: string }): FaqItem[] {
@@ -124,7 +124,7 @@ export default async function BoroughPage({ params }: PageProps) {
 
   if (!data) notFound()
 
-  // Rebuilt template (pilot: Stratford, Newham, Croydon). Title and H1 are unchanged until 14/12.
+  // Rebuilt template (pilot: Stratford, Newham, Croydon). Title and H1 are unchanged until the 14/12 review (done 08/11/2026, brought forward).
   if (usesAreaV2(slug)) return <AreaPageV2 slug={slug} />
 
   const parentBorough = data.partOf ? boroughMeta[data.partOf] : undefined

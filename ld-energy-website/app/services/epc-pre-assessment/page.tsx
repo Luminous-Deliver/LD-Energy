@@ -21,16 +21,16 @@ import '../services.css'
  * 29/09/2026 answers (Abdul-2 references/epc-audit-and-scheme-rules.md): unlodged it is not an EPC and isn't insured; it
  * can be lodged as the EPC within 3 months as is, or up to 18 months with the homeowner's letter; it must not be
  * presented as a retrofit assessment. No Our promise here: its first promise is about lodgement, and this is not lodged.
- * Title and descriptions stay frozen until 14/12; only the H1 changes. Section ids kept.
+ * Title and descriptions stay frozen until the 14/12 review (done 08/11/2026, brought forward); only the H1 changes. Section ids kept.
  * Parity: Abdul-2 projects/ld-energy-redesign-2026-10/research/epc-pre-assessment-parity-2026-10-24.md
  */
 const LODGE_LATER = `£${site.addOns.lodgeLater}`
 const FROM_PRICE = `£${priceFrom.preAssessment}`
 
 export const metadata: Metadata = {
-  title: `EPC Pre-Assessment London | Your Score Without Lodging It | From ${FROM_PRICE}`,
+  title: `EPC Pre-Assessment London | From ${FROM_PRICE}`,
   description:
-    `Find out what your London property would score before anything goes on the public register. A full survey by an accredited assessor, deliberately not lodged, with a written improvement plan included. From ${FROM_PRICE}.`,
+    `See what your London home would score before anything goes on the public register. A full assessment, not lodged, with a written improvement plan. From ${FROM_PRICE}.`,
   alternates: { canonical: `${site.url}/services/epc-pre-assessment` },
   openGraph: {
     images: [defaultOgImage],

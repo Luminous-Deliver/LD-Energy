@@ -1,4 +1,38 @@
 /** @type {import('next').NextConfig} */
+/**
+ * /blog moved to /guides on 04/11/2026 (plan PLAN-AREAS-GUIDES-2026-10-22 §12). Every old URL answers with a
+ * single permanent redirect to its final address: merged posts and category pages are listed before the
+ * `/blog/:slug` pattern because Next uses the first rule that matches, so none of them chains through it.
+ * Keep indefinitely.
+ */
+const GUIDE_MERGES = {
+  'what-happens-during-epc-assessment': 'prepare-for-epc-assessment',
+  'mees-regulations-2026': 'epc-for-landlords-2026',
+  'mees-timeline-2026-2030': 'epc-c-by-2030',
+  'epc-improvements-by-budget': 'cheapest-ways-improve-epc',
+}
+const CATEGORY_GROUPS = {
+  'epc-basics': 'understand-your-epc',
+  'for-landlords': 'letting-and-mees',
+  regulations: 'letting-and-mees',
+  improvements: 'improving-your-rating',
+  'for-sellers': 'selling-buying-and-floor-plans',
+}
+const guideRedirects = [
+  ...Object.entries(CATEGORY_GROUPS).map(([cat, group]) => ({
+    source: `/blog/category/${cat}`,
+    destination: `/guides#${group}`,
+    permanent: true,
+  })),
+  { source: '/blog/category', destination: '/guides', permanent: true },
+  ...Object.entries(GUIDE_MERGES).flatMap(([from, to]) => [
+    { source: `/blog/${from}`, destination: `/guides/${to}`, permanent: true },
+    { source: `/guides/${from}`, destination: `/guides/${to}`, permanent: true },
+  ]),
+  { source: '/blog', destination: '/guides', permanent: true },
+  { source: '/blog/:slug', destination: '/guides/:slug', permanent: true },
+]
+
 const nextConfig = {
   reactStrictMode: true,
   images: {
@@ -26,6 +60,7 @@ const nextConfig = {
    */
   async redirects() {
     return [
+      ...guideRedirects,
       {
         // Renamed 2026-09-09 when the £15 retrofit consultation became the £35
         // EPC Improvement Plan. Keep indefinitely — external links and search

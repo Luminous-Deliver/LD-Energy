@@ -1,7 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { site, boroughs } from '@/lib/site'
-import { getAllPosts, getPostsByCategory } from '@/lib/blog'
-import { categories } from '@/lib/blog-categories'
+import { getAllPosts } from '@/lib/blog'
 
 const staticRoutes: Array<{ path: string; priority: number; changeFreq: MetadataRoute.Sitemap[number]['changeFrequency'] }> = [
   { path: '/',                        priority: 1.0, changeFreq: 'weekly'  },
@@ -21,7 +20,7 @@ const staticRoutes: Array<{ path: string; priority: number; changeFreq: Metadata
   { path: '/about',                   priority: 0.6, changeFreq: 'monthly' },
   { path: '/quote',                   priority: 0.8, changeFreq: 'monthly' },
   { path: '/contact',                 priority: 0.7, changeFreq: 'monthly' },
-  { path: '/blog',                    priority: 0.8, changeFreq: 'weekly'  },
+  { path: '/guides',                    priority: 0.8, changeFreq: 'weekly'  },
   { path: '/privacy-policy',          priority: 0.3, changeFreq: 'yearly'  },
   { path: '/terms',                   priority: 0.3, changeFreq: 'yearly'  },
 ]
@@ -47,7 +46,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const postPages = posts.map((post) => {
     const dateStr = post.updatedAt || post.publishedAt
     return {
-      url: `${site.url}/blog/${post.slug}`,
+      url: `${site.url}/guides/${post.slug}`,
       // Omit rather than fabricate a date if a post is somehow missing both —
       // frontmatter should always set publishedAt, but don't emit an Invalid Date if not.
       ...(dateStr ? { lastModified: new Date(dateStr) } : {}),
@@ -56,18 +55,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   })
 
-  // Mirror the category page's own noindex rule (app/blog/category/[category]/page.tsx):
-  // don't submit a category to the sitemap while Google is being told not to index it.
-  const categoriesWithPosts = await Promise.all(
-    categories.map(async (cat) => ({ cat, count: (await getPostsByCategory(cat.slug)).length }))
-  )
-  const categoryPages = categoriesWithPosts
-    .filter(({ count }) => count > 0)
-    .map(({ cat }) => ({
-      url: `${site.url}/blog/category/${cat.slug}`,
-      changeFrequency: 'weekly' as const,
-      priority: 0.5,
-    }))
-
-  return [...static_, ...boroughPages, ...postPages, ...categoryPages]
+  // Category pages were removed 04/11/2026 (plan §12); they 301 to their group on /guides.
+  return [...static_, ...boroughPages, ...postPages]
 }

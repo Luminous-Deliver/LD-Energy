@@ -117,7 +117,7 @@ export function EvidenceGuide() {
           . Bringing paperwork does not guarantee a better result — it just means a genuine
           improvement is less likely to go uncredited.{' '}
           <Link
-            href="/blog/prepare-for-epc-assessment"
+            href="/guides/prepare-for-epc-assessment"
             className="font-semibold text-primary-700 underline underline-offset-2 hover:text-primary-800"
           >
             Read the full preparation and evidence guide

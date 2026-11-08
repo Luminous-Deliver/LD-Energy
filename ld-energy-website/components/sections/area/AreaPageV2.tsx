@@ -78,7 +78,7 @@ function sharedFaqs(name: string): FaqItem[] {
 async function readNextSteps(name: string, s: AreaSummary): Promise<NextStep[]> {
   const guide = async (slug: string, kicker: string, img: string, text: string): Promise<NextStep | null> => {
     const p = await getPostBySlug(slug)
-    return p ? { kicker, title: p.title, text, href: `/blog/${slug}`, img, meta: `${p.readingTime} min read` } : null
+    return p ? { kicker, title: p.title, text, href: `/guides/${slug}`, img, meta: `${p.readingTime} min read` } : null
   }
   const first = s.pctLettings >= s.pctSales
     ? await guide('epc-for-landlords-2026', 'Letting and MEES', '/inner/rn-landlord.svg', 'The rules for letting today.')

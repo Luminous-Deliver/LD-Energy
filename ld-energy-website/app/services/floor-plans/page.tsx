@@ -22,12 +22,12 @@ import '../services.css'
 /*
  * /services/floor-plans, rebuilt 24/10/2026 on the inner-page parts, as /services/domestic-epc: the floor plan column of
  * the price list as a title block, the RICS disclaimer wherever a plan is offered, the saving against booking separately
- * from bundleSaving(). Title and descriptions stay frozen until 14/12; only the H1 changes. Section ids kept.
+ * from bundleSaving(). Title and descriptions stay frozen until the 14/12 review (done 08/11/2026, brought forward); only the H1 changes. Section ids kept.
  * Parity: Abdul-2 projects/ld-energy-redesign-2026-10/research/floor-plans-parity-2026-10-24.md
  */
 export const metadata: Metadata = {
   title: `Property Floor Plans London | From £${priceFrom.floorPlan}`,
-  description: `Professional property floor plans across London. Laser-measured, high-resolution files for estate agents. Guide prices from £${priceFrom.floorPlan}, better value when booked alongside an EPC.`,
+  description: `Property floor plans across London. Laser-measured, high-resolution files for estate agents. From £${priceFrom.floorPlan}, better value booked with an EPC.`,
   alternates: { canonical: `${site.url}/services/floor-plans` },
   openGraph: {
     images: [defaultOgImage],

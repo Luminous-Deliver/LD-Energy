@@ -24,7 +24,7 @@ export async function FromTheBlog() {
           </p>
         </div>
         <Link
-          href="/blog"
+          href="/guides"
           className="inline-flex min-h-[44px] items-center gap-1.5 text-sm font-semibold text-primary-700 transition-colors hover:text-primary-800"
         >
           Read all guides
@@ -36,11 +36,11 @@ export async function FromTheBlog() {
         {posts.map((post, idx) => (
           <Link
             key={post.slug}
-            href={`/blog/${post.slug}`}
+            href={`/guides/${post.slug}`}
             className={cn(
               'group flex flex-col rounded-2xl border border-secondary-200 bg-white p-5 transition-all hover:border-primary-300 hover:shadow-premium',
               // Lowest-intent content on the page: one guide on phones, all three
-              // from tablet up. The full list is one tap away at /blog.
+              // from tablet up. The full list is one tap away at /guides.
               idx > 0 && 'hidden md:flex',
             )}
           >
