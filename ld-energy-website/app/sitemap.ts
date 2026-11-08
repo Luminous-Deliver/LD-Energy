@@ -18,7 +18,7 @@ const staticRoutes: Array<{ path: string; priority: number; changeFreq: Metadata
   { path: '/faq',                     priority: 0.7, changeFreq: 'monthly' },
   { path: '/preparing-for-your-epc',  priority: 0.6, changeFreq: 'monthly' },
   { path: '/about',                   priority: 0.6, changeFreq: 'monthly' },
-  { path: '/quote',                   priority: 0.8, changeFreq: 'monthly' },
+  // /quote is noindex since 08/11/2026 (see app/quote/page.tsx), so it stays out of the sitemap.
   { path: '/contact',                 priority: 0.7, changeFreq: 'monthly' },
   { path: '/guides',                    priority: 0.8, changeFreq: 'weekly'  },
   { path: '/privacy-policy',          priority: 0.3, changeFreq: 'yearly'  },
