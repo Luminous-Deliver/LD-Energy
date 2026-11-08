@@ -119,19 +119,21 @@ html { font-synthesis-weight: none; }
 /* L1 (Abdul 23/10/2026, "Quieter, same lockup"): house 32 px, name 16 px on desktop so the nav reads as its equal;
    phones keep their size. */
 .lg__mark { display: block; height: 32px; width: auto; flex: none; }
-.lg__words { display: grid; justify-items: start; gap: 7px; margin-left: 10px; }   /* 12 + 7 + 7 = 26: (32 - 26) / 2 is whole */
+/* Tag B (Abdul 08/11/2026, Refero comparison item 6): tagline 9 -> 11 px, tracking .17 -> .14em, so it reads at
+   nav size. 12 + 5 + 9 = 26: (32 - 26) / 2 is whole. Was gap 7, tag 9/7 px. */
+.lg__words { display: grid; justify-items: start; gap: 5px; margin-left: 10px; }
 .lg__name, .lg__tag { text-transform: uppercase; white-space: nowrap; }
 /* option 2 (Abdul 23/10/2026, premium board): L&D Bold 700, ENERGY Regular 400, same tracking; was one weight, 600 */
 .lg__name b, .pill__home b { font-weight: 700; }
 .lg__name { --t: .06em; font: 400 16px/12px var(--font-sans); letter-spacing: var(--t); margin-right: calc(-1 * var(--t)); color: var(--ink); }
-.lg__tag { --t: .17em; font: 600 9px/7px var(--font-sans); letter-spacing: var(--t); margin-right: calc(-1 * var(--t)); color: var(--sage-700); }
+.lg__tag { --t: .14em; font: 600 11px/9px var(--font-sans); letter-spacing: var(--t); margin-right: calc(-1 * var(--t)); color: var(--sage-700); }
 /* P1 (Abdul 23/10/2026, "P1 · smaller"): phones take L1's proportions so phone and desktop match, house 28 px,
-   name 14.5 px. 11 + 5 + 6 = 22: (28 - 22) / 2 is whole. Was house 33 px, name 17 px. */
+   name 14.5 px. Tag B: 11 + 6 + 9 = 26: (28 - 26) / 2 is whole. Was gap 5, tag 8.5/6 px .16em; house 33 px,
+   name 17 px before that. */
 @media (max-width: 759px) {
   .lg__mark { height: 28px; }
-  .lg__words { gap: 5px; margin-left: 9px; }
+  .lg__words { gap: 6px; margin-left: 9px; }
   .lg__name { font-size: 14.5px; line-height: 11px; }
-  .lg__tag { font-size: 8.5px; line-height: 6px; --t: .16em; }
 }
 
 /* --------------------------------------------------------------- phone menu -- */
